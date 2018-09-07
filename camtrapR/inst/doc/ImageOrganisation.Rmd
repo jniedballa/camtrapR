@@ -1,0 +1,378 @@
+---
+title: "Organising raw camera trap images in camtrapR"
+author: Juergen Niedballa (<niedballa@izw-berlin.de>)
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    fig_width: 6
+    fig_height: 5
+vignette: >
+  %\VignetteIndexEntry{1. Raw camera trap image organisation}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
+# Introduction
+
+
+**camtrapR** provides functions for organising and managing camera trap images and for the preparation of occupancy and (spatial) capture-recapture analyses. Currently the package handles JPG images only. Because of inconsistent metadata structure, there is no support for video files yet. 
+
+The vignettes demonstrate the **camtrapR** workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
+
+```{r eval = TRUE}
+library(camtrapR)
+```
+
+
+## Workflow
+
+The workflow in camptrapR is made up of a number of function that build upon one another in a logical sequence. Here is a list of function grouped by work steps in the order in which they should be run. Details on all functions are provided below, in the other vignettes and the function help files.
+
+* Organising raw images
+1. `createStationFolders`
+1. `fixDateTimeOriginal` (only if necessary)
+1. `timeShiftImages` (only if necessary)
+1. `imageRename`
+1. `addCopyrightTag`
+
+* Species identification and data extraction
+1. `checkSpeciesNames`
+1. `createSpeciesFolders`
+1. `checkSpeciesIdentification`
+1. `appendSpeciesNames`
+1. `exifTagNames` 
+1. `recordTable`
+
+* Data exploration and visualisation (species-level)
+1. `detectionMaps`
+1. `activityHistogram`
+1. `activityDensity`
+1. `activityRadial`
+1. `activityOverlap`
+1. `surveyReport`
+
+* Individual identification and data extraction
+1. `getSpeciesImages`
+1. `recordTableIndividual`
+
+* Preparing input for subsequent analyses
+1. `cameraOperation`
+1. `detectionHistory` (for occupancy analyses)
+1. `spatialDetectionHistory	` (for spatial capture-recapture analyses)
+
+
+## General sampling situation
+
+camtrapR was designed for camera trapping surveys in which an array of camera trap stations (each consisting of one or more camera traps per station) is operated in a study area. The vignettes will provide a guideline for how to use camtrapR in different sampling situations. 
+
+
+## Nomenclature
+
+To facilitate understanding here is a glossary on how we use specific terms. It is standard camera trapping nomenclature.
+
+*  station: a station is a locality containing one or more camera traps (often a pair of two) 
+*  camera trap: refers to the individual camera unit. One or more (often two) constitute a station
+*  occasion: a distinct sampling event of 1 or more days
+*  effort: number of active trapping days per station and occasion
+
+## ExifTool
+
+camtrapR relies on the free and open-source software **ExifTool** written by Phil Harvey to extract metadata from images. ExifTool is freely available [here](http://www.sno.phy.queensu.ca/~phil/exiftool/) and runs on Windows, Linux and MacOS. In order to use it, your system must be able to find the software. On MacOS, Linux and Unix it needs installation and should afterwards be found by the system without problems. How to set up Exiftool for Windows is detailed below. General installation instruction can be found [here]( http://www.sno.phy.queensu.ca/~phil/exiftool/install.html).
+
+### ExifTool for Windows
+
+On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found [here]( http://www.sno.phy.queensu.ca/~phil/exiftool/install.html). Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained .exe file to exiftool.exe and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in Window's PATH variable (e.g. C:/Windows). 
+
+
+```{r eval = FALSE}
+# Check which directories are in PATH (not shown here)
+Sys.getenv("PATH")
+```
+
+```{r}
+# Check if the system can find ExifTool
+Sys.which("exiftool")
+```
+
+If exiftool.exe cannot be placed in a PATH directory (e.g. due to limited user privileges), users can place exiftool.exe in any directory and then add that directory to PATH temporarily for use in the running R session using the function `exiftoolPath`. This is necessary if the directory containing exiftool.exe is not in PATH by default.
+
+```{r}
+# this is a dummy example assuming the directory structure: C:/Path/To/Exiftool/exiftool.exe
+exiftool_dir <- "C:/Path/To/Exiftool"        
+exiftoolPath(exiftoolDir = exiftool_dir)
+```
+Afterwards, Windows (via R) should be able to find ExifTool during the active session.
+
+### ExifTool performance
+
+ExifTool is the performance bottleneck of the package functions. It can extract metadata at a rate of about 160 images per second (approx. 10,000 images per minute, measured on a laptop computer running Windows 7, Intel Core i5-2410M / 2.3 GHz, 6 GB RAM). Performance tends to be lower when ExifTool is first called and increases afterwards; and it decreases in situations with numerous camera trap stations with few images each (because ExifTool is called separately on every station directory). 
+
+In a future release, we plan to offer support for the metadata extraction library Exiv2. Preliminary test showed that performance increased 2-3 fold.
+
+# Camera trap station information
+
+Before looking at how images are handled, let's first familiarise ourselves with how information about camera trap stations are stored. Camera trap station information are tabulated in a simple data frame with 1 row per station (if there was 1 camera per station) or 1 row per camera (if there was more than 1 camera per station). Information to be stored in this table are: station (and camera) IDs, geographic coordinates, setup and retrieval dates and possible dates when camera were not operational (because of malfunction, animal interference, empty batteries, full memory cards etc.). The table can be generated standard spreadsheet software and loaded into R.
+
+
+```{r}
+# here is a sample camera trap station table
+data("camtraps")
+camtraps
+```
+
+Note that the sample data contain only one camera per station. Thus, there is no need to differentiate between station and camera IDs. If there was more than one camera per station, an additional column for camera IDs would be needed. Consequently, there would be one row for each camera and thus several rows per station.
+
+## Station / Camera IDs
+
+Station and camera IDs can be any combination of characters and numbers. Please don't use underscores though, and more specifically, don't use double underscores (\"__\"), as these are used in a number of functions to separate bits of information (e.g. in file names created by `imageRename` or row names in `cameraOperation`).
+
+## Column names
+
+Column names are not prescribed to allow users freedom in naming their data the way they wish (with one exception detailed below). In the sample table, 'Station' contains station IDs, 'utm_y' and 'utm_x' contain the station's geographic coordinates. 'Setup_date' and 'Retrieval_date' are the dates the stations were set up and retrieved from the field. All of these may have user-defined names. 'Problem1_from' and 'Problem1_to' are optional columns to specify periods in which cameras/stations were not operational.  Additional pairs of columns such as 'Problem2_from' and 'Problem2_to' etc. can be added if cameras/stations malfunctioned repeatedly. Their names must follow the pattern given here.
+
+## Date format
+All dates in this table (setup, retrieval and problem columns) should be of data type \"character\" and can be formatted in any way that function `as.Date` can interpret. **camtrapR** by default assumes the standard format \"YYYY-MM-DD\", e.g. \"2015-12-31\", and we recommend to use that format (it is also best for sorting by date). In any case, date format must be consistent between the date columns.
+
+Two functions (`cameraOperation`, `surveyReport`) utilize these date information and therefore contain arguments to specify the date format (`dateFormat` and `CTDateFormat`, respectively). Internally, these arguments are passed to function `as.Date` as  argument `format` and are needed to interpret the character string (e.g. \"2015-12-31\") provided in the table as a date. Details on how to set it correctly can be found in the Details section of the help files of functions `as.Date` and `strptime` or [here]( http://www.r-bloggers.com/date-formats-in-r/).
+
+Here are a few examples for December 1st 2015 (\"generic\" is the abstract representation of your date string (Y = year, M = month, D = day), \"example\" is a formatted example and \"dateFormat argument\" is what you'd specify in `dateFormat` and `CTDateFormat`):
+
+generic  | example  | dateFormat argument  |
+|---|---|---|
+\"YYYY-MM-DD\" | \"2015-12-01\" |  \"%Y-%m-%d\"   |
+\"YYYY/MM/DD\" |\"2015/12/01\" |  \"%Y/%m/%d\"  |
+\"YYYY/MM/DD\" |\"2015/12/1\" |  \"%Y/%m/%d\"  |
+\"MM/DD/YY\" |\"12/01/15\" |   \"%m/%d/%y\" |
+\"YYYYMMDD\" |\"20151201\" | \"%Y%m%d\"  |
+\"DD.MM.YY\" |\"1.12.15\" | \"%d.%m.%y\"  |
+\"DD-MMM-YY\" |\"01-Dec-15\" | \"%d-%b-%y\"  |
+
+
+In the sample table (`camtraps`), we use another date format for demonstration purposes. 
+
+
+Data type of the ID and date columns in the table must be `character` or `factor`. Please don't use data type `Date`. You can turn data type `Date` into `character` using `as.character`.
+
+
+## Station-/ Camera-level covariates
+
+If needed, station-/camera-level covariates can be specified in this table, e.g. trail or habitat type, camera model etc. They can later be used as covariates, e.g. in occupancy models. 
+
+# Organising raw camera trap images
+
+
+After collecting images from camera traps, the images are saved into a directory structure like this:
+
+>rawImages/stationA
+
+>rawImages/stationB
+
+If there was more than 1 camera per station, the station directories must contain camera subdirectories, e.g.
+
+>rawImages/stationA/camera1
+
+>rawImages/stationA/camera2
+
+If you have more than 1 camera per station but don't separate the images from different cameras at this stage, you will not be able to do so at a later point. Later in the workflow, you can decide whether you would like to keep them separate or merge them (in the function `imageRename`).
+
+Generally, you should not work on your raw data and instead keep them as a backup. If you rename you images with `imageRename`, whole camtrapR workflow will take place in a copy of the images to prevent data loss.
+
+Another important point is not to save any other data besides images in image directories. It may interfere with the operation of the package and ExifTool.
+
+## Saving raw images on your hard disk
+
+The directories for the raw images can be created automatically using the function `createStationFolders` and the camera trap station table. As mentioned above, images can either be stored in station directories (if there was 1 camera per station) or in station/camera directories (if there was >1 camera per station).  The behaviour is controlled by the function argument `cameras`. It specifies the camera ID column in the camera trap information table. if it is defined, camera subdirectories will be created within the station directories.
+
+Here is an example in which station directories without camera subdirectories are created. 
+
+```{r}
+# create a temporary dummy directory for tests
+# (normally, you'd set up an empty directory in a proper place, e.g. .../myStudy/rawImages)
+wd_createStationDir <- file.path(tempdir(), "createStationFoldersTest")
+
+# create station directories in  wd_createStationDir
+StationFolderCreate1 <- createStationFolders (inDir       = wd_createStationDir,
+                                              stations    = as.character(camtraps$Station), 
+                                              createinDir = TRUE)
+  
+StationFolderCreate1
+
+```
+
+**IMPORTANT:** Please note that in this vignette station directories are set up in a temporary directory. That does not make any sense in real life and is done here solely to demonstrate how the functions works. So please don't do this at home! Instead, always work in permanent directories!
+
+Once the directories are created, you can copy over your images from the memory cards. 
+
+## Shifting date and time of images
+
+There are situations in which the date and time of your images may be incorrect. Imagine you forgot to set the system time in one of your cameras or reset the time accidentally. Or think of a bug in the camera software that causes years to be wrong as happened in the cameras of a major manufacturer at the turn of the year 2015/2016. Another situation in which images times may need a little shift is when users wish to synchronise the record times between camera pairs.
+
+In any case, systematic offsets of date and time recorded by cameras can be corrected easily. The function `timeShiftImages` does just that by utilising the date/time shift module of ExifTool. All you need is a table containing the time offset in a certain format, i.e.
+
+```{r}
+data(timeShiftTable)
+timeShiftTable
+```
+There is a `station` column with station IDs, `camera` is NA because there was 1 camera per station only in our example, `timeshift` is the amount by which to shift the time of all images at that station, and `sign` specifies the direction in which to shift time. Setting `sign` to `+` sets image time ahead by the amount specified in `timeshift`, `-` sets image times back. `timeshift` format is \"year:month:day hour:minute:second\", i.e. \"1:0:0 0:0:0\" is a shift of exactly 1 year and \"0:0:0 12:10:01\" 12 hours and 10 minutes and 1 second. In the above table, time stampes of images taken at StationA are shifted back by 1 year, and images taken at StationB are shifted ahead by 12 hours.
+
+The function `timeShiftImages` should be run directly after saving the raw images on the hard disk. 
+
+
+```{r}
+# copy sample images to another location (so we don't mess around in the package directory)
+wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")
+file.copy(from = wd_images_raw, to = tempdir() , recursive = TRUE)
+wd_images_raw_copy <- file.path(tempdir(), "raw_images")
+
+timeshift_run <- timeShiftImages(inDir                = wd_images_raw_copy,
+                                 timeShiftTable       = timeShiftTable,
+                                 stationCol           = "Station",
+                                 hasCameraFolders     = FALSE,
+                                 timeShiftColumn      = "timeshift",
+                                 timeShiftSignColumn  = "sign"
+)
+
+timeshift_run
+
+```
+
+ExifTool has now updated the time tag of all images in the directories specified in the `timeShiftTable`. The original images are preserved as XYZ.JPG_original files (XYZ being the original file name). By setting argument `undo = TRUE`, the orginals are restored and the modified images are deleted. The function will check if the number of JPG_original files and JPG files in folders is identical. If not, the function will not work. It does not check for consistency of file names. 
+
+```{r}
+timeshift_undo <- timeShiftImages(inDir               = wd_images_raw_copy,
+                                 timeShiftTable       = timeShiftTable,
+                                 stationCol           = "Station",
+                                 hasCameraFolders     = FALSE,
+                                 timeShiftColumn      = "timeshift",
+                                 timeShiftSignColumn  = "sign",
+                                 undo                 = TRUE
+)
+
+timeshift_undo
+```
+
+<!--  ## Date/Time problems with Reconyx Hyperfire and Maginon cameras -->
+## Date/Time problems with Reconyx Hyperfire cameras
+
+<!--  ### Date/Time problems with Reconyx Hyperfire cameras -->
+
+Some Reconyx Hyperfire cameras (e.g. Hyperfire HC500) don't store date and time in the standard Exif format. Consequently, camtrapR cannot read the DateTimeOriginal tag from these images. This can be fixed easily by using the camtrapR function `fixDateTimeOriginal` or by following the instructions given by Mathias Tobler in the CameraBase documentation (page 7):
+
+http://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf
+
+<!-- ### Date/Time problems with Maginon cameras -->
+
+<!-- Camera trap model Maginon WK1 (and possibly also other models my this manufacturer) also don't store date and time in the standard Exif format, but in a different way compared to Reconyx HC500, hence the `fixDateTimeOriginal` doesn't work on these (currently).  -->
+
+<!-- Maginon cameras don't create the DateTimeOriginal tag of the Exif metadata that camtrapR reads out. The best alternative available is the Exif Modify Date, which corresponds to the date and time in the images + 1 second. (DateTimeOriginal seems to be the shutter time and ModifyDate is the time the image was saved). To make things worse, there also seems to be some metadata problems in JPGs created by these cameras whch prevent exiftool from simply copying the relevant information into the right tag (technical note: exiftool gives an error about "bad format for EXIFIFD entry"). For more information see here: http://owl.phy.queensu.ca/~phil/exiftool/faq.html#Q20. -->
+
+<!-- Currently, there is no camtrapR solution to fix this automatically, but here is a command line way to fix this. Please contace me if such a function in camtrapR would be relevant for you so I can add it. -->
+
+<!-- The general workflow and exiftool commands are these. Adapt the file path to your directory structure (the "C:\Path\to\your\images" part). -->
+
+<!-- **WARNING 1:** Make a backup of your data before doing this to prevent data loss! -->
+
+<!-- **WARNING 2:** Only run this on directories that contain faulty images taken by Maginon cameras! Data loss may occur if these lines are run on healthy images! Also be aware of subfolders from  -->
+
+<!-- 1. Fix the metadata problems -->
+<!-- ```{r eval = FALSE} -->
+<!-- exiftool -all= -tagsfromfile @ -all:all -unsafe -icc_profile "C:\Path\to\your\images" -->
+<!-- ``` -->
+
+<!-- 2. Create a DateTimeOriginal tag from the ModifyDate tag -->
+<!-- ```{r eval = FALSE} -->
+<!-- exiftool "-EXIF:DateTimeOriginal<EXIF:IFD0:ModifyDate" "C:\Path\to\your\images" -->
+<!-- ``` -->
+
+<!-- 3. If satisfied with the results, you can delete the original data which exiftool saved as ".JPG_original" files with the following line. Alternatively, delete them manually. -->
+<!-- ```{r eval = FALSE} -->
+<!-- exiftool -delete_original "C:\Path\to\your\images" -->
+<!-- ``` -->
+
+<!-- If you wish to run these command recursively, i.e. on all images contained in all subfolders of the specified directory, it can be achieved using the "-r" argument. The resulting commands are these: -->
+
+<!-- ```{r eval = FALSE} -->
+<!-- exiftool -all= -tagsfromfile @ -all:all -unsafe -icc_profile -r "C:\Path\to\your\images" -->
+<!-- exiftool "-EXIF:DateTimeOriginal<EXIF:IFD0:ModifyDate" -r "C:\Path\to\your\images" -->
+<!-- exiftool -delete_original -r "C:\Path\to\your\images" -->
+<!-- ``` -->
+
+## Renaming images
+
+Raw images are copied from the raw image directories into a new location and renamed at the same time. The renamed file names follow this pattern (depending on whether there was one or more cameras per station):
+
+>StationID__Date__Time(X).JPG
+
+>StationID__CameraID__Date__Time(X).JPG 
+
+Station ID and camera ID are derived from the raw image directory structure created earlier with `createStationFolders` Date and time are taken from image Exif metadata (read using ExifTool). (X) is a numeric identifier that is assigned to all images taken at the same station (and camera, if applicable) within one minute. This is to avoid identical image names if images were taken in the same second (or in the same minute, if cameras record time in hours and minutes only).
+
+Again, please be aware that temporary directories are used in the example. Set `outDir` to a permanent directory.
+In addition, images are not actually copied (argument `copyImages = FALSE`), but copying and renaming is mererly simulated in out example). So, in real world data, set `copyImages = TRUE`.
+
+```{r}
+ # raw image location
+wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")      
+  # destination for renamed images to be copied to
+wd_images_raw_renamed <- file.path(tempdir(), "raw_images_renamed")       
+
+renaming.table2 <- imageRename(inDir               = wd_images_raw,
+                               outDir              = wd_images_raw_renamed,       
+                               hasCameraFolders    = FALSE,
+                               copyImages          = FALSE
+  )
+
+# here is the information for a few images 
+head(renaming.table2)
+```
+
+So, the first image, \"IMG0001.JPG\" was renamed to \"StationA__2009-04-10__05-07-00(1).JPG\". Here is what the columns mean:
+
+
+| column     | content     |
+|-------|-------------------------------------------------------------|
+| `Directory` | the raw image directory  |
+| `FileName`   |  raw image file name |
+| `Station`   |   the station the image was taken at |
+| `Camera`     | the camera ID (here NA because there were no camera subdirectories )  |
+| `DateTimeOriginal` |  Date and time in R-readable format  |
+| `DateReadable`  |  whether the date could be read from the metadata or not (TRUE = yes)  |
+| `outDir`     |  the directory the renamed image was copied to |
+| `filename_new` | the new file name |
+| `CopyStatus` |  whether the images was copied successfully (TRUE = yes) |
+
+
+At this point you created a copy of your raw images and renamed them. 
+
+## Writing a copyright tag into image metadata
+
+The function `addCopyrightTag` can write a copyright tag into image Exif metadata. While this can be useful when sharing or publishing data, it is not required in the camtrapR workflow. The function will recursively find all images in `inDir` and its subdirectories and writes a user-defined text into the Copyright field of the Exif metadata. 
+
+In doing so, Exiftool normally keeps the original images as .JPG_original files. Note that this behaviour will instantly double the number of images in inDir and the disk space required. If this is not desired, users can set the function argument `keepJPG_original = FALSE` (default is `TRUE`) in order to replace the original files without creating .JPG_original files. I recommend to first try this on a subdataset and to then check the function output. If there are warnings like \"Warning: [minor] Maker notes could not be parsed\" image makernotes may be unreadable afterwards (background to this can be found [here](http://exiv2.org/makernote.html)). On the other hand, you may never need these for analysing camera trapping data.
+
+
+```{r}
+# copy sample images to temporary directory (so we don't mess around in the package directory)
+wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
+file.copy(from = wd_images_ID, to = tempdir(), recursive = TRUE)
+wd_images_ID_copy <- file.path(tempdir(), "sample_images")
+
+# define an example copyright tag
+copyrightTagToAdd <- "Your Name (Your Organisation)"
+
+# write the tag to images
+addCopyrightTag(inDir        = wd_images_ID_copy, 
+                copyrightTag = copyrightTagToAdd, 
+                askFirst     = FALSE)                  # askFirst = FALSE prevents function from asking user to confirm action (which doesn't work in vignettes)
+
+
+# you can check the outcome with function exifTagNames (you'll find field "Copyright" in line 20)
+exifTagNames(wd_images_ID_copy, returnMetadata = TRUE)
+```
+
+The copyright tag will henceforth be visible in digiKam and other image management software.
+
+
+Now that the raw images are organised, the next step is species identification covered in the next vignette.

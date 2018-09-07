@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Juergen Niedballa (niedballa@izw-berlin.de)" />
+
+<meta name="date" content="2017-10-25" />
+
+<title>Extracting Data from Camera Trapping Images</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Extracting Data from Camera Trapping Images</h1>
+<h4 class="author"><em>Juergen Niedballa (<a href="mailto:niedballa@izw-berlin.de">niedballa@izw-berlin.de</a>)</em></h4>
+<h4 class="date"><em>2017-10-25</em></h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#tabulating-species-and-individual-records-the-recordtable-functions">Tabulating species and individual records: the recordTable functions</a><ul>
+<li><a href="#recordtable-tabulating-species-records"><code>recordTable</code>: tabulating species records</a><ul>
+<li><a href="#temporal-independence-between-records">Temporal independence between records</a></li>
+<li><a href="#time-zones-and-daylight-saving-time">Time zones and daylight saving time</a></li>
+<li><a href="#independence-between-cameras-within-stations">Independence between cameras within stations</a></li>
+<li><a href="#ignoring-species">Ignoring species</a></li>
+<li><a href="#extracting-image-metadata">Extracting image metadata</a></li>
+</ul></li>
+<li><a href="#recordtableindividual-tabulating-individuals-of-a-species"><code>recordTableIndividual</code>: tabulating individuals of a species</a><ul>
+<li><a href="#extracting-custom-image-metadata">Extracting custom image metadata</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#camera-operation">Camera Operation</a><ul>
+<li><a href="#saving-and-loading-camera-operation-matrices">Saving and loading camera operation matrices</a></li>
+</ul></li>
+<li><a href="#input-for-subsequent-analyses">Input for subsequent analyses</a><ul>
+<li><a href="#occupancy-analyses">Occupancy analyses</a><ul>
+<li><a href="#handling-of-incomplete-occasions">Handling of incomplete occasions</a></li>
+<li><a href="#saving-and-loading-detection-histories">Saving and loading detection histories</a></li>
+</ul></li>
+<li><a href="#spatial-capture-recapture-analyses">Spatial Capture-Recapture analyses</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(camtrapR)</code></pre></div>
+<div id="tabulating-species-and-individual-records-the-recordtable-functions" class="section level1">
+<h1>Tabulating species and individual records: the recordTable functions</h1>
+<p>There are 2 function to tabulate species records after identification of species from images:</p>
+<ul>
+<li><code>recordTable</code> tabulates records of all images after species-level identification and</li>
+<li><code>recordTableIndividual</code> tabulates individuals of one species.</li>
+</ul>
+<p>Nevertheless, the underlying idea is the same. For each image, the date and time it was taken are read from the image’s Exif metadata using ExifTool. Species or individual ID are read from the directory structure or image metadata (see vignette “Species and Individual Identification”).</p>
+<div id="recordtable-tabulating-species-records" class="section level2">
+<h2><code>recordTable</code>: tabulating species records</h2>
+<p><code>recordTable</code> is typically run after identifying species from images. It reads species IDs from the directory structure the images are placed in or from image metadata tags.</p>
+<p>First we define the directory containing our renamed, identified images</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># find the directory with sample images contained in the package</span>
+wd_images_ID &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;pictures/sample_images&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;camtrapR&quot;</span>, <span class="dt">lib.loc =</span> <span class="kw">.libPaths</span>())</code></pre></div>
+<p>and see how many JPG images we have (this is not necessary, but informative here).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">length</span>(<span class="kw">list.files</span>(wd_images_ID, <span class="dt">pattern =</span> <span class="st">&quot;JPG&quot;</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<pre><code>## [1] 68</code></pre>
+<p>Now we can run <code>recordTable</code>. Here is a minimal example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rec.db.species0 &lt;-<span class="st"> </span><span class="kw">recordTable</span>(<span class="dt">inDir  =</span> wd_images_ID,
+                               <span class="dt">IDfrom =</span> <span class="st">&quot;directory&quot;</span>)</code></pre></div>
+<pre><code>## Warning: timeZone is not specified. Assuming UTC</code></pre>
+<pre><code>## StationA : 8 images</code></pre>
+<pre><code>## StationB : 23 images</code></pre>
+<pre><code>## StationB: removed 6 duplicate records</code></pre>
+<pre><code>## StationC : 37 images</code></pre>
+<pre><code>## StationC: removed 6 duplicate records</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(rec.db.species0)</code></pre></div>
+<pre><code>##    Station Species    DateTimeOriginal       Date     Time delta.time.secs
+## 1 StationA     PBE 2009-04-21 00:40:00 2009-04-21 00:40:00               0
+## 2 StationA     PBE 2009-04-22 20:19:00 2009-04-22 20:19:00          157140
+## 3 StationA     PBE 2009-04-22 20:21:00 2009-04-22 20:21:00             120
+## 4 StationA     PBE 2009-04-23 00:07:00 2009-04-23 00:07:00           13560
+## 5 StationA     PBE 2009-04-23 00:09:00 2009-04-23 00:09:00             120
+## 6 StationA     PBE 2009-05-07 17:11:00 2009-05-07 17:11:00         1270920
+##   delta.time.mins delta.time.hours delta.time.days
+## 1               0              0.0             0.0
+## 2            2619             43.6             1.8
+## 3               2              0.0             0.0
+## 4             226              3.8             0.2
+## 5               2              0.0             0.0
+## 6           21182            353.0            14.7
+##                                                                                                     Directory
+## 1 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 2 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 3 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 4 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 5 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 6 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+##                                FileName
+## 1 StationA__2009-04-21__00-40-00(1).JPG
+## 2 StationA__2009-04-22__20-19-00(1).JPG
+## 3 StationA__2009-04-22__20-21-00(1).JPG
+## 4 StationA__2009-04-23__00-07-00(1).JPG
+## 5 StationA__2009-04-23__00-09-00(1).JPG
+## 6 StationA__2009-05-07__17-11-00(1).JPG</code></pre>
+<p>Argument <code>IDfrom</code> tells the function to look for species directories within the station directories and to take species IDs from these. <code>IDfrom</code> must be set to “metadata” if metadata tagging was used for species identification.</p>
+<p>By default, the function returns all records. Nevertheless, we get a data frame containing 56 records, less than the number of images in the image directory. This is because a number of images were taken at the same time (measured with 1 minute precision by these cameras) and the function removes duplicate records.</p>
+<p>It may suffice to illustrate this with the Pig-tailed macaque images from stationB:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">list.files</span>(<span class="kw">file.path</span>(wd_images_ID, <span class="st">&quot;StationB&quot;</span>, <span class="st">&quot;MNE&quot;</span>))</code></pre></div>
+<pre><code>##  [1] &quot;StationB__2009-04-15__07-21-00(1).JPG&quot;
+##  [2] &quot;StationB__2009-04-15__07-23-00(1).JPG&quot;
+##  [3] &quot;StationB__2009-04-28__17-47-00(1).JPG&quot;
+##  [4] &quot;StationB__2009-04-28__17-47-00(2).JPG&quot;
+##  [5] &quot;StationB__2009-04-28__17-48-00(1).JPG&quot;
+##  [6] &quot;StationB__2009-04-28__17-48-00(2).JPG&quot;
+##  [7] &quot;StationB__2009-04-28__17-48-00(3).JPG&quot;
+##  [8] &quot;StationB__2009-04-28__17-49-00(1).JPG&quot;
+##  [9] &quot;StationB__2009-04-28__17-49-00(2).JPG&quot;
+## [10] &quot;StationB__2009-04-28__17-49-00(3).JPG&quot;</code></pre>
+<p>There are, amongst others, 3 images taken at 17:48:00 on the 28th of April 2009. Of these, only 1 will be returned.</p>
+<p>Here is what the columns of the record table contain:</p>
+<table style="width:97%;">
+<colgroup>
+<col width="11%"></col>
+<col width="86%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>column</th>
+<th>content</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Station</code></td>
+<td>the station the image is from</td>
+</tr>
+<tr class="even">
+<td><code>Species</code></td>
+<td>species name</td>
+</tr>
+<tr class="odd">
+<td><code>DateTimeOriginal</code></td>
+<td>Date and time of record in R-readable format</td>
+</tr>
+<tr class="even">
+<td><code>Date</code></td>
+<td>record date</td>
+</tr>
+<tr class="odd">
+<td><code>Time</code></td>
+<td>record time of day</td>
+</tr>
+<tr class="even">
+<td><code>delta.time.secs</code></td>
+<td>time difference between record and last (independent) record of same species at same station / camera* (in seconds)</td>
+</tr>
+<tr class="odd">
+<td><code>delta.time.mins</code></td>
+<td>time difference between record and last (independent) record of same species at same station / camera* (in minutes)</td>
+</tr>
+<tr class="even">
+<td><code>delta.time.hours</code></td>
+<td>time difference between record and last (independent) record of same species at same station / camera* (in hours)</td>
+</tr>
+<tr class="odd">
+<td><code>delta.time.days</code></td>
+<td>time difference between record and last (independent) record of same species at same station / camera* (in days)</td>
+</tr>
+<tr class="even">
+<td><code>Directory</code></td>
+<td>directory the image is in</td>
+</tr>
+<tr class="odd">
+<td><code>FileName</code></td>
+<td>image file name</td>
+</tr>
+</tbody>
+</table>
+<p>*see below: Independence between cameras within stations</p>
+<div id="temporal-independence-between-records" class="section level3">
+<h3>Temporal independence between records</h3>
+<p>Imagine a species that loves to hang out in front of your cameras. You will end up with hundreds of shots of the same species, maybe even the same animal. Therefore, images can be filtered using an adjustable criterion for temporal independence between subsequent records of the same species in an attempt to remove non-independent records. This is achieved via argument <code>minDeltaTime</code>. It is the minimum time difference (in minutes) between two records of the same species at the same station which are to be considered independent. The default is 0, causing the function to return all records. Setting it to a higher number, e.g. 60 (i.e., 1 hour), is commonly done to thin the number of records. Note that you will not lose records of different species, even if they fall within the specified time interval from a record.</p>
+<p>The argument <code>deltaTimeComparedTo</code> further controls how independence between records is assessed. Setting it to “lastRecord” returns only records taken <code>minDeltaTime</code> minutes after the last record. Setting it to “lastIndependentRecord” returns only records taken <code>minDeltaTime</code> minutes after the last <em>independent</em> record.</p>
+<p>Let’s now apply an 1-hour independence criterion and define a time zone.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rec.db.species60 &lt;-<span class="st"> </span><span class="kw">recordTable</span>(<span class="dt">inDir               =</span> wd_images_ID,
+                                <span class="dt">IDfrom              =</span> <span class="st">&quot;directory&quot;</span>,
+                                <span class="dt">minDeltaTime        =</span> <span class="dv">60</span>,
+                                <span class="dt">deltaTimeComparedTo =</span> <span class="st">&quot;lastRecord&quot;</span>,
+                                <span class="dt">timeZone            =</span> <span class="st">&quot;Asia/Kuala_Lumpur&quot;</span>)</code></pre></div>
+<pre><code>## StationA : 8 images</code></pre>
+<pre><code>## StationB : 23 images</code></pre>
+<pre><code>## StationB: removed 6 duplicate records</code></pre>
+<pre><code>## StationC : 37 images</code></pre>
+<pre><code>## StationC: removed 6 duplicate records</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nrow</span>(rec.db.species60)</code></pre></div>
+<pre><code>## [1] 40</code></pre>
+<p>Now 40 records were returned instead of 56. The missing records were taken less than 1 hour after the prior record of the same species at the same station and therefore omitted.</p>
+</div>
+<div id="time-zones-and-daylight-saving-time" class="section level3">
+<h3>Time zones and daylight saving time</h3>
+<p>Note the warning about the missing time zone in the minimal example above. By default, camtrapR will assume UTC time zone. This should work well in most situations (even though the time zone may not be correct, strictly speaking), because UTC does not use Daylight saving time (DST, aka ‘summer time’), and camera traps normally don’t use time zones (hence, camera traps will normally not respect DST of the area you work in).</p>
+<p>Now, if you work in an area that uses DST, and your camera does not know about DST, there will be a systematic 1-hour offset of all records taken during DST. In addition, records may fall into the non-existing when clocks are advanced in spring.</p>
+<p>So, the question whether or not your cameras record the time zone becomes very important. Here is some recommendations on how to use the argument.</p>
+<p>If your cameras save the time zone, set argument <code>timeZone</code> (both if your area has DST or not). If your cameras don’t save the time zone, and your time zone does not have DST, argument <code>timeZone</code> If your cameras don’t save the time zone, and your time zone has DST, use the default UTC.</p>
+<p>In other words, it is strongly advised to set argument <code>timeZone</code> to your study area’s time zone (one of <code>OlsonNames()</code>), <em>unless</em> your area has DST, but your cameras don’t record it.</p>
+</div>
+<div id="independence-between-cameras-within-stations" class="section level3">
+<h3>Independence between cameras within stations</h3>
+<p>The issue of temporal independence between records becomes slightly more complex if more than one camera was operated at stations. That information can and should be included in the output of <code>recordTable</code> (and <code>recordTableIndividual</code>). Users can then decide whether temporal independence is to be assessed within stations or within cameras at each station. In the first case, argument <code>camerasIndependent</code> must be set to FALSE. 2 images taken at different 2 cameras at the same station within <code>minDeltaTime</code> minutes will be reported as 1 record in the record table (suitable if cameras were places in pairs). In the second case <code>camerasIndependent</code> must be set to TRUE and 2 images taken at different 2 cameras at the same station within <code>minDeltaTime</code> minutes will be reported as 2 record in the record table (suitable e.g., if cameras were located at some distance to one another and faced different trails).</p>
+<p>The <code>cameraID</code> argument controls where camtrapR will look for camera IDs: in the file names (after renaming using <code>imageRename</code>, e.g. “renamedImages/StationA/StationA__<strong>Camera1</strong>__2015-12-31__23-59-59(1).JPG“) or in the directory structure (e.g. renamedImages/StationA/<strong>Camera1</strong>/StationA__Camera1__2015-12-31__23-59-59(1).JPG“). If missing, it will be assumed there was only 1 camera per station.</p>
+</div>
+<div id="ignoring-species" class="section level3">
+<h3>Ignoring species</h3>
+<p>Argument <code>exclude</code> can be used to ignore certain species. This is useful for omitting images in directories like “team” or “unidentified”. Here is an example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># see what species  we recorded</span>
+<span class="kw">table</span>(rec.db.species60$Species)</code></pre></div>
+<pre><code>## 
+##   EGY   MNE NO_ID   PBE   TRA   VTA 
+##     6     2     1    18     8     5</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># remove &quot;NO_ID&quot; by setting argument exclude = &quot;NO_ID&quot;</span>
+rec.db.species60.exclude &lt;-<span class="st"> </span><span class="kw">recordTable</span>(<span class="dt">inDir               =</span> wd_images_ID,
+                                        <span class="dt">IDfrom              =</span> <span class="st">&quot;directory&quot;</span>,
+                                        <span class="dt">minDeltaTime        =</span> <span class="dv">60</span>,
+                                        <span class="dt">deltaTimeComparedTo =</span> <span class="st">&quot;lastIndependentRecord&quot;</span>,
+                                        <span class="dt">timeZone            =</span> <span class="st">&quot;Asia/Kuala_Lumpur&quot;</span>,
+                                        <span class="dt">exclude             =</span> <span class="st">&quot;NO_ID&quot;</span>)</code></pre></div>
+<pre><code>## StationA : 8 images</code></pre>
+<pre><code>## StationB : 23 images</code></pre>
+<pre><code>## StationB: removed 6 duplicate records</code></pre>
+<pre><code>## StationC : 37 images</code></pre>
+<pre><code>## StationC: removed 6 duplicate records</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># note that &quot;NO_ID&quot; is gone now</span>
+<span class="kw">table</span>(rec.db.species60.exclude$Species)</code></pre></div>
+<pre><code>## 
+## EGY MNE PBE TRA VTA 
+##   6   2  18   8   5</code></pre>
+</div>
+<div id="extracting-image-metadata" class="section level3">
+<h3>Extracting image metadata</h3>
+<p><code>recordTable</code> and <code>recordTableIndividual</code> can both extract additional metadata from images (apart from date and time). For example, some camera models record ambient temperature or moon phase, which may be of interest. Metadata tags are stored in the images at the time they are taken and can be accessed and extracted if their tag names are known. Some tag names are standardised (e.g. “DateTimeOriginal”) while others are manufacturer-specific. Therefore, function <code>exifTagNames</code> returns all Exif metadata it finds in a sample image. Users can then choose which to include in <code>recordTable</code> and <code>recordTableIndividual</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">wd_images_ID &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;pictures/sample_images&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;camtrapR&quot;</span>)
+<span class="kw">exifTagNames</span>(<span class="dt">inDir =</span> wd_images_ID, <span class="dt">returnMetadata =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<pre><code>## Extracted metadata of: C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
+<pre><code>##  [1] &quot;Composite:ImageSize&quot;          &quot;Composite:Megapixels&quot;        
+##  [3] &quot;Composite:ShutterSpeed&quot;       &quot;EXIF:ColorSpace&quot;             
+##  [5] &quot;EXIF:ComponentsConfiguration&quot; &quot;EXIF:Compression&quot;            
+##  [7] &quot;EXIF:CreateDate&quot;              &quot;EXIF:DateTimeOriginal&quot;       
+##  [9] &quot;EXIF:ExifImageHeight&quot;         &quot;EXIF:ExifImageWidth&quot;         
+## [11] &quot;EXIF:ExifVersion&quot;             &quot;EXIF:FlashpixVersion&quot;        
+## [13] &quot;EXIF:Make&quot;                    &quot;EXIF:Model&quot;                  
+## [15] &quot;EXIF:ModifyDate&quot;              &quot;EXIF:ResolutionUnit&quot;         
+## [17] &quot;EXIF:ShutterSpeedValue&quot;       &quot;EXIF:ThumbnailImage&quot;         
+## [19] &quot;EXIF:ThumbnailLength&quot;         &quot;EXIF:ThumbnailOffset&quot;        
+## [21] &quot;EXIF:UserComment&quot;             &quot;EXIF:XResolution&quot;            
+## [23] &quot;EXIF:YCbCrPositioning&quot;        &quot;EXIF:YResolution&quot;            
+## [25] &quot;ExifTool:ExifToolVersion&quot;     &quot;ExifTool:Warning&quot;            
+## [27] &quot;File:BitsPerSample&quot;           &quot;File:ColorComponents&quot;        
+## [29] &quot;File:Directory&quot;               &quot;File:EncodingProcess&quot;        
+## [31] &quot;File:ExifByteOrder&quot;           &quot;File:FileAccessDate&quot;         
+## [33] &quot;File:FileCreateDate&quot;          &quot;File:FileModifyDate&quot;         
+## [35] &quot;File:FileName&quot;                &quot;File:FilePermissions&quot;        
+## [37] &quot;File:FileSize&quot;                &quot;File:FileType&quot;               
+## [39] &quot;File:FileTypeExtension&quot;       &quot;File:ImageHeight&quot;            
+## [41] &quot;File:ImageWidth&quot;              &quot;File:MIMEType&quot;               
+## [43] &quot;File:YCbCrSubSampling&quot;        &quot;SourceFile&quot;</code></pre>
+<p>If one has no idea what kind of data are behind these tag names, <code>returnMetadata</code> can be set to TRUE to return the actual metadata instead of the tag names only.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exifTagNames</span>(<span class="dt">inDir =</span> wd_images_ID, <span class="dt">returnMetadata =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## Extracted metadata of: C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
+<pre><code>##  [1] &quot;[ExifTool]      ExifTool Version Number         : 10.62&quot;                                                                                                      
+##  [2] &quot;[ExifTool]      Warning                         : FileName encoding not specified&quot;                                                                            
+##  [3] &quot;[File]          File Name                       : StationA__2009-04-21__00-40-00(1).JPG&quot;                                                                      
+##  [4] &quot;[File]          Directory                       : C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE&quot;
+##  [5] &quot;[File]          File Size                       : 27 kB&quot;                                                                                                      
+##  [6] &quot;[File]          File Modification Date/Time     : 2017:10:25 19:09:11+08:00&quot;                                                                                  
+##  [7] &quot;[File]          File Access Date/Time           : 2017:10:25 19:09:11+08:00&quot;                                                                                  
+##  [8] &quot;[File]          File Creation Date/Time         : 2017:10:25 19:09:11+08:00&quot;                                                                                  
+##  [9] &quot;[File]          File Permissions                : rw-rw-rw-&quot;                                                                                                  
+## [10] &quot;[File]          File Type                       : JPEG&quot;                                                                                                       
+## [11] &quot;[File]          File Type Extension             : jpg&quot;                                                                                                        
+## [12] &quot;[File]          MIME Type                       : image/jpeg&quot;                                                                                                 
+## [13] &quot;[File]          Exif Byte Order                 : Little-endian (Intel, II)&quot;                                                                                  
+## [14] &quot;[File]          Image Width                     : 100&quot;                                                                                                        
+## [15] &quot;[File]          Image Height                    : 75&quot;                                                                                                         
+## [16] &quot;[File]          Encoding Process                : Baseline DCT, Huffman coding&quot;                                                                               
+## [17] &quot;[File]          Bits Per Sample                 : 8&quot;                                                                                                          
+## [18] &quot;[File]          Color Components                : 3&quot;                                                                                                          
+## [19] &quot;[File]          Y Cb Cr Sub Sampling            : YCbCr4:2:2 (2 1)&quot;                                                                                           
+## [20] &quot;[EXIF]          Make                            : G4&quot;                                                                                                         
+## [21] &quot;[EXIF]          Camera Model Name               : CUDDEBACK&quot;                                                                                                  
+## [22] &quot;[EXIF]          X Resolution                    : 72&quot;                                                                                                         
+## [23] &quot;[EXIF]          Y Resolution                    : 72&quot;                                                                                                         
+## [24] &quot;[EXIF]          Modify Date                     : 2009:04:21 00:40:00&quot;                                                                                        
+## [25] &quot;[EXIF]          Resolution Unit                 : inches&quot;                                                                                                     
+## [26] &quot;[EXIF]          Y Cb Cr Positioning             : Co-sited&quot;                                                                                                   
+## [27] &quot;[EXIF]          Exif Version                    : 0200&quot;                                                                                                       
+## [28] &quot;[EXIF]          Components Configuration        : Y, Cb, Cr, -&quot;                                                                                               
+## [29] &quot;[EXIF]          Flashpix Version                : 0100&quot;                                                                                                       
+## [30] &quot;[EXIF]          Color Space                     : sRGB&quot;                                                                                                       
+## [31] &quot;[EXIF]          Exif Image Width                : 100&quot;                                                                                                        
+## [32] &quot;[EXIF]          Exif Image Height               : 75&quot;                                                                                                         
+## [33] &quot;[EXIF]          Date/Time Original              : 2009:04:21 00:40:00&quot;                                                                                        
+## [34] &quot;[EXIF]          Create Date                     : 2009:04:21 00:40:00&quot;                                                                                        
+## [35] &quot;[EXIF]          User Comment                    : 1 ATTEMPT G1H&quot;                                                                                              
+## [36] &quot;[EXIF]          Shutter Speed Value             : 1&quot;                                                                                                          
+## [37] &quot;[EXIF]          Compression                     : JPEG (old-style)&quot;                                                                                           
+## [38] &quot;[EXIF]          Thumbnail Offset                : 408&quot;                                                                                                        
+## [39] &quot;[EXIF]          Thumbnail Length                : 25353&quot;                                                                                                      
+## [40] &quot;[EXIF]          Thumbnail Image                 : (Binary data 25353 bytes, use -b option to extract)&quot;                                                        
+## [41] &quot;[Composite]     Image Size                      : 100x75&quot;                                                                                                     
+## [42] &quot;[Composite]     Megapixels                      : 0.007&quot;                                                                                                      
+## [43] &quot;[Composite]     Shutter Speed                   : 1&quot;</code></pre>
+<p>Note that when <code>returnMetadata = TRUE</code> the tag names contain spaces whereas they don’t when <code>returnMetadata = FALSE</code>. When supplying tagnames to the <code>recordTable</code> functions, use the tag names without spaces (as returned when <code>returnMetadata = FALSE</code>).</p>
+<p>Please also note that <code>exifTagNames</code> by default returns the metadata tag group along with the tag names (since version 0.99.6), which is helpful to unambiguously identify and extract specific metadata tags as shown in the next step.</p>
+<p>Of the tags shown here, “DateTimeOriginal” contains the date and time that camtrapR reads out. Apart from that, there is little information of ecological interest in the example data. However, for demonstration purposes, let’s extract information about the camera model and make:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rec.db.species.metadata1 &lt;-<span class="st"> </span><span class="kw">recordTable</span>(<span class="dt">inDir                  =</span> wd_images_ID,
+                                        <span class="dt">IDfrom                 =</span> <span class="st">&quot;directory&quot;</span>,
+                                        <span class="dt">timeZone               =</span> <span class="st">&quot;Asia/Kuala_Lumpur&quot;</span>,
+                                        <span class="dt">additionalMetadataTags =</span> <span class="kw">c</span>(<span class="st">&quot;EXIF:Model&quot;</span>, <span class="st">&quot;EXIF:Make&quot;</span>))</code></pre></div>
+<pre><code>## StationA : 8 images</code></pre>
+<pre><code>## StationB : 23 images</code></pre>
+<pre><code>## StationB: removed 6 duplicate records</code></pre>
+<pre><code>## StationC : 37 images</code></pre>
+<pre><code>## StationC: removed 6 duplicate records</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(rec.db.species.metadata1)</code></pre></div>
+<pre><code>##    Station Species    DateTimeOriginal       Date     Time delta.time.secs
+## 1 StationA     PBE 2009-04-21 00:40:00 2009-04-21 00:40:00               0
+## 2 StationA     PBE 2009-04-22 20:19:00 2009-04-22 20:19:00          157140
+## 3 StationA     PBE 2009-04-22 20:21:00 2009-04-22 20:21:00             120
+## 4 StationA     PBE 2009-04-23 00:07:00 2009-04-23 00:07:00           13560
+## 5 StationA     PBE 2009-04-23 00:09:00 2009-04-23 00:09:00             120
+## 6 StationA     PBE 2009-05-07 17:11:00 2009-05-07 17:11:00         1270920
+##   delta.time.mins delta.time.hours delta.time.days
+## 1               0              0.0             0.0
+## 2            2619             43.6             1.8
+## 3               2              0.0             0.0
+## 4             226              3.8             0.2
+## 5               2              0.0             0.0
+## 6           21182            353.0            14.7
+##                                                                                                     Directory
+## 1 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 2 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 3 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 4 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 5 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+## 6 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/PBE
+##                                FileName EXIF.Model EXIF.Make
+## 1 StationA__2009-04-21__00-40-00(1).JPG  CUDDEBACK        G4
+## 2 StationA__2009-04-22__20-19-00(1).JPG  CUDDEBACK        G4
+## 3 StationA__2009-04-22__20-21-00(1).JPG  CUDDEBACK        G4
+## 4 StationA__2009-04-23__00-07-00(1).JPG  CUDDEBACK        G4
+## 5 StationA__2009-04-23__00-09-00(1).JPG  CUDDEBACK        G4
+## 6 StationA__2009-05-07__17-11-00(1).JPG  CUDDEBACK        G4</code></pre>
+<p>There are 2 additional columns containing the information from the metadata we requested.</p>
+</div>
+</div>
+<div id="recordtableindividual-tabulating-individuals-of-a-species" class="section level2">
+<h2><code>recordTableIndividual</code>: tabulating individuals of a species</h2>
+<p>Individual identification of species is a prerequiste for running (spatial) capture-recapture models. <code>recordTableIndividual</code> and the subsequent <code>spatialDetectionHistory</code> function prepare data for these models.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># find the directory with tagged sample images contained in the package</span>
+wd_images_individual_ID &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;pictures/sample_images_tagged/LeopardCat&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;camtrapR&quot;</span>)
+ <span class="co"># missing space in species = &quot;LeopardCat&quot; is because of CRAN package policies</span>
+
+ rec.db.pbe &lt;-<span class="st"> </span><span class="kw">recordTableIndividual</span>(<span class="dt">inDir                  =</span> wd_images_individual_ID,
+                                     <span class="dt">IDfrom                 =</span> <span class="st">&quot;metadata&quot;</span>,
+                                     <span class="dt">minDeltaTime           =</span> <span class="dv">60</span>,
+                                     <span class="dt">deltaTimeComparedTo    =</span> <span class="st">&quot;lastIndependentRecord&quot;</span>,
+                                     <span class="dt">hasStationFolders      =</span> <span class="ot">FALSE</span>,         <span class="co"># images are not in station directories</span>
+                                     <span class="dt">metadataIDTag          =</span> <span class="st">&quot;individual&quot;</span>,  <span class="co"># the name of the metadata tag containing individual IDs</span>
+                                     <span class="dt">timeZone               =</span> <span class="st">&quot;Asia/Kuala_Lumpur&quot;</span>
+ )</code></pre></div>
+<pre><code>## C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images_tagged/LeopardCat : 26 images</code></pre>
+<pre><code>## StationA, StationB, StationC: removed 3 duplicate records</code></pre>
+<div id="extracting-custom-image-metadata" class="section level3">
+<h3>Extracting custom image metadata</h3>
+<p>In addition to the metadata that were saved when the image was taken (see above), custom metadata tags assigned in image management software can also be extracted. These may contain species ID tags if species were identified using metadata tags (instead of moving images into species directories), but also individual IDs, animal counts, sex of animals recorded, etc..</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(rec.db.pbe)</code></pre></div>
+<pre><code>##    Station    Species Individual    DateTimeOriginal       Date     Time
+## 1 StationA LeopardCat          1 2009-05-07 17:11:00 2009-05-07 17:11:00
+## 2 StationA LeopardCat          2 2009-04-21 00:40:00 2009-04-21 00:40:00
+## 3 StationA LeopardCat          2 2009-04-22 20:19:00 2009-04-22 20:19:00
+## 4 StationA LeopardCat          2 2009-04-23 00:07:00 2009-04-23 00:07:00
+## 5 StationB LeopardCat          1 2009-04-07 00:23:00 2009-04-07 00:23:00
+## 6 StationB LeopardCat          1 2009-04-14 06:13:00 2009-04-14 06:13:00
+##   delta.time.secs delta.time.mins delta.time.hours delta.time.days
+## 1               0               0              0.0             0.0
+## 2               0               0              0.0             0.0
+## 3          157140            2619             43.6             1.8
+## 4           13680             228              3.8             0.2
+## 5               0               0              0.0             0.0
+## 6          625800           10430            173.8             7.2
+##                                                                                                          Directory
+## 1 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 2 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 3 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 4 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 5 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 6 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images_tagged/LeopardCat
+##                                FileName metadata_Species
+## 1 StationA__2009-05-07__17-11-00(1).JPG      Leopard Cat
+## 2 StationA__2009-04-21__00-40-00(1).JPG      Leopard Cat
+## 3 StationA__2009-04-22__20-19-00(1).JPG      Leopard Cat
+## 4 StationA__2009-04-23__00-07-00(1).JPG      Leopard Cat
+## 5 StationB__2009-04-07__00-23-00(1).JPG      Leopard Cat
+## 6 StationB__2009-04-14__06-13-00(1).JPG      Leopard Cat
+##   metadata_individual               HierarchicalSubject
+## 1                   1 Species|Leopard Cat, individual|1
+## 2                   2 Species|Leopard Cat, individual|2
+## 3                   2 Species|Leopard Cat, individual|2
+## 4                   2 Species|Leopard Cat, individual|2
+## 5                   1 Species|Leopard Cat, individual|1
+## 6                   1 Species|Leopard Cat, individual|1</code></pre>
+</div>
+</div>
+</div>
+<div id="camera-operation" class="section level1">
+<h1>Camera Operation</h1>
+<p>The camera operation matrix is a day-by-station matrix that states how many cameras were active at a station on a given day. Rows represent stations and columns days, beginning with the day the first camera was set up and ending the day the last camera was retrieved.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"> <span class="co"># first load the camera trap station table</span>
+<span class="kw">data</span>(camtraps)
+ 
+camop_problem &lt;-<span class="st"> </span><span class="kw">cameraOperation</span>(<span class="dt">CTtable      =</span> camtraps,
+                                 <span class="dt">stationCol   =</span> <span class="st">&quot;Station&quot;</span>,
+                                 <span class="dt">setupCol     =</span> <span class="st">&quot;Setup_date&quot;</span>,
+                                 <span class="dt">retrievalCol =</span> <span class="st">&quot;Retrieval_date&quot;</span>,
+                                 <span class="dt">writecsv     =</span> <span class="ot">FALSE</span>,
+                                 <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,
+                                 <span class="dt">dateFormat   =</span> <span class="st">&quot;%d/%m/%Y&quot;</span>
+)
+
+<span class="co"># as a reminder, these are the dates in our station information table</span>
+camtraps[,-<span class="kw">which</span>(<span class="kw">colnames</span>(camtraps) %in%<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;utm_y&quot;</span>, <span class="st">&quot;utm_x&quot;</span>))]</code></pre></div>
+<pre><code>##    Station Setup_date Retrieval_date Problem1_from Problem1_to
+## 1 StationA 02/04/2009     14/05/2009                          
+## 2 StationB 03/04/2009     16/05/2009                          
+## 3 StationC 04/04/2009     17/05/2009    12/05/2009  17/05/2009</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># now let's have a look at the first few columns of the camera operation matrix</span>
+camop_problem[, <span class="dv">1</span>:<span class="dv">5</span>]</code></pre></div>
+<pre><code>##          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06
+## StationA          1          1          1          1          1
+## StationB         NA          1          1          1          1
+## StationC         NA         NA          1          1          1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># and the last few</span>
+camop_problem[, (<span class="kw">ncol</span>(camop_problem)-<span class="dv">6</span>):<span class="kw">ncol</span>(camop_problem)]</code></pre></div>
+<pre><code>##          2009-05-11 2009-05-12 2009-05-13 2009-05-14 2009-05-15 2009-05-16
+## StationA          1          1          1          1         NA         NA
+## StationB          1          1          1          1          1          1
+## StationC          1          0          0          0          0          0
+##          2009-05-17
+## StationA         NA
+## StationB         NA
+## StationC          0</code></pre>
+<p>If stations were not set up, values are NA. If they were set up but malfunctioning, it is 0. Operational stations get value 1.</p>
+<p>Here is a little function for plotting the camera operation matrix. Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">camopPlot &lt;-<span class="st"> </span>function(camOp){
+  
+  which.tmp &lt;-<span class="st"> </span><span class="kw">grep</span>(<span class="kw">as.Date</span>(<span class="kw">colnames</span>(camOp)), <span class="dt">pattern =</span> <span class="st">&quot;01$&quot;</span>)
+  label.tmp &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">as.Date</span>(<span class="kw">colnames</span>(camOp))[which.tmp], <span class="st">&quot;%Y-%m&quot;</span>)
+  at.tmp &lt;-<span class="st"> </span>which.tmp /<span class="st"> </span><span class="kw">ncol</span>(camOp)
+  
+  <span class="kw">image</span>(<span class="kw">t</span>(<span class="kw">as.matrix</span>(camOp)), <span class="dt">xaxt =</span> <span class="st">&quot;n&quot;</span>, <span class="dt">yaxt =</span> <span class="st">&quot;n&quot;</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;grey70&quot;</span>))
+  <span class="kw">axis</span>(<span class="dv">1</span>, <span class="dt">at =</span> at.tmp, <span class="dt">labels =</span> label.tmp)
+  <span class="kw">axis</span>(<span class="dv">2</span>, <span class="dt">at =</span> <span class="kw">seq</span>(<span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="kw">nrow</span>(camOp)), <span class="dt">labels =</span> <span class="kw">rownames</span>(camOp), <span class="dt">las =</span> <span class="dv">1</span>)
+  <span class="kw">abline</span>(<span class="dt">v =</span> at.tmp, <span class="dt">col =</span> <span class="kw">rgb</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="fl">0.2</span>))
+  <span class="kw">box</span>()
+}</code></pre></div>
+<p>And this is what we get</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">camopPlot</span>(<span class="dt">camOp =</span> camop_problem)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div id="saving-and-loading-camera-operation-matrices" class="section level2">
+<h2>Saving and loading camera operation matrices</h2>
+<p>The camera operation matrix can easily be saved as a csv file (by setting argument <code>writecsv = TRUE</code>, <code>check.names = FALSE</code> and defining <code>outdir</code>). In order to load the csv into R again, it is necessary to tell R to use the station IDs (the first column) as row names:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">camOp &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> ..., <span class="dt">row.names =</span> <span class="dv">1</span>, <span class="dt">check.names =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><code>check.names = FALSE</code> ensures that column names (the dates) are read back into R as they are (e.g. “2015-12-01”). Otherwise one may end up with unreadable column names (at least for camtrapR) such as “X2015.12.01”.</p>
+</div>
+</div>
+<div id="input-for-subsequent-analyses" class="section level1">
+<h1>Input for subsequent analyses</h1>
+<p>It is very easy to prepare input for occupancy and spatial capture-recapture (SCR) analyses in camtrapR. All one needs it a record table and the camera operation matrix. Making input for SCR analyses further requires the camera trap station table.</p>
+<div id="occupancy-analyses" class="section level2">
+<h2>Occupancy analyses</h2>
+<p>Occupancy models use detection/non-detection matrices in which for every station and every occasion “1”&quot; signifies a detection of a given species and “0”&quot; signifies non-detecion.</p>
+<p>Here is how to obtain a detection/non-detection matrix using function <code>detectionHistory</code>. Because the function builds on prior functions (<code>recordTable</code> and <code>cameraOperation</code>) we also show these function here to provide the context.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create camera operation matrix</span>
+camop_no_problem &lt;-<span class="st"> </span><span class="kw">cameraOperation</span>(<span class="dt">CTtable      =</span> camtraps,
+                                    <span class="dt">stationCol   =</span> <span class="st">&quot;Station&quot;</span>,
+                                    <span class="dt">setupCol     =</span> <span class="st">&quot;Setup_date&quot;</span>,
+                                    <span class="dt">retrievalCol =</span> <span class="st">&quot;Retrieval_date&quot;</span>,
+                                    <span class="dt">hasProblems  =</span> <span class="ot">FALSE</span>,
+                                    <span class="dt">dateFormat   =</span> <span class="st">&quot;%d/%m/%Y&quot;</span>
+)
+
+<span class="co"># define image directory</span>
+wd_images_ID &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;pictures/sample_images&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;camtrapR&quot;</span>)
+
+<span class="co"># make record table</span>
+recordTableSample &lt;-<span class="st"> </span><span class="kw">recordTable</span>(<span class="dt">inDir               =</span> wd_images_ID,
+                                 <span class="dt">IDfrom              =</span> <span class="st">&quot;directory&quot;</span>,
+                                 <span class="dt">minDeltaTime        =</span> <span class="dv">60</span>,
+                                 <span class="dt">deltaTimeComparedTo =</span> <span class="st">&quot;lastIndependentRecord&quot;</span>,
+                                 <span class="dt">timeZone            =</span> <span class="st">&quot;Asia/Kuala_Lumpur&quot;</span>
+)</code></pre></div>
+<pre><code>## StationA : 8 images</code></pre>
+<pre><code>## StationB : 23 images</code></pre>
+<pre><code>## StationB: removed 6 duplicate records</code></pre>
+<pre><code>## StationC : 37 images</code></pre>
+<pre><code>## StationC: removed 6 duplicate records</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># make detection history (without trapping effort)</span>
+DetHist1 &lt;-<span class="st"> </span><span class="kw">detectionHistory</span>(<span class="dt">recordTable         =</span> recordTableSample,
+                            <span class="dt">camOp                =</span> camop_no_problem,
+                            <span class="dt">stationCol           =</span> <span class="st">&quot;Station&quot;</span>,
+                            <span class="dt">speciesCol           =</span> <span class="st">&quot;Species&quot;</span>,
+                            <span class="dt">recordDateTimeCol    =</span> <span class="st">&quot;DateTimeOriginal&quot;</span>,
+                            <span class="dt">species              =</span> <span class="st">&quot;VTA&quot;</span>,
+                            <span class="dt">occasionLength       =</span> <span class="dv">7</span>,
+                            <span class="dt">day1                 =</span> <span class="st">&quot;station&quot;</span>,
+                            <span class="dt">includeEffort        =</span> <span class="ot">FALSE</span>
+)</code></pre></div>
+<pre><code>## Warning: timeZone is not specified. Assuming UTC</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">DetHist1</code></pre></div>
+<pre><code>## $detection_history
+##          o1 o2 o3 o4 o5 o6 o7
+## StationA  0  1  0  0  1  0 NA
+## StationB  0  1  0  1  0  0 NA
+## StationC  0  0  1  0  0  0 NA</code></pre>
+<p>Note the warning about the missing time zone (as in the functions <code>recordTable</code> and <code>recordTable</code>). Normally, it should be fine, but to be on the safe side, better set it to your study area’s time zone.</p>
+<p>If trapping effort is thought to influence detection probability, it can be returned by setting <code>includeEffort = TRUE</code>. This way the number of active trapping days per occasion and station is returned.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># make detection history (with trapping effort)</span>
+DetHist2 &lt;-<span class="st"> </span><span class="kw">detectionHistory</span>(<span class="dt">recordTable          =</span> recordTableSample,
+                             <span class="dt">camOp                =</span> camop_no_problem,
+                             <span class="dt">stationCol           =</span> <span class="st">&quot;Station&quot;</span>,
+                             <span class="dt">speciesCol           =</span> <span class="st">&quot;Species&quot;</span>,
+                             <span class="dt">recordDateTimeCol    =</span> <span class="st">&quot;DateTimeOriginal&quot;</span>,
+                             <span class="dt">species              =</span> <span class="st">&quot;VTA&quot;</span>,
+                             <span class="dt">timeZone             =</span> <span class="st">&quot;Asia/Kuala_Lumpur&quot;</span>,
+                             <span class="dt">occasionLength       =</span> <span class="dv">7</span>,
+                             <span class="dt">day1                 =</span> <span class="st">&quot;station&quot;</span>,
+                             <span class="dt">includeEffort        =</span> <span class="ot">TRUE</span>,
+                             <span class="dt">scaleEffort          =</span> <span class="ot">FALSE</span>
+)
+
+DetHist2[[<span class="dv">1</span>]]  <span class="co"># detection history</span></code></pre></div>
+<pre><code>##          o1 o2 o3 o4 o5 o6 o7
+## StationA  0  1  0  0  1  0  0
+## StationB  0  1  0  1  0  0  0
+## StationC  0  0  1  0  0  0  0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">DetHist2[[<span class="dv">2</span>]]  <span class="co"># effort (in days per occasion)</span></code></pre></div>
+<pre><code>##          o1 o2 o3 o4 o5 o6 o7
+## StationA  7  7  7  7  7  7  1
+## StationB  7  7  7  7  7  7  2
+## StationC  7  7  7  7  7  7  2</code></pre>
+<p>To help with convergence of models, the effort matrix can be scaled to mean = 0 and sd = 1 by setting <code>scaleEffort = TRUE</code>. If <code>writecsv = TRUE</code>, the scaling parameters will also be saved in a separate csv file.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">DetHist3 &lt;-<span class="st"> </span><span class="kw">detectionHistory</span>(<span class="dt">recordTable          =</span> recordTableSample,
+                             <span class="dt">camOp                =</span> camop_no_problem,
+                             <span class="dt">stationCol           =</span> <span class="st">&quot;Station&quot;</span>,
+                             <span class="dt">speciesCol           =</span> <span class="st">&quot;Species&quot;</span>,
+                             <span class="dt">recordDateTimeCol    =</span> <span class="st">&quot;DateTimeOriginal&quot;</span>,
+                             <span class="dt">species              =</span> <span class="st">&quot;VTA&quot;</span>,
+                             <span class="dt">timeZone             =</span> <span class="st">&quot;Asia/Kuala_Lumpur&quot;</span>,
+                             <span class="dt">occasionLength       =</span> <span class="dv">7</span>,
+                             <span class="dt">day1                 =</span> <span class="st">&quot;station&quot;</span>,
+                             <span class="dt">includeEffort        =</span> <span class="ot">TRUE</span>,
+                             <span class="dt">scaleEffort          =</span> <span class="ot">TRUE</span>
+)
+
+DetHist3[[<span class="dv">2</span>]]  <span class="co"># effort (scaled)</span></code></pre></div>
+<pre><code>##                 o1        o2        o3        o4        o5        o6
+## StationA 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062
+## StationB 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062
+## StationC 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062
+##                 o7
+## StationA -2.726668
+## StationB -2.206122
+## StationC -2.206122</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">DetHist3[[<span class="dv">3</span>]]  <span class="co"># scaling parameters for back-transformation</span></code></pre></div>
+<pre><code>##   effort.scaled.center effort.scaled.scale
+## 1             6.238095            1.921061</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># backtransform scaled effort like this if needed</span>
+(DetHist3[[<span class="dv">2</span>]] *<span class="st"> </span>DetHist3[[<span class="dv">3</span>]]$effort.scaled.scale) +<span class="st"> </span>DetHist3[[<span class="dv">3</span>]]$effort.scaled.center</code></pre></div>
+<pre><code>##          o1 o2 o3 o4 o5 o6 o7
+## StationA  7  7  7  7  7  7  1
+## StationB  7  7  7  7  7  7  2
+## StationC  7  7  7  7  7  7  2</code></pre>
+<div id="handling-of-incomplete-occasions" class="section level3">
+<h3>Handling of incomplete occasions</h3>
+<p>The following table shows the behaviour of the detectionHistory function for different occasion-level camera operation values (table head) under different combinations of the arguments <code>includeEffort</code> and <code>minActiveDaysPerOccasion</code> in the function <code>detectionHistory</code>.</p>
+<table style="width:44%;">
+<colgroup>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>includeEffort</th>
+<th>minActiveDaysPerOccasion</th>
+<th>camera operation all 1</th>
+<th>at least one 1</th>
+<th>all 0</th>
+<th>0 and NA</th>
+<th>all NA</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TRUE</td>
+<td>not defined</td>
+<td>0/1</td>
+<td>0/1</td>
+<td>NA</td>
+<td>NA</td>
+<td>NA</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>TRUE</td>
+<td>defined</td>
+<td>0/1</td>
+<td>0/1/NA*</td>
+<td>NA</td>
+<td>NA</td>
+<td>NA</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>FALSE</td>
+<td>not defined</td>
+<td>0/1</td>
+<td>NA</td>
+<td>NA</td>
+<td>NA</td>
+<td>NA</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>FALSE</td>
+<td>defined</td>
+<td>0/1</td>
+<td>0/1/NA*</td>
+<td>NA</td>
+<td>NA</td>
+<td>NA</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>*: NA if there were less active days in an occasion than <code>minActiveDaysPerOccasion</code></p>
+<p>The same applies to generation of input for spatial capture-recapture analyses using <code>spatialDetectionHistory</code> as described below.</p>
+</div>
+<div id="saving-and-loading-detection-histories" class="section level3">
+<h3>Saving and loading detection histories</h3>
+<p>The detection history and effort matrices can easily be saved as csv files (by setting argument <code>writecsv = TRUE</code> and defining <code>outdir</code>). In order to load the csv into R again, it is necessary to tell R to use the station IDs as row names:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">detHist &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> ..., <span class="dt">row.names =</span> <span class="dv">1</span>)
+effort  &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">file =</span> ..., <span class="dt">row.names =</span> <span class="dv">1</span>)</code></pre></div>
+</div>
+</div>
+<div id="spatial-capture-recapture-analyses" class="section level2">
+<h2>Spatial Capture-Recapture analyses</h2>
+<p>Input for spatial capture-recapture analyses can be generated in the form of <code>capthist</code>-objects as defined in the <code>secr</code> package with the function <code>spatialDetectionHistory</code>. Output can be in the form of counts (number of individual detections per occasion, argument, argument <code>output = &quot;count&quot;</code>) or binary (was an individual detected during an occasion, argument <code>output = &quot;binary&quot;</code>). note that the detector type will change accordingly: “proximity” if <code>output = &quot;binary&quot;</code> and “count” if <code>output = &quot;count&quot;</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(recordTableIndividualSample)
+<span class="kw">data</span>(camtraps)
+
+<span class="co"># create camera operation matrix (with problems/malfunction)</span>
+camop_problem &lt;-<span class="st"> </span><span class="kw">cameraOperation</span>(<span class="dt">CTtable      =</span> camtraps,
+                                 <span class="dt">stationCol   =</span> <span class="st">&quot;Station&quot;</span>,
+                                 <span class="dt">setupCol     =</span> <span class="st">&quot;Setup_date&quot;</span>,
+                                 <span class="dt">retrievalCol =</span> <span class="st">&quot;Retrieval_date&quot;</span>,
+                                 <span class="dt">writecsv     =</span> <span class="ot">FALSE</span>,
+                                 <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,
+                                 <span class="dt">dateFormat   =</span> <span class="st">&quot;%d/%m/%Y&quot;</span>
+)
+
+sdh &lt;-<span class="st"> </span><span class="kw">spatialDetectionHistory</span>(<span class="dt">recordTableIndividual =</span> recordTableIndividualSample, 
+                               <span class="dt">species               =</span> <span class="st">&quot;LeopardCat&quot;</span>,  
+                               <span class="dt">output                =</span> <span class="st">&quot;binary&quot;</span>,
+                               <span class="dt">camOp                 =</span> camop_problem, 
+                               <span class="dt">CTtable               =</span> camtraps,
+                               <span class="dt">stationCol            =</span> <span class="st">&quot;Station&quot;</span>, 
+                               <span class="dt">speciesCol            =</span> <span class="st">&quot;Species&quot;</span>,
+                               <span class="dt">Xcol                  =</span> <span class="st">&quot;utm_x&quot;</span>,
+                               <span class="dt">Ycol                  =</span> <span class="st">&quot;utm_y&quot;</span>,
+                               <span class="dt">individualCol         =</span> <span class="st">&quot;Individual&quot;</span>,
+                               <span class="dt">recordDateTimeCol     =</span> <span class="st">&quot;DateTimeOriginal&quot;</span>,
+                               <span class="dt">recordDateTimeFormat  =</span> <span class="st">&quot;%Y-%m-%d %H:%M:%S&quot;</span>,
+                               <span class="dt">occasionLength        =</span> <span class="dv">10</span>, 
+                               <span class="dt">day1                  =</span> <span class="st">&quot;survey&quot;</span>,
+                               <span class="dt">includeEffort         =</span> <span class="ot">TRUE</span>,
+                               <span class="dt">timeZone              =</span> <span class="st">&quot;Asia/Kuala_Lumpur&quot;</span>
+  )
+  
+<span class="co"># missing space in species = &quot;LeopardCat&quot; was introduced by recordTableIndividual </span>
+<span class="co"># (because of CRAN package policies. You can have spaces in your directory names)</span>
+
+  <span class="kw">summary</span>(sdh)</code></pre></div>
+<pre><code>## Object class      capthist 
+## Detector type     proximity 
+## Detector number   3 
+## Average spacing   2575.831 m 
+## x-range           523000 526000 m 
+## y-range           604000 607050 m 
+## 
+##  Usage range by occasion
+##      1  2  3  4 5
+## min  8 10 10 10 0
+## max 10 10 10 10 5
+## 
+## Counts by occasion 
+##                   1 2 3 4 5 Total
+## n                 2 2 3 2 1    10
+## u                 2 0 1 0 0     3
+## f                 0 1 0 2 0     3
+## M(t+1)            2 2 3 3 3     3
+## losses            0 0 0 0 0     0
+## detections        3 4 4 3 1    15
+## detectors visited 2 3 3 2 1    11
+## detectors used    3 3 3 3 2    14</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  <span class="kw">plot</span>(sdh, <span class="dt">tracks =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## Warning in plot.capthist(sdh, tracks = TRUE): track for repeat detections
+## on same occasion joins points in arbitrary sequence</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

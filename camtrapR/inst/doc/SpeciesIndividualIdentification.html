@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Juergen Niedballa (niedballa@izw-berlin.de)" />
+
+<meta name="date" content="2017-10-25" />
+
+<title>Identifying species and individuals in camtrapR</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Identifying species and individuals in camtrapR</h1>
+<h4 class="author"><em>Juergen Niedballa (<a href="mailto:niedballa@izw-berlin.de">niedballa@izw-berlin.de</a>)</em></h4>
+<h4 class="date"><em>2017-10-25</em></h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#methods-for-species-and-individual-identification---general">Methods for species and individual identification - General</a><ul>
+<li><a href="#drag-drop">Drag &amp; drop</a></li>
+<li><a href="#metadata-tagging">Metadata tagging</a><ul>
+<li><a href="#image-management-software-recommendations-for-metadata-tagging">Image management software recommendations for metadata tagging</a></li>
+<li><a href="#digikam-setup">digiKam setup</a></li>
+<li><a href="#metadata-tag-structure">Metadata tag structure</a></li>
+<li><a href="#how-does-metadata-extraction-work">How does metadata extraction work?</a></li>
+<li><a href="#what-if-non-hierarchical-metadata-tags-were-assigned-to-images-already">What if non-hierarchical metadata tags were assigned to images already?</a></li>
+<li><a href="#how-to-import-a-metadata-tag-tree-into-digikam">How to import a metadata tag tree into digiKam</a></li>
+</ul></li>
+<li><a href="#double-observer-identification">Double observer identification</a></li>
+<li><a href="#comparison-of-identification-methods">Comparison of identification methods</a></li>
+</ul></li>
+<li><a href="#species-identification">Species identification</a><ul>
+<li><a href="#checking-species-names-with-the-itis-taxonomic-database">Checking species names with the ITIS taxonomic database</a></li>
+<li><a href="#species-identification-via-drag-drop-of-images">Species identification via drag &amp; drop of images</a><ul>
+<li><a href="#creating-species-directories">Creating species directories</a></li>
+<li><a href="#moving-images-into-species-directories">Moving images into species directories</a></li>
+</ul></li>
+<li><a href="#species-identification-by-metadata-tagging">Species identification by metadata tagging</a></li>
+<li><a href="#checking-species-identification">Checking species identification</a></li>
+<li><a href="#comparing-double-observer-identification">Comparing double observer identification</a></li>
+<li><a href="#appending-species-names-to-image-files">Appending species names to image files</a></li>
+<li><a href="#collecting-all-images-of-a-species">Collecting all images of a species</a></li>
+</ul></li>
+<li><a href="#individual-identification">Individual identification</a><ul>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#individual-identification-by-drag-drop">Individual identification by drag &amp; drop</a></li>
+<li><a href="#individual-identification-by-metadata-tagging">Individual identification by metadata tagging</a><ul>
+<li><a href="#double-observer-identification-of-individuals">Double observer identification of individuals</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(camtrapR)
+<span class="kw">data</span>(camtraps)</code></pre></div>
+<div id="methods-for-species-and-individual-identification---general" class="section level1">
+<h1>Methods for species and individual identification - General</h1>
+<p>Having organised your camera trap images into station (and camera) directories as explained in the vignette “Organising raw camera trap images in camtrapR”, you can begin with species (and individual) identification.</p>
+<p>Generally, species identification come before individual identification. camtrapR supports two different methods for identifying species and individuals:</p>
+<ol style="list-style-type: decimal">
+<li>by moving renamed images into species/individual directories within station directories (drag &amp; drop) or</li>
+<li>by assigning metadata tags to images in image management software (metadata tagging).</li>
+</ol>
+<p>It is recommended to to work with the renamed images (function <code>imageRename</code>), not the original generic file names. Species names are case-sensitive and must be spelled <em>exactly</em> the same in each station, including interpunction and white spaces. “Leopard” is not identical to “leopard” and “Pig-tailed Macaque” is different from “Pig-tailed Macaque”.</p>
+<div id="drag-drop" class="section level2">
+<h2>Drag &amp; drop</h2>
+<p>For species identification, images can be moved into species directories created within station directories. The species ID is then read from the directory name. Likewise, individuals can be identified by moving them into indivdual directories. Be aware that one first needs to collect all images of the species of interest (using <code>getSpeciesImages</code> described below) before individual identification.</p>
+</div>
+<div id="metadata-tagging" class="section level2">
+<h2>Metadata tagging</h2>
+<p>Metadata tags can be assigned to images in image management software. They are saved in the image metadata automatically, from where they can later be read out by two camtrapR functions (<code>recordTable</code> and <code>recordTableIndividual</code>). Metadata tagging can be used to assign custom tags to images, e.g. species ID, individual ID for capture-recapture analyses, number of individuals on images, sex or age class of individuals, behaviour etc..</p>
+<div id="image-management-software-recommendations-for-metadata-tagging" class="section level3">
+<h3>Image management software recommendations for metadata tagging</h3>
+<p>Here is a list of suitable software for metadata tagging:</p>
+<ul>
+<li>digiKam (<a href="http://www.digikam.org" class="uri">http://www.digikam.org</a>)</li>
+<li>Adobe Bridge</li>
+<li>Adobe Lightroom</li>
+</ul>
+<p>Among these, we recommend digiKam because it is free and open-source software. All of these programs offer customisable metadata structures and are easy to use. We only tested these three programs and it is unlikely that other software will work smoothly, if at all. <strong>Picasa is not suitable</strong>, because it does not allow for hierarchical tags, the total number of tags is limited, and it may overwrite and permanently destroy your original metadata.</p>
+</div>
+<div id="digikam-setup" class="section level3">
+<h3>digiKam setup</h3>
+<p>digiKam needs to write metadata tags into image metadata, not into .xmp sidecar files. Its behaviour can be configured. Here’s how to set up digiKam:</p>
+<p>If installing for the first time, it will ask you to make a few settings when you first start the program. When asked “Configure Metadata Storage to Files”, set “Add Information to Files” instead of the default “Do Nothing”.</p>
+<p>If digiKam was installed already, go to “Settings”, then “Configure digiKam”. There, select “Metadata” on the left and, in the tab “Behaviour”, make sure that “Image tags” is checked in the box titled “Write This Information to the Metadata”. Below, in the box “Reading and Writing Metadata”, make sure that both “Read from sidecar files” and “Write to sidecar files” are unchecked.</p>
+</div>
+<div id="metadata-tag-structure" class="section level3">
+<h3>Metadata tag structure</h3>
+<p>Before assigning metadata tags, users need to set up a hierarchical tag structure in image management software. This structure is customisable and can be expanded as needed. In digiKam, this is done in the Tag Manager. Here’s some examples:</p>
+<ul>
+<li>Species
+<ul>
+<li>SpeciesA</li>
+<li>SpeciesB</li>
+</ul></li>
+<li>Individual
+<ul>
+<li>Female1</li>
+<li>Female2</li>
+<li>Male1</li>
+<li>Male2</li>
+</ul></li>
+</ul>
+<p>Be careful to use one level of hierarchy in your tags only. The following example will not work:</p>
+<ul>
+<li>Individual
+<ul>
+<li>Male
+<ul>
+<li>1</li>
+<li>2</li>
+</ul></li>
+<li>Female
+<ul>
+<li>1</li>
+<li>2</li>
+</ul></li>
+</ul></li>
+</ul>
+<p>The crucial point is to set up tag groups (e.g. “Species” for species identification) which then contain the desired tags (e.g. species tags such as “Leopard Cat”, “Malay Civet” etc.). This is what is meant by hierarchical tag structure. For clarification, here is a screenshot of the digiKam tag tree in which an image was identified as showing a Leopard Cat.</p>
+<div class="figure">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOkAAACoCAIAAACKUV59AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAA5DSURBVHhe7Z3LbxTJHcfz13DY2164cE2UbB4cuGRYwa5XJIrEIVIUKQuSJcsXhJSQjVYJm5UYiZCglRK0jjZIPIxfsGYB28Le9YDBj8HGNraxscOuLYg45Fddj67uru5p8MxUV9f3o7LVU11dNdJ85jfVo6rffO8VAG4Cd4GrwF3gKnAXuEqB3K3X6+fPnz969OixY8fGx8dFLQAp2HdXKfuzKDAYZLNbd//40Ud5imht4tChQ2TqmTNn1tbW6D8XVwGDQRpNcPe7RmS7S3aSoyQuHdN/rmwMGAySNMfdz/9zJVZ6Ll69eKWvt3+oobunT58mO9Pirk4ugwe73967Lyjd/aLqjZg9V9nbUZ0Vj0ABaeBuX1/fyZMnxQMTyt2RuzVVxr+Zqk3NTM/Wh24M53E3OdlNg/QVlxlhwkllZ89VB/kRKCdZ7vb29r711lt79uwRj03E3B2buPd17eHU9NxsfX7h8eLNr241dPf48eN0rybcbESDuEtB9/A5xEpPSHWXi1upVHK6OzZxf3zyweT9aQq3pO3S8vLKysro2FhDd+lerV6vCzczaRB0GUOde/dVzs6JRwyq6agOUjxmE4nwFIvQsanFXPUwr9nXyQJ2cCF/H8Qbx1oCO5jdVeIePHgwj7tfXLpGk4SHM/VH849J2fX19Y2Aydq9hu5S0O3s7Ozp6eE3bRnku10TYkmrmM0iGIdTWM3Lwe5AaHaVQXpjY4ruXUPBY2ATg7u6uDndvdw7QNF2cWmJ7rc2NzefS2Zm5xq6S5C++/fvP3XqFA2dZnCOoKsRRMp4+Hz1qr8rqAzjaFBIRFYTu7eTF5obx0QHFjC4Szdn5KvixIkT4oQJ7u61geuPF5dWV1cp1pKyVLO9vU3/5xcW8rhL8CnvgQMHqtXq8PBw0uDX/Y5s9mxHEB11d1lwle5GTW3gbuwUg/WPOYNVsu7V8sDdvf7lTS7u1tYWPdyRLC8v53SXUHdsFOwvXLgwMjKiDM4bdAfP6ZoGoZEUlDEytFCrFGTPGcxRlvQ11oP20Bx374yMTk7WpqdnHs3PLz95svb06dP1dfpbXV3L7y6hf+Fw5MiRvr4+Crckbu6gyzwLP9xFTUdnF4uRkTAZfO4nWoqa+GQj1rhZXyGD3dEcd7PJ7y6h60vQDFiceEM0BUG5aIK7eYponQ+lLx2IqjcH7paW3brbIsjaZohLwN3SUlB3AWgI3AWuAneBq8Bd4CpwF7gK3AWuAneBq8Bd4ColcRe5HTzEbXeR28FnbLobW/OQVkRrE8jt4DOW3RUrzdLJdpfsJEeR28FP7LvL8znoxVJuh3D9LpVdbIjIufonrZnYb8dKfJsdiFAId1ViByrWcjvoMqXs88nHLtwNFrnrC+RfP8VEztHLQIHctZzbIfKq78aAN3ZXbqfbFXC3LSh3C5PbQb7q2i72/i75Ca5tIqqeFdt+wv1qcl9Q5ey5sJ9ws5CM4sZmnNRgz59Y1GyVRSUyBLXkx+rZlhn77hYmt4P2whscUmYHzbgZbOMab8kquVjB/mHVUtopskAYm0nIQnNSH9lP9B0V9GMcItptebHvbmFyO2ivOgtmoRNSaF6jyyGPI9ppleLCoJB2xmYK1j4j7vID+VaJB105RLLb8mLf3cLkdtBfdfkBHfpENUog1UweG6VMumhsFpI23w1b8l314d765BCGbkuLfXeLkttBf9WZE8FxZFrJz+pyqGM6MM4Zkjkf0ucMRBDjQ33F9wzaiMz+7s7DylfjEIluS4p9d4uY2yF8+VksZDXMGGWkOqsdy6lFxXyvpk+RE8109EtEkNZHDJ6PnPUyEkOIm0u9TUmx7242+d0ldH2JXed2AIXGsrt5imidD6UvHYgqUFJsutsiyFqI6wMldBd4AtwFrgJ3gavAXeAqcBe4CtwFrgJ3gavAXeAqJXEX+Rk8xG13kZ/BZ2y6G1u3kFZEaxPIz+Azlt0Vq8XSyXaX7CRHkZ/BT+y7y3My6KVA+RnCJedp6ItrQVsphLsqOQMV1/IzwF1rFMhdN/MzwF1rFMLdAudnUJXsIPht1yAey502lbStO6D12He32PkZdHfVrkZ2nLVlErQF++4WOz+D7q52NmurOmgT9t0tdH4GuFtg7Ltb6PwMRnfZMeYM9rHvbrHzMxjdzZFmAbQe++5mk99dQteXQH6GcmPZ3TxFtM6H0pcORBUoKTbdbRFkLcT1gRK6CzwB7gJXgbvAVeAucBW4C1wF7gJXgbvAVeAucJWSuIv8DB7itrvIz+AzNt2NrVtIK6K1CeRn8BnL7orVYulku0t2kqPIz+An9t3lORn0UoT8DNEf3ANFpBDuquQMVAqRn4F77MHP6zlNgdwtUn4Gvu0nZ3oRYIdCuFu4/AwM7Zepmcd8LiFtjtewa8PsDaAt2He3SPkZjO5q9YPdwTzYWIMpcrux724R8zMwyN3gYRhig0KT4GRN/FrQDuy7W8j8DNp8Vx0okjVw1wb23S1ifgZ2LCe7wXF0PmCsgbvtxr67xc7PEKBPEvgXZ/EauGsB++5mk99dQteXQH6GcmPZ3TxFtM6H0pcORBUoKTbdbRFkLcT1gRK6CzwB7gJXgbvAVeAucBW4C1wF7gJXgbvAVeAucJWSuIv8DB7itrvIz+AzNt2NrVtIK6K1CeRn8BnL7orVYlFevHjx8uXLnZ0dOs52l+wkR5GfwU/su8tzMqhye3S8+tnghyf+NVNf3N7ezna32fkZrKzBTRuXbZgTS4TDn9EEIYVwVyVnGB2/t/Hsvz8/Wv3+ux9fGRin0NvQ3dbkZ2gnpnGDte1y4wZ7WFXHEbxe814gd8cm7j1aWO65fPcH7378yw/PP3my0nDO0ML8DO0jOa62vb4BcNcSyt3ag9n6wlJtaub5t9+995u//fDQn6/duDc9M9PQ3VbmZwgI9/bIzZXabh9tQ1tHdVDUq31s/V2imcyvw5qFORxkP5Xkr7qyU7G9nIJon9RhbAi/sO/u8O2x23dn//75rY1nz64O1d557/QvfneebtdqlvMzEFqNlodBKMsM42cDh/iUNKxUqE5YM2l22I/h17SpkwYTXL3P2HAeYd/duUfzv+76J8Xau5MLvzr22U86Prk0UKOZru38DFxEGdh4bItGRIqCgX+RC2Vl+HvZUk2tWcRO47jmuJvVp3/Yd3fs7sTc/OqPDv/lnfdPk7gf/PYfL17+j+ot52cgkg41dldOVcOWMkdJfnfT5rvZffqHfXdv3rqztr71+097f/z+Jz/94K//vjLBv9y1mp+BQzWGzAzCqtAkrZmqpAAZn0Xo/Yf9GOYMRBBfQ3359wwN+vQO++7eGRl9+HC6vrD6h0+v/qna9/zbnfWNDdv5GXQXZSW/HwprdBH5TRirl8Kx2MlqDnd3GmOk/PSvJO/VOPrQIkgn+5R3b7hXazPcXc729jaFW7pF4wmdFPndJXR9iXblZ/A6+FnEsrt5imidD6UvHYiqlgN37WDT3RZB1rZRXALu2qGE7gJPgLvAVeAucBW4C1wF7gJXgbvAVeAucBW4C1ylJO4iP4OHuO0u8jP4jE13Y+sW0opobQL5GXzGsrtitVg62e6SneQo8jP4iX13eVoGvfRcvHrxSl9v/1BDd5udn8GwENa8NlzwZqtwgoFkMeyPMIDlPgYK4a7Kz0Bl/Jup2tTM9Gx96MZwHnebm5+hItd0S7hnTXdXXsUWmIebiNKBuwYK5O7YxL2vaw+npudm6/MLjxdvfnWrobtNz8/Q2dUR2eQz2P12V3e6N7t2N28PcNdAIdwdm7g/Pvlg8v40hVvSdml5eWVlZXRsrKG7LcjPQP9VIORbGkNvoukRiLRT0c2Sap+ZQBORvTfELCXRebjtp6LvC8qslHkk2BBhLoiSYt/dLy5do0nCw5n6o/nHpOz6+vpGwKSl/Axy928gBHNOU02gatJPRaWMTmqpDfdMqaajdy4u1ObcaZXyaWh5JKK7REuIfXcv9w5QtF1cWqL7rc3NzecSa/kZhLLKuYgZ0jmDNIlTMgRGgi6hXcXiZUoP8mkExJ9bvFJcGBT2ntGGKC/23b02cP3x4tLq6irFWlKWavh2S3v5GYKpwqCyRFeE68jnEtmnWFykyMf/s8chulhydpHsIU1Ts7ux+K0PUVrsu3v9y5tc3K2tLXq4I7GZnyEIgdI5WU+V3BvmCm+ZcYp7Fm5G19AGUu3NneefM8RmCNoQ5cW+u3dGRicna9PTM4/m55efPFl7+vTp+rql/Azq9abgpyKZqmcxkn0oG1IuJE8x2O2XuvEKYaqJz/fIiIke5Cyiot+WGSuZ8bxDzBnaAnc3m/zuErq+RLvyM6SSuEtrKszX2FTBLyy7m6eI1vlQ+tKBqLIFmzOouWnzYUG9lf0XH5vutgiy1ra4fALQik9tObVgxeugS5TQXeAJcBe4CtwFrgJ3gavAXeAqcBe4CtwFrgJ3gauUxF3kZ/AQt91FfgafselubN1CWhGtTSA/g89YdlesFksn212ykxxFfgY/se8uz8mgl7LnZ+Boq2qS69ZBDgrhrkrOQMWD/AxiqXi4tJf/bOXrsZu3TUkokLve5GdgEXfXa9LhbjHc9Ss/Q+p+B95byrVBqA6GoGuppT6cp9h317v8DKLbJBnXagOFGRhiQ3uHfXe9y8/QIO7yg+i1YdANCjNbG9pX7LvrX36G6KwgJNQxfq1Bd7hbAHf9y88g+g/1Fd8zaE9AXKt8pVM+ZmDIxr67/uVnCGCWyzlALMAzgg71a/X2QT3rXB77iX13s8nvLqHrS5Q8P4P3WHY3TxGt86H0pQNRZQv2uc8DKmgJNt1tEWStbXH5FCKcPIBWUEJ3gSfAXeAqcBe4CtwFbvLq1f8BJgFVCVqdWwcAAAAASUVORK5CYII=" alt="The desired tag structure shown in a digiKam screenshot" />
+<p class="caption">The desired tag structure shown in a digiKam screenshot</p>
+</div>
+<p>Two <strong>important</strong> warnings about metadata tagging: image management software must be configured to write custom image metadata tags into the images themselves, not into .xmp sidecar files. The relevant functions cannot read tags from .xmp sidecar files. Make sure you set the preferences in your image management software accordingly. In digiKam, go to Settings/Configure digiKam/Metadata. There, make sure “Write to sidecar files” is unchecked.</p>
+<p>Secondly, do not use spaces or interpunction in the tag group names.</p>
+</div>
+<div id="how-does-metadata-extraction-work" class="section level3">
+<h3>How does metadata extraction work?</h3>
+<p>This if for those who are interested in the technical details of how custom metadata are saved in images. The image management software will save metadata in a metadata tag field called “HierarchicalSubject” which camtrapR can then read out. Let’s assume that in the above example we had three images, showing:</p>
+<ol style="list-style-type: decimal">
+<li>SpeciesA,</li>
+<li>Female1 of SpeciesB,</li>
+<li>both species in the same image.</li>
+</ol>
+<p>Here’s what the content of the HierarchicalSubject field would look like:</p>
+<p>Species|SpeciesA</p>
+<p>Species|SpeciesB, Individual|Female1</p>
+<p>Species|SpeciesA, Species|SpeciesB</p>
+<p>Note that multiple tags are separated by commas and hierarchy levels are by default separated by a vertical bar (“|”). Adobe software also lets you use colon (“:”); you can tell camtrapR which to use using argument <code>metadataHierarchyDelimitor</code> in a number of functions). camtrapR reads these lines and can automatically tabulate the contents.</p>
+</div>
+<div id="what-if-non-hierarchical-metadata-tags-were-assigned-to-images-already" class="section level3">
+<h3>What if non-hierarchical metadata tags were assigned to images already?</h3>
+<p>If you have set of tagged images, but the tags are not structured hierarchically as explained above, but rather flat (no tag groups, only tags), they can easily be brought into the format needed by camtrapR in digiKam. This will, however, change your original metadata structure. So to be on the safe side, take some precautions:</p>
+<ul>
+<li>make a backup of your images,</li>
+<li>first try it on a sub-dataset,</li>
+<li>and maybe even do it on another computer (digiKam’s internal tag structure changes and even re-loading the original images will not restore it).</li>
+</ul>
+<p>Let’s assume you have species tags (e.g. “Leopard Cat”) that are not hierarchically ordered. The digiKam workflow to order them hierarchically (in order to make them readable in camtrapR) is as follows:</p>
+<ol style="list-style-type: decimal">
+<li>Open the captions/tags window on the right side of your screen.</li>
+<li>create a new tag (e.g. “Species”).</li>
+<li>You can manipulate the tag structure by dragging tags around. So you could then drag your species tags (e.g. “Leopard Cat”) into the “Species” tag group (afterwards it should look similar to the screenshot above). But note: dragging the tags around doesn’t update the image metadata yet!</li>
+<li>To update the image metadata with your new tag structure (and to populate the image metadata tag “HierarchicalSubject” that camtrapR reads), select the images, click the “More” button in the bottom right corner of the screen, then “Write metadata to each file”.</li>
+<li>Repeat the last step for each station directory.</li>
+</ol>
+<p>Afterwards, the “HierarchicalSubject” of your image metadata should contain the tag structure. You can check using the <code>exifTagNames</code> function as described in the section above.</p>
+<p>This procedure also works for other tags, not only “Species”.</p>
+</div>
+<div id="how-to-import-a-metadata-tag-tree-into-digikam" class="section level3">
+<h3>How to import a metadata tag tree into digiKam</h3>
+<p>Consider this scenario: you created an elaborate tag tree and would like to share it with colleagues for them to tag images independently, but using the same tags that you use. Instead of making them create the tags manually, you can use a dummy image, assign <em>all</em> possible metadata tags of interest to it and share that tagged dummy image. Once imported into digiKam on another machine, that machine’s digiKam tag tree will be updated automatically and will then contain all tags present in your dummy image.</p>
+</div>
+</div>
+<div id="double-observer-identification" class="section level2">
+<h2>Double observer identification</h2>
+<p>Double observer identification is only available with metadata tagging, not with the drag &amp; drop method. It can be used both for species and individual identification (the latter with some limitations detailed below). Both observers need to tag images independently using separate metadata tag groups (e.g. “SpeciesID_Peter” and “SpeciesID_Paul”). but with both observers using identical tags for the same species/individual (e.g., not “Leopard Cat” and “leopard cat”). The function <code>checkSpeciesIdentification</code> then returns images that were assigned to different species/individuals by different observers, which can then be harmonised (see below). It also returns images that were tagged by one observer only.</p>
+</div>
+<div id="comparison-of-identification-methods" class="section level2">
+<h2>Comparison of identification methods</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Functionality</th>
+<th>metadata tagging</th>
+<th>drag &amp; drop</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>double observer identification</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>multiple species per image</td>
+<td>yes</td>
+<td>no<sup>1</sup></td>
+</tr>
+<tr class="odd">
+<td>batch ID</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>filtering by tags</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>crowd-source ID<sup>2</sup></td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>portability and robustness</td>
+<td>high<sup>3</sup></td>
+<td>medium<sup>4</sup></td>
+</tr>
+</tbody>
+</table>
+<p><sup>1</sup> images need to be copied and moved to different species directories to allow for this functionality</p>
+<p><sup>2</sup> identification performed by independent observers on sub-datasets</p>
+<p><sup>3</sup> species identification tags are written into metadata permanently</p>
+<p><sup>4</sup> Species ID depends on directory structure</p>
+</div>
+</div>
+<div id="species-identification" class="section level1">
+<h1>Species identification</h1>
+<div id="checking-species-names-with-the-itis-taxonomic-database" class="section level2">
+<h2>Checking species names with the ITIS taxonomic database</h2>
+<p>Generally, you are free to use any species names you wish to - scientific names, common names, local names, abbreviations, codes, etc. But it may often be desirable to be consistent with species names, e.g. to ensure long-term usability of data or to facilitate data exchange between researchers. Therefore, users can check the species names they wish to use in species identification (common or scientific names) against the <a href="http://www.itis.gov">ITIS taxonomic database</a> using the function <code>checkSpeciesNames</code>. The function returns matching common and scientific names to the names provided by the user, taxon ranks and authors, the ITIS taxonomic serial number (TSN) and an ITIS taxon url. Internally, the function <code>checkSpeciesNames</code> makes use of the R package <code>taxize</code>.</p>
+<p>If multiple matches are found, a menu allows users to choose their species of interest (if argument <code>ask = TRUE</code>). By default, only accepted species names are returned (controlled by argument <code>accepted</code>). Invalid names will return no matches but NA.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># find data for 2 species with correctly spelled names</span>
+checkNames1 &lt;-<span class="st"> </span><span class="kw">checkSpeciesNames</span> (<span class="dt">speciesNames =</span> <span class="kw">c</span>(<span class="st">&quot;Bearded Pig&quot;</span>, <span class="st">&quot;Malayan Civet&quot;</span>),
+                                  <span class="dt">searchtype   =</span> <span class="st">&quot;common&quot;</span>)
+checkNames1</code></pre></div>
+<pre><code>##      tsn     user_name     scientificName              commonName
+## 1 625012   Bearded Pig       Sus barbatus bearded pig/Bearded Pig
+## 2 622004 Malayan Civet Viverra tangalunga           Malayan Civet
+##     authorship rankname
+## 1 Müller, 1838  Species
+## 2   Gray, 1832  Species
+##                                                                               itis_url
+## 1 http://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&amp;search_value=625012
+## 2 http://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&amp;search_value=622004
+##   taxon_status
+## 1        valid
+## 2        valid</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># and with scientific names (note that this is for a subspecies)</span>
+checkNames2 &lt;-<span class="st"> </span><span class="kw">checkSpeciesNames</span> (<span class="dt">speciesNames =</span> <span class="st">&quot;Viverra tangalunga tangalunga&quot;</span>,
+                                  <span class="dt">searchtype   =</span> <span class="st">&quot;scientific&quot;</span>)
+checkNames2</code></pre></div>
+<pre><code>##      tsn                     user_name                scientificName
+## 1 726578 Viverra tangalunga tangalunga Viverra tangalunga tangalunga
+##   commonName authorship   rankname
+## 1         NA Gray, 1832 Subspecies
+##                                                                               itis_url
+## 1 http://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&amp;search_value=726578
+##   taxon_status
+## 1        valid</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># an invalid name: the accepted name of the leopard cat is Prionailurus bengalensis</span>
+checkNames3 &lt;-<span class="st"> </span><span class="kw">checkSpeciesNames</span> (<span class="dt">speciesNames =</span> <span class="st">&quot;Felis bengalensis&quot;</span>,
+                                  <span class="dt">searchtype   =</span> <span class="st">&quot;scientific&quot;</span>,
+                                  <span class="dt">accepted     =</span> <span class="ot">FALSE</span>)
+checkNames3</code></pre></div>
+<pre><code>##      tsn         user_name    scientificName  commonName authorship
+## 1 183793 Felis bengalensis Felis bengalensis leopard cat Kerr, 1792
+##   rankname
+## 1  Species
+##                                                                               itis_url
+## 1 http://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&amp;search_value=183793
+##   taxonUsageRating
+## 1          invalid</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## an ambiguous name name: Chevrotain (Tragulus)
+## this does not work in vignettes, but should run on your machine
+ <span class="co"># checkNames4 &lt;- checkSpeciesNames (speciesNames = c(&quot;Chevrotain&quot;),</span>
+ <span class="co">#                                   searchtype   = &quot;common&quot;)</span>
+ <span class="co"># 1              # making a choice from the menu</span>
+ <span class="co"># checkNames4</span></code></pre></div>
+</div>
+<div id="species-identification-via-drag-drop-of-images" class="section level2">
+<h2>Species identification via drag &amp; drop of images</h2>
+<p>Species identification by moving images into species directories is simple. It can be done in a generic file manager (provided it shows preview images) or in the file manager that comes with image management software (e.g. FastStone Image Viewer, IrfanView or digiKam). Images must be <strong>moved</strong> into species directories. <strong>Don’t copy</strong> images into species directories! All images must be placed in species directories and no image may be left outside species directories after identification.</p>
+<div id="creating-species-directories" class="section level3">
+<h3>Creating species directories</h3>
+<p>The function <code>createSpeciesFolders</code> assists with species identification by drag &amp; drop by creating species directories automatically in all station directories. Alternatively, directories can be created manually. <code>createSpeciesFolders</code> can also remove empty species directories after identification (by setting <code>removeFolders = FALSE</code>). In doing so, it will not touch directories that contain any files.</p>
+<p>It makes sense to create directories for all species one expects to find in the study area, and possibly also for images one wants to exclude later on, e.g. unidentifiable images, blank images or team photos.</p>
+<p>Here is an example in which we first create station directories and the then species directories within these. Note that creating station directories in the example is for demonstration purposes only. Normally, at this point you would already have a directory structure with station directories (possibly with camera subdirectories), each containing renamed, unsorted images. Running <code>createStationFolders</code> here therefore is for demonstration only.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># this dummy directory will be used as inDir (containing station directories with species subdirectories)</span>
+wd_createSpeciesFoldersTest &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(), <span class="st">&quot;createSpeciesFoldersTest&quot;</span>)
+
+<span class="co"># now first create the station directories</span>
+<span class="co"># (normally, you'd create species directories in the station directories that </span>
+<span class="co"># already contain renamed, unsorted images). Again, this is for demonstation only.</span>
+StationFolderCreate1 &lt;-<span class="st"> </span><span class="kw">createStationFolders</span> (<span class="dt">inDir       =</span> wd_createSpeciesFoldersTest,
+                                              <span class="dt">stations    =</span> <span class="kw">as.character</span>(camtraps$Station), 
+                                              <span class="dt">createinDir =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## created 3 directories</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">StationFolderCreate1</code></pre></div>
+<pre><code>##    station
+## 1 StationA
+## 2 StationB
+## 3 StationC
+##                                                                                directory
+## 1 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationA
+## 2 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationB
+## 3 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationC
+##   created exists
+## 1    TRUE   TRUE
+## 2    TRUE   TRUE
+## 3    TRUE   TRUE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># species names for which we want to create subdirectories</span>
+species &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Sambar Deer&quot;</span>, <span class="st">&quot;Bay Cat&quot;</span>)
+
+<span class="co"># create species subdirectories</span>
+SpeciesFolderCreate1 &lt;-<span class="st"> </span><span class="kw">createSpeciesFolders</span> (<span class="dt">inDir               =</span> wd_createSpeciesFoldersTest,
+                                              <span class="dt">species             =</span> species,
+                                              <span class="dt">hasCameraFolders    =</span> <span class="ot">FALSE</span>,
+                                              <span class="dt">removeFolders       =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<pre><code>## created 6 directories</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SpeciesFolderCreate1</code></pre></div>
+<pre><code>##                                                                                            directory
+## 1 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationA/Sambar Deer
+## 2     C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationA/Bay Cat
+## 3 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationB/Sambar Deer
+## 4     C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationB/Bay Cat
+## 5 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationC/Sambar Deer
+## 6     C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationC/Bay Cat
+##   created exists
+## 1    TRUE   TRUE
+## 2    TRUE   TRUE
+## 3    TRUE   TRUE
+## 4    TRUE   TRUE
+## 5    TRUE   TRUE
+## 6    TRUE   TRUE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># delete empty species directories</span>
+SpecFolderCreate2 &lt;-<span class="st"> </span><span class="kw">createSpeciesFolders</span> (<span class="dt">inDir               =</span> wd_createSpeciesFoldersTest,
+                                           <span class="dt">species             =</span> species,
+                                           <span class="dt">hasCameraFolders    =</span> <span class="ot">FALSE</span>,
+                                           <span class="dt">removeFolders       =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## deleted 6 empty directories</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">SpecFolderCreate2</code></pre></div>
+<pre><code>##                                                                                            directory
+## 1 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationA/Sambar Deer
+## 2     C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationA/Bay Cat
+## 3 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationB/Sambar Deer
+## 4     C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationB/Bay Cat
+## 5 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationC/Sambar Deer
+## 6     C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/createSpeciesFoldersTest/StationC/Bay Cat
+##   still.exists
+## 1        FALSE
+## 2        FALSE
+## 3        FALSE
+## 4        FALSE
+## 5        FALSE
+## 6        FALSE</code></pre>
+</div>
+<div id="moving-images-into-species-directories" class="section level3">
+<h3>Moving images into species directories</h3>
+<p>Now is the time to move (not copy) images of species into the prepared species directories. If images were misplaced (thereby misidentified) they can be moved to another species directory at any time. Rerun the following function and species identification will be updated in your tables (see function <code>recordTable</code> in the Data extraction vignette).</p>
+</div>
+</div>
+<div id="species-identification-by-metadata-tagging" class="section level2">
+<h2>Species identification by metadata tagging</h2>
+<p>If you wish to use metadata tagging for species identification, first set up the hierarchical metadata tag structure as explained above. Also, make sure your images are in station directories like this:</p>
+<blockquote>
+<p>inDir/Station/…</p>
+</blockquote>
+<p>or</p>
+<blockquote>
+<p>inDir/Station/Camera/…</p>
+</blockquote>
+<p>(… being the renamed JPG images). Note that the directory structure is the one produced by function <code>imageRename</code>.</p>
+<p>Now you can begin tagging your images. Contrary to species identification by drag an drop, it is not necessary to create species directories and to move images when using metadata tags for identification. Several species tags can be assigned to the same image if images recorded several species. They will be separated into separate records when you tabulate records. Once identification is complete, function <code>recordTable</code> will extract and tabulate the metadata for you (see vignette “Extracting Data from Images”).</p>
+</div>
+<div id="checking-species-identification" class="section level2">
+<h2>Checking species identification</h2>
+<p>Misidentified images can act as false positives and can thus have grave effects when analysing detection/non-detection data, e.g. with occupancy models. Therefore it is very important to make sure species identification is correct. Species may be misidentifed by moving images into wrong directories or assigning wrong species tags. This can be (partly) checked using function <code>checkSpeciesIdentification</code>. Within each station and for each image, it assesses whether there are images of another species taken within a given time interval. Often, it is unlikely that different species are encountered within very short time intervals at the same location. This can help to find images that were misidentified, particularly if they were part of a sequence of images. The function will not be able to find “isolated” images, i.e. images that were misidentified, but were not part of a sequence of images. Likewise, if all images of a sequence were misidentified, they cannot be found either.</p>
+<p><code>checkSpeciesIdentification</code> can check on species identification for both methods of species identification: drag &amp; drop into species directories or metadata tagging. The former requires one of the following directory structures:</p>
+<blockquote>
+<p>inDir/Station/Species<br />
+inDir/Station/Camera/Species</p>
+</blockquote>
+<p>The latter requires one of the following directory structures:</p>
+<blockquote>
+<p>inDir/Station<br />
+inDir/Station/Camera</p>
+</blockquote>
+<p>Here is an example using images identified with the drag &amp; drop method.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">wd_images_ID &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;pictures/sample_images&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;camtrapR&quot;</span>)
+
+<span class="co"># run check with 120 seconds (2 minutes) maximum time differnce</span>
+check.folders &lt;-<span class="st"> </span><span class="kw">checkSpeciesIdentification</span>(<span class="dt">inDir               =</span> wd_images_ID,
+                                            <span class="dt">IDfrom              =</span> <span class="st">&quot;directory&quot;</span>,
+                                            <span class="dt">hasCameraFolders    =</span> <span class="ot">FALSE</span>,
+                                            <span class="dt">maxDeltaTime        =</span> <span class="dv">120</span>)</code></pre></div>
+<pre><code>## StationA : checking 8 images in 2 directories</code></pre>
+<pre><code>## StationB : checking 23 images in 4 directories</code></pre>
+<pre><code>## StationC : checking 37 images in 4 directories</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">check.folders</code></pre></div>
+<pre><code>## $temporalIndependenceCheck
+##     station
+## 7  StationC
+## 29 StationC
+##                                                                                                      Directory
+## 7  C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationC/EGY
+## 29 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationC/TRA
+##                                 FileName species    DateTimeOriginal
+## 7  StationC__2009-04-27__00-17-00(1).JPG     EGY 2009-04-27 00:17:00
+## 29 StationC__2009-04-27__00-19-00(1).JPG     TRA 2009-04-27 00:19:00
+## 
+## $IDconflictCheck
+## data frame with 0 columns and 0 rows</code></pre>
+<p>The function returns a list with 2 elements. The first element (<code>temporalIndependenceCheck</code>) is the check on temporal proximity of different species (the second element <code>IDconflictCheck</code> is describes in the next paragraph). In our example, two images of different species were taken within 2 minutes of one another at StationC (a chevrotain and a moon rat in our example). Now one should check the species identity of these 2 images to make sure they were identified correctly. If not, the species ID in the incorrectly identified image is corrected. The function <code>checkSpeciesIdentification</code> can be re-run as often as desired. The behaviour of the function can be further specified by arguments <code>excludeSpecies</code> and <code>stationsToCheck</code>. The first causes camtrapR to ignore certain species and the latter can be used to check only certain stations.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># check only station A and B (will give no results)</span>
+<span class="kw">checkSpeciesIdentification</span>(<span class="dt">inDir               =</span> wd_images_ID,
+                           <span class="dt">IDfrom              =</span> <span class="st">&quot;directory&quot;</span>,
+                           <span class="dt">hasCameraFolders    =</span> <span class="ot">FALSE</span>,
+                           <span class="dt">maxDeltaTime        =</span> <span class="dv">120</span>,
+                           <span class="dt">stationsToCheck     =</span> <span class="kw">c</span>(<span class="st">&quot;StationA&quot;</span>, <span class="st">&quot;StationB&quot;</span>))</code></pre></div>
+<pre><code>## StationA : checking 8 images in 2 directories</code></pre>
+<pre><code>## StationB : checking 23 images in 4 directories</code></pre>
+<pre><code>## $temporalIndependenceCheck
+## data frame with 0 columns and 0 rows
+## 
+## $IDconflictCheck
+## data frame with 0 columns and 0 rows</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Exclude chevrotains (Tragulus spp).  will give no results</span>
+<span class="kw">checkSpeciesIdentification</span>(<span class="dt">inDir               =</span> wd_images_ID,
+                           <span class="dt">IDfrom              =</span> <span class="st">&quot;directory&quot;</span>,
+                           <span class="dt">hasCameraFolders    =</span> <span class="ot">FALSE</span>,
+                           <span class="dt">maxDeltaTime        =</span> <span class="dv">120</span>,
+                           <span class="dt">excludeSpecies      =</span> <span class="st">&quot;TRA&quot;</span>)</code></pre></div>
+<pre><code>## StationA : checking 8 images in 2 directories
+## StationB : checking 23 images in 4 directories</code></pre>
+<pre><code>## StationC : checking 20 images in 3 directories</code></pre>
+<pre><code>## $temporalIndependenceCheck
+## data frame with 0 columns and 0 rows
+## 
+## $IDconflictCheck
+## data frame with 0 columns and 0 rows</code></pre>
+</div>
+<div id="comparing-double-observer-identification" class="section level2">
+<h2>Comparing double observer identification</h2>
+<p>The second element returned by <code>checkSpeciesIdentification</code> (<code>IDconflictCheck</code>) reports on images with conflicting IDs if two observers identified images via metadata tagging. To that end, the arguments <code>metadataSpeciesTag</code> and <code>metadataSpeciesTagToCompare</code> need to be set. All records that differ in their assigned IDs will be reported (also if one of them is empty). If <code>metadataSpeciesTagToCompare</code> is not defined, the data frame will be empty.</p>
+</div>
+<div id="appending-species-names-to-image-files" class="section level2">
+<h2>Appending species names to image files</h2>
+<p>Once species are identified correctly, species names can be appended to image file names using <code>appendSpeciesNames</code>. The species names are taken from the directory names (of the drag and drop method was used) or from metadata tags and will be appended to the image file names. Set argument <code>IDfrom = &quot;directory&quot;</code> or <code>IDfrom = &quot;metadata&quot;</code>, respectively. A data frame will show directories, old and new file names.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># copy sample images to another location (so we don't mess around in the package directory)</span>
+wd_images_ID &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;pictures/sample_images&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;camtrapR&quot;</span>)
+<span class="kw">file.copy</span>(<span class="dt">from =</span> wd_images_ID, <span class="dt">to =</span> <span class="kw">tempdir</span>() , <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">wd_images_species_copy &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(), <span class="st">&quot;sample_images&quot;</span>)
+
+
+species_names_append &lt;-<span class="st"> </span><span class="kw">appendSpeciesNames</span>(<span class="dt">inDir               =</span> wd_images_species_copy,
+                                           <span class="dt">IDfrom              =</span> <span class="st">&quot;directory&quot;</span>,
+                                           <span class="dt">hasCameraFolders    =</span> <span class="ot">FALSE</span>
+)</code></pre></div>
+<pre><code>## renamed 68 out of 68 images in C:\Users\JRGEN~1\AppData\Local\Temp\RtmpOuKnnX/sample_images</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(species_names_append)</code></pre></div>
+<pre><code>##                                                                         directory
+## 1 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 2 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 3 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 4 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 5 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 6 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+##                            filename_old species
+## 1 StationA__2009-04-21__00-40-00(1).JPG     PBE
+## 2 StationA__2009-04-22__20-19-00(1).JPG     PBE
+## 3 StationA__2009-04-22__20-21-00(1).JPG     PBE
+## 4 StationA__2009-04-23__00-07-00(1).JPG     PBE
+## 5 StationA__2009-04-23__00-09-00(1).JPG     PBE
+## 6 StationA__2009-05-07__17-11-00(1).JPG     PBE
+##                                 filename_new renamed
+## 1 StationA__2009-04-21__00-40-00(1)__PBE.JPG    TRUE
+## 2 StationA__2009-04-22__20-19-00(1)__PBE.JPG    TRUE
+## 3 StationA__2009-04-22__20-21-00(1)__PBE.JPG    TRUE
+## 4 StationA__2009-04-23__00-07-00(1)__PBE.JPG    TRUE
+## 5 StationA__2009-04-23__00-09-00(1)__PBE.JPG    TRUE
+## 6 StationA__2009-05-07__17-11-00(1)__PBE.JPG    TRUE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">species_names_remove &lt;-<span class="st"> </span><span class="kw">appendSpeciesNames</span>(<span class="dt">inDir               =</span> wd_images_species_copy,
+                                           <span class="dt">IDfrom              =</span> <span class="st">&quot;directory&quot;</span>,
+                                           <span class="dt">hasCameraFolders    =</span> <span class="ot">FALSE</span>,
+                                           <span class="dt">removeNames         =</span> <span class="ot">TRUE</span>
+)</code></pre></div>
+<pre><code>## renamed 68 out of 68 images in C:\Users\JRGEN~1\AppData\Local\Temp\RtmpOuKnnX/sample_images</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(species_names_remove)</code></pre></div>
+<pre><code>##                                                                         directory
+## 1 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 2 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 3 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 4 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 5 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+## 6 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sample_images/StationA/PBE
+##                                 filename_old species
+## 1 StationA__2009-04-21__00-40-00(1)__PBE.JPG     PBE
+## 2 StationA__2009-04-22__20-19-00(1)__PBE.JPG     PBE
+## 3 StationA__2009-04-22__20-21-00(1)__PBE.JPG     PBE
+## 4 StationA__2009-04-23__00-07-00(1)__PBE.JPG     PBE
+## 5 StationA__2009-04-23__00-09-00(1)__PBE.JPG     PBE
+## 6 StationA__2009-05-07__17-11-00(1)__PBE.JPG     PBE
+##                            filename_new renamed
+## 1 StationA__2009-04-21__00-40-00(1).JPG    TRUE
+## 2 StationA__2009-04-22__20-19-00(1).JPG    TRUE
+## 3 StationA__2009-04-22__20-21-00(1).JPG    TRUE
+## 4 StationA__2009-04-23__00-07-00(1).JPG    TRUE
+## 5 StationA__2009-04-23__00-09-00(1).JPG    TRUE
+## 6 StationA__2009-05-07__17-11-00(1).JPG    TRUE</code></pre>
+</div>
+<div id="collecting-all-images-of-a-species" class="section level2">
+<h2>Collecting all images of a species</h2>
+<p>The function <code>getSpeciesImages</code> collects all images of a focal species from all stations and saves them in another directory, creating an image report. This should be done after all images were identified. The function serves 2 purposes:</p>
+<ol style="list-style-type: decimal">
+<li>it can be used to check species identification by creating a species image report (which can then be sent for expert identification and confirmation), and</li>
+<li>it is a prerequisite for individual identification.</li>
+</ol>
+<p>The images that are to be copied can be specified an a record table (as returned by function <code>recordTable</code>) or, alternatively, the function can scan for all images of your target species that were identified using either the drag and drop method or metadata tagging for species identification. Please see the function help file for more detail.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># again, we use a temporary directory for demonstration. Change this in your own code!</span>
+wd_images_species_copy &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(), <span class="st">&quot;sampleSpeciesImages&quot;</span>)
+
+species_to_copy &lt;-<span class="st"> &quot;VTA&quot;</span>    <span class="co"># = Viverra tangalunga, Malay Civet</span>
+
+specImagecopy &lt;-<span class="st"> </span><span class="kw">getSpeciesImages</span>(<span class="dt">species                 =</span> species_to_copy,
+                                  <span class="dt">IDfrom                  =</span> <span class="st">&quot;directory&quot;</span>,
+                                  <span class="dt">inDir                   =</span> wd_images_ID,
+                                  <span class="dt">outDir                  =</span> wd_images_species_copy,
+                                  <span class="dt">createStationSubfolders =</span> <span class="ot">FALSE</span>
+  )</code></pre></div>
+<pre><code>## VTA  - copied 5 out of 5 images in C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images   to   C:\Users\JRGEN~1\AppData\Local\Temp\RtmpOuKnnX/sampleSpeciesImages/VTA</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">specImagecopy</code></pre></div>
+<pre><code>##   species
+## 1     VTA
+## 2     VTA
+## 3     VTA
+## 4     VTA
+## 5     VTA
+##                                                                                                 DirectoryOrig
+## 1 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/VTA
+## 2 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationA/VTA
+## 3 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationB/VTA
+## 4 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationB/VTA
+## 5 C:/Users/Jürgen/AppData/Local/Temp/RtmpqkIbK4/Rinst267c53ddcc0/camtrapR/pictures/sample_images/StationC/VTA
+##                            FilenameOrig
+## 1 StationA__2009-04-10__05-07-00(1).JPG
+## 2 StationA__2009-05-06__19-06-00(1).JPG
+## 3 StationB__2009-04-15__19-12-00(1).JPG
+## 4 StationB__2009-04-27__05-07-00(1).JPG
+## 5 StationC__2009-04-24__02-57-00(1).JPG
+##                                                                  DirectoryCopy
+## 1 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sampleSpeciesImages/VTA
+## 2 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sampleSpeciesImages/VTA
+## 3 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sampleSpeciesImages/VTA
+## 4 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sampleSpeciesImages/VTA
+## 5 C:\\Users\\JRGEN~1\\AppData\\Local\\Temp\\RtmpOuKnnX/sampleSpeciesImages/VTA
+##                            FilenameCopy copy_ok
+## 1 StationA__2009-04-10__05-07-00(1).JPG    TRUE
+## 2 StationA__2009-05-06__19-06-00(1).JPG    TRUE
+## 3 StationB__2009-04-15__19-12-00(1).JPG    TRUE
+## 4 StationB__2009-04-27__05-07-00(1).JPG    TRUE
+## 5 StationC__2009-04-24__02-57-00(1).JPG    TRUE</code></pre>
+</div>
+</div>
+<div id="individual-identification" class="section level1">
+<h1>Individual identification</h1>
+<p>Before individual identification, images need to be identified to species level using one of the methods described above. All images of the focal species are then collected using <code>getSpeciesImages</code> (you could also do it manually, but it is laborious and cumbersome). Users can choose if they need station directories or not. Note that it is not possible (but also not needed) to have camera subdirectories in station directories. Thus, directory structure is one of these:</p>
+<blockquote>
+<p>speciesImages/SpeciesA/…</p>
+</blockquote>
+<p>or</p>
+<blockquote>
+<p>speciesImages/SpeciesA/Station1/…</p>
+</blockquote>
+<p>where … stands for the renamed JPG images.</p>
+<p>As with species identification, individuals can be identified by drag and drop or by metadata tagging. We recommend identifying individuals using metadata tags in image management software because is more convenient.</p>
+<div id="requirements" class="section level2">
+<h2>Requirements</h2>
+<p>Identifying individuals from images is similar to species identification, but there are important differences: In order to use the function <code>recordTableIndividual</code> which extracts the information from tagged images, images must have been copied into a species directory (e.g. with <code>getSpeciesImages</code>). It is further recommended to use <code>imageRename</code> for renaming images earlier in the workflow (if images were not renamed, make sure you create station directories when collecting the species images with <code>getSpeciesImages</code>.</p>
+<p>This will ensure that the function can find all the relevant information:</p>
+<ul>
+<li>species names are read from the directory name</li>
+<li>station ID: read either from the directory name or file name (depending on argument <code>hasStationFolders</code>)</li>
+<li>camera ID: read from filename (depending on argument <code>cameraID</code>). This is optional.</li>
+<li>individual ID: read from metadata tags or individual directory names (depending on argument <code>IDfrom</code>)</li>
+</ul>
+</div>
+<div id="individual-identification-by-drag-drop" class="section level2">
+<h2>Individual identification by drag &amp; drop</h2>
+<p>Individuals can be identified by moving images into individual directories, either within station directories or not. If no station directories are used, the images must have been renames with <code>imageRename</code> because otherwise there will be no way of deriving the station ID.</p>
+</div>
+<div id="individual-identification-by-metadata-tagging" class="section level2">
+<h2>Individual identification by metadata tagging</h2>
+<p>Metadata tagging of individual IDs is analogous to species assignment with metadata.</p>
+<div id="double-observer-identification-of-individuals" class="section level3">
+<h3>Double observer identification of individuals</h3>
+<p>Despite its name, the function <code>checkSpeciesIdentification</code>can also be used to compare individual IDs assigned via metadata by multiple observers (with some limitations still). The idea is the same as with comparing double-observer species identifcation. In other words, the function treats individual IDs as if they were species IDs. Images of a species need to be stored in a species directory containing only images of that species (see function <code>getSpeciesImages</code>), preferably in station subdirectories. If images were not stored in station directories, the function will not be able to tell you which station the images were taken at (but you still have unique file names), do be careful when interpreting the first part of the output (the check for temporal independence).</p>
+<p>For lack of an example dataset in the package, here’s two theoretical code examples which assumes tagged images of only one species in this directory C:/Users/Peter/individualID/SpeciesA, either with or without station subdirectories</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># all images in one directory, no station subdirectories</span>
+<span class="co"># column &quot;station&quot; in outtable will be uninformative</span>
+ID_check1 &lt;-<span class="st"> </span><span class="kw">checkSpeciesIdentification</span>(<span class="dt">inDir                       =</span> <span class="st">&quot;C:/Users/Peter/individualID&quot;</span>,
+                                        <span class="dt">stationsToCheck             =</span> <span class="st">&quot;SpeciesA&quot;</span>,         <span class="co"># no station subdirectories</span>
+                                        <span class="dt">IDfrom                      =</span> <span class="st">&quot;metadata&quot;</span>,
+                                        <span class="dt">hasCameraFolders            =</span> <span class="ot">FALSE</span>,
+                                        <span class="dt">metadataSpeciesTag          =</span> <span class="st">&quot;Example_Species_ID_Paul&quot;</span>,
+                                        <span class="dt">metadataSpeciesTagToCompare =</span> <span class="st">&quot;Example_Species_ID_Peter&quot;</span>,
+                                        <span class="dt">maxDeltaTime                =</span> <span class="dv">60</span>)
+
+<span class="co"># check results with either of the following two:</span>
+<span class="co"># ID_check1[[2]]   </span>
+<span class="co"># ID_check1$IDconflictCheck   </span>
+
+<span class="co"># all images in station subdirectories</span>
+ID_check2 &lt;-<span class="st"> </span><span class="kw">checkSpeciesIdentification</span>(<span class="dt">inDir                       =</span> <span class="st">&quot;C:/Users/Peter/individualID/SpeciesA&quot;</span>,  <span class="co"># with station subdirectories</span>
+                                        <span class="dt">IDfrom                      =</span> <span class="st">&quot;metadata&quot;</span>,
+                                        <span class="dt">hasCameraFolders            =</span> <span class="ot">FALSE</span>,
+                                        <span class="dt">metadataSpeciesTag          =</span> <span class="st">&quot;Example_Species_ID_Paul&quot;</span>,
+                                        <span class="dt">metadataSpeciesTagToCompare =</span> <span class="st">&quot;Example_Species_ID_Peter&quot;</span>,
+                                        <span class="dt">maxDeltaTime                =</span> <span class="dv">60</span>)</code></pre></div>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

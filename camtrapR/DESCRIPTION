@@ -1,0 +1,39 @@
+Package: camtrapR
+Type: Package
+Title: Camera Trap Data Management and Preparation of Occupancy and
+        Spatial Capture-Recapture Analyses
+Version: 0.99.9
+Date: 2017-10-25
+Authors@R: c(
+        person("Juergen", "Niedballa", email = "niedballa@izw-berlin.de", role = c("aut", "cre")),
+        person("Alexandre", "Courtiol", role = "aut"),
+        person("Rahel", "Sollmann", role = "aut"),
+        person("John", "Mathai", role = "ctb"),
+        person("Seth Timothy", "Wong", role = "ctb"),
+        person("An The Truong", "Nguyen", role = "ctb"),
+        person("Azlan bin", "Mohamed", role = "ctb"),
+        person("Andrew", "Tilker", role = "ctb"),
+        person("Andreas", "Wilting", role = c("ctb", "ths"))
+        )
+Depends: R (>= 3.1.0)
+Imports: methods, rgdal, sp, overlap, secr, taxize, ritis
+Suggests: unmarked, knitr, rmarkdown, raster
+VignetteBuilder: knitr
+SystemRequirements: ExifTool
+        (http://www.sno.phy.queensu.ca/~phil/exiftool/)
+Description: Management of and data extraction from camera trap photographs in wildlife studies. The package provides a workflow for storing and sorting camera trap photographs, computes record databases and detection/non-detection matrices for occupancy and spatial capture-recapture analyses with great flexibility. In addition, it provides simple mapping functions (number of species, number of independent species detections by station) and can visualise activity data.
+License: GPL (>= 2)
+NeedsCompilation: no
+Packaged: 2017-10-25 11:10:37 UTC; J<c3><bc>rgen
+Author: Juergen Niedballa [aut, cre],
+  Alexandre Courtiol [aut],
+  Rahel Sollmann [aut],
+  John Mathai [ctb],
+  Seth Timothy Wong [ctb],
+  An The Truong Nguyen [ctb],
+  Azlan bin Mohamed [ctb],
+  Andrew Tilker [ctb],
+  Andreas Wilting [ctb, ths]
+Maintainer: Juergen Niedballa <niedballa@izw-berlin.de>
+Repository: CRAN
+Date/Publication: 2017-10-25 13:04:26 UTC
