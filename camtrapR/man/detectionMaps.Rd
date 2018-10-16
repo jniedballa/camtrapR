@@ -151,7 +151,7 @@ Mapstest <- detectionMaps(CTtable           = camtraps,
 # with a polygon in the background
 
 # make a dummy polygon for the background
-poly1 <- Polygon(cbind(c(523500,524500,525000),c(606500, 605000, 606000)))
+poly1 <- Polygon(cbind(c(521500,526500,527000, 521500),c(607500, 608000, 603500, 603500)))
 poly2 <- Polygons(list(poly1), "s1")
 poly3 <- SpatialPolygons(list(poly2))
 

@@ -56,7 +56,11 @@ The values of \code{timeShiftColumn} must adhere to the following pattern: "YYYY
 \code{timeShiftSignColumn} signifies the direction of the time shift. "+" moves image dates into the future (i.e. the image date lagged behind the actual date) and "-" moves image dates back (if the image dates were ahead of actual time).
 
 ExifTool stores the original images as \code{.JPG_original} files in the original file location. By setting \code{undo = TRUE}, any JPG files in the directories specified by \code{timeShiftTable} will be deleted and the original JPEGs will be restored from the JPG_original files. Please make a backup before using \code{undo}.
+
+Years can have 365 or 366 days, and months 28 to 31 days. Here is how the function handles these (from the exiftool help page):
+"The ability to shift dates by Y years, M months, etc, conflicts with the design goal of maintaining a constant shift for all time values when applying a batch shift. This is because shifting by 1 month can be equivalent to anything from 28 to 31 days, and 1 year can be 365 or 366 days, depending on the starting date. The inconsistency is handled by shifting the first tag found with the actual specified shift, then calculating the equivalent time difference in seconds for this shift and applying this difference to subsequent tags in a batch conversion."
 }
+
 \value{
  A \code{data.frame} containing the information about the processed directories and the number of images.
 }

@@ -103,7 +103,7 @@ These plots are generated from the record table and the camera trap table.
 \author{
 Juergen Niedballa
 
-Maintainer:Juergen Niedballa <niedballa@izw-berlin.de>
+Maintainer:Juergen Niedballa <camtrapr@gmail.com>
 }
 
 \references{

@@ -22,7 +22,8 @@ recordTable(inDir,
   metadataHierarchyDelimitor = "|",
   metadataSpeciesTag,
   additionalMetadataTags,
-  removeDuplicateRecords = TRUE
+  removeDuplicateRecords = TRUE,
+  returnFileNamesMissingTags = FALSE
 )
 }
 %- maybe also 'usage' for other objects documented here.
@@ -71,6 +72,9 @@ recordTable(inDir,
 }
   \item{removeDuplicateRecords}{
   logical. If there are several records of the same species at the same station (also same camera if cameraID is defined) at exactly the same time, show only one?
+}
+  \item{returnFileNamesMissingTags}{
+  logical. If species are assigned with metadata and images are not tagged, return a few file names of these images as a message?
 }
 }
 \details{

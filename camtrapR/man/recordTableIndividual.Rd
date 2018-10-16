@@ -22,7 +22,8 @@ recordTableIndividual(inDir,
   metadataHierarchyDelimitor = "|",
   metadataIDTag,
   additionalMetadataTags,
-  removeDuplicateRecords = TRUE
+  removeDuplicateRecords = TRUE,
+  returnFileNamesMissingTags = FALSE
 )
 }
 %- maybe also 'usage' for other objects documented here.
@@ -71,6 +72,9 @@ recordTableIndividual(inDir,
 }
   \item{removeDuplicateRecords}{
   logical. If there are several records of the same individual at the same station (also same camera if cameraID is defined) at exactly the same time, show only one?
+}
+  \item{returnFileNamesMissingTags}{
+  logical. If species are assigned with metadata and images are not tagged, return a few file names of these images as a message?
 }
 }
 \details{
