@@ -1,19 +1,36 @@
+Changes in camtrapR 1.0
+==========================
+
+bugfixes
+------------
+  o activityDensity: fixed problem with argument allSpecies = TRUE that caused output list to return values for one species only (reported by Sally Soo).
+  o appendSpeciesNames, checkSpeciesIdentification,getSpeciesImages, recordTableIndividual: fixed error in extracting species IDs from image metadata in directories in which no images are tagged. These stations are now skipped with a warning.
+  o detectionHistory / spatialDetectionHistory: fixed error with detection histories and effort matrix full of NAs arising if camera operation matrix had values > 2 (after argument camerasIndependent = TRUE in cameraOperation)
+
+other changes
+------------
+  o imageRename: meaningful error message if no DateTimeOriginal tag was readable (e.g. all cameras were Reconyx HC500)
+  o recordTable/ recordTableIndividual: new argument: returnFileNamesMissingTags: file name of images with missing species tag are returned if TRUE (default = FALSE)
+  o surveyReport: in sample R script enclosed in survey report zip file, object cameraOperation was renamed to camOp (to avoid the clash with the function name cameraOperation)
+  o detectionHistory: the detection history output csv was renamed from record_history... to detection_history...
+
+
 Changes in camtrapR 0.99.9
 ==========================
 
 bugfixes
 ------------
-o camera operation: fixed bug with empty entries in cameraCol when cameraCol is defined (reported by Partha Sarathi Ghose)
-o recordTable / recordTableIndividual: verbose warnings and better handling of situations in which date/time is unreadable (empty Exif:DateTimeOriginal metadata tag)
+  o camera operation: fixed bug with empty entries in cameraCol when cameraCol is defined (reported by Partha Sarathi Ghose)
+  o recordTable / recordTableIndividual: verbose warnings and better handling of situations in which date/time is unreadable (empty Exif:DateTimeOriginal metadata tag)
 
 new features
 ------------
   o detectionHistory / activity plot functions: if date/time is unreadable function returns row IDs to facilitate checks
-  o activityDensity: warning instead of error if bandwidth estimation fails and argumetn allSpecies = TRUE (arises with single records, or a few records at similar time of day)
+  o activityDensity: warning instead of error if bandwidth estimation fails and argument allSpecies = TRUE (problem occurred with single records, or few records at similar time of day)
 
 other changes
 ------------
-o exifTagNames: returns name of image from which metadata were extracted as a message
+  o exifTagNames: returns name of image from which metadata were extracted as a message
 
 
 Changes in camtrapR 0.99.8
