@@ -12,7 +12,8 @@ recordTable <- function(inDir,
                         metadataHierarchyDelimitor = "|",
                         metadataSpeciesTag,
                         additionalMetadataTags,
-                        removeDuplicateRecords = TRUE
+                        removeDuplicateRecords = TRUE,
+                        returnFileNamesMissingTags = FALSE
 )
 {
 
@@ -73,6 +74,8 @@ recordTable <- function(inDir,
   }
 
   stopifnot(is.logical(removeDuplicateRecords))
+  stopifnot(is.logical(returnFileNamesMissingTags))
+
 
   metadata.tagname <- "HierarchicalSubject"    # for extracting metadata assigned in tagging software
 
@@ -89,6 +92,10 @@ recordTable <- function(inDir,
   stopifnot(class(minDeltaTime) == "integer")
 
   if(minDeltaTime != 0){
+    if(removeDuplicateRecords == FALSE){
+      warning("minDeltaTime is > 0. Therefore, removeDuplicateRecords was set to TRUE (otherwise there may be records taken at the same time)", call. = FALSE, immediate. = TRUE)
+      removeDuplicateRecords <- TRUE
+    }
     stopifnot(hasArg(deltaTimeComparedTo))
     stopifnot(class(deltaTimeComparedTo) == "character")
     stopifnot(deltaTimeComparedTo %in% c("lastRecord", "lastIndependentRecord"))
@@ -143,8 +150,8 @@ recordTable <- function(inDir,
       metadata.tmp <- checkDateTimeOriginal (intable    = metadata.tmp,
                                              dirs_short = dirs_short,
                                              i          = i)
-      if(is.null(metadata.tmp)) next          
-      
+      if(is.null(metadata.tmp)) next
+
       # now split HierarchicalSubject tags and add as columns to table
       metadata.tmp <- addMetadataAsColumns (intable                    = metadata.tmp,
                                             metadata.tagname           = metadata.tagname,
@@ -159,11 +166,19 @@ recordTable <- function(inDir,
                                        speciesCol             = speciesCol,
                                        dirs_short             = dirs_short,
                                        i_tmp                  = i,
-                                       multiple_tag_separator = multiple_tag_separator
+                                       multiple_tag_separator = multiple_tag_separator,
+                                       returnFileNamesMissingTags = returnFileNamesMissingTags
       )
 
-      # if no tagged images in current station, go to next one
-      if(class(metadata.tmp) != "data.frame")       next
+      # if images in station contain no metadata species tags, skip that station
+      if(class(metadata.tmp) != "data.frame"){
+        if(metadata.tmp == "found no species tag") {
+          warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
+        } else {
+          warning(paste(dirs_short[i], ":   error in species tag extraction. Skipping. Please report", sep = ""), call. = FALSE, immediate. = TRUE)
+        }
+        next
+      }
 
       # remove empty metadata columns (if HierarchicalSubject is all empty or if additionalMetadataTags were not found)
       empty_cols <- which(apply(metadata.tmp, MARGIN = 2, FUN = function(X){all(X == "-")}))
@@ -185,7 +200,7 @@ recordTable <- function(inDir,
       }
 
       if(nrow(metadata.tmp) >= 1){   # if anything left after excluding species, do
-    
+
         # convert character vector extracted from images to time object and format for outfilename
         metadata.tmp$DateTimeOriginal <- as.POSIXct(strptime(x = metadata.tmp$DateTimeOriginal, format = "%Y:%m:%d %H:%M:%S", tz = timeZone))
 
