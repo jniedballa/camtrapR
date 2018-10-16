@@ -76,24 +76,6 @@ activityDensity <- function(recordTable,
       if(isTRUE(writePNG))  dev.off()
     }, silent = TRUE)
     if(class(try_error_tmp) == "try-error") warning(paste(toupper(spec.tmp), ": ", try_error_tmp[1], "    - SKIPPED", sep = ""), call. = FALSE)
-  
-    # if(isTRUE(writePNG)){
-    #   png(filename = paste("activity_density_", species, "_", Sys.Date(), ".png", sep = ""),
-    #       width = pngWidth, height = pngHeight, units = "px", res = 96, type = "cairo")
-    #   densityPlot(subset_species$Time.rad,
-    #               main = paste("Activity of", species),
-    #               rug = add.rug,
-    #               ...)
-    #   mtext(paste("number of records:", nrow(subset_species)), side = 3, line = 0)
-    #   dev.off()
-    # }
-    # if(isTRUE(plotR)){
-    #   densityPlot(subset_species$Time.rad,
-    #               main = paste("Activity of", species),
-    #               rug = add.rug,
-    #               ...)
-    #   mtext(paste("number of records:", nrow(subset_species)), side = 3, line = 0)
-    # }
     
   } else {
     
@@ -118,25 +100,18 @@ activityDensity <- function(recordTable,
                                                             rug  = add.rug,
                                                             ...)
             mtext(paste("number of records:", nrow(subset_species)), side = 3, line = 0)
-            }
+          }
           if(isTRUE(writePNG))  dev.off()
         }, silent = TRUE)
         if(class(try_error_tmp) == "try-error") warning(paste(toupper(spec.tmp), ": ", try_error_tmp[1], "    - SKIPPED", sep = ""), call. = FALSE)
       }
       
-      #if(isTRUE(plotR) & class(try_error_tmp) != "try-error"){
-      #  densityPlot(subset_species$Time.rad,
-      #              main = plot_main_title,
-      #              rug = add.rug,
-      #              ...)
-      #  mtext(paste("number of records:", nrow(subset_species)), side = 3, line = 0)
-      #}
-      #suppressWarnings(rm(try_error_tmp))
+      
+      subset_species_list[[i]] <- subset_species$Time.rad
+      names(subset_species_list)[i] <- spec.tmp
     }
-    subset_species_list[[i]] <- subset_species$Time.rad
-    names(subset_species_list)[i] <- spec.tmp
   }
-  #}
+  
   if(allSpecies == FALSE){
     return(invisible(subset_species$Time.rad))
   } else {
