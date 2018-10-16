@@ -1,18 +1,19 @@
 recordTableIndividual <- function(inDir,
-                                     hasStationFolders,
-                                     IDfrom,
-                                     cameraID,
-                                     camerasIndependent,
-                                     minDeltaTime = 0,
-                                     deltaTimeComparedTo,
-                                     timeZone,
-                                     stationCol,
-                                     writecsv = FALSE,
-                                     outDir,
-                                     metadataHierarchyDelimitor = "|",
-                                     metadataIDTag,
-                                     additionalMetadataTags,
-                                     removeDuplicateRecords = TRUE
+                                  hasStationFolders,
+                                  IDfrom,
+                                  cameraID,
+                                  camerasIndependent,
+                                  minDeltaTime = 0,
+                                  deltaTimeComparedTo,
+                                  timeZone,
+                                  stationCol,
+                                  writecsv = FALSE,
+                                  outDir,
+                                  metadataHierarchyDelimitor = "|",
+                                  metadataIDTag,
+                                  additionalMetadataTags,
+                                  removeDuplicateRecords = TRUE,
+                                  returnFileNamesMissingTags = FALSE
 
 )
 {
@@ -81,6 +82,7 @@ recordTableIndividual <- function(inDir,
   }
 
   stopifnot(is.logical(removeDuplicateRecords))
+  stopifnot(is.logical(returnFileNamesMissingTags))
 
   metadata.tagname <- "HierarchicalSubject"    # for extracting metadata assigned in tagging software
 
@@ -143,12 +145,12 @@ recordTableIndividual <- function(inDir,
     } else {
 
       message(paste(dirs_short[i], ":", nrow(metadata.tmp), "images"))
-      
+
       # check presence / consistency of DateTimeOriginal column, go to next station or remove records if necessary
       metadata.tmp <- checkDateTimeOriginal (intable    = metadata.tmp,
                                              dirs_short = dirs_short,
                                              i          = i)
-      if(is.null(metadata.tmp)) next          
+      if(is.null(metadata.tmp)) next
 
       # now split HierarchicalSubject tags and add as columns to table
       metadata.tmp <- addMetadataAsColumns (intable                    = metadata.tmp,
@@ -165,11 +167,21 @@ recordTableIndividual <- function(inDir,
                                        speciesCol             = individualCol,
                                        dirs_short             = dirs_short,
                                        i_tmp                  = i,
-                                       multiple_tag_separator = multiple_tag_separator
+                                       multiple_tag_separator = multiple_tag_separator,
+                                       returnFileNamesMissingTags = returnFileNamesMissingTags
       )
-      
-      # if no tagged images in current station, go to next one
-      if(class(metadata.tmp) != "data.frame")       next
+
+
+      # if images in station contain no metadata species tags or are not tagged, skip that station
+      if(class(metadata.tmp) != "data.frame"){
+        if(metadata.tmp == "found no species tag") {
+          warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
+        } else {
+          warning(paste(dirs_short[i], ":   error in species tag extraction. Skipping. Please report", sep = ""), call. = FALSE, immediate. = TRUE)
+        }
+        next
+      }
+
 
       # remove empty metadata columns (if HierarchicalSubject is all empty or if additionalMetadataTags were not found)
       empty_cols <- which(apply(metadata.tmp, MARGIN = 2, FUN = function(X){all(X == "-")}))
@@ -281,9 +293,9 @@ recordTableIndividual <- function(inDir,
       }
     }
   }
-  
 
-  
+
+
    # remove "independent" column
   cols_to_remove <- which(colnames(record.table3) %in% c("independent"))
   if(length(cols_to_remove) >= 1){
