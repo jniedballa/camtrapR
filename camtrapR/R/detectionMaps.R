@@ -30,7 +30,7 @@ detectionMaps <- function(CTtable,
   checkForSpacesInColumnNames(stationCol = stationCol, speciesCol = speciesCol, Xcol = Xcol, Ycol = Ycol)
   if(class(CTtable) != "data.frame") stop("CTtable must be a data.frame", call. = FALSE)
   if(class(recordTable) != "data.frame") stop("recordTable must be a data.frame", call. = FALSE)
-  
+
   if(!stationCol %in% colnames(CTtable))      stop(paste('stationCol = "',   stationCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
   if(!stationCol %in% colnames(recordTable))  stop(paste('stationCol = "',   stationCol,     '" is not a column name in recordTable', sep = ''), call. = FALSE)
   if(!speciesCol %in% colnames(recordTable))  stop(paste('speciesCol = "', speciesCol,       '" is not a column name in recordTable', sep = ''), call. = FALSE)
@@ -107,15 +107,28 @@ detectionMaps <- function(CTtable,
   lty_polygon_border <- 1
 
   range.expand.factor <- 0.04
-  x.range <- extendrange(r = range(range(dat2[Xcol])), f = range.expand.factor)
-  y.range <- extendrange(r = range(range(dat2[Ycol])), f = range.expand.factor)
+
+  if(hasArg(backgroundPolygon)){
+    x.range <- extendrange(r = range(c(coordinates(backgroundPolygon@bbox)[1,], dat2[,Xcol])), f = range.expand.factor)
+    y.range <- extendrange(r = range(c(coordinates(backgroundPolygon@bbox)[2,], dat2[,Ycol])), f = range.expand.factor)
+
+    X.tmp <- pngMaxPix / diff(range(c(coordinates(backgroundPolygon@bbox)[1,], dat2[,Xcol])))
+    Y.tmp <- pngMaxPix / diff(range(c(coordinates(backgroundPolygon@bbox)[1,], dat2[,Ycol])))
+
+  } else {
+
+    x.range <- extendrange(r = range(range(dat2[,Xcol])), f = range.expand.factor)
+    y.range <- extendrange(r = range(range(dat2[,Ycol])), f = range.expand.factor)
+
+    X.tmp <- pngMaxPix / diff(range(dat2[Xcol]))
+    Y.tmp <- pngMaxPix / diff(range(dat2[Ycol]))}
 
   par(mar = par.mar.tmp,
       xpd = TRUE,
       xaxs = "i")
 
-  X.tmp <- pngMaxPix / diff(range(dat2[Xcol]))
-  Y.tmp <- pngMaxPix / diff(range(dat2[Ycol]))
+
+
   if(X.tmp > Y.tmp){
     pngWidth <-  pngMaxPix
     pngHeight <- round(pngMaxPix / (X.tmp /  Y.tmp))
@@ -335,6 +348,9 @@ detectionMaps <- function(CTtable,
   }
 
   outtable <- data.frame(dat2, t3[,-1], n_species = t4[,-1])
+  # if only 1 species, add column name 
+  if(ncol(t3) == 2 & hasArg(speciesToShow)) colnames(outtable)[ncol(outtable) - 1] <- speciesToShow
+
   rownames(outtable) <- NULL
   # write Shapefile
   if(writeShapefile == TRUE){
