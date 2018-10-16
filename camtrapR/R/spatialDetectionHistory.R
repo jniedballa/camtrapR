@@ -51,15 +51,15 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   checkForSpacesInColumnNames(stationCol = stationCol, Xcol = Xcol, Ycol = Ycol, 
                                          recordDateTimeCol = recordDateTimeCol, speciesCol = speciesCol, individualCol)
-  if(class(CTtable) != "data.frame") stop("CTtable must be a data.frame", call. = FALSE)
-  if(!stationCol %in% colnames(CTtable)) stop(paste('stationCol = "',   stationCol,  '" is not a column name in CTtable', sep = ''), call. = FALSE)
+  if(class(CTtable) != "data.frame")       stop("CTtable must be a data.frame", call. = FALSE)
+  if(!stationCol %in% colnames(CTtable))   stop(paste('stationCol = "',   stationCol,  '" is not a column name in CTtable', sep = ''), call. = FALSE)
   if(!Xcol %in% colnames(CTtable))         stop(paste('Xcol = "',   Xcol,  '" is not a column name in CTtable', sep = ''), call. = FALSE)
   if(!Ycol %in% colnames(CTtable))         stop(paste('Ycol = "',   Ycol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
   
   if(!stationCol %in% colnames(recordTableIndividual))            stop(paste('stationCol = "',   stationCol,  '" is not a column name in recordTableIndividual', sep = ''), call. = FALSE)
-  if(!recordDateTimeCol %in% colnames(recordTableIndividual))  stop(paste('recordDateTimeCol = "', recordDateTimeCol,  '" is not a column name in recordTableIndividual', sep = ''), call. = FALSE)
+  if(!recordDateTimeCol %in% colnames(recordTableIndividual))     stop(paste('recordDateTimeCol = "', recordDateTimeCol,  '" is not a column name in recordTableIndividual', sep = ''), call. = FALSE)
   if(!speciesCol %in% colnames(recordTableIndividual))            stop(paste('speciesCol = "', speciesCol,  '" is not a column name in recordTableIndividual', sep = ''), call. = FALSE)
-  if(!individualCol %in% colnames(recordTableIndividual))       stop(paste('individualCol = "', individualCol,  '" is not a column name in recordTableIndividual', sep = ''), call. = FALSE)
+  if(!individualCol %in% colnames(recordTableIndividual))         stop(paste('individualCol = "', individualCol,  '" is not a column name in recordTableIndividual', sep = ''), call. = FALSE)
   
     
   stopifnot(length(stationCol) == 1)
@@ -133,6 +133,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
     stopifnot(minActiveDaysPerOccasion <= occasionLength)
   }
 
+  if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
   occasionStartTime    <- as.integer(round(occasionStartTime))
   if(occasionStartTime != 0 & !is.integer(occasionStartTime)) stop ("occasionStartTime must be between 0 and 23")
   if(occasionStartTime < 0 | occasionStartTime >= 24)         stop ("occasionStartTime must be between 0 and 23")
@@ -181,7 +182,8 @@ spatialDetectionHistory <- function(recordTableIndividual,
   #####################################################################################################################
   # bring date, time, station ids into shape
 
-  subset_species           <- subset(recordTableIndividual, recordTableIndividual[,speciesCol] == species)
+
+  subset_species           <- recordTableIndividual[recordTableIndividual[,speciesCol] == species,]
   subset_species$DateTime2 <- as.POSIXlt(subset_species[,recordDateTimeCol], tz = timeZone, format = recordDateTimeFormat)
 
 
@@ -215,6 +217,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
   if(day1 == "survey") {day1switch <- 1} else {
     if(day1 == "station") {day1switch <- 2} else {
       try(date.test <- as.Date(day1), silent = TRUE)
+      if(!exists("date.test")) stop("day1 is not specified correctly. It can only be 'station', 'survey', or a date formatted as 'YYYY-MM-DD', e.g. '2016-12-31'")
       if(class(date.test) != "Date") stop('could not interpret argument day1: can only be "station", "survey" or a specific date (e.g. "2015-12-31")')
       if(hasArg(buffer)) stop("if buffer is defined, day1 can only be 'survey' or 'station'")
       suppressWarnings(rm(date.test))
