@@ -138,7 +138,8 @@ assignSpeciesID <- function(intable,
                             speciesCol,
                             dirs_short,
                             i_tmp,
-                            multiple_tag_separator)
+                            multiple_tag_separator,
+                            returnFileNamesMissingTags)
 {
 
   file.sep <- .Platform$file.sep
@@ -155,10 +156,20 @@ assignSpeciesID <- function(intable,
         intable[,speciesCol] <- intable[,metadataSpeciesTag2]
         nrow.intable <- nrow(intable)
         species_records_to_remove <- which(is.na(intable[,speciesCol]))
+
         if(length(species_records_to_remove) >= 1){
+
+          if(isTRUE(returnFileNamesMissingTags)){
+            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "records out of", nrow.intable,
+                                 "because of missing species metadata tag:\n"),
+                          paste(head(paste(intable$Directory[species_records_to_remove], intable$FileName[species_records_to_remove], sep = file.sep)), collapse = "\n")),
+                    call. = FALSE, immediate. = TRUE)
+          } else {
+            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "records out of", nrow.intable,
+                                 "because of missing species metadata tag")),
+                    call. = FALSE, immediate. = TRUE)
+          }
           intable <- intable[-species_records_to_remove,]      #remove records without species tag
-          warning(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "records out of", nrow.intable,
-                         "because of missing species metadata tag"), call. = FALSE, immediate. = TRUE)
         }
 
         intable <- separateMultipleSpecies (intable                = intable,
@@ -241,10 +252,10 @@ addStationCameraID <- function(intable,
     if(cameraID == "directory"){            # this can only happen in recordTable. Not in recordTableIndividual
       if(IDfrom == "directory"){             # assumes directory structure: Station/Camera/Species
         intable <- cbind(intable,
-                         sapply(strsplit(intable$Directory, split = file.sep, fixed = TRUE), FUN = function(X){X[length(X) - 1]}))  
+                         sapply(strsplit(intable$Directory, split = file.sep, fixed = TRUE), FUN = function(X){X[length(X) - 1]}))
         } else {                                    # assumes directory structure: Station/Camera
         intable <- cbind(intable,
-                         sapply(strsplit(intable$Directory, split = file.sep, fixed = TRUE), FUN = function(X){X[length(X)]}))  
+                         sapply(strsplit(intable$Directory, split = file.sep, fixed = TRUE), FUN = function(X){X[length(X)]}))
         }
       colnames(intable)[ncol(intable)]     <- cameraCol
     }
@@ -260,7 +271,7 @@ checkDateTimeOriginal <- function (intable, dirs_short, i){
       warning(paste(dirs_short[i], ": no readable date/time information. Skipping"), call. = FALSE,  immediate. = TRUE)
       intable <- NULL
     } else {
-    
+
     # if date/time information is missing for some records only
      if(any(intable$DateTimeOriginal == "-")){
       which_no_time <- which(intable$DateTimeOriginal == "-")
@@ -673,7 +684,7 @@ calculateTrappingEffort <- function(cam.op,
 
     index <- 1
     for(m in 1:ncol(effort)){    # for every occasion in the effort matrix
-      # index for columns to aggregate
+      # index for columns in camera operation matrix to aggregate
       if(index + occasionLength2 <= ncol(cam.op)){
         index.tmp <- index : (index + occasionLength2 - 1)
       } else {
@@ -686,8 +697,8 @@ calculateTrappingEffort <- function(cam.op,
       effort[, m] <- ifelse(apply(as.matrix(cam.op[,index.tmp]), MARGIN = 1, FUN = function(X) {sum(is.na(X))}) == length(index.tmp), NA, effort[,m])
       # if full occasion = 0 in cam.op, make effort NA
       effort[, m] <- ifelse(apply(as.matrix(cam.op[,index.tmp]), MARGIN = 1, FUN = function(X) {all(X == 0)}),   NA, effort[,m])
-      # if full occasion is not 1 (i.e. all 0 or NA), set effort NA
-      effort[, m] <- ifelse(apply(as.matrix(cam.op[,index.tmp]), MARGIN = 1, FUN = function(X) {all(X != 1)}),   NA, effort[,m])
+      # if full occasion is smaller than 1 (i.e. all 0 or NA), set effort NA
+      effort[, m] <- ifelse(apply(as.matrix(cam.op[,index.tmp]), MARGIN = 1, FUN = function(X) {all(X < 1)}),   NA, effort[,m])
 
       # set cells in effort matrix NA (according to input arguments)
       # this is later used to adjust the detection/non-detection matrix
@@ -726,7 +737,7 @@ calculateTrappingEffort <- function(cam.op,
   if(isTRUE(scaleEffort2)){
     if(occasionLength2 == 1) stop("cannot scale effort if occasionLength is 1", call. = FALSE)
     if(length(table(effort)) == 1) stop(paste("all values of effort are identical (", names(table(effort)), "). Cannot scale effort", sep = ""), call. = FALSE)
-    
+
     scale.eff.tmp <- scale(as.vector(effort))                       # scale effort (as a vector, not matrix)
     scale.eff.tmp.attr <- data.frame(effort.scaled.center = NA,     # prepare empty data frame
                                      effort.scaled.scale = NA)
@@ -892,17 +903,17 @@ makeSurveyZip <- function(output,
   sink(file = scriptfile, append = TRUE)
   cat("###  camera operation matrix  ### \n\n")
 
-  cat(paste("cameraOperation <- cameraOperation(CTtable = CTtable,
-            stationCol                                  = '", stationCol, "',
+  cat(paste("camOp <- cameraOperation(CTtable = CTtable,
+            stationCol                        = '", stationCol, "',
             #cameraCol,
-            setupCol                                    = '", setupCol, "',
-            retrievalCol                                = '", retrievalCol, "',
-            hasProblems                                 = '", CTHasProblems, "',
+            setupCol                          = '", setupCol, "',
+            retrievalCol                      = '", retrievalCol, "',
+            hasProblems                       = '", CTHasProblems, "',
             #byCamera,
             #allCamsOn,
             #camerasIndependent,
-            dateFormat                                  = '", CTDateFormat, "' #,
-            #writecsv                                   = FALSE,
+            dateFormat                        = '", CTDateFormat, "' #,
+            #writecsv                         = FALSE,
             #outDir
   ) \n\n\n", sep = ""))
 
