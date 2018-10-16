@@ -37,10 +37,7 @@ imageRename <- function(inDir,
     stopifnot(length(outDir) == 1)
     if(isTRUE(all(unlist(strsplit(tolower(inDir), split = file.sep)) %in%
                   unlist(strsplit(tolower(outDir), split = file.sep))))) stop("outDir may not be identical to or a subdirectory of inDir", call. = FALSE)
-
-    #list.files.tmp <- list.files(outDir, recursive = TRUE)
-    #if(copyImages == TRUE & length(list.files.tmp) >= 1) stop("outDir must be empty if you wish to copy images", call. = FALSE)
-  }
+    }
   if(copyImages == TRUE){
 
     if(any(c(grep("/$", inDir) == 1, grep("/$", outDir) == 1))) stop("inDir and outDir may not end with /", call. = FALSE)
@@ -123,11 +120,12 @@ imageRename <- function(inDir,
       suppressWarnings(na.date.rows <- which(is.na(metadata.tmp$DateTimeOriginal)))
       if(length(na.date.rows) != 0){
         #metadata.tmp.na.date <- metadata.tmp[na.date.rows,]
-        warning(paste("couldn't read DateTimeOriginal tag of ",
-                    paste(file.path(metadata.tmp$Directory,  metadata.tmp$FileName)[na.date.rows], collapse = ", ")))
+        warning(paste("could not read DateTimeOriginal tag of: \n",
+                    paste(paste(metadata.tmp$Directory,  metadata.tmp$FileName, sep = file.sep)[na.date.rows], collapse = "\n")),
+                call. = FALSE, immediate. = TRUE)
         metadata.tmp <- data.frame(metadata.tmp, DateReadable = NA)
         metadata.tmp$DateReadable[-na.date.rows] <- TRUE
-        metadata.tmp$DateReadable[na.date.rows] <- FALSE
+        metadata.tmp$DateReadable[na.date.rows]  <- FALSE
       } else {
         metadata.tmp$DateReadable <- TRUE
       }
@@ -161,7 +159,7 @@ imageRename <- function(inDir,
       }
       rm(metadata.tmp.split, metadata.tmp.split2)
 
-      # convert time object character vector to and format for outfilename
+      # convert time object to character vector and format for outfilename
       time.tmp <- gsub(pattern = ":", replacement = "-", metadata.tmp2$DateTimeOriginal)
       time.tmp2 <- gsub(pattern = " ", replacement = "__", time.tmp)
       metadata.tmp2$DateTime_for_filename <- time.tmp2
@@ -193,6 +191,9 @@ imageRename <- function(inDir,
       rm(metadata.tmp2)
     }
   }
+
+  if(all(!isTRUE(copy.info.table$DateReadable))) stop("could not read DateTimeOriginal tag of any image. Check if the DateTimeOriginal tag is present in metadata with exifTagNames(..., returnMetadata = TRUE). If not, try fixing it with fixDateTimeOriginal()",
+                                                      call. = FALSE)
 
     # create directory structure in outDir
       if(isTRUE(copyImages)){
@@ -244,7 +245,7 @@ imageRename <- function(inDir,
       if(isTRUE(proceed)){
       # find items to copy
           items_to_copy <- which(copy.info.table$DateReadable == TRUE & copy.info.table$fileExistsAlready == FALSE)
-          
+
           message(paste("copying", length(items_to_copy), "images to", outDir, " ... This may take some time."))
 
           copy.info.table$CopyStatus[items_to_copy] <- file.copy(from      = apply(copy.info.table[items_to_copy, c("Directory", "FileName")],  MARGIN = 1, FUN = paste, collapse = file.sep),
