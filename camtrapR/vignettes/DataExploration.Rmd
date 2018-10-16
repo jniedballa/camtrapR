@@ -1,6 +1,6 @@
 ---
 title: "Data exploration and visualisation in camtrapR"
-author: Juergen Niedballa (<niedballa@izw-berlin.de>)
+author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
