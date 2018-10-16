@@ -67,6 +67,7 @@ detectionHistory <- function(recordTable,
   }
   stopifnot(is.logical(writecsv))
 
+  if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
   occasionStartTime <- as.integer(round(occasionStartTime))
   if(occasionStartTime != 0 & !is.integer(occasionStartTime)) {stop ("occasionStartTime must be between 0 and 23")}
   if(occasionStartTime < 0 | occasionStartTime >= 24){stop ("occasionStartTime must be between 0 and 23")}
@@ -109,7 +110,7 @@ detectionHistory <- function(recordTable,
   #############
   # bring date, time, station ids into shape
 
-  subset_species           <- subset(recordTable, recordTable[,speciesCol] == species)
+  subset_species           <- recordTable[recordTable[,speciesCol] == species,]
   subset_species$DateTime2 <- as.POSIXlt(subset_species[,recordDateTimeCol], tz = timeZone, format = recordDateTimeFormat)
 
   # check consistency of argument day1
@@ -118,6 +119,7 @@ detectionHistory <- function(recordTable,
   if(day1 == "survey") {day1switch <- 1} else {
     if(day1 == "station") {day1switch <- 2} else {
       try(date.test <- as.Date(day1), silent = TRUE)
+      if(!exists("date.test")) stop("day1 is not specified correctly. It can only be 'station', 'survey', or a date formatted as 'YYYY-MM-DD', e.g. '2016-12-31'")
       if(class(date.test) != "Date") stop('could not interpret argument day1: can only be "station", "survey" or a specific date (e.g. "2015-12-31")')
       if(hasArg(buffer)) stop("if buffer is defined, day1 can only be 'survey' or 'station'")
       suppressWarnings(rm(date.test))
@@ -205,8 +207,8 @@ if(day1 %in% c("survey")){
 
     # fill detection matrix with 1 in appropriate cells
     for(xyz in which(sapply(occasions.by.station, FUN = function(x){!is.null(x)}))){
-      if(any(occasions.by.station[[xyz]] < 0)) stop("this is a bug in the function (line 188). Please report it.", call. = FALSE)
-      if(any(occasions.by.station[[xyz]] > ncol(record.hist))) stop("this is a bug in the function (line 189). Please report it.", call. = FALSE)
+      if(any(occasions.by.station[[xyz]] < 0)) stop("this is a bug in the function (DH_error1). Please report it.", call. = FALSE)
+      if(any(occasions.by.station[[xyz]] > ncol(record.hist))) stop("this is a bug in the function (DH_error2). Please report it.", call. = FALSE)
       record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), occasions.by.station[[xyz]]] <- 1
     }
     record.hist[is.na(cam.op.worked)] <- NA   # remove the records that were taken when cams were NA (redundant with above:   # remove records taken after day1 + maxNumberDays)
@@ -276,7 +278,7 @@ if(day1 %in% c("survey")){
   }
 
   # create names for the csv files
-  outtable.name <- paste(species, "__record_history__", effortstring,
+  outtable.name <- paste(species, "__detection_history__", effortstring,
                          occasionLength, "_days_per_occasion_",
                          maxNumberDaysstring,
                          "_occasionStart", occasionStartTime,"h_",
