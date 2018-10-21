@@ -75,7 +75,7 @@ activityDensity <- function(recordTable,
         mtext(paste("number of records:", nrow(subset_species)), side = 3, line = 0)}
       if(isTRUE(writePNG))  dev.off()
     }, silent = TRUE)
-    if(class(try_error_tmp) == "try-error") warning(paste(toupper(spec.tmp), ": ", try_error_tmp[1], "    - SKIPPED", sep = ""), call. = FALSE)
+    if(class(try_error_tmp) == "try-error") warning(paste(toupper(species), ": ", try_error_tmp[1], "    - SKIPPED", sep = ""), call. = FALSE)
     
   } else {
     
