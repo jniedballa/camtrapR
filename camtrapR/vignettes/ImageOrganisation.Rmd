@@ -1,5 +1,5 @@
 ---
-title: "Organising raw camera trap images in camtrapR"
+title: "1. Organising raw camera trap images in camtrapR"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output: 
@@ -314,8 +314,8 @@ In addition, images are not actually copied (argument `copyImages = FALSE`), but
 
 ```{r}
  # raw image location
-wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")      
-  # destination for renamed images to be copied to
+wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")   
+ # destination for renamed images to be copied to
 wd_images_raw_renamed <- file.path(tempdir(), "raw_images_renamed")       
 
 renaming.table2 <- imageRename(inDir               = wd_images_raw,

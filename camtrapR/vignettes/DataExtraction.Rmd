@@ -1,5 +1,5 @@
 ---
-title: "Extracting Data from Camera Trapping Images"
+title: "3. Extracting Data from Camera Trapping Images"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output: 
