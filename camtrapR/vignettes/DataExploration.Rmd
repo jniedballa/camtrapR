@@ -1,5 +1,5 @@
 ---
-title: "Data exploration and visualisation in camtrapR"
+title: "4. Data exploration and visualisation in camtrapR"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output: 
@@ -197,7 +197,7 @@ species4activity <- "PBE"    # = Prionailurus bengalensis, Leopard Cat
 
 ### Kernel density estimation
 
-`activityDensity` uses the function `densityPlot` from the `overlap` package internally.
+`activityDensity` uses the function `densityPlot` from the `overlap` package.
 
 ```{r}
 
@@ -257,14 +257,30 @@ activityOverlap (recordTable = recordTableSample,
                  speciesB    = speciesB_for_activity,
                  writePNG    = FALSE,
                  plotR       = TRUE,
-                 linecol     = c("red", "blue"),     # line colour of speciesA / speciesB
-                 linewidth   = c(3,3),               # line width of speciesA / speciesB
                  add.rug     = TRUE
 )
 
 ```
 
-
+This plot an be customised by passing additional arguments to `overlapPlot`:
+```{r}
+activityOverlap (recordTable = recordTableSample,
+                 speciesA    = speciesA_for_activity,
+                 speciesB    = speciesB_for_activity,
+                 writePNG    = FALSE,
+                 plotR       = TRUE,
+                 createDir   = FALSE,
+                 pngMaxPix   = 1000,
+                 linecol     = c("black", "blue"),
+                 linewidth   = c(5,3),
+                 linetype    = c(1, 2),
+                 olapcol     = "darkgrey",
+                 add.rug     = TRUE,
+                 extend      = "lightgrey",
+                 ylim        = c(0, 0.25),
+                 main        = paste("Activity overlap: ", speciesA_for_activity, "-", speciesB_for_activity)
+)
+```
 # Survey summary report
 
 `surveyReport` conveniently creates a summary report containing:
