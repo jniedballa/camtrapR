@@ -1,4 +1,4 @@
-importFrom("overlap", overlapEst, getBandWidth, densityFit, overlapPlot)
+importFrom("overlap", overlapEst, getBandWidth, densityFit, overlapPlot, densityPlot)
 importFrom("grDevices", col2rgb, dev.off, extendrange, png,
            rgb)
 importFrom("graphics", abline, axis, box, grconvertX, grconvertY,
