@@ -118,7 +118,7 @@ Juergen Niedballa
 
  if (Sys.which("exiftool") != ""){        # only run these examples if ExifTool is available
 
- rec.db.pbe <- recordTableIndividual(inDir                     = wd_images_ID,
+ rec_table_pbe <- recordTableIndividual(inDir                  = wd_images_ID,
                                         minDeltaTime           = 60,
                                         deltaTimeComparedTo    = "lastRecord",
                                         hasStationFolders      = FALSE,
