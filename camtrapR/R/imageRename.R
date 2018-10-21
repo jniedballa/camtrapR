@@ -192,7 +192,7 @@ imageRename <- function(inDir,
     }
   }
 
-  if(all(!isTRUE(copy.info.table$DateReadable))) stop("could not read DateTimeOriginal tag of any image. Check if the DateTimeOriginal tag is present in metadata with exifTagNames(..., returnMetadata = TRUE). If not, try fixing it with fixDateTimeOriginal()",
+  if(!any(copy.info.table$DateReadable)) stop("could not read DateTimeOriginal tag of any image. Check if the DateTimeOriginal tag is present in metadata with exifTagNames(..., returnMetadata = TRUE). If not, try fixing it with fixDateTimeOriginal()",
                                                       call. = FALSE)
 
     # create directory structure in outDir
