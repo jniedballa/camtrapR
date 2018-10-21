@@ -31,10 +31,10 @@ This function plots kernel density estimates of two species' diel activity data 
   data.frame. the record table created by \code{\link{recordTable}}
 }
   \item{speciesA}{
-  Name of species 1
+  Name of species 1 (as found in \code{speciesCol} of {recordTable})
 }
   \item{speciesB}{
-  Name of species 2
+  Name of species 2 (as found in \code{speciesCol} of {recordTable})
 }
  \item{speciesCol}{
   character. name of the column specifying species names in \code{recordTable}
@@ -74,13 +74,13 @@ This function plots kernel density estimates of two species' diel activity data 
 }
 }
 \details{
-\code{...} can be graphical parameters passed on to function \code{\link[overlap]{overlapPlot}}, e.g. \code{linetype}, \code{linewidth}, \code{linecol}.
+\code{...} can be graphical parameters passed on to function \code{\link[overlap]{overlapPlot}}, e.g. \code{linetype}, \code{linewidth}, \code{linecol} (see example below).
 }
 \value{
 Returns invisibly the \code{data.frame} with plot coordinates returned by \code{\link[overlap]{overlapPlot}}.
 }
 \references{
-Mike Meredith and Martin Ridout (2014). overlap: Estimates of coefficient of overlapping for animal activity patterns. R package version 0.2.4. \url{https://CRAN.R-project.org/package=overlap} \cr
+Mike Meredith and Martin Ridout (2018). overlap: Estimates of coefficient of overlapping for animal activity patterns. R package version 0.3.2. \url{https://CRAN.R-project.org/package=overlap} \cr
 Ridout, M.S. and Linkie, M. (2009) Estimating overlap of daily activity patterns from camera trap data. Journal of Agricultural, Biological and Environmental Statistics, 14, 322-337.
 }
 \author{
@@ -104,7 +104,15 @@ data(recordTableSample)
 speciesA_for_activity <- "VTA"    # = Viverra tangalunga, Malay Civet
 speciesB_for_activity <- "PBE"    # = Prionailurus bengalensis, Leopard Cat
 
-# create activity overlap plot
+# create activity overlap plot (basic)
+activityOverlap (recordTable = recordTableSample,
+                 speciesA    = speciesA_for_activity,
+                 speciesB    = speciesB_for_activity,
+                 writePNG    = FALSE,
+                 plotR       = TRUE
+)
+
+# create activity overlap plot (prettier and with some overlapPlot arguments set)
 activityOverlap (recordTable = recordTableSample,
                  speciesA    = speciesA_for_activity,
                  speciesB    = speciesB_for_activity,
@@ -112,11 +120,15 @@ activityOverlap (recordTable = recordTableSample,
                  plotR       = TRUE,
                  createDir   = FALSE,
                  pngMaxPix   = 1000,
-                 linecol     = c("red", "blue"),
-                 linewidth   = c(3,3),
-                 add.rug     = TRUE
+                 linecol     = c("black", "blue"),
+                 linewidth   = c(5,3),
+                 linetype    = c(1, 2),
+                 olapcol     = "darkgrey",
+                 add.rug     = TRUE,
+                 extend      = "lightgrey",
+                 ylim        = c(0, 0.25),
+                 main        = paste("Activity overlap: ", speciesA_for_activity, "-", speciesB_for_activity)
 )
-
 
 }
 
