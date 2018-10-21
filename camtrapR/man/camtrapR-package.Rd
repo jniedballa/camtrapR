@@ -114,7 +114,7 @@ camtrapR Google Group \url{https://groups.google.com/forum/#!forum/camtrapr} \cr
 
 Lemon, J. (2006) Plotrix: a package in the red light district of R. R-News, 6(4): 8-12. \cr
 
-Mike Meredith and Martin Ridout (2014). overlap: Estimates of coefficient of overlapping for animal activity patterns. R package version 0.2.4. \url{https://CRAN.R-project.org/package=overlap} \cr
+Mike Meredith and Martin Ridout (2018). overlap: Estimates of coefficient of overlapping for animal activity patterns. R package version 0.3.2. \url{https://CRAN.R-project.org/package=overlap} \cr
 
 Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ } \cr
 }
@@ -128,5 +128,6 @@ Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ } \cr
 \pkg{plotrix}
 \pkg{taxize}
 \pkg{ritis}
+\pkg{wiqid}
 }
 
