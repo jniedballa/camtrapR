@@ -53,6 +53,11 @@ detectionMaps <- function(CTtable,
   if(any(is.na(CTtable[,stationCol])))stop("there are NAs in stationCol")
 
   if(writeShapefile == TRUE) {
+    
+    if (!requireNamespace("rgdal", quietly = TRUE)) {
+      stop("the package 'rgdal' is needed for this function,  you can try to install via: install.packages('rgdal')")
+    } 
+    
     stopifnot(hasArg(shapefileDirectory))
     stopifnot(file.exists(shapefileDirectory))
   }
