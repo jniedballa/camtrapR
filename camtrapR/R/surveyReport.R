@@ -235,11 +235,13 @@ surveyReport <- function(recordTable,
 
 
   # total number of independent records by species
-  species_record_table <- data.frame(species = NA, n_events = NA, n_stations = NA)
+  species_record_table <- data.frame(species    = rep(NA, times = length(unique(recordTable[, speciesCol]))),
+                                     n_events   = rep(NA, times = length(unique(recordTable[, speciesCol]))), 
+                                     n_stations = rep(NA, times = length(unique(recordTable[, speciesCol]))))
 
   for(i in 1:length(unique(recordTable[, speciesCol]))){
 
-    tmp                              <- unique(recordTable[, speciesCol])[i]
+    tmp                           <- unique(recordTable[, speciesCol])[i]
     subset.tmp                    <- subset(recordTable, recordTable[, speciesCol] == tmp)
     species_record_table[i, ]     <- c(tmp, nrow(subset.tmp), length(unique(subset.tmp[,stationCol])))
     rm(subset.tmp, tmp)
@@ -266,9 +268,9 @@ surveyReport <- function(recordTable,
   colnames(n_spec_by_station) <- c(stationCol, "n_species")
   rownames(n_spec_by_station) <- NULL
 
-  for(i in 1:length(unique(recordTable[, stationCol]))){
+  for(j in 1:length(unique(recordTable[, stationCol]))){
 
-    tmp                      <- unique(recordTable[, stationCol])[i]
+    tmp                      <- unique(recordTable[, stationCol])[j]
     subset.tmp               <- table(subset(recordTable, recordTable[, stationCol] == tmp)[,speciesCol] )
 
     station_record_table.tmp <- station_record_table[station_record_table[, stationCol] == tmp,]
