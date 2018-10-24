@@ -127,7 +127,9 @@ activityOverlap (recordTable = recordTableSample,
                  add.rug     = TRUE,
                  extend      = "lightgrey",
                  ylim        = c(0, 0.25),
-                 main        = paste("Activity overlap: ", speciesA_for_activity, "-", speciesB_for_activity)
+                 main        = paste("Activity overlap: ", 
+                                     speciesA_for_activity, "-", 
+                                     speciesB_for_activity)
 )
 
 }

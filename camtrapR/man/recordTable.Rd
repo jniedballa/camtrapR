@@ -158,7 +158,7 @@ any(rec_table2$Species == "NO_ID")
 #############
 # here's how the removeDuplicateRecords argument works
 
-\donttest{   # this is because otherwise the test would run too long to pass CRAN tests
+\dontrun{   # this is because otherwise the test would run too long to pass CRAN tests
 
 rec_table3a <- recordTable(inDir              = wd_images_ID,
                        IDfrom                 = "directory",
@@ -187,7 +187,7 @@ all(rec_table3a[-whichAreDuplicated,] == rec_table3b)
 }
 
 } else {                                # show function output if ExifTool is not available
-message("ExifTool is not available. Cannot test function")
+message("ExifTool is not available. Cannot test function. Loading recordTableSample instead")
 data(recordTableSample)
 }
 
