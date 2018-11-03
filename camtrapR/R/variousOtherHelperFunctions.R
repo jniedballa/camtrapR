@@ -139,7 +139,7 @@ assignSpeciesID <- function(intable,
                             dirs_short,
                             i_tmp,
                             multiple_tag_separator,
-                            returnFileNamesMissingTags)
+                            returnFileNamesMissingTags = FALSE)
 {
 
   file.sep <- .Platform$file.sep
