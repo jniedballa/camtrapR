@@ -139,7 +139,8 @@ getSpeciesImages <- function(species,
                                            speciesCol             = "species",
                                            dirs_short             = dirs_short,
                                            i_tmp                  = i,
-                                           multiple_tag_separator = multiple_tag_separator
+                                           multiple_tag_separator = multiple_tag_separator,
+                                           returnFileNamesMissingTags = FALSE
           )
 
           # filter by species

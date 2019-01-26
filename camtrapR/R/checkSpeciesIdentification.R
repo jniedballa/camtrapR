@@ -117,7 +117,8 @@ checkSpeciesIdentification <- function(inDir,
                                        speciesCol             = "species",
                                        dirs_short             = dirs_short,
                                        i_tmp                  = i,
-                                       multiple_tag_separator = multiple_tag_separator
+                                       multiple_tag_separator = multiple_tag_separator,
+                                       returnFileNamesMissingTags = FALSE
       )
 
       # if images in station contain no metadata species tags, skip that station
