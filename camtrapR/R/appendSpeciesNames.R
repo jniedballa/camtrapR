@@ -15,11 +15,11 @@ appendSpeciesNames <- function(inDir,
   stopifnot(is.logical(hasCameraFolders))
 
   file.sep <- .Platform$file.sep
-  
+
   if(class(IDfrom) != "character"){stop("IDfrom must be of class 'character'")}
   if(IDfrom %in% c("metadata", "directory") == FALSE) stop("'IDfrom' must be 'metadata' or 'directory'")
 
-  if(IDfrom == "metadata"){    
+  if(IDfrom == "metadata"){
     if(metadataHierarchyDelimitor %in% c("|", ":") == FALSE) stop("'metadataHierarchyDelimitor' must be '|' or ':'")
     metadata.tagname <- "HierarchicalSubject"
 
@@ -130,19 +130,15 @@ multiple_tag_separator = "__"
                                          speciesCol             = "species",
                                          dirs_short             = dirs_short,
                                          i_tmp                  = i,
-                                         multiple_tag_separator = "_&_"   # this is different from the one defined above to prevent (!) separating multiple entries in the same image: Species will be something like "Leopard Cat__Malay Badger"
-        )
+                                         multiple_tag_separator = "_&_",   # this is different from the one defined above to prevent (!) separating multiple entries in the same image: Species will be something like "Leopard Cat__Malay Badger"
+                                         returnFileNamesMissingTags = FALSE)
 
-        # if images in station contain no metadata species tags, skip that station
-        if(class(metadata.tmp) != "data.frame"){
-          if(metadata.tmp == "found no species tag") {
-            warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
-          } else {
-            warning(paste(dirs_short[i], ":   error in species tag extraction. Skipping. Please report", sep = ""), call. = FALSE, immediate. = TRUE)
-          }
-          next
-        }
-      
+      # if images in station contain not metadata species tags, skip that station
+      if(metadata.tmp == "found no species tag") {
+        warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
+        next
+      }
+
         # assign camera ID
         if(hasCameraFolders == TRUE){
           if(IDfrom == "directory"){
@@ -218,7 +214,7 @@ multiple_tag_separator = "__"
   if(IDfrom == "directory"){
     message(paste("renamed", sum(renaming.table$renamed), "out of", nrow(renaming.table), "images in", inDir))
   } else {
-    message(paste("renamed", sum(renaming.table$renamed), 
+    message(paste("renamed", sum(renaming.table$renamed),
       "out of", nrow(renaming.table), "images with species ID out of", sum(unlist(nrow.metadata.tmp), na.rm = TRUE), "images in", inDir))
   }
 
