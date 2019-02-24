@@ -11,6 +11,7 @@ This function generates species detection histories that can be used in occupanc
 detectionHistory(recordTable,
  species,
  camOp,
+ output = c("binary", "count"),
  stationCol = "Station",
  speciesCol = "Species",
  recordDateTimeCol = "DateTimeOriginal",
@@ -39,6 +40,9 @@ detectionHistory(recordTable,
 }
   \item{camOp}{
   The camera operability matrix as created by \code{\link{cameraOperation}}
+}
+ \item{output}{
+  character. Return binary detections ("binary") or counts of detections ("count")
 }
   \item{stationCol}{
   character. name of the column specifying Station ID in \code{recordTable}
@@ -91,7 +95,10 @@ detectionHistory(recordTable,
 
 }
 \details{
+
 The function computes a species detection matrix, either as a detection-by-date or a detection-by-occasion matrix. \code{day1} defines if each stations detection history will begin on that station's setup day (\code{day1 = "station"}) or if all station's detection histories have a common origin (the day the first station was set up if \code{day1 = "survey"} or a fixed date if, e.g. \code{day1 = "2015-12-31"}). If \code{day1} is a date, \code{\link[base]{as.Date}} must be able to understand it. The most suitable format is "\%Y-\%m-\%d", e.g. "2015-12-31".
+
+\code{output} is analogous to \code{\link{spatialDetectionHistory}}. It makes the function return either counts of detections during occasions, or a binary indicator for whether the species was detected. 
 
 \code{includeEffort} controls whether an additional effort matrix is computed or not. This also affects the detection matrices. If \code{includeEffort = FALSE}, all occasions in which a station was not set up or malfunctioning (NA or 0 in \code{camOp}) will result in NAs in the detection history. If \code{includeEffort = TRUE}, the record history will only contain 0 and 1, and no NAs. The effort matrix can then be included in occupancy models as a (continuous) observation covariate to estimate the effect of effort on detection probability.
 
@@ -108,6 +115,8 @@ Depending on the value of \code{includeEffort} and \code{scaleEffort}, a list wi
 }
 
  \section{Warning}{
+ Setting \code{output = "count"} returns a count of detections, not individuals. We strongly advise against using it as input for models of animal abundance (such as N-Mixture models) models which use counts as input. 
+
  Please note the section about defining argument \code{timeZone} in the vignette on data extraction (accessible via \code{vignette("DataExtraction")} or online (\url{https://cran.r-project.org/package=camtrapR/vignettes/DataExtraction.html})).
  }
 
