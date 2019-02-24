@@ -12,6 +12,7 @@ activityOverlap <- function(recordTable,
                             createDir = FALSE,
                             pngMaxPix = 1000,
                             add.rug = TRUE,
+                            overlapEstimator = c("Dhat1", "Dhat4", "Dhat5"),
                             ...){
 
 
@@ -20,6 +21,8 @@ activityOverlap <- function(recordTable,
   on.exit(setwd(wd0))
   on.exit(par(mar = mar0), add = TRUE)
 
+  overlapEstimator <- match.arg(overlapEstimator)
+  
   checkForSpacesInColumnNames(speciesCol = speciesCol, recordDateTimeCol = recordDateTimeCol)
   if(!is.data.frame(recordTable)) stop("recordTable must be a data frame", call. = FALSE)
   if(!speciesCol %in% colnames(recordTable))        stop(paste('speciesCol = "', speciesCol, '" is not a column name in recordTable', sep = ''), call. = FALSE)
@@ -54,10 +57,11 @@ activityOverlap <- function(recordTable,
   
    
   # set graphics  parameters and out directory
-  overlapEst.tmp <- overlap::overlapEst(A = subset_speciesA$Time.rad, B = subset_speciesB$Time.rad)
+  overlapEst.tmp <- overlap::overlapEst(A = subset_speciesA$Time.rad, B = subset_speciesB$Time.rad, 
+                                        type = overlapEstimator)
 
-  dhat.tmp <- paste(names(overlapEst.tmp)[1],
-                    round(overlapEst.tmp, digits = 2)[1], sep = "=")
+  dhat.tmp <- paste(names(overlapEst.tmp),
+                    round(overlapEst.tmp, digits = 2), sep = "=")
   cex.sub      <- 0.75
   pngWidth     <- pngMaxPix
   pngHeight    <- round(pngMaxPix * 0.8)
