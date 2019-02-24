@@ -2,7 +2,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
                                     species,
                                     camOp,
                                     CTtable,
-                                    output,
+                                    output = c("binary", "count"),
                                     stationCol = "Station",
                                     speciesCol = "Species",
                                     sessionCol,
@@ -42,7 +42,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   if(hasArg(makeRMarkInput)) stopifnot(is.logical(makeRMarkInput))
 
-  output <- match.arg(output, choices = c("binary", "count"))
+  output <- match.arg(output)
 
   stopifnot(hasArg(occasionLength))
 
