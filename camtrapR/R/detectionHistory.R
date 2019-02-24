@@ -31,7 +31,7 @@ detectionHistory <- function(recordTable,
   if(!speciesCol %in% colnames(recordTable))  stop(paste('speciesCol = "', speciesCol, '" is not a column name in recordTable', sep = ''), call. = FALSE)
   if(!recordDateTimeCol %in% colnames(recordTable))  stop(paste('recordDateTimeCol = "', recordDateTimeCol,  '" is not a column name in recordTable', sep = ''), call. = FALSE)
   
-  output <- match.arg (arg = ouput, choices = c("binary", "count"))
+  output <- match.arg (output)
   
   stopifnot(hasArg(species))
   stopifnot(is.character(species))
