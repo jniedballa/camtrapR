@@ -22,6 +22,7 @@ This function plots kernel density estimates of two species' diel activity data 
   createDir = FALSE, 
   pngMaxPix = 1000,
   add.rug = TRUE,
+  overlapEstimator = c("Dhat1", "Dhat4", "Dhat5"),
   ...
 )
 }
@@ -68,6 +69,9 @@ This function plots kernel density estimates of two species' diel activity data 
 }
   \item{add.rug}{
   logical. add a rug to the plot?
+}
+ \item{overlapEstimator}{
+  character. Which overlap estimator to return (passed on to argument \code{type} in \code{\link[overlap]{overlapEst}})
 }
   \item{\dots}{
   additional arguments to be passed to function \code{\link[overlap]{overlapPlot}}
