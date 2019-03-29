@@ -199,7 +199,7 @@ separateMultipleSpecies <- function(intable,
   records_duplicate_length <- sapply(records_duplicate, length)
 
   if(any(records_duplicate_length > 1)){
-    intable <- intable[rep(row.names(intable), records_duplicate_length), ]                # replicate rows with >1 species
+    intable <- intable[rep(row.names(intable), records_duplicate_length), ]                # replicate rows with >1 species / individual
     intable[,speciesCol] <- unlist(strsplit (records0, split = multiple_tag_separator))    # assign species anew
   }
   return(intable)
@@ -1028,5 +1028,67 @@ makeSurveyZip <- function(output,
 
   # remove temporary directory
   #unlink(dir.zip, recursive = TRUE)
-
 }
+
+
+
+##########################################################################################################
+# assign session IDs to records in recordTableIndividual based on a session column in camera trap table
+# This is for when there are several entries for each station, one for each session
+# in other words, if stations were operated continuously and session start/end dates are defined in camera trap table
+
+assignSessionIDtoRecordTableIndividual <- function(recordTableIndividual_tmp,
+                                                   cameraTrapTable_tmp,
+                                                   stationCol,
+                                                   sessionCol,
+                                                   setup_date_col,
+                                                   retrieval_date_col){
+  
+  # check input
+  if(sessionCol %in% colnames(recordTableIndividual_tmp)) stop("recordTableIndividual has a session column already. Cannot assign new session ID",
+                                                               call. = FALSE)
+  if(!setup_date_col %in% colnames(cameraTrapTable_tmp)) stop("CTtable setup column must be called 'Setup_date'",
+                                                               call. = FALSE)
+  if(!retrieval_date_col %in% colnames(cameraTrapTable_tmp)) stop("CTtable retrieval column must be called 'Retrieval_date'",
+                                                             call. = FALSE)
+  
+  # define "between" function
+  `%between%` <- function(x, interval) x >= interval[1] & x <= interval[2]
+  
+  # add an empty session column
+  recordTableIndividual_tmp[, sessionCol] <- NA
+  
+  for(i in 1:length(unique(cameraTrapTable_tmp[,stationCol]))){
+    
+    # find index of records in station i and respective dates
+    record_rows_id_tmp <- which(recordTableIndividual_tmp[,stationCol] == unique(cameraTrapTable_tmp[,stationCol])[i])
+    rec_dates_tmp <- recordTableIndividual_tmp$Date [record_rows_id_tmp]
+    
+    # NOTE: output may be assigned to wrong session if occasionStartTime != 0!!!
+    
+    # extract session start/end dates (by session)
+    session_id    <- cameraTrapTable_tmp[, sessionCol]         [cameraTrapTable_tmp[,stationCol] == unique(cameraTrapTable_tmp[,stationCol])[i]]
+    session_start <- cameraTrapTable_tmp[, setup_date_col]     [cameraTrapTable_tmp[,stationCol] == unique(cameraTrapTable_tmp[,stationCol])[i]]
+    session_end   <- cameraTrapTable_tmp[, retrieval_date_col] [cameraTrapTable_tmp[,stationCol] == unique(cameraTrapTable_tmp[,stationCol])[i]]
+    
+    # assign session ID to recordTable
+    for(session_id_tmp in session_id){
+      record_rows_session_id_tmp <- which(rec_dates_tmp %between% c(session_start[session_id_tmp], session_end[session_id_tmp]))
+      recordTableIndividual_tmp[record_rows_id_tmp, sessionCol]  [record_rows_session_id_tmp] <- session_id_tmp
+    }
+    rm(session_id, session_start, session_end, record_rows_id_tmp, rec_dates_tmp)
+  }
+  
+  # create new station columns based on station + session (and create backup first)
+  
+  recordTableIndividual_tmp$station_backup <- recordTableIndividual_tmp[, stationCol]
+  cameraTrapTable_tmp$station_backup       <- cameraTrapTable_tmp[, stationCol]
+  
+  recordTableIndividual_tmp[, stationCol] <- paste(recordTableIndividual_tmp[, stationCol], recordTableIndividual_tmp[, sessionCol], sep = "_session")
+  cameraTrapTable_tmp[, stationCol]       <- paste(cameraTrapTable_tmp[, stationCol], cameraTrapTable_tmp[, sessionCol], sep = "_session")
+  
+  
+  return(list(recordTable = recordTableIndividual_tmp,
+              CTtable     = cameraTrapTable_tmp))
+}
+
