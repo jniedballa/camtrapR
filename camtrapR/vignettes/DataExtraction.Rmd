@@ -286,7 +286,7 @@ It is very easy to prepare input for occupancy and spatial capture-recapture (SC
 
 ## Occupancy analyses
 
-Occupancy models use detection/non-detection matrices in which for every station and every occasion "1"" signifies a detection of a given species and "0"" signifies non-detecion.
+Occupancy models use detection/non-detection matrices in which for every station and every occasion "1"" signifies a detection of a given species, "0"" signifies non-detecion, and NA missing data.
 
 Here is how to obtain a detection/non-detection matrix using function `detectionHistory`. Because the function builds on prior functions (`recordTable` and `cameraOperation`) we also show these function here to provide the context.
 
@@ -380,7 +380,7 @@ DetHist3[[3]]  # scaling parameters for back-transformation
 
 ### Handling of incomplete occasions
 
-The following table shows the behaviour of the detectionHistory function for different occasion-level camera operation values (table head) under different combinations of the arguments `includeEffort` and `minActiveDaysPerOccasion` in the function `detectionHistory`.
+The following table shows the behaviour of the `detectionHistory` function for different combinations of the function arguments `includeEffort` and `minActiveDaysPerOccasion` and different occasion-level camera operation values (table head, column 3-7). Depending on these arguments, incomplete occasions will either NA or have values of 0/1 (depending on whether there was a detection) in the output detection matrix .
 
 | includeEffort  | minActiveDaysPerOccasion  | camera operation all 1 | at least one 1  | all 0 | 0 and NA |  all NA |
 |---|---|---|---|---|---|---|---| 
@@ -441,7 +441,8 @@ sdh <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSamp
   )
   
 # missing space in species = "LeopardCat" was introduced by recordTableIndividual 
-# (because of CRAN package policies. You can have spaces in your directory names)
+# (because of CRAN package policies). 
+# In your own data you can have spaces in your directory names.
 
   summary(sdh)
   plot(sdh, tracks = TRUE)

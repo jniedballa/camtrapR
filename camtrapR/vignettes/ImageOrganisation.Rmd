@@ -109,8 +109,6 @@ Afterwards, Windows (via R) should be able to find ExifTool during the active se
 
 ExifTool is the performance bottleneck of the package functions. It can extract metadata at a rate of about 160 images per second (approx. 10,000 images per minute, measured on a laptop computer running Windows 7, Intel Core i5-2410M / 2.3 GHz, 6 GB RAM). Performance tends to be lower when ExifTool is first called and increases afterwards; and it decreases in situations with numerous camera trap stations with few images each (because ExifTool is called separately on every station directory). 
 
-In a future release, we plan to offer support for the metadata extraction library Exiv2. Preliminary test showed that performance increased 2-3 fold.
-
 # Camera trap station information
 
 Before looking at how images are handled, let's first familiarise ourselves with how information about camera trap stations are stored. Camera trap station information are tabulated in a simple data frame with 1 row per station (if there was 1 camera per station) or 1 row per camera (if there was more than 1 camera per station). Information to be stored in this table are: station (and camera) IDs, geographic coordinates, setup and retrieval dates and possible dates when camera were not operational (because of malfunction, animal interference, empty batteries, full memory cards etc.). The table can be generated standard spreadsheet software and loaded into R.
@@ -350,7 +348,7 @@ At this point you created a copy of your raw images and renamed them.
 
 The function `addCopyrightTag` can write a copyright tag into image Exif metadata. While this can be useful when sharing or publishing data, it is not required in the camtrapR workflow. The function will recursively find all images in `inDir` and its subdirectories and writes a user-defined text into the Copyright field of the Exif metadata. 
 
-In doing so, Exiftool normally keeps the original images as .JPG_original files. Note that this behaviour will instantly double the number of images in inDir and the disk space required. If this is not desired, users can set the function argument `keepJPG_original = FALSE` (default is `TRUE`) in order to replace the original files without creating .JPG_original files. I recommend to first try this on a subdataset and to then check the function output. If there are warnings like \"Warning: [minor] Maker notes could not be parsed\" image makernotes may be unreadable afterwards (background to this can be found [here](http://exiv2.org/makernote.html)). On the other hand, you may never need these for analysing camera trapping data.
+In doing so, Exiftool normally keeps the original images as .JPG_original files. Note that this behaviour will instantly double the number of images in inDir and the disk space required. If this is not desired, users can set the function argument `keepJPG_original = FALSE` (default is `TRUE`) in order to replace the original files without creating *.JPG_original files. I recommend to first try this on a copy of a subdataset and to then check the function output. If there are warnings like \"Warning: [minor] Maker notes could not be parsed\" image makernotes may be unreadable afterwards (they are proprietary, undocumented formats). On the other hand, you may never need these for analysing camera trapping data.
 
 
 ```{r}

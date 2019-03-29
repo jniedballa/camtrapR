@@ -85,6 +85,7 @@ From version 0.99.0, the function can also handle images identied with metadata 
 
 \examples{
 
+\donttest{
 wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
 
 if (Sys.which("exiftool") != ""){        # only run this example if ExifTool is available
@@ -95,6 +96,7 @@ check.folders <- checkSpeciesIdentification(inDir             = wd_images_ID,
                                             writecsv          = FALSE)
                                      
 check.folders   # In the example, 2 different species were photographed within 2 minutes. 
+}
 }
 
 \dontrun{
