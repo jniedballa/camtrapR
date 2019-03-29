@@ -281,6 +281,8 @@ activityOverlap (recordTable = recordTableSample,
                  main        = paste("Activity overlap: ", speciesA_for_activity, "-", speciesB_for_activity)
 )
 ```
+
+
 # Survey summary report
 
 `surveyReport` conveniently creates a summary report containing:

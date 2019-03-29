@@ -164,7 +164,7 @@ recordTableIndividual <- function(inDir,
       metadata.tmp <- assignSpeciesID (intable                = metadata.tmp,            # also works for individual IDs assuming that there is 1 species only
                                        IDfrom                 = IDfrom,
                                        metadataSpeciesTag     = metadataIDTag,
-                                       speciesCol             = individualCol,
+                                       speciesCol             = individualCol,           # individuals are treated as species here (so multiple individuals tagged in the same picture will be returned)
                                        dirs_short             = dirs_short,
                                        i_tmp                  = i,
                                        multiple_tag_separator = multiple_tag_separator,
@@ -177,7 +177,7 @@ recordTableIndividual <- function(inDir,
         if(metadata.tmp == "found no species tag") {
           warning(paste(dirs_short[i], ":   metadataIDTag '", metadataIDTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
         } else {
-          warning(paste(dirs_short[i], ":   error in species tag extraction. Skipping. Please report", sep = ""), call. = FALSE, immediate. = TRUE)
+          warning(paste(dirs_short[i], ":   error in individual tag extraction. Skipping. Please report", sep = ""), call. = FALSE, immediate. = TRUE)
         }
         next
       }
@@ -195,7 +195,7 @@ recordTableIndividual <- function(inDir,
       if(!hasArg(cameraID)) metadata.tmp <- do.call(addStationCameraID, arg.list0)
       if( hasArg(cameraID)) metadata.tmp <- do.call(addStationCameraID, c(arg.list0, cameraID = cameraID))   # if cameraID is defined, it will be extracted from file names
 
-      # add species (from last part of inDir)
+      # add species name to table (from last part of inDir)
       inDir.split <- unlist(strsplit(inDir, split = .Platform$file.sep, fixed = TRUE))
       metadata.tmp[,speciesCol] <- inDir.split[length(inDir.split)]
 
@@ -204,7 +204,7 @@ recordTableIndividual <- function(inDir,
         # convert character vector extracted from images to time object and format for outfilename
         metadata.tmp$DateTimeOriginal <- as.POSIXct(strptime(x = metadata.tmp$DateTimeOriginal, format = "%Y:%m:%d %H:%M:%S", tz = timeZone))
 
-        # sort by (camera), species and time
+        # sort by station, (camera), individual and time
         if(camerasIndependent == TRUE) {
           metadata.tmp <- metadata.tmp[order(metadata.tmp[,stationCol], metadata.tmp[,individualCol], metadata.tmp[,cameraCol], metadata.tmp$DateTimeOriginal),]
         } else {
@@ -213,11 +213,11 @@ recordTableIndividual <- function(inDir,
 
         #remove duplicate records of same individual taken in same second at the same station (by the same camera, if relevant)
         metadata.tmp2 <- removeDuplicatesOfRecords(metadata.tmp           = metadata.tmp,
-                                                  removeDuplicateRecords = removeDuplicateRecords,
-                                                  camerasIndependent     = camerasIndependent,
-                                                  stationCol             = stationCol,
-                                                  speciesCol             = speciesCol,
-                                                  cameraCol              = cameraCol)
+                                                   removeDuplicateRecords = removeDuplicateRecords,
+                                                   camerasIndependent     = camerasIndependent,
+                                                   stationCol             = stationCol,
+                                                   speciesCol             = individualCol,    # meaning, there will be no duplicate records of the same individual at the same second and station
+                                                   cameraCol              = cameraCol)
 
         # assess independence between records and calculate time differences
         d1 <- assessTemporalIndependence (intable             = metadata.tmp2,
