@@ -111,14 +111,39 @@ spatialDetectionHistory <- function(recordTableIndividual,
       stopifnot(is.numeric(CTtable[,sessionCol]))
       if(!all(sort(unique(CTtable[,sessionCol])) == seq.int(from = 1, to = max(CTtable[,sessionCol]), by = 1)))
         stop("Problem in sessionCol: Values must come from a gapless sequence of integer numbers starting with 1", call. = FALSE)
+      
       # introduce sessionCol in recordTable by matching station IDs
-      recordTableIndividual <- merge(recordTableIndividual, CTtable[,c(stationCol, sessionCol)], by = stationCol)
+      # first check if there is multiple sessions per station (with identical station IDs)
+      
+      # 1) if there is only 1 session per station
+     # recordTableIndividual <- merge(recordTableIndividual, CTtable[,c(stationCol, sessionCol)], by = stationCol)
+      
+      # 2) if there are multiple entries for each station 
+      out_tmp <- assignSessionIDtoRecordTableIndividual(recordTableIndividual_tmp = recordTableIndividual,
+                                                        cameraTrapTable_tmp       = CTtable,
+                                                        stationCol                = stationCol,
+                                                        sessionCol                = sessionCol,
+                                                        setup_date_col            = "Setup_date",
+                                                        retrieval_date_col        = "Retrieval_date")
+      
+      
+      # get both tables out of function output list
+      recordTableIndividual <- out_tmp$recordTable
+     
+      
+      # update rownames of camOp matrix (first check that they match CTtable)
+      if(any(CTtable[,stationCol] != out_tmp$CTtable$station_backup)) stop ("The order of station IDs in CTtable got jumbled up in assignSessionIDtoRecordTableIndividual. Please report the bug", call. = FALSE)
+      CTtable <- out_tmp$CTtable 
+      if(any(CTtable[,stationCol] != out_tmp$CTtable[,stationCol])) stop("error in assignSessionIDtoRecordTableIndividual: station column order doesn't match camOp matrix anymore",
+                                                                         call. = FALSE)
+      rownames(camOp) <- CTtable[,stationCol]
+   
+      rm(out_tmp)
     }
   }
 
-  if(any(CTtable[,stationCol] != rownames(camOp))) stop ("there is a mismatch between station IDs in CTtable and rownames in camOp")
-
-
+  if(length(CTtable[,stationCol]) != length(rownames(camOp))) stop ("there is a mismatch between station IDs in CTtable and rownames in camOp (length differs)", call. = FALSE)
+  if(any(CTtable[,stationCol] != rownames(camOp)))            stop ("The order of station IDs in CTtable and rownames in camOp differs [2]", call. = FALSE)
 
   if(hasArg(timeZone) == FALSE) {
     warning("timeZone is not specified. Assuming UTC", call. = FALSE)
@@ -194,7 +219,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
       rec_station_session <- unique(subset_species[,c(stationCol, sessionCol)])
       cam_station_session <- unique(CTtable[,c(stationCol, sessionCol)])
 
-      rec_station_session$included_rec <- TRUE
+      rec_station_session$included_rec     <- TRUE
       cam_station_session$included_station <- TRUE
       merged_tmp <- merge(rec_station_session, cam_station_session, all=TRUE)
 
@@ -283,10 +308,11 @@ spatialDetectionHistory <- function(recordTableIndividual,
   ############
   #  define the 1st day of the effective survey period.
 
+  # for each record, what is the respective beginning of the trapping period (used to calculate the occasion), 
   if(day1 %in% c("survey")){
-    time2 <- date_ranges$start_first_occasion_survey[match(subset_species[,stationCol], rownames(date_ranges))]
+    time2 <- date_ranges$start_first_occasion_survey[match(subset_species[,stationCol], rownames(date_ranges))]   # difference is relative to first occasion of survey
   } else {
-    time2 <- date_ranges$start_first_occasion[match(subset_species[,stationCol], rownames(date_ranges))]
+    time2 <- date_ranges$start_first_occasion[match(subset_species[,stationCol], rownames(date_ranges))]         # difference is relative to first occasion at each station
   }
 
 
@@ -394,7 +420,6 @@ spatialDetectionHistory <- function(recordTableIndividual,
     if(sessionCol %in% colnames(CTtable)){
       secr.traps <- list()
 
-      # if(any(CTtable[,stationCol] != rownames(cam.op.worked))) stop ("there is a mismatch between station IDs in CTtable and rownames in camop")
       if(any(table(CTtable[,sessionCol]) == 1)) stop ("there is a session in CTtable that has only one station.")
 
       for(sessionID in 1:max(CTtable[,sessionCol])){
