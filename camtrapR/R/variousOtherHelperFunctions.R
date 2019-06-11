@@ -1055,9 +1055,10 @@ assignSessionIDtoRecordTableIndividual <- function(recordTableIndividual_tmp,
   # define "between" function
   `%between%` <- function(x, interval) x >= interval[1] & x <= interval[2]
   
-  # add an empty session column
+  # add an empty session column to the record table
   recordTableIndividual_tmp[, sessionCol] <- NA
   
+  # for each station, find the respective sessions and assign the session IDs to the records based on their date.
   for(i in 1:length(unique(cameraTrapTable_tmp[,stationCol]))){
     
     # find index of records in station i and respective dates
@@ -1065,6 +1066,7 @@ assignSessionIDtoRecordTableIndividual <- function(recordTableIndividual_tmp,
     rec_dates_tmp <- recordTableIndividual_tmp$Date [record_rows_id_tmp]
     
     # NOTE: output may be assigned to wrong session if occasionStartTime != 0!!!
+    # There is also an issue when station ID is a combination of station and session IDs.
     
     # extract session start/end dates (by session)
     session_id    <- cameraTrapTable_tmp[, sessionCol]         [cameraTrapTable_tmp[,stationCol] == unique(cameraTrapTable_tmp[,stationCol])[i]]
@@ -1080,7 +1082,7 @@ assignSessionIDtoRecordTableIndividual <- function(recordTableIndividual_tmp,
   }
   
   # create new station columns based on station + session (and create backup first)
-  
+
   recordTableIndividual_tmp$station_backup <- recordTableIndividual_tmp[, stationCol]
   cameraTrapTable_tmp$station_backup       <- cameraTrapTable_tmp[, stationCol]
   
