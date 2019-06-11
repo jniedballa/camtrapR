@@ -63,7 +63,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
   
     
   stopifnot(length(stationCol) == 1)
-  recordTableIndividual[, stationCol] <- as.character(recordTableIndividual[,   stationCol])
+  recordTableIndividual[, stationCol] <- as.character(recordTableIndividual[, stationCol])
   stopifnot(is.character(stationCol))
 
   stopifnot(length(speciesCol) == 1)
@@ -131,19 +131,29 @@ spatialDetectionHistory <- function(recordTableIndividual,
       recordTableIndividual <- out_tmp$recordTable
      
       
-      # update rownames of camOp matrix (first check that they match CTtable)
+       # check that old station column is matches backup station column in output of (first check that they match CTtable)
       if(any(CTtable[,stationCol] != out_tmp$CTtable$station_backup)) stop ("The order of station IDs in CTtable got jumbled up in assignSessionIDtoRecordTableIndividual. Please report the bug", call. = FALSE)
+      
       CTtable <- out_tmp$CTtable 
-      if(any(CTtable[,stationCol] != out_tmp$CTtable[,stationCol])) stop("error in assignSessionIDtoRecordTableIndividual: station column order doesn't match camOp matrix anymore",
-                                                                         call. = FALSE)
-      rownames(camOp) <- CTtable[,stationCol]
-   
+     
+      # see if there are duplicate station#session IDs in CTtable (meaning multiple cameras per station/session)
+      nonDuplicatedStationSessionIDs <- which(!duplicated(CTtable[,stationCol]))
+      if(any(CTtable[nonDuplicatedStationSessionIDs, stationCol] != rownames(camOp))) stop("mismatch between order of station/sessions in camOp and CTtable")
+      
+      # check that new station column 
+      if(any(rownames(camOp) != CTtable[nonDuplicatedStationSessionIDs, stationCol])) stop("error in assignSessionIDtoRecordTableIndividual: station column order doesn't match camOp matrix anymore",
+                                                                    call. = FALSE)
+      
+      # remove redundant cameras from CTtable
+      CTtable <- CTtable[nonDuplicatedStationSessionIDs,]
+      
       rm(out_tmp)
     }
   }
 
-  if(length(CTtable[,stationCol]) != length(rownames(camOp))) stop ("there is a mismatch between station IDs in CTtable and rownames in camOp (length differs)", call. = FALSE)
-  if(any(CTtable[,stationCol] != rownames(camOp)))            stop ("The order of station IDs in CTtable and rownames in camOp differs [2]", call. = FALSE)
+  # check that length of station IDs in CTtable and camop match
+  if(length(unique(CTtable[,stationCol])) != length(rownames(camOp))) stop ("there is a mismatch between station IDs in CTtable and rownames in camOp (length differs)", call. = FALSE)
+  if(any(unique(CTtable[,stationCol]) != rownames(camOp)))            stop ("The order of station IDs in CTtable and rownames in camOp differs [2]", call. = FALSE)
 
   if(hasArg(timeZone) == FALSE) {
     warning("timeZone is not specified. Assuming UTC", call. = FALSE)
@@ -398,8 +408,17 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   coord.ct <- CTtable[,c(Xcol, Ycol)]
   colnames(coord.ct) <- c("x", "y")
-  rownames(coord.ct) <- CTtable[,stationCol]
-
+  
+  # if there are multiple cameras per station/session, subset to remove those excess cameras
+  #if(exists("nonDuplicatedStationSessionIDs")){
+  #  coord.ct <- coord.ct[nonDuplicatedStationSessionIDs, ]
+  #  rownames(coord.ct) <- CTtable[nonDuplicatedStationSessionIDs, stationCol]
+  #} else {
+    rownames(coord.ct) <- CTtable[,stationCol]
+  #}
+  
+  if(!all(rownames(coord.ct) == rownames(cam.op.worked))) stop("Error assigning rownames to traps data frame. Please report this bug")
+  
   # set detector type according to desired output (count or binary)
   detectortype <- ifelse (output == "binary", "proximity", "count")
 
@@ -408,10 +427,15 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   if(hasArg(stationCovariateCols)){
     whichstationCovariateCols <- which(colnames(CTtable) %in% stationCovariateCols)
+    
     stationCovsDF <- data.frame(CTtable[, whichstationCovariateCols])
+    
     if(length(stationCovariateCols) == 1) {
       colnames(stationCovsDF) <- stationCovariateCols
     }
+  # if(exists("nonDuplicatedStationSessionIDs")){
+  #    stationCovsDF <- stationCovsDF[nonDuplicatedStationSessionIDs, stationCovariateCols]
+  #  } 
   }
 
   # if sessionCol is defined and it is found in CTtable, make a list of traps objects (one for each session)
@@ -420,7 +444,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
     if(sessionCol %in% colnames(CTtable)){
       secr.traps <- list()
 
-      if(any(table(CTtable[,sessionCol]) == 1)) stop ("there is a session in CTtable that has only one station.")
+      if(any(table(CTtable[, sessionCol]) == 1)) stop ("there is a session in CTtable that has only one station.")
 
       for(sessionID in 1:max(CTtable[,sessionCol])){
         which.session.tmp <- which(CTtable[,sessionCol] == sessionID)   # index of all stations active during session
