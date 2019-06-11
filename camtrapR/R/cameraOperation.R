@@ -1,6 +1,7 @@
 cameraOperation <- function(CTtable,
                             stationCol = "Station",
                             cameraCol,
+                            sessionCol,
                             setupCol,
                             retrievalCol,
                             hasProblems = FALSE,
@@ -50,9 +51,8 @@ cameraOperation <- function(CTtable,
     checkForSpacesInColumnNames(cameraCol = cameraCol)
     if(!cameraCol %in% colnames(CTtable)) stop(paste('cameraCol = "', cameraCol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
     if(hasArg(byCamera) == FALSE) stop("if cameraCol is set, byCamera must be specified")
-    CTtable[,cameraCol] <- as.character(CTtable[,cameraCol])
-    stopifnot(cameraCol %in% colnames(CTtable))
     stopifnot(is.logical(byCamera))
+    CTtable[,cameraCol] <- as.character(CTtable[,cameraCol])
     if(byCamera == FALSE){
       if(hasArg(allCamsOn) == FALSE) stop("if cameraCol is set and byCamera is FALSE, allCamsOn must be specified")
       stopifnot(is.logical(allCamsOn))
@@ -64,20 +64,34 @@ cameraOperation <- function(CTtable,
   } else {
     if(hasArg(byCamera)) warning("If cameraCol is not defined, byCamera will have no effect")
   }
-
-
+  
   stopifnot(c(stationCol, setupCol, retrievalCol) %in% colnames(CTtable))
+  
+  # check argument sessionCol
+  if(hasArg(sessionCol)){
+    checkForSpacesInColumnNames(sessionCol = sessionCol)
+    if(!sessionCol %in% colnames(CTtable)) stop(paste('sessionCol = "', sessionCol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
+    if(!is.numeric(CTtable[,sessionCol])) stop("Values of sessionCol must be numeric", call. = FALSE)
+    if(!all(sort(unique(CTtable[,sessionCol])) == seq.int(from = 1, to = max(CTtable[,sessionCol]), by = 1)))
+      stop("Problem in sessionCol: Values must come from a gapless sequence of integer numbers starting with 1", call. = FALSE)
+    
+    # if everything is ok, combine station + session ID to new station ID
+    CTtable[,stationCol] <- paste(CTtable[,stationCol], CTtable[,sessionCol], sep = "_session")
+  }
 
-  if(any(is.na(CTtable[,setupCol])))stop("there are NAs in setupCol")
-  if(any(is.na(CTtable[,retrievalCol])))stop("there are NAs in retrievalCol")
 
-  if(all(is.na(as.Date(CTtable[,setupCol], format = dateFormat)))){ stop("Cannot read date format in setupCol")}
+  
+
+  if(any(is.na(CTtable[,setupCol])))     stop("there are NAs in setupCol")
+  if(any(is.na(CTtable[,retrievalCol]))) stop("there are NAs in retrievalCol")
+
+  if(all(is.na(as.Date(CTtable[,setupCol],     format = dateFormat)))){ stop("Cannot read date format in setupCol")}
   if(all(is.na(as.Date(CTtable[,retrievalCol], format = dateFormat)))) {stop("Cannot read date format in retrievalCol")}
 
-  if(any(is.na(as.Date(CTtable[,setupCol], format = dateFormat)))){ stop("at least one entry in setupCol cannot be interpreted using dateFormat")}
+  if(any(is.na(as.Date(CTtable[,setupCol],     format = dateFormat)))){ stop("at least one entry in setupCol cannot be interpreted using dateFormat")}
   if(any(is.na(as.Date(CTtable[,retrievalCol], format = dateFormat)))) {stop("at least one entry in retrievalCol cannot be interpreted using dateFormat")}
 
-  CTtable[,setupCol] <- as.Date(CTtable[,setupCol], format = dateFormat)
+  CTtable[,setupCol]     <- as.Date(CTtable[,setupCol],     format = dateFormat)
   CTtable[,retrievalCol] <- as.Date(CTtable[,retrievalCol], format = dateFormat)
 
   if(hasArg(outDir)){
@@ -125,7 +139,9 @@ cameraOperation <- function(CTtable,
   if(hasArg(cameraCol)){      # there is a camera column, i.e., potentially > 1 cameras per station
 
     if(any(CTtable[,cameraCol] == "")) stop("there are empty cells in cameraCol. Please provide camera IDs for all cameras",
-                                            call. = FALSE)    # if there are emtpy cells a camera column, fill them with 1
+                                            call. = FALSE)    
+    if(any(is.na(CTtable[,cameraCol]))) stop("there are NAs in cameraCol. Please provide camera IDs for all cameras",
+                                            call. = FALSE)    
 
     stationCamSeparator <- "__"
     if(length(grep(pattern = stationCamSeparator, x = CTtable[,stationCol])) >= 1) stop("Station IDs may not contain double underscores ('__')", call. = FALSE)
