@@ -261,7 +261,11 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
 
   if("POSIXlt" %in% class(subset_species$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTableIndividual using specified recordDateTimeFormat")
-  if(any(is.na(subset_species$DateTime2))) stop("at least 1 entry in recordDateTimeCol of recordTableIndividual could not be interpreted using recordDateTimeFormat")
+  if(any(is.na(subset_species$DateTime2))) stop(paste(sum(is.na(subset_species$DateTime2)), "out of",
+                                                      nrow(subset_species), 
+                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
+                                                      paste(rownames(subset_species)[which(is.na(subset_species$DateTime2))], collapse = ", ")))
+  
 
   ####
   checkCamOpColumnNames (cameraOperationMatrix = camOp)

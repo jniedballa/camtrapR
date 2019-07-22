@@ -129,9 +129,11 @@ detectionHistory <- function(recordTable,
     }
   }
   
-  if("POSIXlt" %in% class(subset_species$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat")
-  if(any(is.na(subset_species$DateTime2))) stop(paste("at least 1 entry in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat. row",
-                                                      paste(which(is.na(subset_species$DateTime2)), collapse = ", ")))
+  if("POSIXlt" %in% class(subset_species$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat. The column is not in POSIXlt format")
+  if(any(is.na(subset_species$DateTime2))) stop(paste(sum(is.na(subset_species$DateTime2)), "out of",
+                                                      nrow(subset_species), 
+                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
+                                                      paste(rownames(subset_species)[which(is.na(subset_species$DateTime2))], collapse = ", ")))
   
   checkCamOpColumnNames (cameraOperationMatrix = camOp)
   cam.op.worked0 <- as.matrix(camOp)
