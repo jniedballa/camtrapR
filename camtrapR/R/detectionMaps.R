@@ -28,15 +28,19 @@ detectionMaps <- function(CTtable,
 
   # check column names
   checkForSpacesInColumnNames(stationCol = stationCol, speciesCol = speciesCol, Xcol = Xcol, Ycol = Ycol)
-  if(class(CTtable) != "data.frame") stop("CTtable must be a data.frame", call. = FALSE)
+  if(class(CTtable) != "data.frame")     stop("CTtable must be a data.frame", call. = FALSE)
   if(class(recordTable) != "data.frame") stop("recordTable must be a data.frame", call. = FALSE)
 
-  if(!stationCol %in% colnames(CTtable))      stop(paste('stationCol = "',   stationCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
-  if(!stationCol %in% colnames(recordTable))  stop(paste('stationCol = "',   stationCol,     '" is not a column name in recordTable', sep = ''), call. = FALSE)
-  if(!speciesCol %in% colnames(recordTable))  stop(paste('speciesCol = "', speciesCol,       '" is not a column name in recordTable', sep = ''), call. = FALSE)
+  if(!stationCol %in% colnames(CTtable))      stop(paste('stationCol = "', stationCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
+  if(!stationCol %in% colnames(recordTable))  stop(paste('stationCol = "', stationCol,     '" is not a column name in recordTable', sep = ''), call. = FALSE)
+  if(!speciesCol %in% colnames(recordTable))  stop(paste('speciesCol = "', speciesCol,     '" is not a column name in recordTable', sep = ''), call. = FALSE)
+
   if(!Xcol %in% colnames(CTtable))            stop(paste('Xcol = "',   Xcol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
   if(!Ycol %in% colnames(CTtable))            stop(paste('Ycol = "',   Ycol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
-
+  
+  if(!is.numeric(CTtable[,Xcol])              stop(paste('The values of Xcol "',   Xcol, '" must be numeric', sep = ''), call. = FALSE)
+  if(!is.numeric(CTtable[,Ycol])              stop(paste('The values of Ycol "',   Ycol, '" must be numeric', sep = ''), call. = FALSE)
+  
 
   CTtable[,stationCol] <- as.character(CTtable[,stationCol])
   recordTable[,stationCol] <- as.character(recordTable[,stationCol])
