@@ -192,12 +192,16 @@ imageRename <- function(inDir,
     }
   }
   
-  if(!any(copy.info.table$DateReadable)) stop("could not read DateTimeOriginal tag of any image. Check if the DateTimeOriginal tag is present in metadata with exifTagNames(..., returnMetadata = TRUE). If not, try fixing it with fixDateTimeOriginal()",
+  # error if no date/time tag is readable
+  if(!any(copy.info.table$DateReadable)) stop("could not read DateTimeOriginal tag of any image. Check if the DateTimeOriginal tag is present in metadata with exifTagNames(..., returnMetadata = TRUE). If not, fixDateTimeOriginal() might help.",
+                                              call. = FALSE)
+  # warning if at least one date/time tag is not readable
+  if(!all(copy.info.table$DateReadable)) warning(paste("Some DateTimeOriginal tags are unreadable, e.g. \n", 
+                                                   paste(apply(copy.info.table[!which(copy.info.table$DateReadable), c("Directory", "FileName")],  MARGIN = 1, FUN = paste, collapse = file.sep), collapse = "\n")),
                                               call. = FALSE)
   
   # create directory structure in outDir
   if(isTRUE(copyImages)){
-    #sapply(unique(copy.info.table$outDir), dir.create, recursive = TRUE)   # old
     
     if(!isTRUE(keepCameraSubfolders))   dir2create <- file.path (outDir, dirs_short)    # outDir with station subdirectories
     
@@ -215,7 +219,7 @@ imageRename <- function(inDir,
       dir2create <- file.path (outDir, dirs_recursive2)                                                                         # outDir with station and camera subdirectories
     }
     
-    #if(isTRUE(createEmptyDirectories)) sapply(file.path(outDir, dirs_short), FUN = dir.create, recursive = TRUE, showWarnings = FALSE)     # create station directories
+    
     sapply(dir2create, FUN = dir.create, recursive = TRUE, showWarnings = FALSE)           # create directories (recursively)
   }
   
@@ -226,14 +230,15 @@ imageRename <- function(inDir,
     copy.info.table$fileExistsAlready <- FALSE
   }
   
+  # exit if no new images to be copied
   if(all(copy.info.table$fileExistsAlready)){
-    stop("No new images to be copied. Exiting.")
+    stop("No new images to be copied. Exiting.", call. = FALSE)
   }
   
+  # message if there are images in outDir already
   if(any(copy.info.table$fileExistsAlready)) {
-    message(paste(sum(copy.info.table$fileExistsAlready), "out of", nrow(copy.info.table), "images existed already in outDir. They will not be copied"))
+    message(paste(sum(copy.info.table$fileExistsAlready), "out of", nrow(copy.info.table), "images exist already in outDir. They will not be copied"))
   }
-  
   
   # copy images
   if(isTRUE(copyImages)){
@@ -255,15 +260,18 @@ imageRename <- function(inDir,
       copy.info.table$CopyStatus[items_to_copy] <- file.copy(from      = apply(copy.info.table[items_to_copy, c("Directory", "FileName")],  MARGIN = 1, FUN = paste, collapse = file.sep),
                                                              to        = apply(copy.info.table[items_to_copy, c("outDir", "filename_new")], MARGIN = 1, FUN = paste, collapse = file.sep),
                                                              overwrite = FALSE)
-      copy.info.table$CopyStatus[-items_to_copy] <- FALSE
+      # if not all images are copied, set copystatus of the images that were not copied to FALSE
+      if(length(items_to_copy) < nrow(copy.info.table)) copy.info.table$CopyStatus[-items_to_copy] <- FALSE
     } else {
-      copy.info.table$CopyStatus <- FALSE
+      copy.info.table$CopyStatus <- FALSE     # if copyImages = TRUE & proceed = FALSE
     }
   } else {
-    copy.info.table$CopyStatus <- FALSE
+    copy.info.table$CopyStatus <- FALSE       # if copyImages = FALSE
   }
   
-  rownames(copy.info.table) <- NULL
+  rownames(copy.info.table) <- NULL     # remove rownames
+  
+  # remove unused columns
   copy.info.table <- copy.info.table[,-which(names(copy.info.table) %in%
                                                c("DateTimeOriginal2", "DateTime_for_filename", "minute.append"))]
   # save table
