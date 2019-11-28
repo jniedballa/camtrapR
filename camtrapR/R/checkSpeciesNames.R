@@ -4,6 +4,12 @@ checkSpeciesNames <- function(speciesNames,
                               ask = TRUE
 ){
 
+  if (!requireNamespace("taxize", quietly = TRUE)) {
+    stop("Please install the package taxize to run this function")
+  }
+  if (!requireNamespace("ritis", quietly = TRUE)) {
+    stop("Please install the package ritis to run this function")
+  }
   # check input
   if(searchtype  %in% c("scientific", "common") == FALSE) stop ("'searchtype' must be 'scientific' or 'common'")
   stopifnot(is.logical(accepted))
@@ -13,19 +19,19 @@ checkSpeciesNames <- function(speciesNames,
   file.sep <- .Platform$file.sep
 
   # query ITIS TSN (taxnonomic serial number)
-  tsns <- get_tsn(searchterm = speciesNames,
+  tsns <- taxize::get_tsn(searchterm = speciesNames,
                   searchtype = searchtype,
                   verbose    = FALSE,
                   accepted   = accepted,
                   ask        = ask)
 
-  tsns <- as.tsn(unique(tsns), check = FALSE)    # remove duplicates
+  tsns <- taxize::as.tsn(unique(tsns), check = FALSE)    # remove duplicates
 
   # warning if a name was not found
   if(any(is.na(tsns))){
     not.matched <- which(is.na(tsns))
     warning(paste("found no matches for", length(not.matched), "name(s):\n",  paste(speciesNames[not.matched], collapse = ", ")), immediate. = TRUE, call. = FALSE)
-    tsns_worked <- as.tsn(tsns[-not.matched], check = FALSE)
+    tsns_worked <- taxize::as.tsn(tsns[-not.matched], check = FALSE)
   } else {
     tsns_worked <- tsns
   }
