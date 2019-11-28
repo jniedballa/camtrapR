@@ -18,8 +18,10 @@ activityDensity <- function(recordTable,
   mar0 <- par()$mar
   on.exit(setwd(wd0))
   on.exit(par(mar = mar0), add = TRUE)
+
+  recordTable <- dataFrameTibbleCheck(df = recordTable)
   
-  tz <- "UTC"
+  timeZone <- "UTC"
   
   checkForSpacesInColumnNames(speciesCol = speciesCol, recordDateTimeCol = recordDateTimeCol)
   if(!is.data.frame(recordTable)) stop("recordTable must be a data frame", call. = FALSE)
@@ -32,16 +34,16 @@ activityDensity <- function(recordTable,
     stopifnot(hasArg(species))
   }
   
-  recordTable$DateTime2 <- strptime(as.character(recordTable[,recordDateTimeCol]), format = recordDateTimeFormat, tz = tz)
-  if("POSIXlt" %in% class(recordTable$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat")
-  if(any(is.na(recordTable$DateTime2))) stop(paste("at least 1 entry in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat. row",
-                                                   paste(which(is.na(recordTable$DateTime2)), collapse = ", ")))
+  
+  recordTable$DateTime2 <- parseDateTimeObject(inputColumn = recordTable[,recordDateTimeCol],
+                                               dateTimeFormat = recordDateTimeFormat,
+                                               timeZone = timeZone)
   recordTable$Time2 <- format(recordTable$DateTime2, format = "%H:%M:%S", usetz = FALSE)
   
   
   # radians time
-  recordTable$Time.rad <- (as.numeric(as.POSIXct(strptime(recordTable$Time2, format = "%H:%M:%S", tz = tz))) -
-                             as.numeric(as.POSIXct(strptime("0", format = "%S", tz = tz)))) / 3600 * (pi/12)
+  recordTable$Time.rad <- (as.numeric(as.POSIXct(strptime(recordTable$Time2, format = "%H:%M:%S", tz = timeZone))) -
+                             as.numeric(as.POSIXct(strptime("0", format = "%S", tz = timeZone)))) / 3600 * (pi/12)
   
   if(isTRUE(writePNG)){
     if(hasArg(plotDirectory)){

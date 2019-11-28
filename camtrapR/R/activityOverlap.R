@@ -24,7 +24,8 @@ activityOverlap <- function(recordTable,
   overlapEstimator <- match.arg(overlapEstimator)
   
   checkForSpacesInColumnNames(speciesCol = speciesCol, recordDateTimeCol = recordDateTimeCol)
-  if(!is.data.frame(recordTable)) stop("recordTable must be a data frame", call. = FALSE)
+  recordTable <- dataFrameTibbleCheck(df = recordTable)
+  
   if(!speciesCol %in% colnames(recordTable))        stop(paste('speciesCol = "', speciesCol, '" is not a column name in recordTable', sep = ''), call. = FALSE)
   if(!recordDateTimeCol %in% colnames(recordTable)) stop(paste('recordDateTimeCol = "', recordDateTimeCol, '" is not a column name in recordTable', sep = ''), call. = FALSE)
   
@@ -33,17 +34,17 @@ activityOverlap <- function(recordTable,
   stopifnot(hasArg(speciesB))
   stopifnot(all(c(speciesA, speciesB) %in% recordTable[,speciesCol]))
   
-  tz <- "UTC"
+  timeZone <- "UTC"
 
-  recordTable$DateTime2 <- strptime(as.character(recordTable[,recordDateTimeCol]), format = recordDateTimeFormat, tz = tz)
-  if("POSIXlt" %in% class(recordTable$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat")
-  if(any(is.na(recordTable$DateTime2))) stop(paste("at least 1 entry in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat. row",
-                                                   paste(which(is.na(recordTable$DateTime2)), collapse = ", ")))
+  recordTable$DateTime2 <- parseDateTimeObject(inputColumn = recordTable[,recordDateTimeCol],
+                                               dateTimeFormat = recordDateTimeFormat,
+                                               timeZone = timeZone)
+
   recordTable$Time2 <-   format(recordTable$DateTime2, format = "%H:%M:%S", usetz = FALSE)
 
   # convert time to radians
-  recordTable$Time.rad <- (as.numeric(as.POSIXct(strptime(recordTable$Time2, format = "%H:%M:%S", tz = tz))) -
-                             as.numeric(as.POSIXct(strptime("0", format = "%S", tz = tz)))) / 3600 * (pi/12)
+  recordTable$Time.rad <- (as.numeric(as.POSIXct(strptime(recordTable$Time2, format = "%H:%M:%S", tz = timeZone))) -
+                             as.numeric(as.POSIXct(strptime("0", format = "%S", tz = timeZone)))) / 3600 * (pi/12)
 
   subset_speciesA <- subset(recordTable, recordTable[,speciesCol] == speciesA)
   subset_speciesB <- subset(recordTable, recordTable[,speciesCol] == speciesB)
@@ -73,6 +74,9 @@ activityOverlap <- function(recordTable,
   if(!is.null(dots[['linetype']])){ lty.tmp <- dots[['linetype']]}  else {lty.tmp <- c(1, 2)}
   if(!is.null(dots[['linewidth']])){lwd.tmp <- dots[['linewidth']]} else {lwd.tmp <- c(1, 1)}
   if(!is.null(dots[['linecol']])){  col.tmp <- dots[['linecol']]}   else {col.tmp <- c("black", "blue")}
+  if(!is.null(dots[['main']])){     main.tmp <- dots[['main']]}   else {main.tmp <- paste("Activity overlap: ", 
+                                                                                          substitute(speciesA), "and", 
+                                                                                          substitute(speciesB))}
 
 # check that plot directory exists, create it if needed and desired, and set working directory
   if(isTRUE(writePNG)){
@@ -100,7 +104,9 @@ activityOverlap <- function(recordTable,
     overlapPlot(A    = subset_speciesA$Time.rad, 
                 B    = subset_speciesB$Time.rad,
                 rug  = add.rug,
+                main = main.tmp,
                 ...)
+    
     legend( x      = "top",
             legend = dhat.tmp,
             bty    = "n",
@@ -122,9 +128,11 @@ activityOverlap <- function(recordTable,
   if(isTRUE(plotR)){
 
     par(mar = mar.tmp)
-    plot.values <- overlapPlot(A = subset_speciesA$Time.rad, B = subset_speciesB$Time.rad,
+    plot.values <- overlapPlot(A = subset_speciesA$Time.rad, 
+                               B = subset_speciesB$Time.rad,
                                rug = add.rug,
-                               ... )
+                               main = main.tmp,
+                               ...)
 
     legend(x      = "top",
            legend = dhat.tmp,

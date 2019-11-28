@@ -18,7 +18,9 @@ activityRadial <- function(recordTable,
   on.exit(par(mar = mar0), add = TRUE)
 						                  
   checkForSpacesInColumnNames(speciesCol = speciesCol, recordDateTimeCol = recordDateTimeCol)
-  if(!is.data.frame(recordTable)) stop("recordTable must be a data frame", call. = FALSE)
+  
+  recordTable <- dataFrameTibbleCheck(df = recordTable)
+
   if(!speciesCol %in% colnames(recordTable))           stop(paste('speciesCol = "', speciesCol, '" is not a column name in recordTable', sep = ''), call. = FALSE)
   if(!recordDateTimeCol %in% colnames(recordTable)) stop(paste('recordDateTimeCol = "', recordDateTimeCol, '" is not a column name in recordTable', sep = ''), call. = FALSE)
 
@@ -28,13 +30,14 @@ activityRadial <- function(recordTable,
     stopifnot(species %in% recordTable[,speciesCol])
   }
   
-  tz <- "UTC"
+  timeZone <- "UTC"
 
-  recordTable$DateTime2 <- strptime(as.character(recordTable[,recordDateTimeCol]), format = recordDateTimeFormat, tz = tz)
-  if("POSIXlt" %in% class(recordTable$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat")
-  if(any(is.na(recordTable$DateTime2))) stop(paste("at least 1 entry in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat. row",
-                                                   paste(which(is.na(recordTable$DateTime2)), collapse = ", ")))
+  recordTable$DateTime2 <- parseDateTimeObject(inputColumn = recordTable[,recordDateTimeCol],
+                                               dateTimeFormat = recordDateTimeFormat,
+                                               timeZone = timeZone)
+
   recordTable$Time2 <- as.POSIXlt(recordTable$DateTime2)$hour
+  
   recordTable[,speciesCol] <- as.character(recordTable[,speciesCol])
 
 
