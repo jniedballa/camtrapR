@@ -20,7 +20,7 @@ recordTable <- function(inDir,
   wd0 <- getwd()
   on.exit(setwd(wd0))
 
-  if(hasArg(stationCol) == FALSE) stationCol <- "Station"
+  if(!hasArg(stationCol)) stationCol <- "Station"
   stopifnot(is.character(stationCol))
   speciesCol <- "Species"
 
@@ -40,7 +40,7 @@ recordTable <- function(inDir,
   multiple_tag_separator <- "_&_"
 
   # check input
-  if(hasArg(timeZone) == FALSE) {
+  if(!hasArg(timeZone)) {
     warning("timeZone is not specified. Assuming UTC", call. = FALSE,  immediate. = TRUE)
     timeZone <- "UTC"
   }
@@ -83,8 +83,8 @@ recordTable <- function(inDir,
     if(class(additionalMetadataTags) != "character"){stop("additionalMetadataTags must be of class 'character'", call. = FALSE)}
     if(any(grep(pattern = " ", x = additionalMetadataTags, fixed = TRUE))) stop("In argument additionalMetadataTags, spaces are not allowed")
     if("HierarchicalSubject" %in% additionalMetadataTags & IDfrom == "metadata")  {
-      warning("'HierarchicalSubject' may not be in 'additionalMetadataTags' if IDfrom = 'metadata'. It will be ignored because the function returns it anyway.", call. = FALSE)
-      additionalMetadataTags <- additionalMetadataTags[-grep(pattern = "HierarchicalSubject", x = additionalMetadataTags)]  # remove it
+      message("'HierarchicalSubject' may not be in 'additionalMetadataTags' if IDfrom = 'metadata'. It will be ignored because the function returns it anyway.", call. = FALSE)
+      additionalMetadataTags <- additionalMetadataTags[-grep(pattern = "HierarchicalSubject", x = additionalMetadataTags)]  # remove HierarchicalSubject from additionalMetadataTags
     }
   }
 
