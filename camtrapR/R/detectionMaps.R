@@ -28,8 +28,9 @@ detectionMaps <- function(CTtable,
 
   # check column names
   checkForSpacesInColumnNames(stationCol = stationCol, speciesCol = speciesCol, Xcol = Xcol, Ycol = Ycol)
-  if(class(CTtable) != "data.frame")     stop("CTtable must be a data.frame", call. = FALSE)
-  if(class(recordTable) != "data.frame") stop("recordTable must be a data.frame", call. = FALSE)
+  
+  CTtable     <- dataFrameTibbleCheck(df = CTtable)
+  recordTable <- dataFrameTibbleCheck(df = recordTable)
 
   if(!stationCol %in% colnames(CTtable))      stop(paste('stationCol = "', stationCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
   if(!stationCol %in% colnames(recordTable))  stop(paste('stationCol = "', stationCol,     '" is not a column name in recordTable', sep = ''), call. = FALSE)
@@ -38,8 +39,8 @@ detectionMaps <- function(CTtable,
   if(!Xcol %in% colnames(CTtable))            stop(paste('Xcol = "',   Xcol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
   if(!Ycol %in% colnames(CTtable))            stop(paste('Ycol = "',   Ycol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
   
-  if(!is.numeric(CTtable[,Xcol])              stop(paste('The values of Xcol "',   Xcol, '" must be numeric', sep = ''), call. = FALSE)
-  if(!is.numeric(CTtable[,Ycol])              stop(paste('The values of Ycol "',   Ycol, '" must be numeric', sep = ''), call. = FALSE)
+  if(!is.numeric(CTtable[,Xcol]))              stop(paste('The values of Xcol "',   Xcol, '" must be numeric', sep = ''), call. = FALSE)
+  if(!is.numeric(CTtable[,Ycol]))              stop(paste('The values of Ycol "',   Ycol, '" must be numeric', sep = ''), call. = FALSE)
   
 
   CTtable[,stationCol] <- as.character(CTtable[,stationCol])
@@ -59,7 +60,7 @@ detectionMaps <- function(CTtable,
   if(writeShapefile == TRUE) {
     
     if (!requireNamespace("rgdal", quietly = TRUE)) {
-      stop("the package 'rgdal' is needed for this function,  you can try to install via: install.packages('rgdal')")
+      stop("the package 'rgdal' is needed for writing shapefiles,  you can install it via: install.packages('rgdal')")
     } 
     
     stopifnot(hasArg(shapefileDirectory))
@@ -355,26 +356,26 @@ detectionMaps <- function(CTtable,
       }
     }
   }
-
+  
   outtable <- data.frame(dat2, t3[,-1], n_species = t4[,-1])
   # if only 1 species, add column name 
   if(ncol(t3) == 2 & hasArg(speciesToShow)) colnames(outtable)[ncol(outtable) - 1] <- speciesToShow
-
+  
   rownames(outtable) <- NULL
   # write Shapefile
   if(writeShapefile == TRUE){
     if(hasArg(shapefileProjection)){proj.tmp <- shapefileProjection } else {proj.tmp <- NA}
     if(hasArg(shapefileName)){layer.tmp <- shapefileName } else {layer.tmp <- paste("species_detection_", Sys.Date(), sep = "")}
-
+    
     spdf <- SpatialPointsDataFrame(coords = outtable[,c(Xcol, Ycol)],
-                                   data = outtable,
-                                   proj4string = CRS(as.character(proj.tmp)))
-
-    writeOGR(obj = spdf,
-             dsn = shapefileDirectory,
-             layer = layer.tmp,
-             driver = "ESRI Shapefile")
+                                       data = outtable,
+                                       proj4string = CRS(as.character(proj.tmp)))
+    
+    rgdal::writeOGR(obj = spdf,
+                    dsn = shapefileDirectory,
+                    layer = layer.tmp,
+                    driver = "ESRI Shapefile")
   }
-
+  
   return(invisible(outtable))
 }
