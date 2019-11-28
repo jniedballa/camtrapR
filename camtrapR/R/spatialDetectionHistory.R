@@ -33,7 +33,10 @@ spatialDetectionHistory <- function(recordTableIndividual,
   #################
   # check input
   stopifnot(hasArg(recordTableIndividual))
-  if(class(recordTableIndividual) != "data.frame") stop("recordTableIndividual must be a data.frame", call. = FALSE)
+  
+  recordTableIndividual <- dataFrameTibbleCheck(df = recordTableIndividual)
+  CTtable <- dataFrameTibbleCheck(df = CTtable)
+
   stopifnot(hasArg(camOp))
 
   stopifnot(hasArg(species))
@@ -119,38 +122,44 @@ spatialDetectionHistory <- function(recordTableIndividual,
      # recordTableIndividual <- merge(recordTableIndividual, CTtable[,c(stationCol, sessionCol)], by = stationCol)
       
       # 2) if there are multiple entries for each station 
-      out_tmp <- assignSessionIDtoRecordTableIndividual(recordTableIndividual_tmp = recordTableIndividual,
-                                                        cameraTrapTable_tmp       = CTtable,
-                                                        stationCol                = stationCol,
-                                                        sessionCol                = sessionCol,
-                                                        setup_date_col            = "Setup_date",
-                                                        retrieval_date_col        = "Retrieval_date")
       
+      recordTableIndividual <- assignSessionIDtoRecordTable (recordTable_tmp = recordTableIndividual,
+                                               camOp = camOp,
+                                               dateTimeCol = recordDateTimeCol,
+                                               stationCol = stationCol,
+                                               sessionCol = sessionCol
+      )
       
-      # get both tables out of function output list
-      recordTableIndividual <- out_tmp$recordTable
-     
-      
-       # check that old station column is matches backup station column in output of (first check that they match CTtable)
-      if(any(CTtable[,stationCol] != out_tmp$CTtable$station_backup)) stop ("The order of station IDs in CTtable got jumbled up in assignSessionIDtoRecordTableIndividual. Please report the bug", call. = FALSE)
-      
-      CTtable <- out_tmp$CTtable 
-     
       # see if there are duplicate station#session IDs in CTtable (meaning multiple cameras per station/session)
+      
+      separatorSession <- "__SESS_"
+      stationCol_backup <- paste(stationCol, "backup", sep = "_")
+      CTtable[, stationCol_backup] <- CTtable[,stationCol]
+      
+      #stationCol <- paste(recordTable_tmp$stationCol, recordTable_tmp$sessionCol, sep = "_")
+      CTtable[, stationCol] <- paste(CTtable[,stationCol], CTtable[,sessionCol], sep = separatorSession)
+      
+      
       nonDuplicatedStationSessionIDs <- which(!duplicated(CTtable[,stationCol]))
-      if(any(CTtable[nonDuplicatedStationSessionIDs, stationCol] != rownames(camOp))) stop("mismatch between order of station/sessions in camOp and CTtable")
+      
+      
+      if(length(nonDuplicatedStationSessionIDs) != nrow(camOp)) stop("mismatch in length of nonDuplicatedStationSessionIDs and nrow(camOp)") 
+      
+      camOp <- camOp[match(CTtable[nonDuplicatedStationSessionIDs, stationCol], rownames(camOp)),]
       
       # check that new station column 
       if(any(rownames(camOp) != CTtable[nonDuplicatedStationSessionIDs, stationCol])) stop("error in assignSessionIDtoRecordTableIndividual: station column order doesn't match camOp matrix anymore",
-                                                                    call. = FALSE)
+                                                                                           call. = FALSE)
       
       # remove redundant cameras from CTtable
       CTtable <- CTtable[nonDuplicatedStationSessionIDs,]
       
-      rm(out_tmp)
+     # rm(out_tmp)
     }
   }
 
+  
+  
   # check that length of station IDs in CTtable and camop match
   if(length(unique(CTtable[,stationCol])) != length(rownames(camOp))) stop ("there is a mismatch between station IDs in CTtable and rownames in camOp (length differs)", call. = FALSE)
   if(any(unique(CTtable[,stationCol]) != rownames(camOp)))            stop ("The order of station IDs in CTtable and rownames in camOp differs [2]", call. = FALSE)
@@ -191,10 +200,10 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
 
 
-  if(species %in% recordTableIndividual[,speciesCol] == FALSE) stop("species is not in speciesCol of recordTableIndividual")
+  if(!species %in% recordTableIndividual[,speciesCol]) stop("species is not in speciesCol of recordTableIndividual")
 
   # check all stations in recordTableIndividual are matched in CTtable
-  if(all(recordTableIndividual[,stationCol] %in% CTtable[,stationCol]) == FALSE) {
+  if(!all(recordTableIndividual[,stationCol] %in% CTtable[,stationCol])) {
     stop(paste("items of stationCol in recordTableIndividual are not matched in stationCol of CTtable: ", paste(recordTableIndividual[-which(recordTableIndividual[,stationCol] %in% CTtable[,stationCol]),stationCol], collapse = ", ")))
   }
 
@@ -213,15 +222,25 @@ spatialDetectionHistory <- function(recordTableIndividual,
     binaryEffort <- FALSE
   }
 
+  
 
   #####################################################################################################################
   # bring date, time, station ids into shape
 
-
   subset_species           <- recordTableIndividual[recordTableIndividual[,speciesCol] == species,]
-  subset_species$DateTime2 <- as.POSIXlt(subset_species[,recordDateTimeCol], tz = timeZone, format = recordDateTimeFormat)
-
-
+  subset_species$DateTime2 <- parseDateTimeObject(inputColumn = subset_species[,recordDateTimeCol],
+                                                  dateTimeFormat = recordDateTimeFormat,
+                                                  timeZone = timeZone,
+                                                  checkNA_out = FALSE)
+  
+  if(any(is.na(subset_species$DateTime2))) stop(paste(sum(is.na(subset_species$DateTime2)), "out of",
+                                                      nrow(subset_species),
+                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
+                                                      paste(rownames(subset_species)[which(is.na(subset_species$DateTime2))], collapse = ", ")))
+  
+  
+  
+  
   # if sessionCol is defined and present in CTtable, check if all records are within correct session. remove if not
   if(hasArg(sessionCol)){
     if(sessionCol %in% colnames(CTtable)){
@@ -260,17 +279,11 @@ spatialDetectionHistory <- function(recordTableIndividual,
     }
   }
 
-  if("POSIXlt" %in% class(subset_species$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTableIndividual using specified recordDateTimeFormat")
-  if(any(is.na(subset_species$DateTime2))) stop(paste(sum(is.na(subset_species$DateTime2)), "out of",
-                                                      nrow(subset_species), 
-                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
-                                                      paste(rownames(subset_species)[which(is.na(subset_species$DateTime2))], collapse = ", ")))
-  
 
   ####
   checkCamOpColumnNames (cameraOperationMatrix = camOp)
   cam.op.worked0 <- as.matrix(camOp)
-
+  
   if(all(as.character(unique(subset_species[,stationCol])) %in% rownames(cam.op.worked0)) == FALSE){
     (stop("Not all values of stationCol in recordTableIndividual are matched by rownames of camOp"))
   }
@@ -351,10 +364,12 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   # get relevant columns from subset_species
   if(hasArg(individualCovariateCols)){
-    sdh0 <- subset_species[, c(individualCol, occasionCol, stationCol, individualCovariateCols)]
+    columnsForCaptures <- c(individualCol, occasionCol, stationCol, individualCovariateCols)
+    sdh0 <- subset_species[, columnsForCaptures]
     colnames(sdh0) <- c("ID", occasionCol, "trapID", individualCovariateCols)
   } else {
-    sdh0 <- subset_species[, c(individualCol, occasionCol, stationCol)]
+    columnsForCaptures <- c(individualCol, occasionCol, stationCol)
+    sdh0 <- subset_species[, columnsForCaptures]
     colnames(sdh0) <- c("ID", occasionCol, "trapID")
   }
 
@@ -392,6 +407,8 @@ spatialDetectionHistory <- function(recordTableIndividual,
       rowindex_sdh_to_remove <- c(rowindex_sdh_to_remove, rowindex_sdh)                                   # save row index into temporary vector
     }
   }
+  
+  
   # if there were records in occasions with effort = 0/NA, remove these records
   if(length(rowindex_sdh_to_remove) != 0){
     warning(paste("removed ", length(rowindex_sdh_to_remove), " record(s) because of effort = 0/NA, incomplete occasions (if includeEffort = FALSE), or effort < minActiveDaysPerOccasion \n(rownames: ",
@@ -413,14 +430,8 @@ spatialDetectionHistory <- function(recordTableIndividual,
   coord.ct <- CTtable[,c(Xcol, Ycol)]
   colnames(coord.ct) <- c("x", "y")
   
-  # if there are multiple cameras per station/session, subset to remove those excess cameras
-  #if(exists("nonDuplicatedStationSessionIDs")){
-  #  coord.ct <- coord.ct[nonDuplicatedStationSessionIDs, ]
-  #  rownames(coord.ct) <- CTtable[nonDuplicatedStationSessionIDs, stationCol]
-  #} else {
-    rownames(coord.ct) <- CTtable[,stationCol]
-  #}
-  
+  rownames(coord.ct) <- CTtable[,stationCol]
+
   if(!all(rownames(coord.ct) == rownames(cam.op.worked))) stop("Error assigning rownames to traps data frame. Please report this bug")
   
   # set detector type according to desired output (count or binary)
@@ -437,9 +448,6 @@ spatialDetectionHistory <- function(recordTableIndividual,
     if(length(stationCovariateCols) == 1) {
       colnames(stationCovsDF) <- stationCovariateCols
     }
-  # if(exists("nonDuplicatedStationSessionIDs")){
-  #    stationCovsDF <- stationCovsDF[nonDuplicatedStationSessionIDs, stationCovariateCols]
-  #  } 
   }
 
   # if sessionCol is defined and it is found in CTtable, make a list of traps objects (one for each session)
@@ -450,7 +458,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
       if(any(table(CTtable[, sessionCol]) == 1)) stop ("there is a session in CTtable that has only one station.")
 
-      for(sessionID in 1:max(CTtable[,sessionCol])){
+      for(sessionID in sort(unique(CTtable[,sessionCol]))){
         which.session.tmp <- which(CTtable[,sessionCol] == sessionID)   # index of all stations active during session
         if(includeEffort == TRUE) {
           secr.traps[[sessionID]] <- read.traps(data         = coord.ct[which.session.tmp,],
@@ -466,22 +474,31 @@ spatialDetectionHistory <- function(recordTableIndividual,
                                                                      FUN = function(x){x - length(which(which(colSums(effort_session_tmp) == 0) <  x) == TRUE)})
 
           rm(effort_session_tmp)
+          # assign station names as row names back
+          rownames(secr.traps[[sessionID]]) <- CTtable[which.session.tmp, stationCol_backup]
+          rownames(secr::usage(secr.traps[[sessionID]])) <- CTtable[which.session.tmp, stationCol_backup]
+          
         } else {
           secr.traps[[sessionID]] <- read.traps(data         = coord.ct[which.session.tmp,],
                                                 detector     = detectortype)
+          rownames(secr.traps[[sessionID]]) <- CTtable[which.session.tmp, stationCol_backup]
         }
-        if(exists("stationCovsDF")) secr::covariates(secr.traps[[sessionID]]) <- stationCovsDF[which.session.tmp,]
+        if(exists("stationCovsDF")) {
+          secr::covariates(secr.traps[[sessionID]]) <- stationCovsDF[which.session.tmp,]
+          rownames(secr::covariates(secr.traps[[sessionID]])) <- CTtable[which.session.tmp, stationCol_backup]
+        }
         rm(which.session.tmp)
       }
 # remove sessions with empty effort (caused by day1 after last station retrieval)
       if(any(sapply(secr::usage(secr.traps), sum) == 0)){
+        which_effort_empty <- which(sapply(secr::usage(secr.traps), sum) == 0)
         if(day1switch == 3){
-          warning("will remove data from session  ", paste(which(sapply(secr::usage(secr.traps), sum) == 0), collapse = ", "), "  because the effort matrix was empty.
+          warning("will remove data from session  ", paste(which_effort_empty, collapse = ", "), "  because the effort matrix was empty.
                   This is probably due to the usage of a date outside the station operation range in argument 'day1'", call. = FALSE)
         } else {
-          warning("will remove data from ", paste(which(sapply(usage(secr.traps), sum) == 0), collapse = ", "), " session because the effort matrix was empty.", call. = FALSE)
+          warning("will remove data from ", paste(which_effort_empty, collapse = ", "), " session because the effort matrix was empty.", call. = FALSE)
         }
-        secr.traps <- secr.traps[-which(sapply(secr::usage(secr.traps), sum) == 0)]
+        secr.traps <- secr.traps[-which_effort_empty]
       }
     }
     }
@@ -524,6 +541,9 @@ spatialDetectionHistory <- function(recordTableIndividual,
   ###########
   # make capthist object
 
+  deparse_sdh2 <- deparseCamOpRownames(sdh2$trapID)
+  sdh2$trapID <- deparse_sdh2$station
+  
   capthist.secr <- make.capthist(captures   = sdh2,
                                  traps      = secr.traps,
                                  fmt        = "trapID",
