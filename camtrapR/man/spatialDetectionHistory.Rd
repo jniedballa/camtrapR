@@ -111,7 +111,7 @@ spatialDetectionHistory(recordTableIndividual,
   logical. Should effort be binary (1 if >1 active day per occasion, 0 otherwise)?
 }
   \item{timeZone}{
-  character. must be an argument of \code{\link[base]{OlsonNames}}
+  character. Must be a value returned by \code{\link[base]{OlsonNames}}
 }
  \item{makeRMarkInput}{
   logical. If \code{FALSE}, output will be a data frame for RMark. If \code{FALSE} or not specified, a secr \code{\link[secr]{capthist}} object
@@ -131,7 +131,13 @@ Output can be returned as individual counts per occasion (\code{output = "count"
 Argument \code{sessionCol} can be used to a create multi-session \code{\link[secr]{capthist}} object. There are two different ways in which the argument is interpreted. It depends on whether a column with the name you specify in argument \code{sessionCol} exists in \code{recordTableIndividual} or in \code{CTtable}. If \code{sessionCol} is found in \code{recordTableIndividual}, the records will be assigned to the specified sessions, and it will be assumed that all camera trap station were used in all sessions. Alternatively, if \code{sessionCol} is found in\code{CTtable}, it will be assumed that only a subset of stations was used in each session, and the records will be assigned automatically (using the station IDs to identify which session they belong into). In both cases, session information must be provided as a sequence of integer numbers beginnign with 1, i.e., you provide the session number directly in \code{sessionCol}. See \code{\link[secr]{session}} for more information about sessions in \pkg{secr}.
 
 \code{\link[secr]{capthist}} objects (as created by \code{\link{spatialDetectionHistory}} for spatial capture-recapture analyses) expect the units of coordinates (\code{Xcol} and \code{col} in \code{CTtable}) to be meters. Therefore, please use a suitable coordinate system (e.g. UTM).
+
+\code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be interpreted either by base-R via \code{\link[base]{strptime}} or in \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument "orders"). \pkg{lubridate} will be used if there are no "\%" characters in \code{recordDateTimeFormat}. 
+
+For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date and time formats in R see \code{\link[base]{strptime}} or \code{\link[lubridate]{parse_date_time}}.
+
 }
+
 
 \section{Warning }{
 Please note the section about defining argument \code{timeZone} in the vignette on data extraction (accessible via \code{vignette("DataExtraction")} or online (\url{https://cran.r-project.org/package=camtrapR/vignettes/DataExtraction.html})).

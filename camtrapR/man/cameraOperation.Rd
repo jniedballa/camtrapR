@@ -11,6 +11,7 @@ Construct a matrix of daily camera trap station operability for use in \code{\li
 cameraOperation(CTtable, 
   stationCol = "Station", 
   cameraCol, 
+  sessionCol,
   setupCol, 
   retrievalCol, 
   hasProblems = FALSE,
@@ -33,6 +34,9 @@ cameraOperation(CTtable,
   \item{cameraCol}{
   character. name of the column specifying Camera ID in \code{CTtable} (optional). If empty, 1 camera per station is assumed.
 }
+\item{sessionCol}{
+  character. name of the column specifying session ID in \code{CTtable} (optional). Use it for creating multi-session / multi-season detection histories (unmarked: \code{\link[unmarked]{unmarkedMultFrame}}; secr: \code{\link[secr]{capthist}} )
+}
   \item{setupCol}{
   character. name of the column containing camera setup dates in \code{CTtable}
 }
@@ -52,7 +56,7 @@ cameraOperation(CTtable,
   logical. Return number of active camera traps by station? Only if \code{byCamera} is FALSE and \code{allCamsOn} is FALSE. If \code{camerasIndependent} is TRUE, output values will be the number of operational cameras at a station. If \code{camerasIndependent} is FALSE, the value is 1 if at least 1 camera was operational, otherwise 0. In both cases, values are NA if no camera was set up.
   }
   \item{dateFormat}{
-  character. The format of columns \code{setupCol} and \code{retrievalCol}. Should be interpretable by \code{as.Date}
+  character. The format of columns \code{setupCol} and \code{retrievalCol} (and potential problem columns) in \code{CTtable}. Must be interpretable by either \code{as.Date} or the "orders" argument \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}.
 }
   \item{writecsv}{
   logical. Should the camera operability matrix be saved as a .csv?
@@ -63,15 +67,39 @@ cameraOperation(CTtable,
 }
 \details{
 \code{cameraCol} is NULL by default. The function then assumes there was 1 camera per station \code{CTtable}. In more than 1 camera was deployed per station, \code{cameraCol} needs to be specified to identify individual cameras within a station.
-\code{dateFormat} defaults to "YYYY-MM-DD", e.g. "2014-10-31". See \code{\link[base]{strptime}} for formatting options.
+\code{dateFormat} defaults to "YYYY-MM-DD", e.g. "2014-10-31". It can be specified either in the format required by \code{\link[base]{strptime}} or the 'orders' argument in \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}. In the example above, "YYYY-MM-DD" would be specified as "\%Y-\%m-\%d" or "ymd". 
+
 If \code{hasProblems} is TRUE, the function tries to find columns \code{ProblemX_from} and \code{ProblemX_to} in \code{CTtable}. \code{X} is a consecutive number from 1 to n, specifying periods in which a camera or station was not operational. If \code{hasProblems} is FALSE, cameras are assumed to have been operational uninterruptedly from setup to retrieval (see \code{\link{camtraps}} for details).
 \code{allCamsOn} only has an effect if there was more than 1 camera at a station. If TRUE, for the station to be considered operational, all cameras at a station need to be operational. If FALSE, at least 1 active camera renders the station operational.
 Argument \code{camerasIndependent} defines if cameras record animals independently (it thus only has an effect if there was more than 1 camera at a station). This is the case if an observation at one camera does not increase the probability for detection at another camera (cameras face different trails at a distance of one another). Non-independence occurs if an animal is likely to trigger both camers (as would be the case with 2 cameras facing each other).
 If \code{camerasIndependent} is TRUE, 2 active cameras at a station will result in a station operation value of 2 in the resulting matrix, i.e., 2 independent trap days at 1 station and day. If \code{camerasIndependent} is FALSE, 2 active cameras will return value 1, i.e., 1 trap night at 1 station per day.
+
+Row names depend on the input arguments and contain the station name and potentially session and camera names (if \code{sessionCol} and/or \code{cameraCol} are defined).
+
+Naming convention is (since version 1.2) \bold{Bold} information are from the columns \code{stationCol}, \code{sessionCol} and \code{cameraCol} in \code{CTtable}:
+
+\bold{Station} \cr
+\bold{Station}__SESS_\bold{SessionID}  \cr
+\bold{Station}__CAM_\bold{CameraID} \cr
+\bold{Station}__SESS_\bold{SessionID}__CAM_\bold{CameraID}
+
+Session are designated with prefix "__SESS_", cameras with prefix "__CAM_". Therefore, these are reserved words and may not be part of station, session or camera names. Here's what it may look like in real life:
+
+
+\bold{Station1} \cr
+\bold{Station1}__SESS_\bold{2019}  \cr
+\bold{Station1}__CAM_\bold{1024152} \cr
+\bold{Station1}__SESS_\bold{2019}__CAM_\bold{1024152}
+
+Functions detectionHistory and spatialDetectionHistory recognize these and use the information accordingly. 
+
 }
 \value{
-  A matrix. Row names indicate Station IDs (camera ID if \code{byCamera = TRUE}), column names are dates. \cr
+  A matrix. Row names always indicate Station IDs. If \code{sessionCol} and/or \code{cameraCol} are defined, they are contained in the row names also (camera ID only if \code{byCamera = TRUE}). Column names are dates. \cr
 Legend: NA: camera(s) not set up, 0: camera(s) not operational, 1 (or higher): number of operational camera(s) or an indicator for whether the station was operational (depending on \code{camerasIndependent} and \code{allCamsOn})  
+
+
+
 }
 % \references{
 % ~put references to the literature/web site here ~
@@ -110,8 +138,19 @@ camop_problem <- cameraOperation(CTtable      = camtraps,
                                  dateFormat   = "\%d/\%m/\%Y"
 )
 
+# with problems/malfunction / dateFormat in lubridate format
+camop_problem_lubridate <- cameraOperation(CTtable      = camtraps,
+                                           stationCol   = "Station",
+                                           setupCol     = "Setup_date",
+                                           retrievalCol = "Retrieval_date",
+                                           writecsv     = FALSE,
+                                           hasProblems  = TRUE,
+                                           dateFormat   = "dmy"
+)
+
 camop_no_problem
 camop_problem
+camop_problem_lubridate
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

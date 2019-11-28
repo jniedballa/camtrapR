@@ -49,7 +49,7 @@ surveyReport (recordTable,
   character. name of the column containing camera retrieval dates in \code{CTtable}
 }
   \item{CTDateFormat}{
-  character. The date format in columns \code{setupCol} and \code{retrievalCol} of \code{CTtable}. 
+  character. The format of columns \code{setupCol} and \code{retrievalCol} (and potential problem columns) in \code{CTtable}. Must be interpretable by either \code{as.Date} or the "orders" argument \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}.
 }
 \item{CTHasProblems}{
   logical. Are there periods of camera malfunction specified in \code{CTtable}?
@@ -75,8 +75,13 @@ surveyReport (recordTable,
 }
 \details{
 
-The value of \code{CTDateFormat} should be interpretable by \code{\link[base]{as.Date}}. \code{CTDateFormat} defaults to "YYYY-MM-DD", e.g. "2014-10-31". See \code{\link[base]{strptime}} for how to format date and time strings in R.
+\code{dateFormat} defaults to "YYYY-MM-DD", e.g. "2014-10-31". It can be specified either in the format required by \code{\link[base]{strptime}} or the 'orders' argument in \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}. In the example above, "YYYY-MM-DD" would be specified as "\%Y-\%m-\%d" or "ymd". 
 If \code{CTHasProblems} is set to TRUE, the function tries to find columns \code{ProblemX_from} and \code{ProblemX_to} in \code{CTtable} (\code{X} designates numbers from 1 to n in which a camera or station was not operational). If there are no such columns all stations are assumed to have been operational uninterruptedly from setup to retrieval.
+
+\code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be interpreted either by base-R via \code{\link[base]{strptime}} or in \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument "orders"). \pkg{lubridate} will be used if there are no "\%" characters in \code{recordDateTimeFormat}. 
+
+For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date and time formats in R see \code{\link[base]{strptime}} or \code{\link[lubridate]{parse_date_time}}.
+ 
 }
 \value{
  An invisible list containing 5 \code{data.frames}. 

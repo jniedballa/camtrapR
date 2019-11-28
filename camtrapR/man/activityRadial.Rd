@@ -68,6 +68,11 @@ The function generates a radial plot of species diel activity using an adapted v
 \details{
 
 \code{radial.plot} was adjusted to show a clockwise 24-hour clock face. It is recommended to set argument \code{lwd} to a value >= 2. You may also wish to add argument \code{rp.type="p"} to show a polygon instead of bars.
+
+\code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be interpreted either by base-R via \code{\link[base]{strptime}} or in \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument "orders"). \pkg{lubridate} will be used if there are no "\%" characters in \code{recordDateTimeFormat}. 
+
+For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date and time formats in R see \code{\link[base]{strptime}} or \code{\link[lubridate]{parse_date_time}}.
+ 
 }
 %\note{
 %These plots can be considered radial histograms.

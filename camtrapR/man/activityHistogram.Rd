@@ -62,6 +62,12 @@ logical. Show plots in R graphics device?
 }
 \details{
 Activity is calculated from the time of day of records. The date is ignored.
+
+\code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be interpreted either by base-R via \code{\link[base]{strptime}} or in \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument "orders"). \pkg{lubridate} will be used if there are no "\%" characters in \code{recordDateTimeFormat}. 
+
+For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date and time formats in R see \code{\link[base]{strptime}} or \code{\link[lubridate]{parse_date_time}}.
+
+ 
 }
  \value{
   It returns invisibly a vector of species record date and time in \code{POSIXlt} format.

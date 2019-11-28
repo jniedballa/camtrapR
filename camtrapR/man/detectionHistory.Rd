@@ -27,7 +27,8 @@ detectionHistory(recordTable,
  datesAsOccasionNames = FALSE,
  timeZone,
  writecsv = FALSE,
- outDir
+ outDir,
+ unmarkedMultFrameInput
 )
 }
 %- maybe also 'usage' for other objects documented here.
@@ -54,7 +55,7 @@ detectionHistory(recordTable,
   character. name of the column specifying date and time in \code{recordTable}
 }
   \item{recordDateTimeFormat}{
-  format of column \code{recordDateTimeCol} in \code{recordTable}
+  character. Format of column \code{recordDateTimeCol} in \code{recordTable}
 }
   \item{occasionLength}{
   integer. occasion length in days
@@ -84,7 +85,7 @@ detectionHistory(recordTable,
   If \code{day1 = "survey"}, occasion names in the detection history will be composed of first and last day of that occasion.
 }
   \item{timeZone}{
-  character. must be an argument of \code{\link[base]{OlsonNames}}
+  character. Must be a value returned by \code{\link[base]{OlsonNames}}
 }
   \item{writecsv}{
   logical. Should the detection history be saved as a .csv?
@@ -92,11 +93,13 @@ detectionHistory(recordTable,
   \item{outDir}{
   character. Directory into which detection history .csv file is saved
 }
-
+  \item{unmarkedMultFrameInput}{
+  logical. Return input for multi-season occupancy models in unmarked (argument "y" in \code{\link[unmarked]{unmarkedMultFrame}}?
+}
 }
 \details{
 
-The function computes a species detection matrix, either as a detection-by-date or a detection-by-occasion matrix. \code{day1} defines if each stations detection history will begin on that station's setup day (\code{day1 = "station"}) or if all station's detection histories have a common origin (the day the first station was set up if \code{day1 = "survey"} or a fixed date if, e.g. \code{day1 = "2015-12-31"}). If \code{day1} is a date, \code{\link[base]{as.Date}} must be able to understand it. The most suitable format is "\%Y-\%m-\%d", e.g. "2015-12-31".
+The function computes a species detection matrix, either as a detection-by-date or a detection-by-occasion matrix. \code{day1} defines if each stations detection history will begin on that station's setup day (\code{day1 = "station"}) or if all station's detection histories have a common origin (the day the first station was set up if \code{day1 = "survey"} or a fixed date if, e.g. \code{day1 = "2015-12-31"}). If \code{day1} is a date, \code{\link[base]{as.Date}} must be able to understand it. The most suitable format is "YYYY-MM-DD", e.g. "2015-12-31".
 
 \code{output} is analogous to \code{\link{spatialDetectionHistory}}. It makes the function return either counts of detections during occasions, or a binary indicator for whether the species was detected. 
 
@@ -104,7 +107,12 @@ The function computes a species detection matrix, either as a detection-by-date 
 
 The number of days that are aggregated is controlled by \code{occasionLength}. \code{occasionStartTime} can be used to make occasions begin another hour than midnight (the default). This may be relevant for nocturnal animals, in which 1 whole night would be considered an occasion.
 The values of \code{stationCol} in \code{recordTable} must be matched by the row names of \code{camOp} (case-insensitive), otherwise an error is raised.
-\code{DateTimeFormat} defaults to "\%Y-\%m-\%d \%H:\%M:\%S", e.g. "2014-09-30 22:59:59". For details on how to specify date and time formats in R see \code{\link[base]{strptime}}.
+
+\code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be interpreted either by base-R via \code{\link[base]{strptime}} or in \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument "orders"). \pkg{lubridate} will be used if there are no "\%" characters in \code{recordDateTimeFormat}. 
+
+For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date and time formats in R see \code{\link[base]{strptime}} or \code{\link[lubridate]{parse_date_time}}.
+
+If the camera operation matrix (\code{camOp}) was created for a multi-season study (argument \code{sesssionCol} in \code{\link{cameraOperation}} was set, it will be detected automatically. Output can be for unmarkedMultFrame by setting \code{unmarkedMultFrameInput = TRUE}. Each row corresponds to a site, and the columns are in season-major, occasion-minor order, e.g. season1-occasion1, season1-occasion2, etc.).
 
 }
 \value{
@@ -175,7 +183,7 @@ DetHist1                     # this is a list with 1 element
 DetHist1$detection_history   # this is the contained detection/non-detection matrix
 
 
-# with effort
+# with effort / using base R to define recordDateTimeFormat
 DetHist2 <- detectionHistory(recordTable          = recordTableSample,
                              camOp                = camop_no_problem,
                              stationCol           = "Station",
@@ -192,5 +200,24 @@ DetHist2 <- detectionHistory(recordTable          = recordTableSample,
 
 DetHist2$detection_history  # detection history  (alternatively, use: DetHist2[[1]])
 DetHist2$effort             # effort (alternatively, use: DetHist2[[2]])
+
+# with effort / using lubridate package to define recordDateTimeFormat
+DetHist2_lub <- detectionHistory(recordTable          = recordTableSample,
+                             camOp                = camop_no_problem,
+                             stationCol           = "Station",
+                             speciesCol           = "Species",
+                             recordDateTimeCol    = "DateTimeOriginal",
+                             recordDateTimeFormat = "ymd HMS",
+                             species              = "VTA",
+                             occasionLength       = 7,
+                             day1                 = "station",
+                             datesAsOccasionNames = FALSE,
+                             includeEffort        = TRUE,
+                             scaleEffort          = FALSE,
+                             timeZone             = "Asia/Kuala_Lumpur"
+)
+
+DetHist2_lub$detection_history  # detection history  (alternatively, use: DetHist2[[1]])
+DetHist2_lub$effort             # effort (alternatively, use: DetHist2_lub[[2]])
 
 }

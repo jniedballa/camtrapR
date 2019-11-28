@@ -79,6 +79,11 @@ This function plots kernel density estimates of two species' diel activity data 
 }
 \details{
 \code{...} can be graphical parameters passed on to function \code{\link[overlap]{overlapPlot}}, e.g. \code{linetype}, \code{linewidth}, \code{linecol} (see example below).
+
+\code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be interpreted either by base-R via \code{\link[base]{strptime}} or in \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument "orders"). \pkg{lubridate} will be used if there are no "\%" characters in \code{recordDateTimeFormat}. 
+
+For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date and time formats in R see \code{\link[base]{strptime}} or \code{\link[lubridate]{parse_date_time}}.
+ 
 }
 \value{
 Returns invisibly the \code{data.frame} with plot coordinates returned by \code{\link[overlap]{overlapPlot}}.
@@ -110,13 +115,16 @@ speciesB_for_activity <- "PBE"    # = Prionailurus bengalensis, Leopard Cat
 
 # create activity overlap plot (basic)
 activityOverlap (recordTable = recordTableSample,
-                 speciesA    = speciesA_for_activity,
-                 speciesB    = speciesB_for_activity,
+                 speciesA    = "VTA",    # = Viverra tangalunga, Malay Civet
+                 speciesB    = "PBE",    # = Prionailurus bengalensis, Leopard Cat
                  writePNG    = FALSE,
                  plotR       = TRUE
 )
 
+
+                                     
 # create activity overlap plot (prettier and with some overlapPlot arguments set)
+
 activityOverlap (recordTable = recordTableSample,
                  speciesA    = speciesA_for_activity,
                  speciesB    = speciesB_for_activity,
@@ -131,8 +139,8 @@ activityOverlap (recordTable = recordTableSample,
                  add.rug     = TRUE,
                  extend      = "lightgrey",
                  ylim        = c(0, 0.25),
-                 main        = paste("Activity overlap: ", 
-                                     speciesA_for_activity, "-", 
+                 main        = paste("Activity overlap between ", 
+                                     speciesA_for_activity, "and", 
                                      speciesB_for_activity)
 )
 
