@@ -10,7 +10,7 @@ timeShiftImages <- function(inDir,
 {
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool")
 
-  stopifnot(class(timeShiftTable) == "data.frame")
+  timeShiftTable <- dataFrameTibbleCheck(df = timeShiftTable)
   
   # convert all columns to character
   for(i in 1:ncol(timeShiftTable)){
