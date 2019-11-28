@@ -131,21 +131,34 @@ Station and camera IDs can be any combination of characters and numbers. Please 
 Column names are not prescribed to allow users freedom in naming their data the way they wish (with one exception detailed below). In the sample table, 'Station' contains station IDs, 'utm_y' and 'utm_x' contain the station's geographic coordinates. 'Setup_date' and 'Retrieval_date' are the dates the stations were set up and retrieved from the field. All of these may have user-defined names. 'Problem1_from' and 'Problem1_to' are optional columns to specify periods in which cameras/stations were not operational.  Additional pairs of columns such as 'Problem2_from' and 'Problem2_to' etc. can be added if cameras/stations malfunctioned repeatedly. Their names must follow the pattern given here.
 
 ## Date format
-All dates in this table (setup, retrieval and problem columns) should be of data type \"character\" and can be formatted in any way that function `as.Date` can interpret. **camtrapR** by default assumes the standard format \"YYYY-MM-DD\", e.g. \"2015-12-31\", and we recommend to use that format (it is also best for sorting by date). In any case, date format must be consistent between the date columns.
 
-Two functions (`cameraOperation`, `surveyReport`) utilize these date information and therefore contain arguments to specify the date format (`dateFormat` and `CTDateFormat`, respectively). Internally, these arguments are passed to function `as.Date` as  argument `format` and are needed to interpret the character string (e.g. \"2015-12-31\") provided in the table as a date. Details on how to set it correctly can be found in the Details section of the help files of functions `as.Date` and `strptime` or [here]( http://www.r-bloggers.com/date-formats-in-r/).
+All dates in this table (setup, retrieval and problem columns) should be of data type \"character\" and can be formatted in any way that function `as.Date` can interpret. Since version 1.2, camtrapR also supports the more flexible and convenient naming conventions of package `lubridate`, which makes it easier to specify dates correctly.
 
-Here are a few examples for December 1st 2015 (\"generic\" is the abstract representation of your date string (Y = year, M = month, D = day), \"example\" is a formatted example and \"dateFormat argument\" is what you'd specify in `dateFormat` and `CTDateFormat`):
+**camtrapR** by default assumes the standard format \"YYYY-MM-DD\", e.g. \"2015-12-31\", and we recommend to use that format (it is also best for sorting by date). In any case, the date format must be consistent between the various date columns.
 
-generic  | example  | dateFormat argument  |
-|---|---|---|
-\"YYYY-MM-DD\" | \"2015-12-01\" |  \"%Y-%m-%d\"   |
-\"YYYY/MM/DD\" |\"2015/12/01\" |  \"%Y/%m/%d\"  |
-\"YYYY/MM/DD\" |\"2015/12/1\" |  \"%Y/%m/%d\"  |
-\"MM/DD/YY\" |\"12/01/15\" |   \"%m/%d/%y\" |
-\"YYYYMMDD\" |\"20151201\" | \"%Y%m%d\"  |
-\"DD.MM.YY\" |\"1.12.15\" | \"%d.%m.%y\"  |
-\"DD-MMM-YY\" |\"01-Dec-15\" | \"%d-%b-%y\"  |
+Two functions (`cameraOperation`, `surveyReport`) utilize these date information and therefore contain arguments to specify the date format (`dateFormat` and `CTDateFormat`, respectively). These arguments are used to interpret the character string in the table (e.g. \"2015-12-31\") as a date. 
+
+If these arguments contain the character "\%" (characteristic of the format argument to `strptime`), they are passed to function `as.Date` as argument `format`. If they don't contain character "\%", they are interpreted as `orders` arguments to the function `parse_date_time` in the `lubridate` package. 
+
+
+Details on how to set it correctly can be found in the Details section of the help files of functions `as.Date` and `strptime` or `parse_date_time`.
+
+[Here is some information about date format in base R]( http://www.r-bloggers.com/date-formats-in-r/). 
+
+[Here is some information about date format in lubridate](https://lubridate.tidyverse.org/).
+
+
+Here are a few examples for December 1st 2015 (\"generic\" is the abstract representation of your date string (Y = year, M = month, D = day), \"example\" is a formatted example and \"dateFormat argument\" is what you'd specify in `dateFormat` and `CTDateFormat` in either the base R or `lubridate` naming convention):
+
+generic  | example  | dateFormat argument (base)  | dateFormat argument (lubridate)  |
+|---|---|---|---|
+\"YYYY-MM-DD\" | \"2015-12-01\" |  \"%Y-%m-%d\"   | \"ymd\"   |
+\"YYYY/MM/DD\" |\"2015/12/01\" |  \"%Y/%m/%d\"  | \"ymd\"  |
+\"YYYY/MM/DD\" |\"2015/12/1\" |  \"%Y/%m/%d\"  | \"ymd\"  |
+\"MM/DD/YY\" |\"12/01/15\" |   \"%m/%d/%y\" | \"mdy\"  |
+\"YYYYMMDD\" |\"20151201\" | \"%Y%m%d\"  | \"ymd\"  |
+\"DD.MM.YY\" |\"1.12.15\" | \"%d.%m.%y\"  | \"dmy\"  |
+\"DD-MMM-YY\" |\"01-Dec-15\" | \"%d-%b-%y\"  | \"dmy\"  |
 
 
 In the sample table (`camtraps`), we use another date format for demonstration purposes. 
