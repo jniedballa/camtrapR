@@ -14,8 +14,6 @@ getSpeciesImages <- function(species,
 
   if(hasArg(recordTable) & hasArg(inDir)) stop("recordTable and inDir cannot be both defined. Please define one only.", call. = FALSE)
     
-   # check column names
-  
   
   stopifnot(is.logical(createStationSubfolders))
 
@@ -34,8 +32,9 @@ getSpeciesImages <- function(species,
   }
 
   if(hasArg(recordTable)){
-  checkForSpacesInColumnNames(speciesCol = speciesCol)
-  if(!is.data.frame(recordTable)) stop("recordTable must be a data frame", call. = FALSE)
+    recordTable <- dataFrameTibbleCheck(df = recordTable)
+    checkForSpacesInColumnNames(speciesCol = speciesCol)
+  #if(!is.data.frame(recordTable)) stop("recordTable must be a data frame", call. = FALSE)
   
   if(!speciesCol %in% colnames(recordTable))  stop(paste('speciesCol = "', speciesCol, '" is not a column name in recordTable', sep = ''), call. = FALSE)
 
