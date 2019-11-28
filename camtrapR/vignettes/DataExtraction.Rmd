@@ -1,5 +1,5 @@
 ---
-title: "3. Extracting Data from Camera Trapping Images"
+title: "3. Extracting Data from Camera Trapping Images, occupancy & secr input"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output: 
@@ -8,13 +8,14 @@ output:
     fig_width: 6
     fig_height: 5
 vignette: >
-  %\VignetteIndexEntry{3. Extracting data from camera trap images}
+  %\VignetteIndexEntry{3. Extracting data from camera trap images, occupancy & secr}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
 ```{r results = "hide"}
 library(camtrapR)
+library(secr)
 ```
 
 # Tabulating species and individual records: the recordTable functions
@@ -108,15 +109,15 @@ Now `r nrow(rec.db.species60)` records were returned instead of `r nrow(rec.db.s
 
 ### Time zones and daylight saving time
 
-Note the warning about the missing time zone in the minimal example above. By default, camtrapR will assume UTC time zone. This should work well in most situations (even though the time zone may not be correct, strictly speaking), because UTC does not use Daylight saving time (DST, aka 'summer time'), and camera traps normally don't use time zones (hence, camera traps will normally not respect DST of the area you work in).
+Note the warning about the missing time zone in the minimal example above. By default, camtrapR will assume UTC time zone. This should work well in most situations (even though the time zone may not be correct, strictly speaking), because UTC does not use daylight saving time (DST, aka 'summer time'), and camera traps normally don't use time zones (hence, camera traps will normally not respect DST of the area you work in and will not adjust image timestamps accordingly).
 
-Now, if you work in an area that uses DST, and your camera does not know about DST, there will be a systematic 1-hour offset of all records taken during DST. In addition, records may fall into the non-existing when clocks are advanced in spring.
+Now, if you work in an area that uses DST, and your camera does not know about DST, things can go wrong in various ways and you may end up with a systematic 1-hour offset. If you set your cameras up during DST (in summer) and set the internal clock accordingly, all records taken in winter (non-DST period) will be recorded as 1 hour later than according to actual clock time. If you set your cameras up during winter (not DST) and set the internal clock accordingly, all records taken in summer (DST period) will be recorded as 1 hour earlier than according to actual clock time. In addition, records may fall into the non-existing hour when clocks are advanced in spring, leading to an error in interpreting the date/time.
 
-So, the question whether or not your cameras record the time zone becomes very important. Here is some recommendations on how to use the argument.
+So, the question whether or not your cameras record the time zone becomes very important. Here is some recommendations on how to use the argument `timeZone`.
 
-If your cameras save the time zone, set argument `timeZone` (both if your area has DST or not). 
-If your cameras don't save the time zone, and your time zone does not have DST, argument `timeZone`
-If your cameras don't save the time zone, and your time zone has DST, use the default UTC.
+If your cameras save the time zone and adjust image timestamps accordingly, set argument `timeZone` to your study area time zone (both if your area has DST or not). 
+If your cameras don't save the time zone, and your time zone does not have DST, set argument `timeZone` to your study area time zone
+If your cameras don't save the time zone, and your time zone has DST, leave argument `timeZone` at the default UTC.
 
 In other words, it is strongly advised to set argument `timeZone` to your study area's time zone (one of `OlsonNames()`), *unless* your area has DST, but your cameras don't record it. 
 
@@ -226,7 +227,10 @@ The camera operation matrix is a day-by-station matrix that states how many came
 
 ```{r}
  # first load the camera trap station table
+
 data(camtraps)
+
+dateFormat <- "%d/%m/%Y"
  
 camop_problem <- cameraOperation(CTtable      = camtraps,
                                  stationCol   = "Station",
@@ -234,7 +238,7 @@ camop_problem <- cameraOperation(CTtable      = camtraps,
                                  retrievalCol = "Retrieval_date",
                                  writecsv     = FALSE,
                                  hasProblems  = TRUE,
-                                 dateFormat   = "%d/%m/%Y"
+                                 dateFormat   = dateFormat
 )
 
 # as a reminder, these are the dates in our station information table
@@ -251,13 +255,17 @@ If stations were not set up, values are NA. If they were set up but malfunctioni
 Here is a little function for plotting the camera operation matrix. Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.
 
 ```{r}
-camopPlot <- function(camOp){
+camopPlot <- function(camOp, 
+                      palette = "Red-Yellow"){
   
   which.tmp <- grep(as.Date(colnames(camOp)), pattern = "01$")
   label.tmp <- format(as.Date(colnames(camOp))[which.tmp], "%Y-%m")
   at.tmp <- which.tmp / ncol(camOp)
   
-  image(t(as.matrix(camOp)), xaxt = "n", yaxt = "n", col = c("red", "grey70"))
+  values_tmp <- na.omit(unique(c(camOp)))
+
+  image(t(as.matrix(camOp)), xaxt = "n", yaxt = "n", col = hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE))
+  
   axis(1, at = at.tmp, labels = label.tmp)
   axis(2, at = seq(from = 0, to = 1, length.out = nrow(camOp)), labels = rownames(camOp), las = 1)
   abline(v = at.tmp, col = rgb(0,0,0, 0.2))
@@ -280,9 +288,9 @@ camOp <- read.csv(file = ..., row.names = 1, check.names = FALSE)
 
 `check.names = FALSE` ensures that column names (the dates) are read back into R as they are (e.g. "2015-12-01"). Otherwise one may end up with unreadable column names (at least for camtrapR) such as "X2015.12.01".
 
-# Input for subsequent analyses
+# Input for subsequent analyses (single-season)
 
-It is very easy to prepare input for occupancy and spatial capture-recapture (SCR) analyses in camtrapR. All one needs it a record table and the camera operation matrix. Making input for SCR analyses further requires the camera trap station table.
+It is very easy to prepare input for single-season occupancy and spatial capture-recapture (SCR) analyses in camtrapR. All one needs it a record table and the camera operation matrix. Making input for SCR analyses further requires the camera trap station table. 
 
 ## Occupancy analyses
 
@@ -299,7 +307,7 @@ camop_no_problem <- cameraOperation(CTtable      = camtraps,
                                     setupCol     = "Setup_date",
                                     retrievalCol = "Retrieval_date",
                                     hasProblems  = FALSE,
-                                    dateFormat   = "%d/%m/%Y"
+                                    dateFormat   = dateFormat
 )
 
 # define image directory
@@ -410,7 +418,6 @@ Input for spatial capture-recapture analyses can be generated in the form of `ca
 ```{r}
 
 data(recordTableIndividualSample)
-data(camtraps)
 
 # create camera operation matrix (with problems/malfunction)
 camop_problem <- cameraOperation(CTtable      = camtraps,
@@ -419,7 +426,7 @@ camop_problem <- cameraOperation(CTtable      = camtraps,
                                  retrievalCol = "Retrieval_date",
                                  writecsv     = FALSE,
                                  hasProblems  = TRUE,
-                                 dateFormat   = "%d/%m/%Y"
+                                 dateFormat   = dateFormat
 )
 
 sdh <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSample, 
@@ -446,5 +453,192 @@ sdh <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSamp
 
   summary(sdh)
   plot(sdh, tracks = TRUE)
+
+```
+
+
+# Input for subsequent analyses (multi-season)
+
+Since version 1.2, camtrapR can prepare input for multi-season occupancy and spatial capture-recapture analyses (in unmarked and secr). The process is very similar to the one for single-season models. 
+
+## Multi-season occupancy analyses
+
+camtrapR prepares detection histories that can be used as input for argument `y` in function `unmarkedMultFrame`. `unmarkedMultFrame` creates the input for function `colext` which fits multi-season occupancy models.
+
+For multi-season occupancy, we need a session column in the camera trap table. Records will be assigned to session automatically based on their dates.
+
+First we simulate data for 2 seasons by duplicating the existing sample data and adjusting the dates (add 1 year)
+```{r}
+
+# simulate records from multiple seasons
+recordTableSample_season2 <- recordTableSample
+recordTableSample_season2$DateTimeOriginal <- gsub("2009", "2010", recordTableSample_season2$DateTimeOriginal)  # substitute 2009 with 2010)
+recordTableSample_season <- rbind(recordTableSample, recordTableSample_season2) # combine with season 1
+rm(recordTableSample_season2)
+
+# also, for clarity, lets remove all unnecessary columns
+recordTableSample_season <- recordTableSample_season[, c("Station", "Species", "DateTimeOriginal")]
+
+
+# Now we simulate a camera trap table with 2 seasons by adding 1 year to all dates (substitute 2009 with 2010)
+# and converting back to character format
+camtraps_season2 <- camtraps
+
+camtraps_season2[, "Setup_date"]     <- gsub("2009", "2010", camtraps_season2[, "Setup_date"])
+camtraps_season2[, "Retrieval_date"] <- gsub("2009", "2010", camtraps_season2[, "Retrieval_date"])
+camtraps_season2[, "Problem1_from"]  <- gsub("2009", "2010", camtraps_season2[, "Problem1_from"])
+camtraps_season2[, "Problem1_to"]    <- gsub("2009", "2010", camtraps_season2[, "Problem1_to"])
+
+# add an extra station with different dates 
+camtraps_season2 <- rbind(camtraps_season2, NA)
+camtraps_season2$Station[4] <- "StationD"
+camtraps_season2$utm_y[4]  <- 607050
+camtraps_season2$utm_x[4]  <- 525000
+camtraps_season2$Setup_date[4]  <- "04/04/2010"
+camtraps_season2$Retrieval_date[4]  <- "17/06/2010"
+camtraps_season2$Problem1_from[4] <- "20/05/2010"
+camtraps_season2$Problem1_to[4] <- "30/05/2010"
+
+# add session column
+camtraps$session <- 2009
+camtraps_season2$session <- 2010
+
+# combine the tables for 2 seasons
+camtraps_season <- rbind(camtraps, camtraps_season2)
+
+# create camera operation matrix
+camop_session <- cameraOperation(CTtable         = camtraps_season,
+                                    stationCol   = "Station",
+                                    setupCol     = "Setup_date",
+                                    sessionCol   = "session",
+                                    retrievalCol = "Retrieval_date",
+                                    hasProblems  = TRUE,
+                                    dateFormat   = dateFormat
+)
+
+# plot camera operation matrix
+par(oma = c(0,7,0,0))
+camopPlot(camop_session)
+
+
+# make multi-season detection history
+DetHist_multi <- detectionHistory(recordTable   = recordTableSample_season,
+                            camOp                = camop_session,
+                            stationCol           = "Station",
+                            speciesCol           = "Species",
+                            species              = "VTA",
+                            occasionLength       = 10,
+                            day1                 = "station",
+                            recordDateTimeCol     = "DateTimeOriginal",
+                            includeEffort        = TRUE,
+                            scaleEffort          = FALSE,
+                            timeZone             = "UTC",
+                            unmarkedMultFrameInput = TRUE
+)
+
+DetHist_multi
+```
+
+Note that the function makes sure that all seasons have identical number of occasions, and that all stations are represented, even if they were not sampled in all seasons.
+
+From here, the resulting object can be used in unmarked.
+
+```{r}
+
+year_matrix <- matrix(unique(as.character(camtraps_season$session)),
+               ncol = length(unique(as.character(camtraps_season$session))),
+               nrow = length(unique(camtraps_season$Station)),
+               byrow = TRUE)
+
+# this is a made up example table with station covariates for demonstration
+site_covariates <- data.frame(Station = rownames(DetHist_multi$detection_history),
+                              elevation = c(100, 200, 500, 300),
+                              treecover = c(80, 100, 50, 10))
+
+umf <- unmarked::unmarkedMultFrame(y = DetHist_multi$detection_history,
+                                   siteCovs = site_covariates,
+                                   yearlySiteCovs = list(year = year_matrix),
+                                   obsCovs = list(effort = DetHist_multi$effort),
+                                   numPrimary = 2)
+
+
+
+colext_example <- unmarked::colext(psiformula = ~ treecover,    # First-year occupancy
+                                   gammaformula = ~ 1,          # Colonization
+                                   epsilonformula = ~ 1,        # Extinction
+                                   pformula = ~ effort,         # Detection
+                                   data = umf,
+                                   method="BFGS")
+summary(colext_example)
+```
+
+
+## Multi-season spatial capture-recapture
+
+For secr, session IDs must be a gapless sequence of numbers beginning with 1. So 2009 becomes season 1 and 2010 season 2
+
+```{r}
+camtraps_season$session[camtraps_season$session == 2009] <- 1
+camtraps_season$session[camtraps_season$session == 2010] <- 2
+```
+
+```{r}
+
+# we also want a few records in season 2
+recordTableIndividualSample_season2 <- recordTableIndividualSample[1:10,]
+recordTableIndividualSample_season2$DateTimeOriginal <- gsub("2009", "2010", recordTableIndividualSample_season2$DateTimeOriginal)
+recordTableIndividualSample_season <- rbind(recordTableIndividualSample, recordTableIndividualSample_season2)
+
+
+
+# for clarity, lets remove all unnecessary columns
+recordTableIndividualSample_season <- recordTableIndividualSample_season[, c("Station", "Species", "Individual", "DateTimeOriginal")]
+
+```
+
+
+```{r}
+
+# create camera operation matrix (with problems/malfunction), same as above for multi-season occupancy
+camop_session <- cameraOperation(CTtable         = camtraps_season,
+                                    stationCol   = "Station",
+                                    setupCol     = "Setup_date",
+                                    sessionCol   = "session",
+                                    retrievalCol = "Retrieval_date",
+                                    hasProblems  = TRUE,
+                                    dateFormat   = dateFormat
+)
+
+
+
+sdh_multi <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSample_season,
+                               species               = "LeopardCat",
+                               output                = "binary",
+                               camOp                 = camop_session,
+                               CTtable               = camtraps_season,
+                               stationCol            = "Station",
+                               speciesCol            = "Species",
+                               sessionCol            = "session",
+                               Xcol                  = "utm_x",
+                               Ycol                  = "utm_y",
+                               individualCol         = "Individual",
+                               recordDateTimeCol     = "DateTimeOriginal",
+                               recordDateTimeFormat  = "%Y-%m-%d %H:%M:%S",
+                               occasionLength        = 10,
+                               day1                  = "survey",
+                               includeEffort         = TRUE,
+                               timeZone              = "Asia/Kuala_Lumpur",
+                               stationCovariateCols  = "utm_y",     # made up, a potential site covariate from camtraps_season
+                               individualCovariateCols = "Individual"   # made up, a potential individual covariate from recordTable
+  )
+
+
+  # summary(sdh_multi)
+  # par(mfrow = c(1,2))
+  # plot(sdh_multi)
+  # 
+  # secr.fit.example <- secr.fit(capthist = sdh2,
+  #                              start = c(-1, -2, 10))   # with starting values, since its only very little data
+  # summary(secr.fit.example)
 
 ```
