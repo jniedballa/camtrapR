@@ -1,4 +1,4 @@
-# Version Check for .onAttach()
+# Version Check for .onAttach()  ####
 # adapted from http://thecoatlessprofessor.com/programming/automatically-check-if-r-package-is-the-latest-version-on-package-load/. Thank you!
 
 
@@ -24,7 +24,7 @@
 }
 
 
-# for all functions in which user specifies column names: error if spaces in column names
+# for all functions in which user specifies column names: error if spaces in column names    ####
 checkForSpacesInColumnNames <- function(...){
 
   z <- list(...)
@@ -49,7 +49,7 @@ checkForSpacesInColumnNames <- function(...){
 
 
 
-# for functions reading out and tabulating image metadata
+# run exiftool for functions reading out and tabulating image metadata    ####
 
 runExiftool <- function(command.tmp,
                         colnames.tmp)
@@ -74,6 +74,7 @@ runExiftool <- function(command.tmp,
 }
 
 
+# add image metadata as columns in record table ####
 addMetadataAsColumns <- function(intable,
                                  metadata.tagname,
                                  metadataHierarchyDelimitor,
@@ -131,7 +132,7 @@ addMetadataAsColumns <- function(intable,
 }
 
 
-
+# assign species IDs from metadata tags or directory names   ####
 assignSpeciesID <- function(intable,
                             IDfrom,
                             metadataSpeciesTag,
@@ -188,7 +189,7 @@ assignSpeciesID <- function(intable,
 }
 
 
-# find and separate multiple species in same image (only if using metadata ID)
+# find and separate multiple species in same image (only if using metadata ID)    ####
 separateMultipleSpecies <- function(intable,
                                     speciesCol,
                                     multiple_tag_separator)
@@ -208,7 +209,7 @@ separateMultipleSpecies <- function(intable,
 
 
 
-# add station and camera id to metadata table
+# add station and camera id to metadata table   ####
 
 addStationCameraID <- function(intable,
                                dirs_short,
@@ -263,7 +264,7 @@ addStationCameraID <- function(intable,
   return(intable)
 }
 
-# check if date/time information is present and was readable
+# check if date/time information is present and was readable    ####
 
 checkDateTimeOriginal <- function (intable, dirs_short, i){
      # if all date/time information is missing, go to next station
@@ -280,8 +281,9 @@ checkDateTimeOriginal <- function (intable, dirs_short, i){
     }
     }
     return(intable)
-    }
-  # remove duplicate records of same species taken in same second at the same station (by the same camera, if relevant)
+}
+
+  # remove duplicate records of same species taken in same second at the same station (by the same camera, if relevant)   ####
   # Note to self: this may also be done outside the station loop, after the final record table is assembled. Saves a few executions of this function.
 
   removeDuplicatesOfRecords <- function(metadata.tmp, removeDuplicateRecords, camerasIndependent, stationCol, speciesCol, cameraCol){
@@ -304,7 +306,7 @@ checkDateTimeOriginal <- function (intable, dirs_short, i){
         }
 
 
-#### assess temporal independence between records
+# assess temporal independence between records   ####
 
 assessTemporalIndependence <- function(intable,
                                        deltaTimeComparedTo,
@@ -415,7 +417,7 @@ assessTemporalIndependence <- function(intable,
 }
 
 
-# add potential new columns to global record.table
+# add potential new columns to global record.table   ####
 
 addNewColumnsToGlobalTable <- function(intable,
                                        i,
@@ -447,8 +449,10 @@ addNewColumnsToGlobalTable <- function(intable,
 
 
 #####################################################
+
 # for detectionHistory functions
 
+# check column names of camera operation matrix  ####
 checkCamOpColumnNames <- function(cameraOperationMatrix){
 camopTest <- try(as.Date(colnames(cameraOperationMatrix)), silent = TRUE)
 if(class(camopTest) == "try-error") stop(paste('Could not interpret column names in camOp as Dates. Desired format is YYYY-MM-DD, e.g. "2016-12-31". First column name in your camera operation matrix is "', colnames(cameraOperationMatrix)[1], '"', sep = '' ), call. = FALSE)
@@ -456,6 +460,7 @@ if(any(is.na(colnames(cameraOperationMatrix)))) stop("There are NAs in the colum
 }
 
 
+# create table of station / camera deployment and image data ranges  ####
 createDateRangeTable <- function(cam.op,
                                  subset_species_tmp,
                                  buffer_tmp,
@@ -488,9 +493,9 @@ createDateRangeTable <- function(cam.op,
 
     # check if images were taken between setup and retrieval dates (Error if images outside station date range)
   if(any(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp), na.rm = TRUE)) warning(paste("record date before camera operation date range: ",
-                                                                                                                          paste(rownames(date_ranges)[which(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp))], collapse = ", " )), call. = FALSE)
+                                                                                                                          paste(rownames(date_ranges)[which(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp))], "\n", collapse = ", " )), call. = FALSE)
   if(any(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp), na.rm = TRUE)) warning(paste("record date after camera operation date range: ",
-                                                                                                                          paste(rownames(date_ranges)[which(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp))], collapse = ", " )), call. = FALSE)
+                                                                                                                          paste(rownames(date_ranges)[which(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp))], "\n", collapse = ", " )), call. = FALSE)
 
   # define when first occasion begins (to afterwards remove prior records in function    cleanSubsetSpecies)
   if(!hasArg(buffer_tmp)) buffer_tmp <- 0
@@ -540,7 +545,7 @@ createDateRangeTable <- function(cam.op,
 
 
 
-
+# check camera operation matrix with date range table  ####
 adjustCameraOperationMatrix <- function(cam.op,
                                         date_ranges2,
                                         timeZone_tmp,
@@ -633,7 +638,7 @@ adjustCameraOperationMatrix <- function(cam.op,
 }
 
 
-
+# check consistency of species record table before creating detection history (remove records outside date range etc)  ####
 cleanSubsetSpecies <- function(subset_species2 ,
                                stationCol2,
                                date_ranges2
@@ -675,7 +680,7 @@ cleanSubsetSpecies <- function(subset_species2 ,
 }
 
 
-
+# calculate trapping effort matrix by day   ####
 calculateTrappingEffort <- function(cam.op,
                                     occasionLength2,
                                     scaleEffort2,
@@ -1033,7 +1038,7 @@ makeSurveyZip <- function(output,
 
 
 ##########################################################################################################
-# assign session IDs to records in recordTableIndividual based on a session column in camera trap table
+# assign session IDs to records in recordTableIndividual based on a session column in camera trap table    ####
 # This is for when there are several entries for each station, one for each session
 # in other words, if stations were operated continuously and session start/end dates are defined in camera trap table
 
@@ -1047,9 +1052,9 @@ assignSessionIDtoRecordTableIndividual <- function(recordTableIndividual_tmp,
   # check input
   if(sessionCol %in% colnames(recordTableIndividual_tmp)) stop("recordTableIndividual has a session column already. Cannot assign new session ID",
                                                                call. = FALSE)
-  if(!setup_date_col %in% colnames(cameraTrapTable_tmp)) stop("CTtable setup column must be called 'Setup_date'",
+  if(!setup_date_col %in% colnames(cameraTrapTable_tmp)) stop("CTtable setup column not found",
                                                                call. = FALSE)
-  if(!retrieval_date_col %in% colnames(cameraTrapTable_tmp)) stop("CTtable retrieval column must be called 'Retrieval_date'",
+  if(!retrieval_date_col %in% colnames(cameraTrapTable_tmp)) stop("CTtable retrieval column not found",
                                                              call. = FALSE)
   
   # define "between" function
@@ -1094,3 +1099,329 @@ assignSessionIDtoRecordTableIndividual <- function(recordTableIndividual_tmp,
               CTtable     = cameraTrapTable_tmp))
 }
 
+assignSessionIDtoRecordTable <- function(recordTable_tmp,
+                                         camOp,
+                                         dateTimeCol,
+                                         stationCol,
+                                         sessionCol
+                                         ){
+  
+
+  camop.info.df <- deparseCamOpRownames(camOp)
+  
+  recordTable_tmp[, sessionCol] <- NA
+  
+  record_dates_tmp <- as.Date(recordTable_tmp[, dateTimeCol])
+  camOp_dates_tmp  <- as.Date(colnames(camOp))
+  
+  # remove records before / after camOp date range
+  records_too_early <- which(sapply(record_dates_tmp, FUN = function(x) x < min(camOp_dates_tmp)))
+  
+  if(length(records_too_early) > 0) {
+    recordTable_tmp <- recordTable_tmp[-records_too_early, ]
+    warning(paste(length(records_too_late), "records were removed because they were before the first day in the camera operation matrix"), call. = FALSE)
+    record_dates_tmp <- as.Date(recordTable_tmp[, dateTimeCol])
+  }
+  
+  records_too_late  <- which(sapply(record_dates_tmp, FUN = function(x) x > max(camOp_dates_tmp)))
+  
+  if(length(records_too_late) > 0) {
+    recordTable_tmp <- recordTable_tmp[- records_too_late, ]
+    warning(paste(length(records_too_late), "records were removed because they were after the last day in the camera operation matrix"), call. = FALSE)
+    record_dates_tmp <- as.Date(recordTable_tmp[, dateTimeCol])
+  }
+  
+  
+  for(i in 1:nrow(camop.info.df)){
+    # for every row in camOp, find all records at that station  
+    which_tmp <- which(recordTable_tmp[, stationCol] == camop.info.df$station[i])
+    
+    if(length(which_tmp) >= 1){
+      # of the records at that station, which are not NA in that row of the camOp (there are different rows for different sessions)
+      which_tmp2 <- which(!is.na(camOp[i, as.character(record_dates_tmp[which_tmp])]))
+      
+      recordTable_tmp[which_tmp[which_tmp2], sessionCol] <- camop.info.df$session[i]
+    }
+  }
+  
+  which_na <- which(is.na(recordTable_tmp[, sessionCol]))
+  
+  if(length(which_na) > 0) {
+    recordTable_tmp <- recordTable_tmp[-which_na,]
+    warning(paste(length(which_na), "records were removed because they could not be assigned to an active station / session"), call. = FALSE)
+  }
+  
+  separatorSession <- "__SESS_"
+  stationCol_backup <- paste(stationCol, "backup", sep = "_")
+  
+  recordTable_tmp[, stationCol_backup] <- recordTable_tmp[, stationCol]
+  
+  recordTable_tmp[, stationCol] <- paste(recordTable_tmp[, stationCol], recordTable_tmp[, sessionCol], sep = separatorSession)
+  
+  #stationSessionCol <- paste(recordTable_tmp$stationCol, recordTable_tmp$sessionCol, sep = "_")
+  #recordTable_tmp[, stationSessionCol] <- paste(recordTable_tmp$stationCol, recordTable_tmp$sessionCol, sep = separatorSession)
+  
+  return(recordTable_tmp)
+}
+
+
+
+# checks if input is data.frame or tibble. If tibble, either convert to data.frame or stop  ####
+
+dataFrameTibbleCheck <- function(df, 
+                                 tibble_allowed = TRUE, 
+                                 data_table_allowed = TRUE){
+  
+  # check if it is a data.frame at all
+  if(!is.data.frame(df)) stop(paste(substitute(df), "must be a data.frame"), call. = FALSE)
+  
+  # handling tibbles (tidyverse)
+  if (requireNamespace("tibble", quietly = TRUE)) {
+    
+    if(tibble::is_tibble(df)) {
+      if(tibble_allowed) {
+        message (paste(substitute(df), "was converted from tibble to data.frame"), call. = FALSE)
+        df <- as.data.frame(df)
+      } else {
+        stop (paste(substitute(df), "is a tibble. Please provide a data.frame instead (use read.csv() or as.data.frame())"), call. = FALSE)
+      }
+    }
+  }
+  
+  # handling data.tables
+  
+  if (requireNamespace("data.table", quietly = TRUE)) {
+    
+    if(data.table::is.data.table(df)) {
+      if(data_table_allowed) {
+        message (paste(substitute(df), "was converted from data.table to data.frame"), call. = FALSE)
+        df <- as.data.frame(df)
+      } else {
+        stop (paste(substitute(df), "is a data.table Please provide a data.frame instead (use read.csv() or as.data.frame())"), call. = FALSE)
+      }
+    }
+  }
+  return(df)
+}
+
+
+# check and convert dates (character) to date objects, either with base functions or lubridate    ####
+
+# CHECK: timeZone argument needed in surveyReport?
+
+parseDateObject <- function(inputColumn,     
+                            dateFormat,   
+                            checkNA,      # throw error if there are NAs in input (only setup / retrieval, not problems)
+                            checkEmpty    # throw error if there are blank values in input  (only setup / retrieval, not problems)
+){
+  
+  inputColumn <- as.character(inputColumn)
+  #if(!class(inputColumn) %in% c("factor", "character")) stop(paste("date column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
+  
+  if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
+  if(checkEmpty & any(inputColumn == "")) stop(paste("there are blank values in", deparse(substitute(inputColumn))), call. = FALSE)
+  
+  # option 1: base functions for dates as per strptime (identified by "%")
+  if(grepl(pattern = "%", x = dateFormat, fixed = TRUE)){
+    out <- as.Date(inputColumn,     format = dateFormat)
+  } else {
+    # option 2: lubridate functions (identified by absence of "%")
+    if(!requireNamespace("lubridate", quietly = TRUE)) stop(paste("package 'lubridate' is required for the specified dateFormat", dateFormat))
+    
+    out <- lubridate::date(lubridate::parse_date_time(inputColumn, orders = dateFormat))
+  }
+  
+  if(all(is.na(out))) stop(paste("Cannot read date format in", deparse(substitute(inputColumn)), ". Output is all NA."), call. = FALSE)
+  
+  if(checkNA & any(is.na(out))) stop(paste("At least one entry in", deparse(substitute(inputColumn)), "cannot be interpreted using dateFormat:", dateFormat, "\n",
+                                           "rows", paste(which(is.na(out)), collapse = ", ")), call. = FALSE)
+  return(out)
+}
+
+
+# check and convert date - time (character) to datetime objects (POSIXlt), either with base functions or lubridate    ####
+
+parseDateTimeObject <- function(inputColumn,     
+                            dateTimeFormat,
+                            timeZone,
+                            checkNA = TRUE,      # throw error if there are NAs in input (only setup / retrieval, not problems)
+                            checkEmpty = TRUE,    # throw error if there are blank values in input  (only setup / retrieval, not problems)
+                            checkNA_out = TRUE  # throw error when there is NAs in output (FALSE so reporting is done by detectionHistory, which returns correct row numbers)
+){
+  
+  inputColumn <- as.character(inputColumn)
+  if(!class(inputColumn) %in% c("factor", "character")) stop(paste("datetime column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
+  
+  if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
+  if(checkEmpty & any(inputColumn == "")) stop(paste("there are blank values in", deparse(substitute(inputColumn))), call. = FALSE)
+  
+  # option 1: base functions for dates as per strptime (identified by "%")
+  if(grepl(pattern = "%", x = dateTimeFormat, fixed = TRUE)){
+    out <- as.POSIXlt(inputColumn, tz = timeZone, format = dateTimeFormat)
+  } else {
+    # option 2: lubridate functions (identified by absence of "%")
+    if(!requireNamespace("lubridate", quietly = TRUE)) stop(paste("package 'lubridate' is required for the specified dateTimeFormat", dateTimeFormat))
+    
+    out <- lubridate::parse_date_time(inputColumn, orders = dateTimeFormat, tz = timeZone)
+  }
+  
+  if(all(is.na(out))) stop(paste("Cannot read datetime format in", deparse(substitute(inputColumn)), ". Output is all NA."), call. = FALSE)
+  
+  if(checkNA_out & any(is.na(out))) stop(paste(sum(is.na(out)), "out of", length(out), "records in",
+                                           deparse(substitute(inputColumn)), "cannot be interpreted using dateTimeFormat:", dateTimeFormat, "\n",
+                                           "rows", paste(which(is.na(out)), collapse = ", ")), call. = FALSE)
+  
+  
+  if(!any(class(out) %in% c("POSIXct", "POSIXlt"))) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat. Output is not POSIX object")
+  return(out)
+}
+
+## make a new empty matrix, a row for each unique station / camera combination
+stationSessionCamMatrix <- function(CTtable,
+                             stationCol,
+                             cameraCol, 
+                             sessionCol, 
+                             setupCol,
+                             retrievalCol,
+                             separator
+){
+  
+  separatorCam     <- "__CAM_"
+  separatorSession <- "__SESS_"
+  
+  double_underscore <- "__"
+  
+  if(length(grep(pattern = double_underscore, x = CTtable[,stationCol])) >= 1) stop(paste("Station IDs may not contain double underscores", double_underscore), call. = FALSE)
+  
+  if(hasArg(sessionCol)){
+    if(any(CTtable[,sessionCol] == "")) stop("there are empty cells in sessionCol Please provide camera IDs for all cameras",
+                                            call. = FALSE)    
+    if(any(is.na(CTtable[,sessionCol]))) stop("there are NAs in sessionCol Please provide camera IDs for all cameras",
+                                             call. = FALSE)    
+    if(length(grep(pattern = double_underscore, x = CTtable[,sessionCol])) >= 1)  stop(paste("Session IDs may not contain double underscores", double_underscore),  call. = FALSE)
+  
+    stationsession <- paste(CTtable[,stationCol], CTtable[,sessionCol], sep = separatorSession)
+    m <- matrix(ncol = abs(as.integer(max(CTtable[,retrievalCol]) - min(CTtable[,setupCol]))) + 1,
+                nrow  = length(stationsession))
+    colnames(m) <- as.character(as.Date(min(CTtable[,setupCol]):max(CTtable[,retrievalCol]), origin = "1970-01-01"))
+    rownames(m) <- stationsession
+  }
+  
+  if(hasArg(cameraCol)){
+    if(any(CTtable[,cameraCol] == "")) stop("there are empty cells in cameraCol. Please provide camera IDs for all cameras",
+                                            call. = FALSE)    
+    if(any(is.na(CTtable[,cameraCol]))) stop("there are NAs in cameraCol. Please provide camera IDs for all cameras",
+                                             call. = FALSE)    
+    if(length(grep(pattern = double_underscore, x = CTtable[,cameraCol])) >= 1)  stop(paste("Camera IDs may not contain double underscores", double_underscore),  call. = FALSE)
+  
+  
+    stationcam <- paste(CTtable[,stationCol], CTtable[,cameraCol], sep = separatorCam)
+    m <- matrix(ncol = abs(as.integer(max(CTtable[,retrievalCol]) - min(CTtable[,setupCol]))) + 1,
+                nrow  = length(stationcam))
+    colnames(m) <- as.character(as.Date(min(CTtable[,setupCol]):max(CTtable[,retrievalCol]), origin = "1970-01-01"))
+    rownames(m) <- stationcam
+  }
+  
+  if(hasArg(sessionCol) & hasArg(cameraCol)){
+    
+    stationsessioncam <- paste(CTtable[,stationCol], separatorSession, CTtable[,sessionCol], separatorCam, CTtable[,cameraCol], sep = "")
+    m <- matrix(ncol = abs(as.integer(max(CTtable[,retrievalCol]) - min(CTtable[,setupCol]))) + 1,
+                 nrow  = length(stationsessioncam))
+    colnames(m) <- as.character(as.Date(min(CTtable[,setupCol]):max(CTtable[,retrievalCol]), origin = "1970-01-01"))
+    rownames(m) <- stationsessioncam
+  }
+  
+  if(!hasArg(sessionCol) & !hasArg(cameraCol)){
+    
+    m <- matrix(ncol = abs(as.integer(max(CTtable[,retrievalCol]) - min(CTtable[,setupCol]))) + 1,
+                nrow  = length(CTtable[, stationCol]))
+    colnames(m) <- as.character(as.Date(min(CTtable[,setupCol]):max(CTtable[,retrievalCol]), origin = "1970-01-01"))
+    rownames(m) <- CTtable[, stationCol]
+  }
+  
+  # # assign attributes to rownames
+  # attr(rownames(m), "station") <- CTtable[,stationCol]
+  # 
+  # if(hasArg(sessionCol)) attr(rownames(m), "session") <- CTtable[, sessionCol]
+  # if(hasArg(cameraCol))  attr(rownames(m), "camera")  <- CTtable[, cameraCol]
+  
+  return(m)
+}
+
+
+deparseCamOpRownames <- function(camOp){
+  
+  separatorCam <- "__CAM_"
+  separatorSession <- "__SESS_"
+  
+  if(is.data.frame(camOp)) camOp <- as.matrix(camOp)
+  
+  # extract rownames, if it is a matrix (if not I assume it is a vector, the result of rownames(camOp))
+  if(is.matrix(camOp)){
+    x <- rownames(camOp)
+  } else {
+    x <- camOp
+  }
+  
+  if(any(grepl(separatorSession, x)) &
+     any(grepl(separatorCam, x))){
+    x2 <- strsplit(x, split = separatorSession)
+    
+    stationIDs <- sapply(x2, FUN = function(x)x[1])
+    
+    sessionCameraIDs <- sapply(x2, FUN = function(x)x[2])
+    
+    x3 <- strsplit(sessionCameraIDs, split = separatorCam)
+    
+    sessionIDs <- sapply(x3, FUN = function(x)x[1])
+    cameraIDs  <- sapply(x3, FUN = function(x)x[2])
+    
+    return(data.frame(station = stationIDs,
+                      session = sessionIDs,
+                      camera = cameraIDs, 
+                      stringsAsFactors = FALSE))
+  }
+  
+  if(any(grepl(separatorSession, x))){
+    x2 <- strsplit(x, split = separatorSession)
+    
+    stationIDs <- sapply(x2, FUN = function(x)x[1])
+    sessionIDs <- sapply(x2, FUN = function(x)x[2])
+    
+    return(data.frame(station = stationIDs,
+                      session = sessionIDs, 
+                      stringsAsFactors = FALSE))
+  }
+  
+  if(any(grepl(separatorCam, x))){
+    x2 <- strsplit(x, split = separatorCam)
+    
+    stationIDs <- sapply(x2, FUN = function(x)x[1])
+    cameraIDs  <- sapply(x2, FUN = function(x)x[2])
+    
+    return(data.frame(station = stationIDs,
+                      camera = cameraIDs, 
+                      stringsAsFactors = FALSE))
+  }
+  return(data.frame(station = x, 
+                    stringsAsFactors = FALSE))
+}
+
+
+
+# add NA columns to matrix to achieve a certain number of columns (for creating multi-seasons unmarked frames)
+padMatrixWithNA <- function(mat, ncol_desired){
+  
+  if(ncol_desired < ncol(mat)){
+    mat.out <- matrix(c(mat, 
+                        rep(NA, times = nrow(mat) * (ncol_desired - ncol(mat)))),
+                      ncol = ncol_desired, 
+                      nrow = nrow(mat)
+    )  
+    rownames(mat.out) <- rownames(mat)
+    colnames(mat.out) <- colnames(mat)
+    return(mat.out)
+  } else {
+    return(mat)
+  }
+}
