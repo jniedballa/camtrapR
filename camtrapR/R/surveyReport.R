@@ -18,16 +18,17 @@ surveyReport <- function(recordTable,
   # check column names
   checkForSpacesInColumnNames(stationCol = stationCol, setupCol = setupCol, retrievalCol = retrievalCol,
                                          recordDateTimeCol = recordDateTimeCol, speciesCol = speciesCol)
-  if(class(CTtable) != "data.frame") stop("CTtable must be a data.frame", call. = FALSE)
-  if(class(recordTable) != "data.frame") stop("recordTable must be a data.frame", call. = FALSE)
+  
+  CTtable     <- dataFrameTibbleCheck(df = CTtable)
+  recordTable <- dataFrameTibbleCheck(df = recordTable)
 
-  if(!stationCol %in% colnames(CTtable))     stop(paste('stationCol = "',   stationCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
-  if(!setupCol %in% colnames(CTtable))        stop(paste('setupCol = "',   setupCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
-  if(!retrievalCol %in% colnames(CTtable))  stop(paste('retrievalCol = "',   retrievalCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
+  if(!stationCol %in% colnames(CTtable))    stop(paste('stationCol = "',   stationCol,   '" is not a column name in CTtable', sep = ''), call. = FALSE)
+  if(!setupCol %in% colnames(CTtable))      stop(paste('setupCol = "',     setupCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
+  if(!retrievalCol %in% colnames(CTtable))  stop(paste('retrievalCol = "', retrievalCol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
 
-  if(!stationCol %in% colnames(recordTable))            stop(paste('stationCol = "',   stationCol,  '" is not a column name in recordTable', sep = ''), call. = FALSE)
+  if(!stationCol %in% colnames(recordTable))         stop(paste('stationCol = "',   stationCol,  '" is not a column name in recordTable', sep = ''), call. = FALSE)
   if(!recordDateTimeCol %in% colnames(recordTable))  stop(paste('recordDateTimeCol = "', recordDateTimeCol,  '" is not a column name in recordTable', sep = ''), call. = FALSE)
-  if(!speciesCol %in% colnames(recordTable))            stop(paste('speciesCol = "', speciesCol,  '" is not a column name in recordTable', sep = ''), call. = FALSE)
+  if(!speciesCol %in% colnames(recordTable))         stop(paste('speciesCol = "', speciesCol,  '" is not a column name in recordTable', sep = ''), call. = FALSE)
 
 
   # make columns character
@@ -36,8 +37,8 @@ surveyReport <- function(recordTable,
   recordTable[,recordDateTimeCol] <- as.character(recordTable[,recordDateTimeCol])
 
   CTtable[,stationCol]    <- as.character(CTtable[,stationCol])
-  CTtable[,setupCol]       <- as.character(CTtable[,setupCol])
-  CTtable[,retrievalCol] <- as.character(CTtable[,retrievalCol])
+  CTtable[,setupCol]      <- as.character(CTtable[,setupCol])
+  CTtable[,retrievalCol]  <- as.character(CTtable[,retrievalCol])
 
 
 
@@ -62,37 +63,28 @@ surveyReport <- function(recordTable,
     stopifnot(c(Xcol, Ycol) %in% colnames(CTtable))
     CTtable[,Xcol] <- as.numeric(as.character(CTtable[,Xcol]))
     CTtable[,Ycol] <- as.numeric(as.character(CTtable[,Ycol]))
-   } #else {
-  #   Xcol <- Ycol <- NA
-  # }
+   } 
 
-  recordTable$DateTime2 <- strptime(recordTable[,recordDateTimeCol],
-                                    format = recordDateTimeFormat,
-                                    tz = "UTC")
+  
+  recordTable$DateTime2 <- parseDateTimeObject(inputColumn = recordTable[,recordDateTimeCol],
+                                               dateTimeFormat = recordDateTimeFormat,
+                                               timeZone = "UTC")
   recordTable$Date2 <- as.Date(recordTable$DateTime2, tz = "UTC")
 
 
-  if("POSIXlt" %in% class(recordTable$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat")
-  if(any(is.na(recordTable$DateTime2))) stop(paste("at least 1 entry in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat. row",
-                                                   paste(which(is.na(recordTable$DateTime2)), collapse = ", ")))
+  # if("POSIXlt" %in% class(recordTable$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat")
+  # if(any(is.na(recordTable$DateTime2))) stop(paste("at least 1 entry in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat. row",
+  #                                                  paste(which(is.na(recordTable$DateTime2)), collapse = ", ")))
 
   if(all(as.character(unique(recordTable[,stationCol])) %in% CTtable[,stationCol]) == FALSE){
     (stop("Not all values of stationCol in recordTable are matched by values of stationCol in CTtable"))
   }
 
-  if(any(is.na(CTtable[,setupCol])))     stop("there are NAs in setupCol")
-  if(any(is.na(CTtable[,retrievalCol]))) stop("there are NAs in retrievalCol")
-
-  if(all(is.na(as.Date(CTtable[,setupCol],     format = CTDateFormat)))) {stop("Cannot read date format in setupCol")}
-  if(all(is.na(as.Date(CTtable[,retrievalCol], format = CTDateFormat)))) {stop("Cannot read date format in retrievalCol")}
-
-  if(any(is.na(as.Date(CTtable[,setupCol],     format = CTDateFormat)))) {stop("at least one entry in setupCol cannot be interpreted using CTDateFormat")}
-  if(any(is.na(as.Date(CTtable[,retrievalCol], format = CTDateFormat)))) {stop("at least one entry in retrievalCol cannot be interpreted using CTDateFormat")}
-
-
-  CTtable[,setupCol]     <- as.Date(strptime(CTtable[,setupCol],     format = CTDateFormat, tz = "UTC"), tz = "UTC")
-  CTtable[,retrievalCol] <- as.Date(strptime(CTtable[,retrievalCol], format = CTDateFormat, tz = "UTC"), tz = "UTC")
-
+  # check date columns and format
+  
+  CTtable[,setupCol]     <- parseDateObject(inputColumn = CTtable[,setupCol],     CTDateFormat, checkNA = TRUE, checkEmpty = TRUE)
+  CTtable[,retrievalCol] <- parseDateObject(inputColumn = CTtable[,retrievalCol], CTDateFormat, checkNA = TRUE, checkEmpty = TRUE)
+  
 
   if(isTRUE(CTHasProblems)){    # camera problem columns
 
@@ -107,7 +99,7 @@ surveyReport <- function(recordTable,
     if(all(order(colnames(CTtable)[cols.prob.to])   == seq(1:length(cols.prob.to)))   == FALSE){"problem columns are not arranged correctly"}
 
     if(length(cols.prob.from) != length(cols.prob.to)){
-      stop("number of 'Problem..._from' and 'Problem..._to' columns differs. Check format. Sample: 'Problem1_from', 'Problem1_to'")
+      stop("number of 'Problem..._from' and 'Problem..._to' columns differs. Check column names Sample: 'Problem1_from', 'Problem1_to'")
     }
 
     n_days_inactive <- data.frame(matrix(NA,
@@ -124,12 +116,9 @@ surveyReport <- function(recordTable,
                         sep = "")
                 )
 
-      CTtable[,cols.prob.from[xy]] <- as.Date(CTtable[,cols.prob.from[xy]], format = CTDateFormat, tz = "UTC")
-      CTtable[,cols.prob.to[xy]]   <- as.Date(CTtable[,cols.prob.to[xy]],   format = CTDateFormat, tz = "UTC")
-
-      if(all(is.na( CTtable[,cols.prob.from[xy]]))) stop(paste("Cannot read date format in", colnames(CTtable)[cols.prob.from[xy]]))
-      if(all(is.na( CTtable[,cols.prob.to[xy]])))   stop(paste("Cannot read date format in", colnames(CTtable)[cols.prob.to[xy]]))
-
+      CTtable[, cols.prob.from[xy]] <- parseDateObject(inputColumn = CTtable[, cols.prob.from[xy]], CTDateFormat, checkNA = FALSE, checkEmpty = FALSE)
+      CTtable[, cols.prob.to[xy]]   <- parseDateObject(inputColumn = CTtable[, cols.prob.to[xy]],   CTDateFormat, checkNA = FALSE, checkEmpty = FALSE)
+      
       n_days_inactive[,xy] <- CTtable[cols.prob.to[xy]] - CTtable[cols.prob.from[xy]]       # compute number of inactive trap nights
       n_days_inactive[,xy] <- as.integer(n_days_inactive[,xy])
     }
