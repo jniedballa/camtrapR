@@ -17,7 +17,8 @@ detectionHistory <- function(recordTable,
                              datesAsOccasionNames = FALSE,
                              timeZone,
                              writecsv = FALSE,
-                             outDir)
+                             outDir,
+                             unmarkedMultFrameInput)
 {
   wd0 <- getwd()
   on.exit(setwd(wd0))
@@ -26,7 +27,9 @@ detectionHistory <- function(recordTable,
   
   # check column names
   checkForSpacesInColumnNames(stationCol = stationCol, speciesCol = speciesCol, recordDateTimeCol = recordDateTimeCol)
-  if(!is.data.frame(recordTable)) stop("recordTable must be a data frame", call. = FALSE)
+  
+  recordTable <- dataFrameTibbleCheck(df = recordTable)
+
   if(!stationCol %in% colnames(recordTable))  stop(paste('stationCol = "', stationCol, '" is not a column name in recordTable', sep = ''), call. = FALSE)
   if(!speciesCol %in% colnames(recordTable))  stop(paste('speciesCol = "', speciesCol, '" is not a column name in recordTable', sep = ''), call. = FALSE)
   if(!recordDateTimeCol %in% colnames(recordTable))  stop(paste('recordDateTimeCol = "', recordDateTimeCol,  '" is not a column name in recordTable', sep = ''), call. = FALSE)
@@ -43,18 +46,14 @@ detectionHistory <- function(recordTable,
   stopifnot(class(recordTable) == "data.frame")
   stopifnot(hasArg(camOp))
   
-  stopifnot(hasArg(stationCol))
   stopifnot(length(stationCol) == 1)
   recordTable[,stationCol] <- as.character(recordTable[,stationCol])
   stopifnot(is.character(stationCol))
   
-  stopifnot(hasArg(speciesCol))
   stopifnot(length(speciesCol) == 1)
   recordTable[,speciesCol] <- as.character(recordTable[,speciesCol])
   stopifnot(is.character(speciesCol))
   
-  
-  stopifnot(hasArg(recordDateTimeCol))
   stopifnot(length(recordDateTimeCol) == 1)
   recordTable[,recordDateTimeCol] <- as.character(recordTable[,recordDateTimeCol])   # make character to get rid of attributes. Will later assign time zone again
   stopifnot(is.character(recordDateTimeCol))
@@ -99,7 +98,7 @@ detectionHistory <- function(recordTable,
     if(!file.exists(outDir)){stop("outDir does not exist")}
   }
   
-  if(includeEffort == TRUE){
+  if(includeEffort){
     if(!hasArg(scaleEffort)) stop("scaleEffort must be defined if includeEffort is TRUE")
     if(class(scaleEffort) != "logical") stop("scaleEffort must be logical (TRUE or FALSE)")
   } else {scaleEffort <- FALSE}
@@ -113,7 +112,16 @@ detectionHistory <- function(recordTable,
   # bring date, time, station ids into shape
   
   subset_species           <- recordTable[recordTable[,speciesCol] == species,]
-  subset_species$DateTime2 <- as.POSIXlt(subset_species[,recordDateTimeCol], tz = timeZone, format = recordDateTimeFormat)
+  subset_species$DateTime2 <- parseDateTimeObject(inputColumn = subset_species[,recordDateTimeCol],
+                                                  dateTimeFormat = recordDateTimeFormat,
+                                                  timeZone = timeZone, 
+                                                  checkNA_out = FALSE)
+  
+  if(any(is.na(subset_species$DateTime2))) stop(paste(sum(is.na(subset_species$DateTime2)), "out of",
+                                                      nrow(subset_species),
+                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
+                                                      paste(rownames(subset_species)[which(is.na(subset_species$DateTime2))], collapse = ", ")))
+  
   
   # check consistency of argument day1
   stopifnot(class(day1) == "character")
@@ -121,30 +129,49 @@ detectionHistory <- function(recordTable,
   if(day1 == "survey") {day1switch <- 1} else {
     if(day1 == "station") {day1switch <- 2} else {
       try(date.test <- as.Date(day1), silent = TRUE)
-      if(!exists("date.test")) stop("day1 is not specified correctly. It can only be 'station', 'survey', or a date formatted as 'YYYY-MM-DD', e.g. '2016-12-31'")
+      if(!exists("date.test"))       stop("day1 is not specified correctly. It can only be 'station', 'survey', or a date formatted as 'YYYY-MM-DD', e.g. '2016-12-31'")
       if(class(date.test) != "Date") stop('could not interpret argument day1: can only be "station", "survey" or a specific date (e.g. "2015-12-31")')
-      if(hasArg(buffer)) stop("if buffer is defined, day1 can only be 'survey' or 'station'")
+      if(hasArg(buffer))             stop("if buffer is defined, day1 can only be 'survey' or 'station'")
       suppressWarnings(rm(date.test))
       day1switch <- 3
     }
   }
   
-  if("POSIXlt" %in% class(subset_species$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat. The column is not in POSIXlt format")
-  if(any(is.na(subset_species$DateTime2))) stop(paste(sum(is.na(subset_species$DateTime2)), "out of",
-                                                      nrow(subset_species), 
-                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
-                                                      paste(rownames(subset_species)[which(is.na(subset_species$DateTime2))], collapse = ", ")))
   
   checkCamOpColumnNames (cameraOperationMatrix = camOp)
+  
+  camop.info.df <- deparseCamOpRownames(camOp)
+  
+  # get information about station / session / camera IDs
+  if("session" %in% colnames(camop.info.df)){
+    
+    stopifnot(is.logical(unmarkedMultFrameInput))
+    
+    # assign session IDs to record table (this will also change station ID to station__session)
+    subset_species <- assignSessionIDtoRecordTable(recordTable_tmp = subset_species,
+                                                    camOp = camOp,
+                                                    dateTimeCol = recordDateTimeCol,
+                                                    stationCol = stationCol,
+                                                    sessionCol = "session")
+  } else {
+    if(hasArg(unmarkedMultFrameInput)) warning("'unmarkedMultFrameInput' is defined, but I cannot find session IDs in the rownames of camOp. Check the row names format and maybe run camtrapR:::deparseCamOpRownames(camOp)", call. = FALSE)
+  }
+  
   cam.op.worked0 <- as.matrix(camOp)
   
   if(all(as.character(unique(subset_species[,stationCol])) %in% rownames(cam.op.worked0)) == FALSE){
+  #if(all(as.character(unique(subset_species[,stationCol])) %in% camop.info.df$station) == FALSE){
     (stop("Not all values of stationCol in recordTable are matched by rownames of camOp"))
   }
   
   ################################################
   # compute date range of stations and records
-  arg.list0 <- list(cam.op = cam.op.worked0, subset_species_tmp = subset_species, stationCol_tmp = stationCol, day1_tmp = day1, occasionStartTime_tmp = occasionStartTime, timeZone_tmp = timeZone)
+  arg.list0 <- list(cam.op = cam.op.worked0, 
+                    subset_species_tmp = subset_species, 
+                    stationCol_tmp = stationCol, 
+                    day1_tmp = day1, 
+                    occasionStartTime_tmp = occasionStartTime, 
+                    timeZone_tmp = timeZone)
   
   if(hasArg(maxNumberDays))  arg.list0 <- c(arg.list0,   maxNumberDays_tmp = maxNumberDays)
   if(hasArg(buffer))   arg.list0 <- c(arg.list0, buffer_tmp =  buffer)
@@ -156,7 +183,10 @@ detectionHistory <- function(recordTable,
   #######################
   # adjust camera operation matrix
   
-  cam.op.worked <- adjustCameraOperationMatrix(cam.op = cam.op.worked0, date_ranges2 = date_ranges, timeZone_tmp = timeZone, day1_2 = day1)
+  cam.op.worked <- adjustCameraOperationMatrix(cam.op       = cam.op.worked0, 
+                                               date_ranges2 = date_ranges, 
+                                               timeZone_tmp = timeZone, 
+                                               day1_2       = day1)
   
   # append occasionStartTime (if != 0) to column names for output table
   if(occasionStartTime != 0){
@@ -165,7 +195,10 @@ detectionHistory <- function(recordTable,
   
   ######################
   # calculate trapping effort by station and occasion
-  arg.list0 <- list(cam.op = cam.op.worked, occasionLength2 = occasionLength, scaleEffort2 = scaleEffort, includeEffort2 = includeEffort)
+  arg.list0 <- list(cam.op          = cam.op.worked, 
+                    occasionLength2 = occasionLength, 
+                    scaleEffort2    = scaleEffort, 
+                    includeEffort2  = includeEffort)
   
   if(hasArg(minActiveDaysPerOccasion))  arg.list0 <- c(arg.list0, minActiveDaysPerOccasion2 = minActiveDaysPerOccasion)
   
@@ -179,7 +212,9 @@ detectionHistory <- function(recordTable,
   ###################
   # remove records that fall into buffer period or were taken after maxNumberDays
   
-  subset_species <- cleanSubsetSpecies(subset_species2 = subset_species, stationCol2 = stationCol, date_ranges2 = date_ranges)
+  subset_species <- cleanSubsetSpecies(subset_species2 = subset_species, 
+                                       stationCol2     = stationCol, 
+                                       date_ranges2    = date_ranges)
   
   ############
   #  define the 1st day of the effective survey period.
@@ -191,9 +226,9 @@ detectionHistory <- function(recordTable,
   
   # calculate the occasion each record belongs into from the time difference between records and beginning of the first occasion
   subset_species$occasion <- as.numeric(ceiling((difftime(time1  = subset_species$DateTime2,
-                                                          time2 =  time2,
-                                                          units = "secs",
-                                                          tz = timeZone)
+                                                          time2  =  time2,
+                                                          units  = "secs",
+                                                          tz     = timeZone)
                                                  / (occasionLength * 86400))))
   
   
@@ -277,6 +312,65 @@ detectionHistory <- function(recordTable,
   }
   
   
+  
+  ## if multi-season object, make input for unmarkedMultFrame if desired
+  if("session" %in% colnames(camop.info.df)){
+    if(unmarkedMultFrameInput){
+      
+      record.hist.season.list <- split(as.data.frame(record.hist), f = camop.info.df$session)
+      effort.season.list      <- split(as.data.frame(effort),      f = camop.info.df$session)
+      
+      all_stations <- unique(camop.info.df$station)
+      
+      # add missing stations for individual seasons
+      record.hist.season.list2 <- lapply(record.hist.season.list, FUN = function(x){
+        deparse_tmp <- deparseCamOpRownames(x)
+          x2 <- matrix(NA, ncol = ncol(x), nrow = length(all_stations))
+          rownames(x2) <- all_stations
+          colnames(x2) <- colnames(x)
+          x2[match(deparse_tmp$station, all_stations), ] <- as.matrix(x)
+          x2
+      })
+      
+      effort.season.list2 <- lapply(effort.season.list, FUN = function(x){
+        deparse_tmp <- deparseCamOpRownames(x)
+        x2 <- matrix(NA, ncol = ncol(x), nrow = length(all_stations))
+        rownames(x2) <- all_stations
+        colnames(x2) <- colnames(x)
+        x2[match(deparse_tmp$station, all_stations), ] <- as.matrix(x)
+        x2
+      })
+      
+      # # get detection history and effort into separate lists
+      # detHist_season_list_det    <- lapply(detHist_season_list, FUN = function(x) {x$detection_history})
+      # detHist_season_list_effort <- lapply(detHist_season_list, FUN = function(x) {x$effort})
+      
+      
+      # add NA columns to make sure all detection histories / effort matrices have same number of occasions (= identical number of columns)
+      ncol_by_season <- sapply(record.hist.season.list, FUN = ncol)
+      
+      #detHist_season_list_det    <- lapply(detHist_season_list, FUN = function(x) {x$detection_history})
+      #detHist_season_list_effort <- lapply(detHist_season_list, FUN = function(x) {x$effort})
+      
+      detHist_season_list_det_padded    <- lapply(record.hist.season.list2, 
+                                                  FUN = padMatrixWithNA, 
+                                                  ncol_desired = max(ncol_by_season))
+      detHist_season_list_effort_padded <- lapply(effort.season.list2, 
+                                                  FUN = padMatrixWithNA, 
+                                                  ncol_desired = max(ncol_by_season))
+      
+      # combine detection histories for all seasons (effort also) into wide format
+      record.hist <- do.call(what = "cbind",
+                                  args = detHist_season_list_det_padded) 
+      effort <- do.call(what = "cbind",
+                                 args = detHist_season_list_effort_padded)
+      
+    }
+  }
+    
+  
+  
+  
   ################################################
   # save output as table
   if(day1switch == 1) day1string <- "_first_day_from_survey"
@@ -317,19 +411,19 @@ detectionHistory <- function(recordTable,
                                       Sys.Date(),
                                       ".csv", sep = "")
   
-  if(isTRUE(writecsv)){
+  if(writecsv){
     setwd(outDir)
     write.csv(record.hist, file = outtable.name)
     if(isTRUE(includeEffort)){
       write.csv(effort, file = outtable.name.effort)
       if(hasArg(scaleEffort)){
-        if(scaleEffort == TRUE)  write.csv(scale.eff.tmp.attr, file = outtable.name.effort.scale)
+        if(scaleEffort)  write.csv(scale.eff.tmp.attr, file = outtable.name.effort.scale)
       }
     }
   }
   
-  if(isTRUE(includeEffort)){
-    if(scaleEffort == TRUE){
+  if(includeEffort){
+    if(scaleEffort){
       return(list(detection_history = record.hist,
                   effort = effort,
                   effort_scaling_parameters = scale.eff.tmp.attr))
