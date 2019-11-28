@@ -1,9 +1,35 @@
+Changes in camtrapR 1.2 (2019-11-28)
+==========================
+
+bugfixes
+------------
+  o imageRename: fixed bug where fileExistsAlready in output table was FALSE when it should be TRUE
+
+new features
+------------
+  o cameraOperation: new argument: sessionCol, to specify trapping sessions (with some changes to the row names in camera operation matrices if there are session and / or camera information)
+  o detectionHistory: support multi-season input and create detection histories for unmarkedFrameMult (from where users can create multi-season occupancy models with colext), new argument "unmarkedFrameMultInput"
+  o spatialDetectionHistory: supports camera operation matrices with session information
+  o all functions that require input data frames check if these are tibbles (tidyverse) or data.tables and convert them to data frames with a message
+  o date and date-time formats as defined by lubridate are now supported (e.g. "ymd" instead of "%Y-%m-%d" or "ymd HMS" instead of "%Y-%m-%d %H:%M:%S")
+  o activityOverlap: main plot title contains species names by default without being specified
+
+other changes
+------------
+  o detectionHistory / spatialDetectionHistory: improved error message if date/time values are not readable (correct row in original recordTable is returned)
+  o detectionMaps: new error message when XCol or YCol are not numeric
+  o package "rgdal" is no longer a dependency. Function "detectionMaps" will throw an error if user tries to write shapefile but package is missing
+  o packages "taxize" and "ritis" are no longer dependencies. Function "checkSpeciesNames" will throw an error if either is missing
+  o simplified data format of sample data: only character and numeric/integer in camtraps, recordTableSample, recordTableIndividualSample and timeShiftTable
+
+
 Changes in camtrapR 1.1
 ==========================
 
 bugfixes
 ------------
   o appendSpeciesNames / checkSpeciesIdentification / getSpeciesImages: fixed error 'argument "returnFileNamesMissingTags" is missing, with no default'
+  o recordTableIndividual: fixed multiple individuals from same image being removed (except for one) when removeDuplicates = TRUE
 
 new features
 ------------

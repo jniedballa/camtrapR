@@ -8,11 +8,8 @@ importFrom("graphics", abline, axis, box, grconvertX, grconvertY,
 importFrom("stats", aggregate, na.omit)
 importFrom("utils", modifyList, write.csv, zip)
 importFrom("methods", hasArg)
-importFrom("utils", "head", "menu")
-importFrom("rgdal", writeOGR)
+importFrom("utils", head, menu)
 importFrom("sp", CRS, SpatialPointsDataFrame, coordinates)
-importFrom("secr", read.traps, make.capthist, traps, RMarkInput, usage)
-importFrom("taxize", get_tsn, as.tsn)
-importFrom("ritis", scientific_name, common_names, taxon_authorship, rank_name, core_metadata)
+importFrom("secr", read.traps, make.capthist, traps, RMarkInput, usage, covariates)
 
 export(activityDensity, activityHistogram, activityOverlap, activityRadial, addCopyrightTag,  appendSpeciesNames, cameraOperation, checkSpeciesIdentification, checkSpeciesNames, createSpeciesFolders, createStationFolders, detectionHistory, detectionMaps, exifTagNames, exiftoolPath, fixDateTimeOriginal, getSpeciesImages, imageRename, recordTable, recordTableIndividual, spatialDetectionHistory, surveyReport, timeShiftImages)
