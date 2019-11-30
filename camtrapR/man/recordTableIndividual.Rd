@@ -23,7 +23,9 @@ recordTableIndividual(inDir,
   metadataIDTag,
   additionalMetadataTags,
   removeDuplicateRecords = TRUE,
-  returnFileNamesMissingTags = FALSE
+  returnFileNamesMissingTags = FALSE,
+  eventSummaryColumn,
+  eventSummaryFunction
 )
 }
 %- maybe also 'usage' for other objects documented here.
@@ -76,7 +78,14 @@ recordTableIndividual(inDir,
   \item{returnFileNamesMissingTags}{
   logical. If species are assigned with metadata and images are not tagged, return a few file names of these images as a message?
 }
+\item{eventSummaryColumn}{
+  character. A column in the record table (e.g. from a metadata tag) by to summarise non-independent records (those within \code{minDeltaTime} of a given record)  with a user-defined function (\code{eventSummaryFunction})
 }
+\item{eventSummaryFunction}{
+  character. The function by which to summarise \code{eventSummaryColumn} of  non-independent records, e.g. "sum", "max" (optional)
+}
+}
+
 \details{
 The function can handle a number of different ways of storing images. In every case, images need to be stored in a species directory first (e.g. using function \code{\link{getSpeciesImages}}). Station subdirectories are optional. Camera subdirectories are not allowed. This directory structure can be created easily with function \code{\link{getSpeciesImages}}.
 
@@ -87,6 +96,8 @@ As with species identification, individuals can be identified in 2 different way
 
 If individual IDs were assigned with image metadata tags, \code{metadataIDTag} must be set to the name of the metadata tag group used for individual identification. \code{metadataHierarchyDelimitor} is "|" for images tagged in DigiKam and images tagged in Adobe Bridge/ Lightroom with the default settings.
 Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPhase" can be extracted if specified in \code{additionalMetadataTags}. Multiple names can be specified as a character vector as: \code{c(Tag1, Tag2, ...)}. Because they are not standardized, function \code{\link{exifTagNames}} provides a vector of all available tag names. The metadata tags thus extracted may be used as individual covariates in spatial capture-recapture models.
+
+\code{eventSummaryColumn} and \code{eventSummaryFunction} can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run \code{recordTable}. Set \code{eventSummaryColumn = "count"} and \code{eventSummaryFunction = "max"} to obtain the maximum number of \code{count} in all images within \code{minDeltaTime} minutes of a given record. The results is in a new column, in this example \code{count_max}. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. \code{eventSummaryColumn = c("count", "count", "camera")} and \code{eventSummaryFunction = c("min", "max", "unique")} to get minimum and maximum count and all unique camera IDs for that event. Note that \code{eventSummaryColumn} and \code{eventSummaryFunction} must be of same length. 
 
 
 }
@@ -112,13 +123,13 @@ Juergen Niedballa
 
  \examples{
 
- wd_images_ID <- system.file("pictures/sample_images_tagged/LeopardCat", package = "camtrapR")
+ wd_images_ID_individual <- system.file("pictures/sample_images_tagged/LeopardCat", package = "camtrapR")
  # missing space in species = "LeopardCat" is because of CRAN package policies
  # note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames
 
  if (Sys.which("exiftool") != ""){        # only run these examples if ExifTool is available
 
- rec_table_pbe <- recordTableIndividual(inDir                  = wd_images_ID,
+ rec_table_pbe <- recordTableIndividual(inDir                  = wd_images_ID_individual,
                                         minDeltaTime           = 60,
                                         deltaTimeComparedTo    = "lastRecord",
                                         hasStationFolders      = FALSE,
@@ -128,6 +139,24 @@ Juergen Niedballa
                                         metadataIDTag          = "individual",
                                         additionalMetadataTags = c("EXIF:Model", "EXIF:Make"),
                                         timeZone               = "Asia/Kuala_Lumpur"
+ )
+ 
+ 
+ # extracting some example summary stats too 
+ # a nonsensical example, get all unique cameras with which the event was photographed
+ 
+  rec_table_pbe2 <- recordTableIndividual(inDir                = wd_images_ID_individual,
+                                        minDeltaTime           = 60,
+                                        deltaTimeComparedTo    = "lastRecord",
+                                        hasStationFolders      = FALSE,
+                                        IDfrom                 = "metadata",
+                                        camerasIndependent     = FALSE,
+                                        writecsv               = FALSE,
+                                        metadataIDTag          = "individual",
+                                        additionalMetadataTags = c("EXIF:Model", "EXIF:Make"),
+                                        timeZone               = "Asia/Kuala_Lumpur",
+                                        eventSummaryColumn     = "EXIF:Make",
+                                        eventSummaryFunction   = "unique"
  )
 
  } else {                                # show function output if ExifTool is not available

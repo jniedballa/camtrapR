@@ -23,7 +23,9 @@ recordTable(inDir,
   metadataSpeciesTag,
   additionalMetadataTags,
   removeDuplicateRecords = TRUE,
-  returnFileNamesMissingTags = FALSE
+  returnFileNamesMissingTags = FALSE,
+  eventSummaryColumn,
+  eventSummaryFunction
 )
 }
 %- maybe also 'usage' for other objects documented here.
@@ -76,6 +78,12 @@ recordTable(inDir,
   \item{returnFileNamesMissingTags}{
   logical. If species are assigned with metadata and images are not tagged, return a few file names of these images as a message?
 }
+\item{eventSummaryColumn}{
+  character. A column in the record table (e.g. from a metadata tag) by to summarise non-independent records (those within \code{minDeltaTime} of a given record)  with a user-defined function (\code{eventSummaryFunction})
+}
+\item{eventSummaryFunction}{
+  character. The function by which to summarise \code{eventSummaryColumn} of  non-independent records, e.g. "sum", "max" (optional)
+}
 }
 \details{
 The function can handle a number of different ways of storing images, and supports species identification by moving images into species directories as well as metadata tagging. In every case, images need to be stored into station directories. If images are identified by moving them into species directories, a camera directory is optional: "Station/Species/XY.JPG" or "Station/Camera/Species/XY.JPG". Likewise, if images are identified using metadata tagging, a camera directory can be used optionally: "Station/XY.JPG" or "Station/Camera/XY.JPG".
@@ -90,7 +98,7 @@ If images are identified by metadata tagging, \code{metadataSpeciesTag} specifie
 
 Many digital images contain  Exif metadata tags such as "AmbientTemperature" or "MoonPhase" that can be extracted if specified in \code{metadataTags}. Because these are manufacturer-specific and not standardized, function \code{\link{exifTagNames}} provides a vector of all available tag names. Multiple names can be specified as a character vector as: \code{c(Tag1, Tag2, ...)}. The metadata tags thus extracted may be used as covariates in modelling species distributions.
 
-
+\code{eventSummaryColumn} and \code{eventSummaryFunction} can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run \code{recordTable}. Set \code{eventSummaryColumn = "count"} and \code{eventSummaryFunction = "max"} to obtain the maximum number of \code{count} in all images within \code{minDeltaTime} minutes of a given record. The results is in a new column, in this example \code{count_max}. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. \code{eventSummaryColumn = c("count", "count", "camera")} and \code{eventSummaryFunction = c("min", "max", "unique")} to get minimum and maximum count and all unique camera IDs for that event. Note that \code{eventSummaryColumn} and \code{eventSummaryFunction} must be of same length. 
 }
 \value{
 A data frame containing species records and additional information about stations, date, time and (optionally) further metadata.
@@ -125,12 +133,12 @@ The results of a number of other function will depend on the output of this func
 }
 
 \examples{
-wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
+wd_images_ID_species <- system.file("pictures/sample_images", package = "camtrapR")
 
 if (Sys.which("exiftool") != ""){        # only run these examples if ExifTool is available
 
 
-rec_table1 <- recordTable(inDir               = wd_images_ID,
+rec_table1 <- recordTable(inDir               = wd_images_ID_species,
                        IDfrom                 = "directory",
                        minDeltaTime           = 60,
                        deltaTimeComparedTo    = "lastRecord",
@@ -139,15 +147,18 @@ rec_table1 <- recordTable(inDir               = wd_images_ID,
 )
 # note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames
 
-rec_table2 <- recordTable(inDir               = wd_images_ID,
+rec_table2 <- recordTable(inDir               = wd_images_ID_species,
                        IDfrom                 = "directory",
                        minDeltaTime           = 60,
                        deltaTimeComparedTo    = "lastRecord",
                        exclude                = "NO_ID",
                        writecsv               = FALSE,
                        timeZone               = "Asia/Kuala_Lumpur",
-                       additionalMetadataTags = c("EXIF:Model", "EXIF:Make", "NonExistingTag")
-)
+                       additionalMetadataTags = c("EXIF:Model", "EXIF:Make", "NonExistingTag"),
+                       eventSummaryColumn     = "EXIF:Make",
+                       eventSummaryFunction   = "unique"
+                       )
+                       
 # note the warning that the last tag in "additionalMetadataTags" was not found
 
 
@@ -160,7 +171,7 @@ any(rec_table2$Species == "NO_ID")
 
 \dontrun{   # this is because otherwise the test would run too long to pass CRAN tests
 
-rec_table3a <- recordTable(inDir              = wd_images_ID,
+rec_table3a <- recordTable(inDir              = wd_images_ID_species,
                        IDfrom                 = "directory",
                        minDeltaTime           = 0,
                        exclude                = "NO_ID",
@@ -168,7 +179,7 @@ rec_table3a <- recordTable(inDir              = wd_images_ID,
                        removeDuplicateRecords = FALSE
 )
 
-rec_table3b <- recordTable(inDir              = wd_images_ID,
+rec_table3b <- recordTable(inDir              = wd_images_ID_species,
                        IDfrom                 = "directory",
                        minDeltaTime           = 0,
                        exclude                = "NO_ID",
