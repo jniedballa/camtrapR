@@ -13,7 +13,9 @@ recordTable <- function(inDir,
                         metadataSpeciesTag,
                         additionalMetadataTags,
                         removeDuplicateRecords = TRUE,
-                        returnFileNamesMissingTags = FALSE
+                        returnFileNamesMissingTags = FALSE,
+                        eventSummaryColumn,
+                        eventSummaryFunction
 )
 {
 
@@ -96,9 +98,9 @@ recordTable <- function(inDir,
       warning("minDeltaTime is > 0. Therefore, removeDuplicateRecords was set to TRUE (otherwise there may be records taken at the same time)", call. = FALSE, immediate. = TRUE)
       removeDuplicateRecords <- TRUE
     }
-    stopifnot(hasArg(deltaTimeComparedTo))
-    stopifnot(class(deltaTimeComparedTo) == "character")
-    stopifnot(deltaTimeComparedTo %in% c("lastRecord", "lastIndependentRecord"))
+    
+    deltaTimeComparedTo < match.arg(deltaTimeComparedTo, choices = c("lastRecord", "lastIndependentRecord"))
+
     if(!hasArg(deltaTimeComparedTo)) stop(paste("minDeltaTime is not 0. deltaTimeComparedTo must be defined"), call. = FALSE)
   } else {
     if(hasArg(deltaTimeComparedTo)) {warning(paste("minDeltaTime is 0. deltaTimeComparedTo = '", deltaTimeComparedTo, "' will have no effect", sep = ""), call. = FALSE, immediate. = TRUE)
@@ -144,7 +146,7 @@ recordTable <- function(inDir,
 
     } else {
 
-      message(paste(dirs_short[i], ":", nrow(metadata.tmp), "images"))
+      # message(paste(dirs_short[i], ":", nrow(metadata.tmp), "images"))
 
       # check presence / consistency of DateTimeOriginal column, go to next station or remove records if necessary
       metadata.tmp <- checkDateTimeOriginal (intable    = metadata.tmp,
@@ -214,7 +216,7 @@ recordTable <- function(inDir,
 
 
         #remove duplicate records of same species taken in same second at the same station (by the same camera, if relevant)
-        metadata.tmp2 <- removeDuplicatesOfRecords(metadata.tmp           = metadata.tmp,
+        metadata.tmp2 <- removeDuplicatesOfRecords(metadata.tmp          = metadata.tmp,
                                                   removeDuplicateRecords = removeDuplicateRecords,
                                                   camerasIndependent     = camerasIndependent,
                                                   stationCol             = stationCol,
@@ -223,13 +225,23 @@ recordTable <- function(inDir,
 
 
         # assess independence between records and calculate time differences
-        d1 <- assessTemporalIndependence (intable             = metadata.tmp2,
-                                          deltaTimeComparedTo = deltaTimeComparedTo,
-                                          camerasIndependent  = camerasIndependent,
-                                          columnOfInterest    = speciesCol,
-                                          cameraCol           = cameraCol,
-                                          minDeltaTime        = minDeltaTime,
-                                          stationCol          = stationCol)
+        args.assessTemporalIndependence <- list(intable             = metadata.tmp2,
+                                                deltaTimeComparedTo = deltaTimeComparedTo,
+                                                columnOfInterest    = speciesCol,
+                                                cameraCol           = cameraCol,
+                                                camerasIndependent  = camerasIndependent,
+                                                minDeltaTime        = minDeltaTime,
+                                                stationCol          = stationCol)
+        
+        if(hasArg(eventSummaryColumn)) {
+          stopifnot(is.character(eventSummaryColumn))
+          stopifnot(is.character(eventSummaryFunction))
+          args.assessTemporalIndependence <- c(args.assessTemporalIndependence,
+                                               eventSummaryColumn   = eventSummaryColumn,
+                                               eventSummaryFunction = eventSummaryFunction)
+        }
+        
+        d1 <- do.call(assessTemporalIndependence, args = args.assessTemporalIndependence)
 
 
       # add potential new columns to global record.table
@@ -250,6 +262,7 @@ recordTable <- function(inDir,
     stop(paste("something went wrong. I looked through all those", length(dirs)  ,"folders and now your table is empty. Did you exclude too many species? Or were date/time information not readable?"), call. = FALSE)
   }
 
+  
   # rearrange table, add date and time as separate columns. add additional column names as needed.
 
   record.table2  <-  data.frame(record.table[,c(stationCol, speciesCol, "DateTimeOriginal")],
@@ -276,32 +289,22 @@ recordTable <- function(inDir,
     colnames(record.table3)[2] <- cameraCol
   }
 
-  #
   rownames(record.table3) <- NULL
 
-  # compute delta time in hours and days
-  record.table3$delta.time.secs  <- round(record.table3$delta.time.secs,       digits = 0)
-  record.table3$delta.time.mins  <- round(record.table3$delta.time.secs  / 60, digits = 0)
-  record.table3$delta.time.hours <- round(record.table3$delta.time.mins  / 60, digits = 1)
-  record.table3$delta.time.days  <- round(record.table3$delta.time.hours / 24, digits = 1)
 
   # warning if additionalMetadataTags were not found
   if(hasArg(additionalMetadataTags)){
-    whichadditionalMetadataTagsFound <- which(gsub(additionalMetadataTags, pattern = ":", replacement = ".") %in% colnames(record.table3))   # replace : in additionalMetadataTags (if specifying tag groups) with . as found in column names
-    if(length(whichadditionalMetadataTagsFound) < length(additionalMetadataTags)){
-      if(length(whichadditionalMetadataTagsFound) == 0) {  # if none of the additionalMetadataTags was found
+    #whichAdditionalMetadataTagsFound <- which(gsub(additionalMetadataTags, pattern = ":", replacement = ".") %in% colnames(record.table3))   # replace : in additionalMetadataTags (if specifying tag groups) with . as found in column names
+    whichAdditionalMetadataTagsFound <- which(additionalMetadataTags %in% colnames(record.table3))   # replace : in additionalMetadataTags (if specifying tag groups) with . as found in column names
+    if(length(whichAdditionalMetadataTagsFound) < length(additionalMetadataTags)){
+      if(length(whichAdditionalMetadataTagsFound) == 0) {  # if none of the additionalMetadataTags was found
         warning(paste("metadata tag(s)  not found in image metadata:  ", paste(additionalMetadataTags, collapse = ", ")), call. = FALSE)
         } else {                                                            # if only some of the additionalMetadataTags was found
-        warning(paste("metadata tag(s)  not found in image metadata:  ", paste(additionalMetadataTags[-whichadditionalMetadataTagsFound], collapse = ", ")), call. = FALSE)
+        warning(paste("metadata tag(s)  not found in image metadata:  ", paste(additionalMetadataTags[-whichAdditionalMetadataTagsFound], collapse = ", ")), call. = FALSE)
       }
     }
   }
 
-  # remove "independent" column
-  cols_to_remove <- which(colnames(record.table3) %in% c("independent"))
-  if(length(cols_to_remove) >= 1){
-    record.table3 <- record.table3[,-cols_to_remove]
-  }
   # make column "HierarchicalSubject" the last column
   col_to_move <- which(colnames(record.table3) %in% metadata.tagname)
   if(length(col_to_move) >= 1){
@@ -310,6 +313,9 @@ recordTable <- function(inDir,
     colnames(record.table3)[ncol(record.table3)] <- metadata.tagname
   }
 
+  # convert to data.frame, in order to get all the column names right (: becomes .)
+  record.table3 <- as.data.frame(record.table3, stringsAsFactors = FALSE)
+  
   # save table
   if(writecsv == TRUE){
     outtable_filename <- paste("record_table_", minDeltaTime, "min_deltaT_", Sys.Date(), ".csv", sep = "")
