@@ -66,7 +66,7 @@ These function use the directory structure built above (Section 'Image managemen
 
 These plots are generated from the record table and the camera trap table.
 \tabular{ll}{
-\code{\link{detectionMaps}} \tab Generate maps of species richness and species presence by station \cr
+\code{\link{detectionMaps}} \tab Generate maps of species richness and species presence by station, export shapefiles \cr
 \code{\link{activityHistogram}} \tab Single-species diel activity histograms \cr
 \code{\link{activityDensity}} \tab Single-species diel activity kernel density estimation plots \cr
 \code{\link{activityRadial}} \tab Single-species diel activity radial plot \cr
@@ -80,7 +80,7 @@ These plots are generated from the record table and the camera trap table.
 
 \tabular{ll}{
 \code{\link{cameraOperation}} \tab Create a camera operability matrix \cr
-\code{\link{detectionHistory}} \tab Species detection histories for occupancy analyses \cr
+\code{\link{detectionHistory}} \tab Species detection histories for occupancy analyses (single and multi-season) \cr
 \code{\link{spatialDetectionHistory}} \tab Detection histories of individuals for spatial capture-recapture analyses  \cr
 \code{\link{surveyReport}} \tab Create a report about camera trap surveys and species detections \cr
 --------------------------- \tab ---------------------------------------------------------------------------------------------- \cr
