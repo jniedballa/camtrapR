@@ -10,6 +10,7 @@ The function will return sample metadata and tag names of Exif metadata of JPEG 
 \usage{
 exifTagNames(inDir, 
   whichSubDir = 1,
+  fileName,
   returnMetadata = FALSE,
   returnTagGroup = TRUE)
 }
@@ -19,7 +20,10 @@ exifTagNames(inDir,
   character. Directory containing camera trap images sorted into station subdirectories (e.g. inDir/StationA/)
 }
 \item{whichSubDir}{
-  integer. The number of the subdirectory of \code{inDir} in which to look for an image
+  integer or character. Either number or name of subdirectory of \code{inDir} in which to look for an image
+}
+\item{fileName}{
+  character. A filename, either the file name of an image in \code{inDir} or a full path with file name (in which case \code{inDir} is not needed)
 }
 \item{returnMetadata}{
   logical. Return actual metadata (TRUE) or metadata tag names only (FALSE)
@@ -57,12 +61,39 @@ if (Sys.which("exiftool") != ""){        # only run this example if ExifTool is 
 wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
 
 # return tag names only
-exifTagNames(inDir          = wd_images_ID,
-             returnMetadata = FALSE)
+exifTagNames(inDir          = wd_images_ID)
 
 # return tag names and metadata
 exifTagNames(inDir          = wd_images_ID,
              returnMetadata = TRUE)
+
+}
+# alternative ways of specifying directories and filenames
+\dontrun{
+
+if (Sys.which("exiftool") != ""){        # only run this example if ExifTool is available
+
+# specify directory by name
+exifTagNames(inDir          = wd_images_ID,
+             returnMetadata = TRUE,
+             whichSubDir    = "StationA")
+             
+# specify inDir and fileName
+exifTagNames(inDir          = wd_images_ID,
+             returnMetadata = TRUE,
+             fileName       = file.path("StationC", "TRA", "StationC__2009-05-02__00-10-00(1).JPG"))
+             
+# it also works this way
+exifTagNames(inDir          = file.path(wd_images_ID, "StationC", "TRA"),
+             returnMetadata = TRUE,
+             fileName       = "StationC__2009-05-02__00-10-00(1).JPG")
+             
+# or by only specifying fileName (line break due to R package policy)
+exifTagNames(fileName       = file.path(wd_images_ID, "StationC", "TRA", 
+                                        "StationC__2009-05-02__00-10-00(1).JPG"),
+             returnMetadata = TRUE)
+             
+}
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
