@@ -1,7 +1,9 @@
 \name{camtrapR-package}
 \alias{camtrapR-package}
 \alias{camtrapR}
+
 \docType{package}
+
 \title{
 Overview of the functions in the camtrapR package
 }
@@ -99,6 +101,22 @@ These plots are generated from the record table and the camera trap table.
 
 }
 }
+
+\section{Vignettes}{
+
+\tabular{ll}{
+
+\href{https://CRAN.R-project.org/package=camtrapR/vignettes/ImageOrganisation.html}{1. Organising raw camera trap images}  \cr
+\href{https://CRAN.R-project.org/package=camtrapR/vignettes/SpeciesIndividualIdentification.html}{2. Identifying species and individuals}  \cr
+\href{https://CRAN.R-project.org/package=camtrapR/vignettes/DataExtraction.html}{3. Extracting Data from Camera Trapping Images}  \cr
+\href{https://CRAN.R-project.org/package=camtrapR/vignettes/DataExploration.html}{4. Data exploration and visualisation}  \cr
+
+
+
+}
+}
+
+
 
 \author{
 Juergen Niedballa
