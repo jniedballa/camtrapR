@@ -123,7 +123,8 @@ Juergen Niedballa
 
  \examples{
 
- wd_images_ID_individual <- system.file("pictures/sample_images_tagged/LeopardCat", package = "camtrapR")
+ wd_images_ID_individual <- system.file("pictures/sample_images_tagged/LeopardCat", 
+                                        package = "camtrapR")
  # missing space in species = "LeopardCat" is because of CRAN package policies
  # note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames
 

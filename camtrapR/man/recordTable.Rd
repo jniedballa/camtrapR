@@ -169,7 +169,7 @@ any(rec_table2$Species == "NO_ID")
 #############
 # here's how the removeDuplicateRecords argument works
 
-\dontrun{   # this is because otherwise the test would run too long to pass CRAN tests
+\dontrun{   # otherwise the example would run too long to pass CRAN tests
 
 rec_table3a <- recordTable(inDir              = wd_images_ID_species,
                        IDfrom                 = "directory",
@@ -188,7 +188,7 @@ rec_table3b <- recordTable(inDir              = wd_images_ID_species,
 )
 
 
-anyDuplicated(rec_tablea[, c("Station", "Species", "DateTimeOriginal")])   # got duplicates
+anyDuplicated(rec_tablea[, c("Station", "Species", "DateTimeOriginal")])    # got duplicates
 anyDuplicated(rec_table3b[, c("Station", "Species", "DateTimeOriginal")])   # no duplicates
 
 # after removing duplicates, both are identical:
