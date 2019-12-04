@@ -103,6 +103,9 @@ checkSpeciesIdentification <- function(inDir,
 		}
       # write metadata from HierarchicalSubject field to individual columns
       if(IDfrom == "metadata"){
+        message(paste(dirs_short[i], ": ", formatC(nrow(metadata.tmp), width = 4), " images", 
+                      makeProgressbar(current = i, total = length(dirs_short)), sep = ""))
+        
         metadata.tmp <- addMetadataAsColumns (intable                    = metadata.tmp,
                                               metadata.tagname           = metadata.tagname,
                                               metadataHierarchyDelimitor = metadataHierarchyDelimitor,

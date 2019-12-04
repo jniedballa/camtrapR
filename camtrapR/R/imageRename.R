@@ -94,7 +94,8 @@ imageRename <- function(inDir,
       warning(paste(dirs_short[i], "seems to contain no images;", " found", length.tmp, "jpgs"), call. = FALSE, immediate. = TRUE)    # give message if station directory contains no jpgs
     } else {
       
-      message(paste(dirs_short[i], ":", nrow(metadata.tmp), "images"))
+      message(paste(dirs_short[i], ": ", formatC(nrow(metadata.tmp), width = 4), " images", 
+                    makeProgressbar(current = i, total = length(dirs_short)), sep = ""))
       
       if(isTRUE(hasCameraFolders)){
         filenames_by_subfolder <- lapply(as.list(list.dirs(dirs[i], full.names =TRUE, recursive = FALSE)),

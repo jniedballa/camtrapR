@@ -123,7 +123,8 @@ getSpeciesImages <- function(species,
 
         if(class(metadata.tmp) == "data.frame"){
 
-          message(paste(dirs_short[i], ": ", nrow(metadata.tmp), "images"))
+          message(paste(dirs_short[i], ": ", formatC(nrow(metadata.tmp), width = 4), " images", 
+                        makeProgressbar(current = i, total = length(dirs_short)), sep = ""))
 
           # add metadata
           metadata.tmp <- addMetadataAsColumns (intable                    = metadata.tmp,
