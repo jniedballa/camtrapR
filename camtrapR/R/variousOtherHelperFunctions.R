@@ -285,29 +285,40 @@ checkDateTimeOriginal <- function (intable, dirs_short, i){
 
 # remove duplicate records of same species taken in same second at the same station (by the same camera, if relevant)   ####
 # Note to self: this may also be done outside the station loop, after the final record table is assembled. Saves a few executions of this function.
+# edit 2019-12-04: but then the messages are useless, so just leave it as is for now
 
-removeDuplicatesOfRecords <- function(metadata.tmp, removeDuplicateRecords, camerasIndependent, stationCol, speciesCol, cameraCol){
+removeDuplicatesOfRecords <- function(metadata.tmp, 
+                                      removeDuplicateRecords, 
+                                      camerasIndependent, 
+                                      stationCol, 
+                                      speciesCol, 
+                                      cameraCol, 
+                                      current, 
+                                      total){
   metadata.tmp0 <- metadata.tmp
+  
+  pb <- makeProgressbar(current = current, total = total)
+  
   if(isTRUE(removeDuplicateRecords)){
     if(isTRUE(camerasIndependent)){
       remove.tmp <- which(duplicated(metadata.tmp[,c("DateTimeOriginal", stationCol, speciesCol, cameraCol)]))
       if(length(remove.tmp >= 1)){
         metadata.tmp <- metadata.tmp[-remove.tmp,]
-        #message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ", nrow(metadata.tmp), " images (", length(remove.tmp), " duplicate records removed)")
       }
     } else {
       remove.tmp <- which(duplicated(metadata.tmp[,c("DateTimeOriginal", stationCol, speciesCol)]))
       if(length(remove.tmp >= 1)) {
         metadata.tmp <- metadata.tmp[-remove.tmp,]
-        
-        #message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ": removed ", length(remove.tmp), " duplicate records")
       }
     }
     message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ",
-            formatC(nrow(metadata.tmp0), width = 5), " images ", formatC(length(remove.tmp), width = 4), " duplicates removed")
+            formatC(nrow(metadata.tmp0), width = 5), " images ", 
+            formatC(length(remove.tmp), width = 4), " duplicates removed",
+            pb)
     } else {
     message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ", 
-            formatC(nrow(metadata.tmp0), width = 5), " images")
+            formatC(nrow(metadata.tmp0), width = 5), " images", 
+            pb)
   }
   return(metadata.tmp)
 }
@@ -1237,9 +1248,6 @@ assignSessionIDtoRecordTable <- function(recordTable_tmp,
   
   recordTable_tmp[, stationCol] <- paste(recordTable_tmp[, stationCol], recordTable_tmp[, sessionCol], sep = separatorSession)
   
-  #stationSessionCol <- paste(recordTable_tmp$stationCol, recordTable_tmp$sessionCol, sep = "_")
-  #recordTable_tmp[, stationSessionCol] <- paste(recordTable_tmp$stationCol, recordTable_tmp$sessionCol, sep = separatorSession)
-  
   return(recordTable_tmp)
 }
 
@@ -1503,4 +1511,17 @@ padMatrixWithNA <- function(mat, ncol_desired){
   } else {
     return(mat)
   }
+}
+
+# for progress indicator in user messages
+makeProgressbar <- function(current, 
+                            total){
+  progress_bar_width <- 20
+  perc <- current / total
+  
+  pb <- paste("      |", 
+              paste(rep("=", times = round(perc * progress_bar_width)), collapse = ""), 
+              paste(rep(" ", times = progress_bar_width - round(perc * progress_bar_width)), collapse = ""), 
+              "|", 
+              "  ", formatC(round(perc * 100), width = 3), "%", sep = "")
 }
