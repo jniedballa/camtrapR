@@ -220,7 +220,9 @@ recordTableIndividual <- function(inDir,
                                                    camerasIndependent     = camerasIndependent,
                                                    stationCol             = stationCol,
                                                    speciesCol             = individualCol,    # meaning, there will be no duplicate records of the same individual at the same second and station
-                                                   cameraCol              = cameraCol)
+                                                   cameraCol              = cameraCol,
+                                                   current                = i, 
+                                                   total                  = length(dirs))
         
         # assess independence between records and calculate time differences (and possibly summarise a column)
         args.assessTemporalIndependence <- list(intable             = metadata.tmp2,

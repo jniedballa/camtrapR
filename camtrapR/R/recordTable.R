@@ -133,7 +133,6 @@ recordTable <- function(inDir,
         colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject")
       }
 
-
   for(i in 1:length(dirs)){   # loop through station directories
 
     # execute exiftool
@@ -221,7 +220,9 @@ recordTable <- function(inDir,
                                                   camerasIndependent     = camerasIndependent,
                                                   stationCol             = stationCol,
                                                   speciesCol             = speciesCol,
-                                                  cameraCol              = cameraCol)
+                                                  cameraCol              = cameraCol,
+                                                  current                = i, 
+                                                  total                  = length(dirs))
 
 
         # assess independence between records and calculate time differences
@@ -258,6 +259,7 @@ recordTable <- function(inDir,
     }    # end      if(nrow(metadata.tmp) == 0){} else {...}   # i.e. directory i contained images
   }      # end      for(i in 1:length(dirs)){   # loop through station directories
 
+  
   if(nrow(record.table) == 0){
     stop(paste("something went wrong. I looked through all those", length(dirs)  ,"folders and now your table is empty. Did you exclude too many species? Or were date/time information not readable?"), call. = FALSE)
   }
