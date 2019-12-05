@@ -1,5 +1,5 @@
 ---
-title: "3. Extracting Data from Camera Trapping Images, occupancy & secr input"
+title: "3. Extracting Data from Camera Trapping Images, creating occupancy & secr input"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output: 
