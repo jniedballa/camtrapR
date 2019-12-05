@@ -377,11 +377,13 @@ copyrightTagToAdd <- "Your Name (Your Organisation)"
 addCopyrightTag(inDir        = wd_images_ID_copy, 
                 copyrightTag = copyrightTagToAdd, 
                 askFirst     = FALSE)                  # askFirst = FALSE prevents function from asking user to confirm action (which doesn't work in vignettes)
+```
 
-
-# you can check the outcome with function exifTagNames (you'll find field "Copyright" in line 20)
+When we check the outcome with function exifTagNames, we find field "Copyright" in line 27.
+```{r}
 exifTagNames(wd_images_ID_copy, returnMetadata = TRUE)
 ```
+
 
 The copyright tag will henceforth be visible in digiKam and other image management software.
 
