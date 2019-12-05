@@ -28,14 +28,14 @@ recordTable <- function(inDir,
 
   checkForSpacesInColumnNames(stationCol = stationCol)
 
-  if(class(IDfrom) != "character"){stop("IDfrom must be of class 'character'")}
+  if(!is.character(IDfrom)){stop("IDfrom must be of class 'character'")}
   if(IDfrom %in% c("metadata", "directory") == FALSE) stop("'IDfrom' must be 'metadata' or 'directory'")
 
  if(IDfrom == "metadata"){
     if(metadataHierarchyDelimitor %in% c("|", ":") == FALSE) stop("'metadataHierarchyDelimitor' must be '|' or ':'")
 
     if(!hasArg(metadataSpeciesTag)) {stop("'metadataSpeciesTag' must be defined if IDfrom = 'metadata'")}
-    if(class(metadataSpeciesTag) != "character"){stop("metadataSpeciesTag must be of class 'character'")}
+    if(!is.character(metadataSpeciesTag)){stop("metadataSpeciesTag must be of class 'character'")}
     if(length(metadataSpeciesTag) != 1){stop("metadataSpeciesTag must be of length 1")}
   }
 
@@ -52,27 +52,27 @@ recordTable <- function(inDir,
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
 
   if(hasArg(metadataSpeciesTag)){
-    if(class(metadataSpeciesTag) != "character"){stop("metadataSpeciesTag must be of class 'character'", call. = FALSE)}
+    if(is.character(metadataSpeciesTag)){stop("metadataSpeciesTag must be of class 'character'", call. = FALSE)}
     if(length(metadataSpeciesTag) != 1){stop("metadataSpeciesTag must be of length 1", call. = FALSE)}
   }
 
   if(hasArg(cameraID)){
-    if(class(cameraID) != "character"){stop("cameraID must be of class 'character'", call. = FALSE)}
+    if(is.character(cameraID)){stop("cameraID must be of class 'character'", call. = FALSE)}
     if(cameraID %in% c("filename", "directory") == FALSE) {stop("cameraID can only be 'filename', 'directory', or missing", call. = FALSE)}
     if(!hasArg(camerasIndependent)){stop("camerasIndependent is not defined. It must be defined if cameraID is defined", call. = FALSE)}
-    if(class(camerasIndependent) != "logical"){stop("camerasIndependent must be of class 'logical'", call. = FALSE)}
+    if(is.logical(camerasIndependent)){stop("camerasIndependent must be of class 'logical'", call. = FALSE)}
   } else { camerasIndependent <- FALSE}
 
   cameraCol <- "Camera"
 
 
   if(hasArg(outDir)){
-    if(class(outDir) != "character"){stop("outDir must be of class 'character'", call. = FALSE)}
+    if(!is.character(outDir)){stop("outDir must be of class 'character'", call. = FALSE)}
     if(file.exists(outDir) == FALSE) stop("outDir does not exist", call. = FALSE)
   }
 
   if(hasArg(exclude)){
-    if(class(exclude) != "character"){stop("exclude must be of class 'character'", call. = FALSE)}
+    if(!is.character(exclude)){stop("exclude must be of class 'character'", call. = FALSE)}
   }
 
   stopifnot(is.logical(removeDuplicateRecords))
@@ -82,7 +82,7 @@ recordTable <- function(inDir,
   metadata.tagname <- "HierarchicalSubject"    # for extracting metadata assigned in tagging software
 
   if(hasArg(additionalMetadataTags)){
-    if(class(additionalMetadataTags) != "character"){stop("additionalMetadataTags must be of class 'character'", call. = FALSE)}
+    if(!is.character(additionalMetadataTags)){stop("additionalMetadataTags must be of class 'character'", call. = FALSE)}
     if(any(grep(pattern = " ", x = additionalMetadataTags, fixed = TRUE))) stop("In argument additionalMetadataTags, spaces are not allowed")
     if("HierarchicalSubject" %in% additionalMetadataTags & IDfrom == "metadata")  {
       message("'HierarchicalSubject' may not be in 'additionalMetadataTags' if IDfrom = 'metadata'. It will be ignored because the function returns it anyway.", call. = FALSE)
@@ -91,7 +91,7 @@ recordTable <- function(inDir,
   }
 
   minDeltaTime <- as.integer(minDeltaTime)
-  stopifnot(class(minDeltaTime) == "integer")
+  stopifnot(is.integer(minDeltaTime))
 
   if(minDeltaTime != 0){
     if(removeDuplicateRecords == FALSE){
@@ -110,10 +110,9 @@ recordTable <- function(inDir,
   }
 
 
-  stopifnot(class(writecsv) == "logical")
+  stopifnot(is.logical(writecsv))
 
-#  if(!hasArg(inDir)){stop("inDir must be defined", call. = FALSE)}
-  if(class(inDir) != "character"){stop("inDir must be of class 'character'", call. = FALSE)}
+  if(!is.character(inDir)){stop("inDir must be of class 'character'", call. = FALSE)}
   if(length(inDir) != 1){stop("inDir may only consist of 1 element only", call. = FALSE)}
   if(!dir.exists(inDir)) stop("Could not find inDir:\n", inDir, call. = FALSE)
 
@@ -172,7 +171,7 @@ recordTable <- function(inDir,
       )
 
       # if images in station contain no metadata species tags, skip that station
-      if(class(metadata.tmp) != "data.frame"){
+      if(!is.data.frame(metadata.tmp)){
         if(metadata.tmp == "found no species tag") {
           warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
         } else {

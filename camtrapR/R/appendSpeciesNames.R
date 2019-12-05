@@ -16,16 +16,16 @@ appendSpeciesNames <- function(inDir,
 
   file.sep <- .Platform$file.sep
 
-  if(class(IDfrom) != "character"){stop("IDfrom must be of class 'character'")}
+  if(!is.character(IDfrom)){stop("IDfrom must be of class 'character'")}
   if(IDfrom %in% c("metadata", "directory") == FALSE) stop("'IDfrom' must be 'metadata' or 'directory'")
 
   if(IDfrom == "metadata"){
     if(metadataHierarchyDelimitor %in% c("|", ":") == FALSE) stop("'metadataHierarchyDelimitor' must be '|' or ':'")
     metadata.tagname <- "HierarchicalSubject"
 
-    if(!hasArg(metadataSpeciesTag)) {stop("'metadataSpeciesTag' must be defined if IDfrom = 'metadata'")}
-    if(class(metadataSpeciesTag) != "character"){stop("metadataSpeciesTag must be of class 'character'")}
-    if(length(metadataSpeciesTag) != 1){stop("metadataSpeciesTag must be of length 1")}
+    if(!hasArg(metadataSpeciesTag))       stop("'metadataSpeciesTag' must be defined if IDfrom = 'metadata'")
+    if(!is.character(metadataSpeciesTag)) stop("metadataSpeciesTag must be of class 'character'")
+    if(length(metadataSpeciesTag) != 1)   stop("metadataSpeciesTag must be of length 1")
   }
 
 multiple_tag_separator = "__"
@@ -109,7 +109,7 @@ multiple_tag_separator = "__"
       metadata.tmp <- runExiftool(command.tmp = command.tmp, colnames.tmp = colnames.tmp)
 
 
-      if(class(metadata.tmp) == "data.frame"){
+      if(is.data.frame(metadata.tmp)){
         # if(IDfrom == "directory"){
           # message(paste(dirs_short[i], ": ", nrow(metadata.tmp), "images"))
         # }

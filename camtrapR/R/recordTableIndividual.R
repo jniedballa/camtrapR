@@ -47,34 +47,34 @@ recordTableIndividual <- function(inDir,
     if(metadataHierarchyDelimitor %in% c("|", ":") == FALSE) stop("'metadataHierarchyDelimitor' must be '|' or ':'")
 
     if(!hasArg(metadataIDTag)) {stop("'metadataIDTag' must be defined if IDfrom = 'metadata'")}
-    if(class(metadataIDTag)  != "character") {stop("metadataIDTag must be of class 'character'")}
+    if(!is.character(metadataIDTag)) {stop("metadataIDTag must be of class 'character'")}
     if(length(metadataIDTag) != 1) {stop("metadataIDTag must be of length 1")}
   }
 
   if(hasArg(metadataIDTag)){
-    if(class(metadataIDTag) != "character"){stop("metadataIDTag must be of class 'character'", call. = FALSE)}
+    if(!is.character(metadataIDTag)){stop("metadataIDTag must be of class 'character'", call. = FALSE)}
     if(length(metadataIDTag) != 1){stop("metadataIDTag must be of length 1", call. = FALSE)}
   }
 
   multiple_tag_separator <- "_&_"
 
   if(hasArg(cameraID)){
-    if(class(cameraID) != "character"){stop("cameraID must be of class 'character'", call. = FALSE)}
+    if(!is.character(cameraID)){stop("cameraID must be of class 'character'", call. = FALSE)}
     if(cameraID %in% c("filename") == FALSE) {stop("cameraID can only be 'filename' or missing", call. = FALSE)}
     if(!hasArg(camerasIndependent)){stop("camerasIndependent is not defined. It must be defined if cameraID is defined", call. = FALSE)}
-    if(class(camerasIndependent) != "logical"){stop("camerasIndependent must be of class 'logical'", call. = FALSE)}
+    if(!is.logical(camerasIndependent)){stop("camerasIndependent must be of class 'logical'", call. = FALSE)}
   } else {camerasIndependent <- FALSE}
 
   cameraCol <- "Camera"
 
 
   if(hasArg(outDir)){
-    if(class(outDir) != "character"){stop("outDir must be of class 'character'", call. = FALSE)}
+    if(!is.character(outDir)){stop("outDir must be of class 'character'", call. = FALSE)}
     if(file.exists(outDir) == FALSE) stop("outDir does not exist", call. = FALSE)
   }
 
   if(hasArg(additionalMetadataTags)){
-    if(class(additionalMetadataTags) != "character"){stop("additionalMetadataTags must be of class 'character'", call. = FALSE)}
+    if(!is.character(additionalMetadataTags)){stop("additionalMetadataTags must be of class 'character'", call. = FALSE)}
     if(any(grep(pattern = " ", x = additionalMetadataTags, fixed = TRUE))) stop("In argument additionalMetadataTags, spaces are not allowed")
     if("HierarchicalSubject" %in% additionalMetadataTags & IDfrom == "metadata")  {
       warning("'HierarchicalSubject' may not be in 'additionalMetadataTags' if IDfrom = 'metadata'. It will be ignored because the function returns it anyway.", call. = FALSE)
@@ -88,7 +88,7 @@ recordTableIndividual <- function(inDir,
   metadata.tagname <- "HierarchicalSubject"    # for extracting metadata assigned in tagging software
 
   minDeltaTime <- as.integer(minDeltaTime)
-  stopifnot(class(minDeltaTime) == "integer")
+  stopifnot(is.integer(minDeltaTime))
 
   if(minDeltaTime != 0){
     if(removeDuplicateRecords == FALSE){
@@ -104,11 +104,9 @@ recordTableIndividual <- function(inDir,
     }
   }
 
+  stopifnot(is.logical(writecsv))
 
-
-  stopifnot(class(writecsv) == "logical")
-
-  if(class(inDir)  != "character"){stop("inDir must be of class 'character'", call. = FALSE)}
+  if(!is.character(inDir) ){stop("inDir must be of class 'character'", call. = FALSE)}
   if(length(inDir) != 1){stop("inDir may only consist of 1 element only", call. = FALSE)}
   if(!dir.exists(inDir)) stop("Could not find inDir:\n", inDir, call. = FALSE)
 
@@ -176,7 +174,7 @@ recordTableIndividual <- function(inDir,
 
 
       # if images in station contain no metadata individual ID tag or are not tagged, skip that station
-      if(class(metadata.tmp) != "data.frame"){
+      if(!is.data.frame(metadata.tmp)){
         if(metadata.tmp == "found no species tag") {
           warning(paste(dirs_short[i], ":   metadataIDTag '", metadataIDTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
         } else {

@@ -15,10 +15,10 @@ checkSpeciesIdentification <- function(inDir,
 
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool")
   if(hasArg(excludeSpecies)){
-    if(class(excludeSpecies) != "character") stop("excludeSpecies must be of class 'character'")
+    if(!is.character(excludeSpecies)) stop("excludeSpecies must be of class 'character'")
   }
   if(hasArg(stationsToCheck)){
-    if(class(stationsToCheck) != "character") stop("stationsToCheck must be of class 'character'")
+    if(!is.character(stationsToCheck)) stop("stationsToCheck must be of class 'character'")
   }
   stopifnot(is.logical(hasCameraFolders))
 
@@ -26,7 +26,7 @@ checkSpeciesIdentification <- function(inDir,
 
   file.sep <- .Platform$file.sep
 
- if(class(IDfrom) != "character"){stop("IDfrom must be of class 'character'")}
+ if(!is.character(IDfrom)){stop("IDfrom must be of class 'character'")}
  if(IDfrom %in% c("metadata", "directory") == FALSE) stop("'IDfrom' must be 'metadata' or 'directory'")
 
  if(IDfrom == "metadata"){
@@ -34,11 +34,11 @@ checkSpeciesIdentification <- function(inDir,
     metadata.tagname <- "HierarchicalSubject"
 
     if(!hasArg(metadataSpeciesTag)) {stop("'metadataSpeciesTag' must be defined if IDfrom = 'metadata'")}
-    if(class(metadataSpeciesTag) != "character"){stop("metadataSpeciesTag must be of class 'character'")}
+    if(!is.character(metadataSpeciesTag)){stop("metadataSpeciesTag must be of class 'character'")}
     if(length(metadataSpeciesTag) != 1){stop("metadataSpeciesTag must be of length 1")}
 
     if(hasArg(metadataSpeciesTagToCompare)) {
-      if(class(metadataSpeciesTagToCompare) != "character"){stop("metadataSpeciesTagToCompare must be of class 'character'")}
+      if(!is.character(metadataSpeciesTagToCompare)){stop("metadataSpeciesTagToCompare must be of class 'character'")}
       if(length(metadataSpeciesTagToCompare) != 1){stop("metadataSpeciesTagToCompare must be of length 1")}
     }
   }
@@ -97,7 +97,7 @@ checkSpeciesIdentification <- function(inDir,
     metadata.tmp <- runExiftool(command.tmp = command.tmp, colnames.tmp = colnames.tmp)
 
 
-    if(class(metadata.tmp) == "data.frame"){
+    if(inherits(metadata.tmp, "data.frame")){
 		if(IDfrom == "directory"){
       message(paste(dirs_short[i], ": checking", nrow(metadata.tmp), "images in", length(dirs.to.check.sho), "directories"))
 		}
@@ -125,7 +125,7 @@ checkSpeciesIdentification <- function(inDir,
       )
 
       # if images in station contain no metadata species tags, skip that station
-      if(class(metadata.tmp) != "data.frame"){
+      if(!inherits(metadata.tmp, "data.frame")){
         if(metadata.tmp == "found no species tag") {
           warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
         } else {

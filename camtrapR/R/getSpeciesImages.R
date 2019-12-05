@@ -22,7 +22,7 @@ getSpeciesImages <- function(species,
     if (isTRUE(all(unlist(strsplit(tolower(inDir), split = file.sep)) %in%
                    unlist(strsplit(tolower(outDir), split = file.sep)))))    stop("outDir may not be identical to or a subdirectory of inDir", call. = FALSE)
 
-    if(class(IDfrom) != "character") stop("IDfrom must be of class 'character'", call. = FALSE)
+    if(!is.character(IDfrom)) stop("IDfrom must be of class 'character'", call. = FALSE)
     if(IDfrom %in% c("metadata", "directory") == FALSE) stop("'IDfrom' must be 'metadata' or 'directory'", call. = FALSE)
 
     if(IDfrom == "metadata"){
@@ -53,7 +53,7 @@ getSpeciesImages <- function(species,
 
 
   if(hasArg(metadataSpeciesTag)){
-    if(class(metadataSpeciesTag) != "character"){stop("metadataSpeciesTag must be of class 'character'", call. = FALSE)}
+    if(!is.character(metadataSpeciesTag)){stop("metadataSpeciesTag must be of class 'character'", call. = FALSE)}
     if(length(metadataSpeciesTag) != 1){stop("metadataSpeciesTag must be of length 1", call. = FALSE)}
   }
 
@@ -121,7 +121,7 @@ getSpeciesImages <- function(species,
         metadata.tmp <- runExiftool(command.tmp = command.tmp, colnames.tmp = colnames.tmp)
 
 
-        if(class(metadata.tmp) == "data.frame"){
+        if(is.data.frame(metadata.tmp)){
 
           message(paste(dirs_short[i], ": ", formatC(nrow(metadata.tmp), width = 4), " images", 
                         makeProgressbar(current = i, total = length(dirs_short)), sep = ""))

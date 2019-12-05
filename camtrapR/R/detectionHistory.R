@@ -43,7 +43,7 @@ detectionHistory <- function(recordTable,
   stopifnot(hasArg(occasionLength))
   
   stopifnot(hasArg(recordTable))
-  stopifnot(class(recordTable) == "data.frame")
+  stopifnot(is.data.frame(recordTable))
   stopifnot(hasArg(camOp))
   
   stopifnot(length(stationCol) == 1)
@@ -100,7 +100,7 @@ detectionHistory <- function(recordTable,
   
   if(includeEffort){
     if(!hasArg(scaleEffort)) stop("scaleEffort must be defined if includeEffort is TRUE")
-    if(class(scaleEffort) != "logical") stop("scaleEffort must be logical (TRUE or FALSE)")
+    if(!is.logical(scaleEffort)) stop("scaleEffort must be logical (TRUE or FALSE)")
   } else {scaleEffort <- FALSE}
   
   if(hasArg(minActiveDaysPerOccasion)){
@@ -124,7 +124,7 @@ detectionHistory <- function(recordTable,
   
   
   # check consistency of argument day1
-  stopifnot(class(day1) == "character")
+  stopifnot(is.character(day1))
   day1 <- tolower(day1)
   if(day1 == "survey") {day1switch <- 1} else {
     if(day1 == "station") {day1switch <- 2} else {

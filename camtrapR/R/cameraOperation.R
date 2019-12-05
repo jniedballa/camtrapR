@@ -94,7 +94,7 @@ cameraOperation <- function(CTtable,
   }
   
   if(hasArg(outDir)){
-    if(class(outDir) != "character"){stop("outDir must be of class 'character'")}
+    if(!is.character(outDir)){stop("outDir must be of class 'character'")}
     if(file.exists(outDir) == FALSE) stop("outDir does not exist")
   }
   

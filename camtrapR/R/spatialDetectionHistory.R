@@ -54,7 +54,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   checkForSpacesInColumnNames(stationCol = stationCol, Xcol = Xcol, Ycol = Ycol, 
                                          recordDateTimeCol = recordDateTimeCol, speciesCol = speciesCol, individualCol)
-  if(class(CTtable) != "data.frame")       stop("CTtable must be a data.frame", call. = FALSE)
+  if(!inherits(CTtable, "data.frame"))     stop("CTtable must be a data.frame", call. = FALSE)
   if(!stationCol %in% colnames(CTtable))   stop(paste('stationCol = "',   stationCol,  '" is not a column name in CTtable', sep = ''), call. = FALSE)
   if(!Xcol %in% colnames(CTtable))         stop(paste('Xcol = "',   Xcol,  '" is not a column name in CTtable', sep = ''), call. = FALSE)
   if(!Ycol %in% colnames(CTtable))         stop(paste('Ycol = "',   Ycol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
@@ -210,11 +210,11 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   if(includeEffort == TRUE){
     if(hasArg(scaleEffort)){
-      if(class(scaleEffort) != "logical") stop("scaleEffort must be logical (currently only FALSE is allowed)")
+      if(!is.logical(scaleEffort)) stop("scaleEffort must be logical (currently only FALSE is allowed)")
       if(isTRUE(scaleEffort))             stop("currently scaleEffort must be FALSE")
     }
     if(hasArg(binaryEffort)){
-      if(class(binaryEffort) != "logical") stop("binaryEffort must be logical (TRUE or FALSE)")
+      if(!is.logical(binaryEffort)) stop("binaryEffort must be logical (TRUE or FALSE)")
     }
     if(binaryEffort == TRUE & scaleEffort == TRUE) stop("'scaleEffort' and 'binaryEffort' cannot both be TRUE")
   } else {
@@ -266,13 +266,13 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
 
   # check consistency of argument day1
-  stopifnot(class(day1) == "character")
+  stopifnot(is.character(day1))
 
   if(day1 == "survey") {day1switch <- 1} else {
     if(day1 == "station") {day1switch <- 2} else {
       try(date.test <- as.Date(day1), silent = TRUE)
       if(!exists("date.test")) stop("day1 is not specified correctly. It can only be 'station', 'survey', or a date formatted as 'YYYY-MM-DD', e.g. '2016-12-31'")
-      if(class(date.test) != "Date") stop('could not interpret argument day1: can only be "station", "survey" or a specific date (e.g. "2015-12-31")')
+      if(!is(date.test, "Date")) stop('could not interpret argument day1: can only be "station", "survey" or a specific date (e.g. "2015-12-31")')
       if(hasArg(buffer)) stop("if buffer is defined, day1 can only be 'survey' or 'station'")
       suppressWarnings(rm(date.test))
       day1switch <- 3
@@ -521,18 +521,17 @@ spatialDetectionHistory <- function(recordTableIndividual,
     if(exists("stationCovsDF")) secr::covariates(secr.traps) <- stationCovsDF
   }
 
-
   # find number of occasions
-  if(includeEffort == FALSE) {
-    noccasions <- ncol(effort)
+  if(includeEffort == FALSE) {  
+    noccasions <- ncol(effort) 
   } else {
-    if(all(class(secr.traps) == "list")) {
-      noccasions <- sapply(secr::usage(secr.traps), ncol)
-    } else {
-      if(class(secr::usage(secr.traps)) == "matrix"){
-        noccasions <- ncol(secr::usage(secr.traps))
+    if(inherits(secr.traps, "list")) {
+      noccasions <- sapply(secr::usage(secr.traps), ncol)    # includeEffort = TRUE / multi-session
+    } else { 
+      if(is(secr::usage(secr.traps), "matrix")){
+        noccasions <- ncol(secr::usage(secr.traps))          # includeEffort = TRUE / single-session
       } else {
-        noccasions <- ncol(effort)
+        noccasions <- ncol(effort)                           # includeEffort = TRUE / single-session
       }
     }
   }
