@@ -150,7 +150,7 @@ camop_no_problem <- cameraOperation(CTtable      = camtraps,
                                     dateFormat   = "\%d/\%m/\%Y"
 )
 
-
+\dontrun{
 if (Sys.which("exiftool") != ""){        # only run this function if ExifTool is available
 recordTableSample <- recordTable(inDir               = wd_images_ID,
                                  IDfrom              = "directory",
@@ -159,9 +159,10 @@ recordTableSample <- recordTable(inDir               = wd_images_ID,
                                  exclude             = "NO_ID",
                                  timeZone            = "Asia/Kuala_Lumpur"
 )
-} else {
-data(recordTableSample)
 }
+}
+data(recordTableSample)    # load the record history, as created above
+
 
 # compute detection history for a species
 
