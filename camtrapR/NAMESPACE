@@ -7,7 +7,7 @@ importFrom("graphics", abline, axis, box, grconvertX, grconvertY,
            text)
 importFrom("stats", aggregate, na.omit)
 importFrom("utils", modifyList, write.csv, zip)
-importFrom("methods", hasArg)
+importFrom("methods", hasArg, is)
 importFrom("utils", head, menu)
 importFrom("sp", CRS, SpatialPointsDataFrame, coordinates)
 importFrom("secr", read.traps, make.capthist, traps, RMarkInput, usage, covariates)
