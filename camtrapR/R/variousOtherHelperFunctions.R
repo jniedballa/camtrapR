@@ -39,11 +39,16 @@ checkForSpacesInColumnNames <- function(...){
   
   # if the argument is of length >1, do
   if(any(sapply(z, FUN = length) > 1)){
-    if(length(z) != 1) stop("this is a bug in 'checkForSpacesInColumnNames'. I'm sorry. Please report it.")
-    if(any(grepl(pattern = " ", x = unlist(z[[1]]), fixed = TRUE))) stop("column names in '", names(z) ,"' may not contain spaces: \n ",
-                                                                         paste(names(unlist(z))[which(grepl(pattern = " ", x = unlist(z), fixed = TRUE))], "=",
-                                                                               z[[1]][which(grepl(pattern = " ", x = unlist(z), fixed = TRUE))], collapse = "\n "),
-                                                                         call. = FALSE)
+    if(length(z) == 1) {
+      if(any(grepl(pattern = " ", x = unlist(z[[1]]), fixed = TRUE))) stop("column names in '", names(z) ,"' may not contain spaces: \n ",
+                                                                           paste(names(unlist(z))[which(grepl(pattern = " ", x = unlist(z), fixed = TRUE))], "=",
+                                                                                 z[[1]][which(grepl(pattern = " ", x = unlist(z), fixed = TRUE))], collapse = "\n "),
+                                                                           call. = FALSE)
+    } 
+    if(length(z) > 1) {
+      which_is_the_culprit <- which(sapply(z, FUN = length) > 1)
+      stop(paste("Argument", names(z)[which_is_the_culprit], "is not of length 1"), call. = FALSE)
+    }
   }
 }
 
@@ -294,7 +299,8 @@ removeDuplicatesOfRecords <- function(metadata.tmp,
                                       speciesCol, 
                                       cameraCol, 
                                       current, 
-                                      total){
+                                      total,
+                                      max_nchar_station){
   metadata.tmp0 <- metadata.tmp
   
   pb <- makeProgressbar(current = current, total = total)
@@ -311,14 +317,32 @@ removeDuplicatesOfRecords <- function(metadata.tmp,
         metadata.tmp <- metadata.tmp[-remove.tmp,]
       }
     }
-    message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ",
-            formatC(nrow(metadata.tmp0), width = 5), " images ", 
-            formatC(length(remove.tmp), width = 4), " duplicates removed",
-            pb)
-    } else {
-    message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ", 
-            formatC(nrow(metadata.tmp0), width = 5), " images", 
-            pb)
+    
+    if(length(unique(metadata.tmp[,stationCol])) == 1) {                  # 1 station per exiftool call
+      message(formatC(as.character(unique(metadata.tmp[,stationCol])), 
+                      width = max_nchar_station, 
+                      flag = "-"), ":  ",
+              formatC(nrow(metadata.tmp0), width = 5), " images ", 
+              formatC(length(remove.tmp),  width = 4), " duplicates removed",
+              pb)
+    } else {                                                               # > 1 station per exiftool call (recordTableIndividual)
+      message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ",
+              formatC(nrow(metadata.tmp0), width = 5), " images ", 
+              formatC(length(remove.tmp),  width = 4), " duplicates removed",
+              pb)
+    }
+  } else {
+    if(length(unique(metadata.tmp[,stationCol])) == 1) {                  # 1 station per exiftool call
+      message(formatC(as.character(unique(metadata.tmp[,stationCol])), 
+                      width = max_nchar_station, 
+                      flag = "-"), ":  ",
+              formatC(nrow(metadata.tmp0), width = 5), " images", 
+              pb)
+    } else {                                                               # > 1 station per exiftool call (recordTableIndividual)
+      message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ", 
+              formatC(nrow(metadata.tmp0), width = 5), " images", 
+              pb)
+    }
   }
   return(metadata.tmp)
 }
@@ -434,14 +458,21 @@ assessTemporalIndependence <- function(intable,
   if(hasArg(eventSummaryColumn)){
     if(all(eventSummaryColumn %in% colnames(intable))){
       if(length(eventSummaryColumn) != length(eventSummaryFunction)) stop('"eventSummaryColumn" and "eventSummaryFunction" must have same length', call. = FALSE)
-      summary_column_name <- paste(eventSummaryColumn, eventSummaryFunction, sep = "_")
-      intable[, summary_column_name] <- NA
+      
     } else {
-      message(paste(unique(intable[, stationCol]), ":eventSummaryColumns " ,
+      warning(paste(unique(intable[, stationCol]), ": eventSummaryColumn(s) " ,
                     paste(eventSummaryColumn[!eventSummaryColumn %in% colnames(intable)], collapse = ", "),
-                    "not found in column names of recordtable"))
+                    " not found in column names of recordtable"), call. = FALSE)
     }
-  }
+    
+    summary_column_name <- paste(eventSummaryColumn, eventSummaryFunction, sep = "_")
+    intable[, summary_column_name[eventSummaryColumn %in% colnames(intable)]] <- NA
+    
+    
+    # summary_column_name <- paste(eventSummaryColumn, eventSummaryFunction, sep = "_")[which(eventSummaryColumn %in% colnames(intable))]
+    # intable[, summary_column_name] <- NA
+  }    # end    if(hasArg(eventSummaryColumn)){
+  
   
   for(xy in 1:length(which_independent)){     # for every independent record (the ones that end up in record table)
     
@@ -471,21 +502,27 @@ assessTemporalIndependence <- function(intable,
     if(hasArg(eventSummaryColumn)){
       
       for(eventSummaryIndex in 1:length(eventSummaryColumn)) {
-        summary_value <- do.call(what = eventSummaryFunction[eventSummaryIndex], 
-                                 args = list(intable[which_records_to_group, eventSummaryColumn[eventSummaryIndex]], 
-                                             na.rm = TRUE))
-        if(!is.infinite(summary_value)){
-          intable[current_row, summary_column_name[eventSummaryIndex]] <- ifelse(length(summary_value) > 1, 
-                                                                                 paste(summary_value, collapse = ", "),
-                                                                                 summary_value)
+        
+        if(eventSummaryColumn[eventSummaryIndex] %in% colnames(intable)){
+          
+          summary_value <- do.call(what = eventSummaryFunction[eventSummaryIndex], 
+                                   args = list(intable[which_records_to_group, eventSummaryColumn[eventSummaryIndex]], 
+                                               na.rm = TRUE))
+          if(!is.infinite(summary_value)){
+            intable[current_row, summary_column_name[eventSummaryIndex]] <- ifelse(length(summary_value) > 1, 
+                                                                                   paste(summary_value, collapse = ", "),
+                                                                                   summary_value)
+          }
+          rm(summary_value)
         }
-
-rm(summary_value)
+        
+        
       }    # end for(eventSummaryIndex in 1:length(eventSummaryColumn)
-      
     }      # end if(hasArg(eventSummaryColumn))
+    
     intable[ current_row, n_imagesColumn] <- length(which_records_to_group)
     rm(which_records_to_group, current_row)
+    
   }        # end for(xy in 1:length(which_independent))
   
   
@@ -514,7 +551,7 @@ addNewColumnsToGlobalTable <- function(intable,
                                        record.table)
 {
   
-  if( nrow(record.table) >= 1){
+  if( nrow(record.table) >= 1){    # if there is a record table already (i.e., it is not the first station with images)
     which_cols_to_add_to_d1 <- seq(1, ncol(record.table))[-which(colnames(record.table) %in% colnames(intable))]   # columns in record.table but not in intable
     
     # if intable lacks columns present in record.table, add them here (filled with NA)
@@ -526,7 +563,9 @@ addNewColumnsToGlobalTable <- function(intable,
     # now check which columns are present in intable but not in record.table (new tag groups) and add these (filled with NA)
     which_cols_to_add_to_record.table <- seq(1, ncol(intable))[-which(colnames(intable) %in% colnames(record.table))]  # columns present in intable but not in record.table
     if(length(which_cols_to_add_to_record.table) >= 1){
-      record.table <- data.frame(record.table, as.list(rep(NA, each = length(which_cols_to_add_to_record.table))))
+      record.table <- data.frame(record.table, 
+                                 as.list(rep(NA, each = length(which_cols_to_add_to_record.table))),
+                                 check.names = FALSE)
       colnames(record.table)[(ncol(record.table) - length(which_cols_to_add_to_record.table) + 1) :  ncol(record.table)] <- colnames(intable)[which_cols_to_add_to_record.table]
     }
     outtable <- intable[,match(colnames(record.table), colnames(intable))]
@@ -1513,7 +1552,7 @@ padMatrixWithNA <- function(mat, ncol_desired){
   }
 }
 
-# for progress indicator in user messages
+# for progress indicator in user messages (28 charcters wide in total)
 makeProgressbar <- function(current, 
                             total){
   progress_bar_width <- 20
