@@ -207,4 +207,48 @@ sdh <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSamp
 
   summary(sdh)
   plot(sdh, tracks = TRUE)
+
+  ## multi-season capthist object
+  # see vignette "3. Extracting Data from Camera Trapping Images, creating occupancy & secr input"
+  
+  data(camtrapsMultiSeason)
+  camtrapsMultiSeason$session[camtrapsMultiSeason$session == 2009] <- 1
+  camtrapsMultiSeason$session[camtrapsMultiSeason$session == 2010] <- 2
+
+  data(recordTableIndividualSampleMultiSeason)
+
+  # create camera operation matrix (with problems/malfunction)
+  camop_session <- cameraOperation(CTtable         = camtrapsMultiSeason,
+                                      stationCol   = "Station",
+                                      setupCol     = "Setup_date",
+                                      sessionCol   = "session",
+                                      retrievalCol = "Retrieval_date",
+                                      hasProblems  = TRUE,
+                                      dateFormat   = dateFormat
+  )
+
+  sdh_multi <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSample_season,
+                               species               = "LeopardCat",
+                               output                = "binary",
+                               camOp                 = camop_session,
+                               CTtable               = camtraps_season,
+                               stationCol            = "Station",
+                               speciesCol            = "Species",
+                               sessionCol            = "session",
+                               Xcol                  = "utm_x",
+                               Ycol                  = "utm_y",
+                               individualCol         = "Individual",
+                               recordDateTimeCol     = "DateTimeOriginal",
+                               recordDateTimeFormat  = "\%Y-\%m-\%d \%H:\%M:\%S",
+                               occasionLength        = 10,
+                               day1                  = "survey",
+                               includeEffort         = TRUE,
+                               timeZone              = "Asia/Kuala_Lumpur",
+                               stationCovariateCols  = "utm_y",     # example
+                               individualCovariateCols = "Individual"   # example
+  )
+
+  summary(sdh_multi)
+  plot(sdh_multi, tracks = TRUE)
+
 }

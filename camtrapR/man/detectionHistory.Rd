@@ -221,4 +221,38 @@ DetHist2_lub <- detectionHistory(recordTable          = recordTableSample,
 DetHist2_lub$detection_history  # detection history  (alternatively, use: DetHist2[[1]])
 DetHist2_lub$effort             # effort (alternatively, use: DetHist2_lub[[2]])
 
+
+# multi-season detection history
+
+# load multi-season data
+data(camtrapsMultiSeason)
+data(recordTableSampleMultiSeason)
+
+# multi-season camera operation matrix
+camop_season <- cameraOperation(CTtable          = camtrapsMultiSeason,
+                                    stationCol   = "Station",
+                                    setupCol     = "Setup_date",
+                                    sessionCol   = "session",
+                                    retrievalCol = "Retrieval_date",
+                                    hasProblems  = TRUE,
+                                    dateFormat   = dateFormat
+)
+
+# multi-season detection history
+DetHist_multi <- detectionHistory(recordTable      = recordTableSampleMultiSeason,
+                            camOp                  = camop_season,
+                            stationCol             = "Station",
+                            speciesCol             = "Species",
+                            species                = "VTA",
+                            occasionLength         = 10,
+                            day1                   = "station",
+                            recordDateTimeCol      = "DateTimeOriginal",
+                            includeEffort          = TRUE,
+                            scaleEffort            = FALSE,
+                            timeZone               = "UTC",
+                            unmarkedMultFrameInput = TRUE
+)
+
+DetHist_multi
+
 }
