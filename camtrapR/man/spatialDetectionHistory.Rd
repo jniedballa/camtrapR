@@ -224,14 +224,14 @@ sdh <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSamp
                                       sessionCol   = "session",
                                       retrievalCol = "Retrieval_date",
                                       hasProblems  = TRUE,
-                                      dateFormat   = dateFormat
+                                      dateFormat   = "\%d/\%m/\%Y"
   )
 
-  sdh_multi <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSample_season,
+sdh_multi <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSampleMultiSeason,
                                species               = "LeopardCat",
                                output                = "binary",
                                camOp                 = camop_session,
-                               CTtable               = camtraps_season,
+                               CTtable               = camtrapsMultiSeason,
                                stationCol            = "Station",
                                speciesCol            = "Species",
                                sessionCol            = "session",
@@ -244,7 +244,7 @@ sdh <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSamp
                                day1                  = "survey",
                                includeEffort         = TRUE,
                                timeZone              = "Asia/Kuala_Lumpur",
-                               stationCovariateCols  = "utm_y",     # example
+                               stationCovariateCols  = "utm_y",         # example
                                individualCovariateCols = "Individual"   # example
   )
 

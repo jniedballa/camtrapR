@@ -235,7 +235,7 @@ camop_season <- cameraOperation(CTtable          = camtrapsMultiSeason,
                                     sessionCol   = "session",
                                     retrievalCol = "Retrieval_date",
                                     hasProblems  = TRUE,
-                                    dateFormat   = dateFormat
+                                    dateFormat   = "\%d/\%m/\%Y"
 )
 
 # multi-season detection history
