@@ -96,6 +96,9 @@ These plots are generated from the record table and the camera trap table.
 \code{\link{camtraps}}\tab  Sample camera trap station information table \cr
 \code{\link{recordTableSample}} \tab Sample species record table \cr
 \code{\link{recordTableIndividualSample}} \tab Single-species record table with individual IDs\cr
+\code{\link{camtrapsMultiSeason}}\tab  Sample multi season camera trap station information table \cr
+\code{\link{recordTableSampleMultiSeason}} \tab Sample  multi season species record table \cr
+\code{\link{recordTableIndividualSampleMultiSeason}} \tab Single-species multi season record table with individual IDs\cr
 \code{\link{timeShiftTable}} \tab Sample camera trap time shift information \cr
 --------------------------- \tab ---------------------------------------------------------------------------------------------- \cr
 
