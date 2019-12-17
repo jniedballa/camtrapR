@@ -29,14 +29,15 @@ recordTable <- function(inDir,
   checkForSpacesInColumnNames(stationCol = stationCol)
 
   if(!is.character(IDfrom)){stop("IDfrom must be of class 'character'")}
-  if(IDfrom %in% c("metadata", "directory") == FALSE) stop("'IDfrom' must be 'metadata' or 'directory'")
+  IDfrom <- match.arg(IDfrom, choices = c("metadata", "directory"))  
+  # if(IDfrom %in% c("metadata", "directory") == FALSE) stop("'IDfrom' must be 'metadata' or 'directory'")
 
  if(IDfrom == "metadata"){
     if(metadataHierarchyDelimitor %in% c("|", ":") == FALSE) stop("'metadataHierarchyDelimitor' must be '|' or ':'")
 
-    if(!hasArg(metadataSpeciesTag)) {stop("'metadataSpeciesTag' must be defined if IDfrom = 'metadata'")}
-    if(!is.character(metadataSpeciesTag)){stop("metadataSpeciesTag must be of class 'character'")}
-    if(length(metadataSpeciesTag) != 1){stop("metadataSpeciesTag must be of length 1")}
+    if(!hasArg(metadataSpeciesTag))       stop("'metadataSpeciesTag' must be defined if IDfrom = 'metadata'")
+    if(!is.character(metadataSpeciesTag)) stop("metadataSpeciesTag must be of class 'character'")
+    if(length(metadataSpeciesTag) != 1)   stop("metadataSpeciesTag must be of length 1")
   }
 
   multiple_tag_separator <- "_&_"
@@ -50,11 +51,6 @@ recordTable <- function(inDir,
     stop("timeZone must be an element of OlsonNames()", call. = FALSE)
   }
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
-
-  if(hasArg(metadataSpeciesTag)){
-    if(is.character(metadataSpeciesTag)){stop("metadataSpeciesTag must be of class 'character'", call. = FALSE)}
-    if(length(metadataSpeciesTag) != 1){stop("metadataSpeciesTag must be of length 1", call. = FALSE)}
-  }
 
   if(hasArg(cameraID)){
     if(is.character(cameraID)){stop("cameraID must be of class 'character'", call. = FALSE)}
@@ -110,28 +106,34 @@ recordTable <- function(inDir,
   }
 
 
-  stopifnot(is.logical(writecsv))
+  
+  if(!is.logical(writecsv))  stop("writecsv must be logical (TRUE or FALSE)", call. = FALSE)
+  if(!is.character(inDir))   stop("inDir must be of class 'character'", call. = FALSE)
+  if(length(inDir) != 1)     stop("inDir may only consist of 1 element only", call. = FALSE)
+  if(!dir.exists(inDir))     stop("Could not find inDir:\n", inDir, call. = FALSE)
 
-  if(!is.character(inDir)){stop("inDir must be of class 'character'", call. = FALSE)}
-  if(length(inDir) != 1){stop("inDir may only consist of 1 element only", call. = FALSE)}
-  if(!dir.exists(inDir)) stop("Could not find inDir:\n", inDir, call. = FALSE)
-
+  if(hasArg(eventSummaryColumn)) {
+    stopifnot(is.character(eventSummaryColumn))
+    stopifnot(is.character(eventSummaryFunction))
+  }
 
   # find image directories
   dirs <- list.dirs(inDir, full.names = TRUE, recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
-  record.table <- data.frame(stringsAsFactors = FALSE)
+  max_nchar_station <- max(nchar(dirs_short))
+  #record.table <- data.frame(stringsAsFactors = FALSE)
+  record.table.list <- list()
 
    # create command line
-
-      if(hasArg(additionalMetadataTags)){
-        command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject', paste(" -",additionalMetadataTags,  collapse = "", sep = ""), ' -ext JPG "', dirs, '"', sep = "")
-        colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject", additionalMetadataTags)
-      } else {
-        command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject -ext JPG "',dirs, '"', sep = "")
-        colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject")
-      }
-
+  
+  if(hasArg(additionalMetadataTags)){
+    command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject', paste(" -",additionalMetadataTags,  collapse = "", sep = ""), ' -ext JPG "', dirs, '"', sep = "")
+    colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject", additionalMetadataTags)
+  } else {
+    command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject -ext JPG "',dirs, '"', sep = "")
+    colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject")
+  }
+  
   for(i in 1:length(dirs)){   # loop through station directories
 
     # execute exiftool
@@ -140,11 +142,10 @@ recordTable <- function(inDir,
     if(class(metadata.tmp) == "NULL"){            # omit station if no images found
 
       length.tmp <- length(list.files(dirs[i], pattern = ".jpg$|JPG$", ignore.case = TRUE, recursive = TRUE))
-      warning(paste(dirs_short[i], "contains no images;", " found", length.tmp, "JPEGs"), call. = FALSE,  immediate. = TRUE)
-
+      message(paste(formatC(dirs_short[i], width = max_nchar_station, flag = "-"),  ":  ",
+                    formatC(length.tmp, width = 5), " images      Skipping", sep = ""))
+      warning(paste(dirs_short[i],  ":  contains no images and was omitted"), call. = FALSE,  immediate. = FALSE)
     } else {
-
-      # message(paste(dirs_short[i], ":", nrow(metadata.tmp), "images"))
 
       # check presence / consistency of DateTimeOriginal column, go to next station or remove records if necessary
       metadata.tmp <- checkDateTimeOriginal (intable    = metadata.tmp,
@@ -175,7 +176,7 @@ recordTable <- function(inDir,
         if(metadata.tmp == "found no species tag") {
           warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
         } else {
-          warning(paste(dirs_short[i], ":   error in species tag extraction. Skipping. Please report", sep = ""), call. = FALSE, immediate. = TRUE)
+          warning(paste(dirs_short[i], ":   error in species tag extraction. Skipping. Please report this bug", sep = ""), call. = FALSE, immediate. = TRUE)
         }
         next
       }
@@ -221,7 +222,8 @@ recordTable <- function(inDir,
                                                   speciesCol             = speciesCol,
                                                   cameraCol              = cameraCol,
                                                   current                = i, 
-                                                  total                  = length(dirs))
+                                                  total                  = length(dirs),
+                                                  max_nchar_station      = max_nchar_station)
 
 
         # assess independence between records and calculate time differences
@@ -234,30 +236,33 @@ recordTable <- function(inDir,
                                                 stationCol          = stationCol)
         
         if(hasArg(eventSummaryColumn)) {
-          stopifnot(is.character(eventSummaryColumn))
-          stopifnot(is.character(eventSummaryFunction))
           args.assessTemporalIndependence <- c(args.assessTemporalIndependence,
-                                               eventSummaryColumn   = eventSummaryColumn,
-                                               eventSummaryFunction = eventSummaryFunction)
+                                               list(eventSummaryColumn   = eventSummaryColumn,
+                                                    eventSummaryFunction = eventSummaryFunction))
         }
         
         d1 <- do.call(assessTemporalIndependence, args = args.assessTemporalIndependence)
 
 
-      # add potential new columns to global record.table
-        d2 <- addNewColumnsToGlobalTable (intable      = d1,
-                                          i            = i,
-                                          record.table = record.table)
+      # # add potential new columns to global record.table
+      #   d2 <- addNewColumnsToGlobalTable (intable      = d1,
+      #                                     i            = i,
+      #                                     record.table = record.table)
+      # 
+      # 
+      # # append table of station i's images metadata to global record table
+      #   record.table <- rbind(d2[[2]], d2[[1]])
+        
+        record.table.list[[i]] <- d1
 
-
-      # append table of station i's images metadata to global record table
-        record.table <- rbind(d2[[2]], d2[[1]])
-
-        suppressWarnings(rm(d1, d2))
+        suppressWarnings(rm(d1))
       }  # end      if(nrow(metadata.tmp) >= 1){} else {...}   # i.e. not all species were excluded
     }    # end      if(nrow(metadata.tmp) == 0){} else {...}   # i.e. directory i contained images
   }      # end      for(i in 1:length(dirs)){   # loop through station directories
 
+  
+  # combine all data frames from list into one data frame
+  record.table <- as.data.frame(rbindlist(record.table.list, fill = TRUE, use.names = TRUE))
   
   if(nrow(record.table) == 0){
     stop(paste("something went wrong. I looked through all those", length(dirs)  ,"folders and now your table is empty. Did you exclude too many species? Or were date/time information not readable?"), call. = FALSE)
@@ -272,7 +277,7 @@ recordTable <- function(inDir,
                                 record.table[,c("delta.time.secs", "delta.time.mins", "delta.time.hours", "delta.time.days",
                                                 "Directory", "FileName")])
 
-  metadata_columns <- which(colnames(record.table) %in% colnames(record.table2) == FALSE)
+  metadata_columns <- which(!colnames(record.table) %in% colnames(record.table2))
 
   # add metadata columns
   if(length(metadata_columns) >= 1){
@@ -314,12 +319,14 @@ recordTable <- function(inDir,
     colnames(record.table3)[ncol(record.table3)] <- metadata.tagname
   }
 
-  # convert to data.frame, in order to get all the column names right (: becomes .)
-  record.table3 <- as.data.frame(record.table3, stringsAsFactors = FALSE)
+  # convert to data.frame, in order to get all the column names right (: becomes .) 
+  # NOTE: doesn't work unless data.frame is called. : in column names means they must be adressed as e.g. record.table3$`IPTC:Keywords`
+  record.table3 <- data.frame(record.table3, stringsAsFactors = FALSE, check.names = TRUE)
   
   # save table
   if(writecsv == TRUE){
     outtable_filename <- paste("record_table_", minDeltaTime, "min_deltaT_", Sys.Date(), ".csv", sep = "")
+    message("saving csv to  ", file.path(inDir, outtable_filename))
     if(hasArg(outDir) == FALSE){
       setwd(inDir)
     } else {

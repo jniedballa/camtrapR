@@ -51,11 +51,6 @@ recordTableIndividual <- function(inDir,
     if(length(metadataIDTag) != 1) {stop("metadataIDTag must be of length 1")}
   }
 
-  if(hasArg(metadataIDTag)){
-    if(!is.character(metadataIDTag)){stop("metadataIDTag must be of class 'character'", call. = FALSE)}
-    if(length(metadataIDTag) != 1){stop("metadataIDTag must be of length 1", call. = FALSE)}
-  }
-
   multiple_tag_separator <- "_&_"
 
   if(hasArg(cameraID)){
@@ -120,8 +115,10 @@ recordTableIndividual <- function(inDir,
     dirs       <- inDir
     dirs_short <- inDir
   }
+  max_nchar_station <- max(nchar(dirs_short))
 
-  record.table <- data.frame(stringsAsFactors = FALSE)
+  #record.table <- data.frame(stringsAsFactors = FALSE)
+  record.table.list <- list()
 
     # create command line and execute exiftool
       if(hasArg(additionalMetadataTags)){
@@ -141,7 +138,10 @@ recordTableIndividual <- function(inDir,
     if(class(metadata.tmp) == "NULL"){            # omit station if no images found
 
       length.tmp <- length(list.files(dirs[i], pattern = ".jpg$|JPG$", ignore.case = TRUE, recursive = TRUE))
-      warning(paste(dirs_short[i], "contain no images;", " found", length.tmp, "JPEGs"), call. = FALSE, immediate. = TRUE)
+      
+      message(paste(formatC(dirs_short[i], width = max_nchar_station, flag = "-"),  ":  ",
+                    formatC(length.tmp, width = 5), " images      Skipping", sep = ""))
+      warning(paste(dirs_short[i],  ":  contains no images and was omitted"), call. = FALSE,  immediate. = FALSE)
 
     } else {
 
@@ -220,7 +220,8 @@ recordTableIndividual <- function(inDir,
                                                    speciesCol             = individualCol,    # meaning, there will be no duplicate records of the same individual at the same second and station
                                                    cameraCol              = cameraCol,
                                                    current                = i, 
-                                                   total                  = length(dirs))
+                                                   total                  = length(dirs),
+                                                   max_nchar_station      = max_nchar_station)
         
         # assess independence between records and calculate time differences (and possibly summarise a column)
         args.assessTemporalIndependence <- list(intable             = metadata.tmp2,
@@ -241,21 +242,27 @@ recordTableIndividual <- function(inDir,
         
         d1 <- do.call(assessTemporalIndependence, args = args.assessTemporalIndependence)
         
+        # save station table to list
+        record.table.list[[i]] <- d1
         
-       # add potential new columns to global record.table
-        d2 <- addNewColumnsToGlobalTable (intable      = d1,
-                                          i            = i,
-                                          record.table = record.table)
+       # # add potential new columns to global record.table
+       #  d2 <- addNewColumnsToGlobalTable (intable      = d1,
+       #                                    i            = i,
+       #                                    record.table = record.table)
+       # 
+       # 
+       # 
+       #  # append table of station i's images metadata to global record table
+       #  record.table <- rbind(d2[[2]], d2[[1]])
 
-
-
-        # append table of station i's images metadata to global record table
-        record.table <- rbind(d2[[2]], d2[[1]])
-
-        suppressWarnings(rm(d1, d2))
+        suppressWarnings(rm(d1))
       }
     }
   }       # end loop through station directories
+  
+  
+  # combine all data frames from list into one data frame
+  record.table <- as.data.frame(rbindlist(record.table.list, fill = TRUE, use.names = TRUE))
 
   if(nrow(record.table) == 0){
     stop(paste("something went wrong. I looked through all those", length(dirs)  ,"folders and now your table is empty"), call. = FALSE)
@@ -313,7 +320,7 @@ recordTableIndividual <- function(inDir,
   }
 
   # convert to data.frame, in order to get all the column names right (: becomes .)
-  record.table3 <- as.data.frame(record.table3, stringsAsFactors = FALSE)
+  record.table3 <- data.frame(record.table3, stringsAsFactors = FALSE, check.names = TRUE)
   
   # save table
   if(length(unique(record.table3[,speciesCol])) > 1){
