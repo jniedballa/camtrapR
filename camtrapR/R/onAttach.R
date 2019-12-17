@@ -30,8 +30,8 @@
   # Use packageStartUpMessages() so that folks can suppress package messages with 
   # suppressPackageStartupMessages(library(pkg))
   
-  if(exists("d"))  packageStartupMessage('This is camtrapR version: ', local_version$Version, ' (', d,')')  # built on ', local_version$Date)
-  if(exists("d2")) packageStartupMessage('This is camtrapR version: ', local_version$Version, '    (', d2,')')  # built on ', local_version$Date)
+  if(exists("d"))  packageStartupMessage('This is camtrapR ', local_version$Version, ' (', d,')')  # built on ', local_version$Date)
+  if(exists("d2")) packageStartupMessage('This is camtrapR ', local_version$Version, '    (', d2,')')  # built on ', local_version$Date)
   
   
   if(latest_version == 1){
