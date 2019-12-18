@@ -188,7 +188,7 @@ rec_table3b <- recordTable(inDir              = wd_images_ID_species,
 )
 
 
-anyDuplicated(rec_tablea[, c("Station", "Species", "DateTimeOriginal")])    # got duplicates
+anyDuplicated(rec_table3a[, c("Station", "Species", "DateTimeOriginal")])   # got duplicates
 anyDuplicated(rec_table3b[, c("Station", "Species", "DateTimeOriginal")])   # no duplicates
 
 # after removing duplicates, both are identical:

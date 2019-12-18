@@ -305,9 +305,9 @@ recordTableIndividual <- function(inDir,
     whichAdditionalMetadataTagsFound <- which(additionalMetadataTags %in% colnames(record.table3))
   if(length(whichAdditionalMetadataTagsFound) < length(additionalMetadataTags)){
       if(length(whichAdditionalMetadataTagsFound) == 0) {  # if none of the additionalMetadataTags was found
-        warning(paste("metadata tag(s)  not found in image metadata:  ", paste(additionalMetadataTags, collapse = ", ")), call. = FALSE)
+        warning("metadata tag(s)  not found in image metadata:  ", paste(additionalMetadataTags, collapse = ", "), call. = FALSE)
         } else {                                                            # if only some of the additionalMetadataTags was found
-        warning(paste("metadata tag(s)  not found in image metadata:  ", paste(additionalMetadataTags[-whichAdditionalMetadataTagsFound], collapse = ", ")), call. = FALSE)
+        warning("metadata tag(s)  not found in image metadata:  ", paste(additionalMetadataTags[-whichAdditionalMetadataTagsFound], collapse = ", "), call. = FALSE)
       }
     }
   }
