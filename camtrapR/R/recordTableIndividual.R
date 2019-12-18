@@ -23,7 +23,7 @@ recordTableIndividual <- function(inDir,
   on.exit(setwd(wd0))
 
   if(!hasArg(stationCol)) stationCol <- "Station"
-  stopifnot(is.character(stationCol))
+  if(!is.character(stationCol))     stop("stationCol must be of class 'character'", call. = FALSE)
   individualCol <- "Individual"
   speciesCol    <- "Species"
 
@@ -37,6 +37,7 @@ recordTableIndividual <- function(inDir,
   if(!is.element(timeZone , OlsonNames())){
     stop("timeZone must be an element of OlsonNames()", call. = FALSE)
   }
+  
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
 
   if(!is.logical(hasStationFolders))    stop("hasStationFolders must be of class 'logical'", call. = FALSE)
@@ -44,32 +45,33 @@ recordTableIndividual <- function(inDir,
   IDfrom <- match.arg(IDfrom, choices = c("metadata", "directory") )
             
  if(IDfrom == "metadata"){
-    if(metadataHierarchyDelimitor %in% c("|", ":") == FALSE) stop("'metadataHierarchyDelimitor' must be '|' or ':'")
-
-    if(!hasArg(metadataIDTag)) {stop("'metadataIDTag' must be defined if IDfrom = 'metadata'")}
-    if(!is.character(metadataIDTag)) {stop("metadataIDTag must be of class 'character'")}
-    if(length(metadataIDTag) != 1) {stop("metadataIDTag must be of length 1")}
+   metadataHierarchyDelimitor <- match.arg(metadataHierarchyDelimitor, choices = c("|", ":"))
+    if(!hasArg(metadataIDTag))       stop('"metadataIDTag" must be defined if IDfrom = "metadata"')
+    if(!is.character(metadataIDTag)) stop("metadataIDTag must be of class 'character'")
+    if(length(metadataIDTag) != 1)   stop("metadataIDTag must be of length 1")
   }
 
   multiple_tag_separator <- "_&_"
 
   if(hasArg(cameraID)){
-    if(!is.character(cameraID)){stop("cameraID must be of class 'character'", call. = FALSE)}
-    if(cameraID %in% c("filename") == FALSE) {stop("cameraID can only be 'filename' or missing", call. = FALSE)}
-    if(!hasArg(camerasIndependent)){stop("camerasIndependent is not defined. It must be defined if cameraID is defined", call. = FALSE)}
-    if(!is.logical(camerasIndependent)){stop("camerasIndependent must be of class 'logical'", call. = FALSE)}
-  } else {camerasIndependent <- FALSE}
+    if(!is.character(cameraID))              stop("cameraID must be of class 'character'", call. = FALSE)
+    if(cameraID %in% c("filename") == FALSE) stop("cameraID can only be 'filename' or missing", call. = FALSE)
+    if(!hasArg(camerasIndependent))          stop("camerasIndependent is not defined. It must be defined if cameraID is defined", call. = FALSE)
+    if(!is.logical(camerasIndependent))      stop("camerasIndependent must be of class 'logical'", call. = FALSE)
+  } else {
+    camerasIndependent <- FALSE
+    }
 
   cameraCol <- "Camera"
 
 
   if(hasArg(outDir)){
-    if(!is.character(outDir)){stop("outDir must be of class 'character'", call. = FALSE)}
-    if(file.exists(outDir) == FALSE) stop("outDir does not exist", call. = FALSE)
+    if(!is.character(outDir))        stop("outDir must be of class 'character'", call. = FALSE)
+    if(isFALSE(file.exists(outDir))) stop("outDir does not exist", call. = FALSE)
   }
 
   if(hasArg(additionalMetadataTags)){
-    if(!is.character(additionalMetadataTags)){stop("additionalMetadataTags must be of class 'character'", call. = FALSE)}
+    if(!is.character(additionalMetadataTags)) stop("additionalMetadataTags must be of class 'character'", call. = FALSE)
     if(any(grep(pattern = " ", x = additionalMetadataTags, fixed = TRUE))) stop("In argument additionalMetadataTags, spaces are not allowed")
     if("HierarchicalSubject" %in% additionalMetadataTags & IDfrom == "metadata")  {
       warning("'HierarchicalSubject' may not be in 'additionalMetadataTags' if IDfrom = 'metadata'. It will be ignored because the function returns it anyway.", call. = FALSE)
@@ -93,7 +95,8 @@ recordTableIndividual <- function(inDir,
     deltaTimeComparedTo < match.arg(deltaTimeComparedTo, choices = c("lastRecord", "lastIndependentRecord"))
     if(!hasArg(deltaTimeComparedTo)) stop(paste("minDeltaTime is not 0. deltaTimeComparedTo must be defined"), call. = FALSE)
   } else {
-    if(hasArg(deltaTimeComparedTo)) {warning(paste("minDeltaTime is 0. deltaTimeComparedTo = '", deltaTimeComparedTo, "' will have no effect", sep = ""), call. = FALSE, immediate. = TRUE)
+    if(hasArg(deltaTimeComparedTo)) {
+      warning(paste("minDeltaTime is 0. deltaTimeComparedTo = '", deltaTimeComparedTo, "' will have no effect", sep = ""), call. = FALSE, immediate. = TRUE)
     } else {
       deltaTimeComparedTo <- "lastRecord"
     }
@@ -101,9 +104,9 @@ recordTableIndividual <- function(inDir,
 
   stopifnot(is.logical(writecsv))
 
-  if(!is.character(inDir) ){stop("inDir must be of class 'character'", call. = FALSE)}
-  if(length(inDir) != 1){stop("inDir may only consist of 1 element only", call. = FALSE)}
-  if(!dir.exists(inDir)) stop("Could not find inDir:\n", inDir, call. = FALSE)
+  if(!is.character(inDir))  stop("inDir must be of class 'character'", call. = FALSE)
+  if(length(inDir) != 1)    stop("inDir may only consist of 1 element only", call. = FALSE)
+  if(!dir.exists(inDir))    stop("Could not find inDir:\n", inDir, call. = FALSE)
 
 
   # find image directories
@@ -117,7 +120,6 @@ recordTableIndividual <- function(inDir,
   }
   max_nchar_station <- max(nchar(dirs_short))
 
-  #record.table <- data.frame(stringsAsFactors = FALSE)
   record.table.list <- list()
 
     # create command line and execute exiftool

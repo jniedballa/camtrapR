@@ -23,18 +23,16 @@ recordTable <- function(inDir,
   on.exit(setwd(wd0))
 
   if(!hasArg(stationCol)) stationCol <- "Station"
-  stopifnot(is.character(stationCol))
+  if(!is.character(stationCol)) stop("stationCol must be of class 'character'")
+  checkForSpacesInColumnNames(stationCol = stationCol)
+  
   speciesCol <- "Species"
 
-  checkForSpacesInColumnNames(stationCol = stationCol)
-
-  if(!is.character(IDfrom)){stop("IDfrom must be of class 'character'")}
+  if(!is.character(IDfrom)) stop("IDfrom must be of class 'character'")
   IDfrom <- match.arg(IDfrom, choices = c("metadata", "directory"))  
-  # if(IDfrom %in% c("metadata", "directory") == FALSE) stop("'IDfrom' must be 'metadata' or 'directory'")
 
  if(IDfrom == "metadata"){
-    if(metadataHierarchyDelimitor %in% c("|", ":") == FALSE) stop("'metadataHierarchyDelimitor' must be '|' or ':'")
-
+    metadataHierarchyDelimitor <- match.arg(metadataHierarchyDelimitor, choices = c("|", ":"))
     if(!hasArg(metadataSpeciesTag))       stop("'metadataSpeciesTag' must be defined if IDfrom = 'metadata'")
     if(!is.character(metadataSpeciesTag)) stop("metadataSpeciesTag must be of class 'character'")
     if(length(metadataSpeciesTag) != 1)   stop("metadataSpeciesTag must be of length 1")
@@ -53,22 +51,24 @@ recordTable <- function(inDir,
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
 
   if(hasArg(cameraID)){
-    if(is.character(cameraID)){stop("cameraID must be of class 'character'", call. = FALSE)}
-    if(cameraID %in% c("filename", "directory") == FALSE) {stop("cameraID can only be 'filename', 'directory', or missing", call. = FALSE)}
-    if(!hasArg(camerasIndependent)){stop("camerasIndependent is not defined. It must be defined if cameraID is defined", call. = FALSE)}
-    if(is.logical(camerasIndependent)){stop("camerasIndependent must be of class 'logical'", call. = FALSE)}
-  } else { camerasIndependent <- FALSE}
+    if(!is.character(cameraID))         stop("cameraID must be of class 'character'", call. = FALSE)
+    cameraID <- match.arg(cameraID, choices = c("filename", "directory"))
+    if(!hasArg(camerasIndependent))     stop("camerasIndependent is not defined. It must be defined if cameraID is defined", call. = FALSE)
+    if(!is.logical(camerasIndependent)) stop("camerasIndependent must be of class 'logical'", call. = FALSE)
+  } else { 
+    camerasIndependent <- FALSE
+  }
 
   cameraCol <- "Camera"
 
 
   if(hasArg(outDir)){
-    if(!is.character(outDir)){stop("outDir must be of class 'character'", call. = FALSE)}
-    if(file.exists(outDir) == FALSE) stop("outDir does not exist", call. = FALSE)
+    if(!is.character(outDir))         stop("outDir must be of class 'character'", call. = FALSE)
+    if(isFALSE(file.exists(outDir)))  stop("outDir does not exist", call. = FALSE)
   }
 
   if(hasArg(exclude)){
-    if(!is.character(exclude)){stop("exclude must be of class 'character'", call. = FALSE)}
+    if(!is.character(exclude)) stop("exclude must be of class 'character'", call. = FALSE)
   }
 
   stopifnot(is.logical(removeDuplicateRecords))
@@ -78,7 +78,7 @@ recordTable <- function(inDir,
   metadata.tagname <- "HierarchicalSubject"    # for extracting metadata assigned in tagging software
 
   if(hasArg(additionalMetadataTags)){
-    if(!is.character(additionalMetadataTags)){stop("additionalMetadataTags must be of class 'character'", call. = FALSE)}
+    if(!is.character(additionalMetadataTags)) stop("additionalMetadataTags must be of class 'character'", call. = FALSE)
     if(any(grep(pattern = " ", x = additionalMetadataTags, fixed = TRUE))) stop("In argument additionalMetadataTags, spaces are not allowed")
     if("HierarchicalSubject" %in% additionalMetadataTags & IDfrom == "metadata")  {
       message("'HierarchicalSubject' may not be in 'additionalMetadataTags' if IDfrom = 'metadata'. It will be ignored because the function returns it anyway.", call. = FALSE)
@@ -90,19 +90,22 @@ recordTable <- function(inDir,
   stopifnot(is.integer(minDeltaTime))
 
   if(minDeltaTime != 0){
-    if(removeDuplicateRecords == FALSE){
+    if(isFALSE(removeDuplicateRecords)){
       warning("minDeltaTime is > 0. Therefore, removeDuplicateRecords was set to TRUE (otherwise there may be records taken at the same time)", call. = FALSE, immediate. = TRUE)
       removeDuplicateRecords <- TRUE
     }
     
     deltaTimeComparedTo < match.arg(deltaTimeComparedTo, choices = c("lastRecord", "lastIndependentRecord"))
-
-    if(!hasArg(deltaTimeComparedTo)) stop(paste("minDeltaTime is not 0. deltaTimeComparedTo must be defined"), call. = FALSE)
+    
+    if(!hasArg(deltaTimeComparedTo)) {
+      stop(paste("minDeltaTime is not 0. deltaTimeComparedTo must be defined"), call. = FALSE)
+    }
   } else {
-    if(hasArg(deltaTimeComparedTo)) {warning(paste("minDeltaTime is 0. deltaTimeComparedTo = '", deltaTimeComparedTo, "' will have no effect", sep = ""), call. = FALSE, immediate. = TRUE)
+    if(hasArg(deltaTimeComparedTo)) {
+      warning(paste("minDeltaTime is 0. deltaTimeComparedTo = '", deltaTimeComparedTo, "' will have no effect", sep = ""), call. = FALSE, immediate. = TRUE)
     } else {
       deltaTimeComparedTo <- "lastRecord"
-      }
+    }
   }
 
 
@@ -113,15 +116,15 @@ recordTable <- function(inDir,
   if(!dir.exists(inDir))     stop("Could not find inDir:\n", inDir, call. = FALSE)
 
   if(hasArg(eventSummaryColumn)) {
-    stopifnot(is.character(eventSummaryColumn))
-    stopifnot(is.character(eventSummaryFunction))
+    if(!is.character(eventSummaryColumn))     stop("eventSummaryColumn must be of class 'character'", call. = FALSE)
+    if(!is.character(eventSummaryFunction))   stop("eventSummaryFunction must be of class 'character'", call. = FALSE)
   }
 
   # find image directories
-  dirs <- list.dirs(inDir, full.names = TRUE, recursive = FALSE)
+  dirs       <- list.dirs(inDir, full.names = TRUE, recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
+  
   max_nchar_station <- max(nchar(dirs_short))
-  #record.table <- data.frame(stringsAsFactors = FALSE)
   record.table.list <- list()
 
    # create command line
