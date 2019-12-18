@@ -1,3 +1,29 @@
+Changes in camtrapR 1.2.2 (2019-12-18)
+======================================
+
+bugfixes
+------------
+  o recordTable: fixed error: cameraID must be of class 'character' when it is character
+
+  
+Changes in camtrapR 1.2.1 (2019-12-17)
+======================================
+
+bugfixes
+------------
+  o recordTable: fixed error: metadataSpeciesTag must be of class 'character' when it is character and IDfrom = "metadata"
+  o recordTable: fixed: 'Error in `[.data.frame`(intable, , match(colnames(record.table), colnames(intable))) :
+  undefined columns selected' (when additionalMetadataTags are defined)
+  
+  new features
+------------
+  o multi-season sample data sets: camtrapsMultiSeason, recordTableSampleMultiSeason, recordTableIndividualSampleMultiSeason
+  
+other changes
+------------
+  o package "data.table" is a dependency now (for more reliable assembly of record table when additionalMetadataTags are defined, see bugfixes)
+
+
 Changes in camtrapR 1.2 (2019-12-04)
 ======================================
 
@@ -18,7 +44,6 @@ new features
   o progress bar in console for all functions that extract image metadata
   o exifTagNames: more flexible, users can define subdirectories by name and give desired file names
   
-
 other changes
 ------------
   o detectionHistory / spatialDetectionHistory: improved error message if date/time values are not readable (correct row in original recordTable is returned)
