@@ -53,7 +53,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
   stopifnot(c(speciesCol, recordDateTimeCol, stationCol, individualCol) %in% colnames(recordTableIndividual))
 
   checkForSpacesInColumnNames(stationCol = stationCol, Xcol = Xcol, Ycol = Ycol, 
-                                         recordDateTimeCol = recordDateTimeCol, speciesCol = speciesCol, individualCol)
+                                         recordDateTimeCol = recordDateTimeCol, speciesCol = speciesCol, individualCol = individualCol)
   if(!inherits(CTtable, "data.frame"))     stop("CTtable must be a data.frame", call. = FALSE)
   if(!stationCol %in% colnames(CTtable))   stop(paste('stationCol = "',   stationCol,  '" is not a column name in CTtable', sep = ''), call. = FALSE)
   if(!Xcol %in% colnames(CTtable))         stop(paste('Xcol = "',   Xcol,  '" is not a column name in CTtable', sep = ''), call. = FALSE)

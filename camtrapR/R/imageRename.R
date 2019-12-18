@@ -18,6 +18,7 @@ imageRename <- function(inDir,
   stopifnot(is.logical(copyImages))
   stopifnot(is.logical(writecsv))
   stopifnot(is.logical(hasCameraFolders))
+  stopifnot(is.logical(createEmptyDirectories))
   
   if(isTRUE(hasCameraFolders)){
     stopifnot(hasArg(keepCameraSubfolders))
@@ -63,7 +64,7 @@ imageRename <- function(inDir,
   }
   
   # remove dirs and dirs_short if they contain no images (and if user overrides default createEmptyDirectories = FALSE)
-  if(!isTRUE(createEmptyDirectories)){
+  if(isFALSE(createEmptyDirectories)){
     stations2remove  <- which(lapply(list_n_files, length) == 0)
     if(length(stations2remove) >= 1){
       dirs          <- dirs[-stations2remove]
@@ -204,7 +205,7 @@ imageRename <- function(inDir,
   # create directory structure in outDir
   if(isTRUE(copyImages)){
     
-    if(!isTRUE(keepCameraSubfolders))   dir2create <- file.path (outDir, dirs_short)    # outDir with station subdirectories
+    if(isFALSE(keepCameraSubfolders))   dir2create <- file.path (outDir, dirs_short)    # outDir with station subdirectories
     
     if(isTRUE(keepCameraSubfolders)) {
       # create list of directories to create

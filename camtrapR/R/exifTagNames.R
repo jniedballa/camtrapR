@@ -45,7 +45,7 @@ exifTagNames <- function(inDir,
   if(!returnMetadata)  message(paste("Metadata of:", file.tmp, sep = "\n"))
   if(returnMetadata)  message(paste("Metadata values of:", file.tmp, sep = "\n"))
   
-  if(!isTRUE(returnMetadata)){
+  if(isFALSE(returnMetadata)){
     command.tmp  <- paste('exiftool -csv', ifelse(returnTagGroup, ' -G',  ''), ' "', file.tmp, '"', sep = "")
     metadata.tmp <- system(command.tmp, intern=TRUE)
     tagnames     <- sort(unlist(strsplit(metadata.tmp[[1]], split = ",")))

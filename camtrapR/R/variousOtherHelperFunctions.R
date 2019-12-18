@@ -489,7 +489,7 @@ assessTemporalIndependence <- function(intable,
       which_records_to_group <- which(intable[, columnOfInterest]       == intable[current_row, columnOfInterest] &   # same species
                                         intable[, stationCol]           == intable[current_row, stationCol]  &        # same station
                                         intable$DateTimeOriginal        >= intable$DateTimeOriginal[current_row] &
-                                        !isTRUE(intable$independent))                                        # not independent
+                                        isFALSE(intable$independent))                                        # not independent
     }
     
     # subset to records before the next independent record

@@ -11,7 +11,7 @@ addCopyrightTag <- function(inDir,
 
   stopifnot(is.logical(keepJPG_original))
 
-  if(!isTRUE(keepJPG_original)) {
+  if(isFALSE(keepJPG_original)) {
     overwrite_command <- " -overwrite_original "
   } else {overwrite_command <- " "}
 

@@ -98,7 +98,7 @@ getSpeciesImages <- function(species,
         copy.table.tmp$FilenameOrig <- files.tmp.short
 
         if(isTRUE(createStationSubfolders))  copy.table.tmp$DirectoryCopy <- file.path(dirs.out0, unlist(strsplit(dir.list.short2[i], split = file.sep))[1])
-        if(!isTRUE(createStationSubfolders)) copy.table.tmp$DirectoryCopy <- dirs.out0
+        if(isFALSE(createStationSubfolders)) copy.table.tmp$DirectoryCopy <- dirs.out0
         copy.table.tmp$FilenameCopy <- files.tmp.short
 
         copy.table <- rbind(copy.table, copy.table.tmp)
@@ -153,7 +153,7 @@ getSpeciesImages <- function(species,
                                          FilenameCopy  = metadata.tmp$FileName)
 
             if(isTRUE(createStationSubfolders))  copy.table.tmp$DirectoryCopy <- file.path(dirs.out0, dirs_short[i])
-            if(!isTRUE(createStationSubfolders)) copy.table.tmp$DirectoryCopy <- dirs.out0
+            if(isFALSE(createStationSubfolders)) copy.table.tmp$DirectoryCopy <- dirs.out0
 
             copy.table <- rbind(copy.table, copy.table.tmp)
           }
@@ -173,7 +173,7 @@ getSpeciesImages <- function(species,
     species_subset <- recordTable[recordTable[,speciesCol] == species,]
 
     if(isTRUE(createStationSubfolders))  DirectoryCopy.tmp <- file.path(dirs.out0, species_subset[,stationCol])
-    if(!isTRUE(createStationSubfolders)) DirectoryCopy.tmp <- dirs.out0
+    if(isFALSE(createStationSubfolders)) DirectoryCopy.tmp <- dirs.out0
 
     # fill copy.table
     copy.table <- data.frame(DirectoryOrig = species_subset$Directory,
