@@ -1,10 +1,15 @@
-Changes in camtrapR 1.2.2 (2019-12-18)
+Changes in camtrapR 1.2.2 (2020-01-07)
 ======================================
 
 bugfixes
 ------------
   o recordTable: fixed error: cameraID must be of class 'character' when it is character
+  o recordTable: fixed error: metadataSpeciesTag must be of class 'character' when it is character
 
+other changes
+------------
+  o cameraOperation: warning if date can be interpreted but is likely wrong (due to incorrectly set dateFormat argument)
+  
   
 Changes in camtrapR 1.2.1 (2019-12-17)
 ======================================
