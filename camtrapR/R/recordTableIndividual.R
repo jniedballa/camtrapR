@@ -235,8 +235,8 @@ recordTableIndividual <- function(inDir,
                                                 stationCol          = stationCol)
         
         if(hasArg(eventSummaryColumn)) {
-          stopifnot(is.character(eventSummaryColumn))
-          stopifnot(is.character(eventSummaryFunction))
+          if(!is.character(eventSummaryColumn))     stop("eventSummaryColumn must be of class 'character'", call. = FALSE)
+          if(!is.character(eventSummaryFunction))   stop("eventSummaryFunction must be of class 'character'", call. = FALSE)
           args.assessTemporalIndependence <- c(args.assessTemporalIndependence,
                                                eventSummaryColumn   = eventSummaryColumn,
                                                eventSummaryFunction = eventSummaryFunction)

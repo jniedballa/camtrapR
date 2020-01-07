@@ -1321,7 +1321,8 @@ dataFrameTibbleCheck <- function(df,
     if(data.table::is.data.table(df)) {
       if(data_table_allowed) {
         message (paste(substitute(df), "was converted from data.table to data.frame"), call. = FALSE)
-        df <- as.data.frame(df)
+        #df <- as.data.frame(df)
+        df <- setDF(df)
       } else {
         stop (paste(substitute(df), "is a data.table Please provide a data.frame instead (use read.csv() or as.data.frame())"), call. = FALSE)
       }
