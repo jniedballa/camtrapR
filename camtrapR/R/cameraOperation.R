@@ -103,6 +103,16 @@ cameraOperation <- function(CTtable,
   CTtable[,setupCol]     <- parseDateObject(inputColumn = CTtable[,setupCol],     dateFormat, checkNA = TRUE, checkEmpty = TRUE)
   CTtable[,retrievalCol] <- parseDateObject(inputColumn = CTtable[,retrievalCol], dateFormat, checkNA = TRUE, checkEmpty = TRUE)
   
+  
+  # check if dates make sense
+  if(any(CTtable[,setupCol]     < as.Date("1970-01-01"))) warning("setup dates begin before 1970. If this is not intended please check dateFormat", call. = FALSE)
+  if(any(CTtable[,retrievalCol] < as.Date("1970-01-01"))) warning("retrieval dates are before 1970. If this is not intended please check dateFormat", call. = FALSE)
+  
+  if(any(CTtable[,setupCol]     > Sys.Date())) warning("setup date is in the future. If this is not intended please check dateFormat", call. = FALSE)
+  if(any(CTtable[,retrievalCol] > Sys.Date())) warning("retrieval date is in the future. If this is not intended please check dateFormat", call. = FALSE)
+  
+  
+  
   if(any(CTtable[,setupCol] > CTtable[,retrievalCol])){
     stop(paste("Setup Date after Retrieval Date:   "),
          paste(CTtable[which(CTtable[,setupCol] > CTtable[,retrievalCol]), stationCol],
