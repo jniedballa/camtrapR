@@ -52,7 +52,8 @@ timeShiftImages <- function(inDir,
   }
 
   if(any(file.exists(shift.dirs) == FALSE)){
-    stop(paste(shift.dirs[file.exists(shift.dirs) == FALSE], "does not exist"))
+    stop(paste("Station directory does not exist:\n", 
+               paste(shift.dirs[file.exists(shift.dirs) == FALSE], collapse = "\n"), sep = ""), call. = FALSE)
   }
 
   if(isTRUE(undo)){
