@@ -64,12 +64,13 @@ Juergen Niedballa
 
 \examples{
 
+
+  \dontrun{
+  
 ### "trial" run. create a table with file names after renaming, but don't copy images.
 
 # first, find sample image directory in package directory:
 wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")
-
-if (Sys.which("exiftool") != ""){        # only run this example if ExifTool is available
 
 # because copyImages = FALSE, outDir does not need to be defined
 renaming.table <- imageRename(inDir               = wd_images_raw,     
@@ -77,32 +78,31 @@ renaming.table <- imageRename(inDir               = wd_images_raw,
                               copyImages          = FALSE,
                               writecsv            = FALSE
   )
-  } else {
-  message("ExifTool is not available. Cannot test function")
-  }
-  
-  \dontrun{
-  
-  # define image directories
 
-  # raw image location
-wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")      
-  # destination for renamed images
+
+  
+### a real example in which images are copied and renamed 
+
+  # define raw image location
+wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR") 
+
+  # define destination for renamed images
 wd_images_raw_renamed <- file.path(tempdir(), "raw_images_renamed")       
 
 
-  if (Sys.which("exiftool") != ""){        # only run this example if ExifTool is available
-  
-  # now we have to set outDir because copyImages = TRUE
+  # now we have to define outDir because copyImages = TRUE
 renaming.table2 <- imageRename(inDir               = wd_images_raw,
                                outDir              = wd_images_raw_renamed,       
                                hasCameraFolders    = FALSE,
                                copyImages          = TRUE,
                                writecsv            = FALSE
   )
-  }
   
+  # show output files
   list.files(wd_images_raw_renamed, recursive = TRUE)
+  
+  # output table
+  renaming.table2
   
   }
 }
