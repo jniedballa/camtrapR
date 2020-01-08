@@ -11,7 +11,7 @@ checkSpeciesNames <- function(speciesNames,
     stop("Please install the package ritis to run this function")
   }
   # check input
-  if(searchtype  %in% c("scientific", "common") == FALSE) stop ("'searchtype' must be 'scientific' or 'common'")
+  searchtype <- match.arg(searchtype, choices =  c("scientific", "common"))
   stopifnot(is.logical(accepted))
   stopifnot(is.character(speciesNames) | is.factor(speciesNames))
   speciesNames <- unique(as.character(speciesNames))
@@ -19,11 +19,30 @@ checkSpeciesNames <- function(speciesNames,
   file.sep <- .Platform$file.sep
 
   # query ITIS TSN (taxnonomic serial number)
-  tsns <- taxize::get_tsn(searchterm = speciesNames,
-                  searchtype = searchtype,
-                  verbose    = FALSE,
-                  accepted   = accepted,
-                  ask        = ask)
+  tsns <- try(
+    taxize::get_tsn(searchterm = speciesNames,
+                    searchtype = searchtype,
+                    accepted   = accepted,
+                    ask        = ask,
+                    messages   = FALSE)
+  )
+  
+  # # NOTE: possible alternative
+  # if(searchtype == "common") {
+  #   search_common(speciesNames)
+  # }
+  # if(searchtype == "scientific") {
+  #   search_common(search_scientific)
+  # }
+  
+  
+  # if try returned an error, end function
+  if(inherits(tsns, "try-error")) {
+    message(paste("error in get_tsn. Exiting without results:\n", 
+                  tsns, sep = ""))
+    return(invisible(NULL))
+  }
+  
 
   tsns <- taxize::as.tsn(unique(tsns), check = FALSE)    # remove duplicates
 
