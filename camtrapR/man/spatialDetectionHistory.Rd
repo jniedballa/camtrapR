@@ -5,7 +5,7 @@
 Generate a \code{capthist} object for spatial capture-recapture analyses from camera-trapping data
 }
 \description{
-This function generates spatial detection histories of individuals of a species for spatial capture-recapture analyses with package \code{\link[secr]{secr}}. Data are stored in a \code{\link[secr]{capthist}} object. The \code{\link[secr]{capthist}} object contains detection histories, camera-trap station location and possibly individual and station-level covariates. Detection histories can have adjustable occasion length and occasion start time (as in the function \code{\link{detectionHistory}}).
+This function generates spatial detection histories of individuals of a species for spatial capture-recapture analyses with package \code{\link[secr:secr-package]{secr}}. Data are stored in a \code{\link[secr]{capthist}} object. The \code{\link[secr]{capthist}} object contains detection histories, camera-trap station location and possibly individual and station-level covariates. Detection histories can have adjustable occasion length and occasion start time (as in the function \code{\link{detectionHistory}}).
 }
 \usage{
 spatialDetectionHistory(recordTableIndividual,
@@ -111,7 +111,7 @@ spatialDetectionHistory(recordTableIndividual,
   logical. Should effort be binary (1 if >1 active day per occasion, 0 otherwise)?
 }
   \item{timeZone}{
-  character. Must be a value returned by \code{\link[base]{OlsonNames}}
+  character. Must be a value returned by \code{\link[base:timezones]{OlsonNames}}
 }
  \item{makeRMarkInput}{
   logical. If \code{FALSE}, output will be a data frame for RMark. If \code{FALSE} or not specified, a secr \code{\link[secr]{capthist}} object

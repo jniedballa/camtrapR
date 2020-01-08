@@ -47,17 +47,14 @@ Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ } \cr
 \author{
 Juergen Niedballa
 }
-% \note{
-%  ~~further notes~~
-% }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{recordTable}}
 }
 \examples{
-if (Sys.which("exiftool") != ""){        # only run this example if ExifTool is available
+
+\dontrun{
+
 wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
 
 # return tag names only
@@ -67,11 +64,6 @@ exifTagNames(inDir          = wd_images_ID)
 exifTagNames(inDir          = wd_images_ID,
              returnMetadata = TRUE)
 
-}
-# alternative ways of specifying directories and filenames
-\dontrun{
-
-if (Sys.which("exiftool") != ""){        # only run this example if ExifTool is available
 
 # specify directory by name
 exifTagNames(inDir          = wd_images_ID,
@@ -93,7 +85,6 @@ exifTagNames(fileName       = file.path(wd_images_ID, "StationC", "TRA",
                                         "StationC__2009-05-02__00-10-00(1).JPG"),
              returnMetadata = TRUE)
              
-}
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

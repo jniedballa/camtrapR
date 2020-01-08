@@ -52,7 +52,7 @@ recordTableIndividual(inDir,
   character. For two records to be considered independent, must the second one be at least \code{minDeltaTime} minutes after the last independent record of the same individual (\code{"lastIndependentRecord"}), or \code{minDeltaTime} minutes after the last record (\code{"lastRecord"})?
 }
   \item{timeZone}{
-  character. Must be a value returned by \code{\link[base]{OlsonNames}}
+  character. Must be a value returned by \code{\link[base:timezones]{OlsonNames}}
 }
   \item{stationCol}{
   character. Name of the camera trap station column in the output table.

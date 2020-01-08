@@ -104,8 +104,9 @@ detectionMaps(CTtable,
  \details{
 The column name \code{stationCol} must be identical in \code{CTtable} and \code{recordTable} and station IDs must match.
 
-Shapefile creation depends on the packages \pkg{sp} and \pkg{rgdal}. \code{shapefileProjection} must be a valid argument of \code{\link[sp]{CRS}}. If \code{shapefileProjection} is undefined, the resulting shapefile will lack a coordinate reference system.
+Shapefile creation depends on the packages \pkg{sp} and \pkg{rgdal}. Argument \code{shapefileProjection} must be a valid argument of \code{\link[sp:CRS-class]{CRS}}. If \code{shapefileProjection} is undefined, the resulting shapefile will lack a coordinate reference system.
  }
+ 
 \value{
 An invisible \code{data.frame} with station coordinates, numbers of events by species at each station and total species number by station. In addition and optionally, R graphics or png image files.
 }
@@ -173,7 +174,7 @@ Mapstest2 <- detectionMaps(CTtable           = camtraps,
 }
 
 \references{
-A great resource for \code{\link[sp]{CRS}} arguments is \url{http://spatialreference.org/}. Use the Proj4 string as \code{shapefileProjection} argument.
+A great resource for \code{\link[sp:CRS-class]{CRS}} arguments is \url{http://spatialreference.org/}. Use the Proj4 string as \code{shapefileProjection} argument.
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

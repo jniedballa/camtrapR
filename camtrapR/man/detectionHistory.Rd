@@ -5,7 +5,7 @@
 Species detection histories for occupancy analyses
 }
 \description{
-This function generates species detection histories that can be used in occupancy analyses, e.g. with package \code{\link[unmarked]{unmarked}}. It generates detection histories in different formats, with adjustable occasion length and occasion start time.
+This function generates species detection histories that can be used in occupancy analyses, e.g. with package \link[unmarked:unmarked-package]{unmarked}. It generates detection histories in different formats, with adjustable occasion length and occasion start time.
 }
 \usage{
 detectionHistory(recordTable,
@@ -85,7 +85,7 @@ detectionHistory(recordTable,
   If \code{day1 = "survey"}, occasion names in the detection history will be composed of first and last day of that occasion.
 }
   \item{timeZone}{
-  character. Must be a value returned by \code{\link[base]{OlsonNames}}
+  character. Must be a value returned by \code{\link[base:timezones]{OlsonNames}}
 }
   \item{writecsv}{
   logical. Should the detection history be saved as a .csv?
