@@ -175,34 +175,79 @@ Double observer identification is only available with metadata tagging, not with
 
 Generally, you are free to use any species names you wish to - scientific names, common names, local names, abbreviations, codes, etc. But it may often be desirable to be consistent with species names, e.g. to ensure long-term usability of data or to facilitate data exchange between researchers. Therefore, users can check the species names they wish to use in species identification (common or scientific names) against the [ITIS taxonomic database](http://www.itis.gov) using the function `checkSpeciesNames`. The function returns matching common and scientific names to the names provided by the user, taxon ranks and authors, the ITIS taxonomic serial number (TSN) and an ITIS taxon url. Internally, the function `checkSpeciesNames` makes use of the R package `taxize`.
 
-If multiple matches are found, a menu allows users to choose their species of interest (if argument `ask = TRUE`).  By default, only accepted species names are returned (controlled by argument `accepted`). Invalid names will return no matches but NA.
+If multiple matches are found, a menu allows users to choose their species of interest (if argument `ask = TRUE`).  By default, only accepted species names are returned (controlled by argument `accepted`). Invalid names will return NA.
 
 
-```{r}
+```{r eval = FALSE}
 
 # find data for 2 species with correctly spelled names
 checkNames1 <- checkSpeciesNames (speciesNames = c("Bearded Pig", "Malayan Civet"),
                                   searchtype   = "common")
 checkNames1
+```
 
+```{r echo = FALSE}
+
+structure(list(tsn = c(625012, 622004), user_name = structure(1:2, .Label = c("Bearded Pig", 
+"Malayan Civet"), class = "factor"), scientificName = c("Sus barbatus", 
+"Viverra tangalunga"), commonName = c("bearded pig/Bearded Pig", 
+"Malayan Civet"), authorship = c("Müller, 1838", "Gray, 1832"
+), rankname = c("Species", "Species"), itis_url = c("https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=625012", 
+"https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=622004"
+), taxon_status = c("valid", "valid")), row.names = c(NA, -2L
+), class = "data.frame")
+```
+
+
+```{r eval = FALSE}
 # and with scientific names (note that this is for a subspecies)
 checkNames2 <- checkSpeciesNames (speciesNames = "Viverra tangalunga tangalunga",
                                   searchtype   = "scientific")
 checkNames2
+```
 
+
+```{r echo = FALSE}
+structure(list(tsn = 726578, user_name = structure(1L, .Label = "Viverra tangalunga tangalunga", class = "factor"), 
+    scientificName = "Viverra tangalunga tangalunga", commonName = NA, 
+    authorship = "Gray, 1832", rankname = "Subspecies", itis_url = "https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=726578", 
+    taxon_status = "valid"), row.names = c(NA, -1L), class = "data.frame")
+```
+
+```{r eval = FALSE}
 # an invalid name: the accepted name of the leopard cat is Prionailurus bengalensis
 checkNames3 <- checkSpeciesNames (speciesNames = "Felis bengalensis",
                                   searchtype   = "scientific",
                                   accepted     = FALSE)
 checkNames3
-
-## an ambiguous name name: Chevrotain (Tragulus)
-## this does not work in vignettes, but should run on your machine
- # checkNames4 <- checkSpeciesNames (speciesNames = c("Chevrotain"),
- #                                   searchtype   = "common")
- # 1              # making a choice from the menu
- # checkNames4
 ```
+
+
+```{r echo = FALSE}
+structure(list(tsn = 183793, user_name = structure(1L, .Label = "Felis bengalensis", class = "factor"), 
+    scientificName = "Felis bengalensis", commonName = "leopard cat", 
+    authorship = "Kerr, 1792", rankname = "Species", itis_url = "https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=183793", 
+    taxonUsageRating = "invalid"), class = "data.frame", row.names = c(NA, 
+-1L))
+```
+
+```{r eval = FALSE}
+# an ambiguous name name: Chevrotain (Tragulus)
+checkNames4 <- checkSpeciesNames (speciesNames = "Chevrotain",
+                                  searchtype   = "common")
+1              # making a choice from the menu
+checkNames4
+```
+
+```{r echo = FALSE}
+structure(list(tsn = 624919, user_name = structure(1L, .Label = "Chevrotain", class = "factor"), 
+    scientificName = "Tragulidae", commonName = "chevrotains", 
+    authorship = "Milne-Edwards, 1864", rankname = "Family", 
+    itis_url = "https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=624919", 
+    taxon_status = "valid"), row.names = c(NA, -1L), class = "data.frame")
+```
+
+
 
 
 ## Species identification via drag & drop of images
@@ -433,28 +478,28 @@ Metadata tagging of individual IDs is analogous to species assignment with metad
 
 Despite its name, the function `checkSpeciesIdentification`can also be used to compare individual IDs assigned via metadata by multiple observers (with some limitations still). The idea is the same as with comparing double-observer species identifcation. In other words, the function treats individual IDs as if they were species IDs. Images of a species need to be stored in a species directory containing only images of that species (see function `getSpeciesImages`), preferably in station subdirectories. If images were not stored in station directories, the function will not be able to tell you which station the images were taken at (but you still have unique file names), do be careful when interpreting the first part of the output (the check for temporal independence).
 
-For lack of an example dataset in the package, here's two theoretical code examples which assumes tagged images of only one species in this directory C:/Users/Peter/individualID/SpeciesA, either with or without station subdirectories
+For lack of an example dataset in the package, here's two theoretical code examples which assumes tagged images of only one species in this directory "C:/Users/Peter/individualID/SpeciesA"", either with or without station subdirectories
 
 ```{r eval = FALSE}
 # all images in one directory, no station subdirectories
 # column "station" in outtable will be uninformative
-ID_check1 <- checkSpeciesIdentification(inDir                       = "C:/Users/Peter/individualID",
-                                        stationsToCheck             = "SpeciesA",         # no station subdirectories
-                                        IDfrom                      = "metadata",
-                                        hasCameraFolders            = FALSE,
+ID_check1 <- checkSpeciesIdentification(inDir    = "C:/Users/Peter/individualID",
+                                        stationsToCheck   = "SpeciesA",         # no station subdirectories
+                                        IDfrom            = "metadata",
+                                        hasCameraFolders  = FALSE,
                                         metadataSpeciesTag          = "Example_Species_ID_Paul",
                                         metadataSpeciesTagToCompare = "Example_Species_ID_Peter",
-                                        maxDeltaTime                = 60)
+                                        maxDeltaTime        = 60)
 
 # check results with either of the following two:
 # ID_check1[[2]]   
 # ID_check1$IDconflictCheck   
 
 # all images in station subdirectories
-ID_check2 <- checkSpeciesIdentification(inDir                       = "C:/Users/Peter/individualID/SpeciesA",  # with station subdirectories
-                                        IDfrom                      = "metadata",
-                                        hasCameraFolders            = FALSE,
-                                        metadataSpeciesTag          = "Example_Species_ID_Paul",
+ID_check2 <- checkSpeciesIdentification(inDir    = "C:/Users/Peter/individualID/SpeciesA",  # with station subdirectories
+                                        IDfrom   = "metadata",
+                                        hasCameraFolders    = FALSE,
+                                        metadataSpeciesTag  = "Example_Species_ID_Paul",
                                         metadataSpeciesTagToCompare = "Example_Species_ID_Peter",
-                                        maxDeltaTime                = 60)
+                                        maxDeltaTime        = 60)
 ```
