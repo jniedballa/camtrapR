@@ -43,7 +43,7 @@ exifTagNames <- function(inDir,
   
   
   if(!returnMetadata)  message(paste("Metadata of:", file.tmp, sep = "\n"))
-  if(returnMetadata)  message(paste("Metadata values of:", file.tmp, sep = "\n"))
+  if(returnMetadata)   message(paste("Metadata values of:", file.tmp, sep = "\n"))
   
   if(isFALSE(returnMetadata)){
     command.tmp  <- paste('exiftool -csv', ifelse(returnTagGroup, ' -G',  ''), ' "', file.tmp, '"', sep = "")

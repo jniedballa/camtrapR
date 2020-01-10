@@ -321,7 +321,7 @@ Raw images are copied from the raw image directories into a new location and ren
 Station ID and camera ID are derived from the raw image directory structure created earlier with `createStationFolders` Date and time are taken from image Exif metadata (read using ExifTool). (X) is a numeric identifier that is assigned to all images taken at the same station (and camera, if applicable) within one minute. This is to avoid identical image names if images were taken in the same second (or in the same minute, if cameras record time in hours and minutes only).
 
 Again, please be aware that temporary directories are used in the example. Set `outDir` to a permanent directory.
-In addition, images are not actually copied (argument `copyImages = FALSE`), but copying and renaming is mererly simulated in out example). So, in real world data, set `copyImages = TRUE`.
+In addition, images are not actually copied (argument `copyImages = FALSE`), but copying and renaming is mererly simulated in out example. So, in real world data, set `copyImages = TRUE`.
 
 ```{r}
  # raw image location
@@ -355,7 +355,7 @@ So, the first image, \"IMG0001.JPG\" was renamed to \"StationA__2009-04-10__05-0
 | `CopyStatus` |  whether the images was copied successfully (TRUE = yes) |
 
 
-At this point you created a copy of your raw images and renamed them. 
+At this point you created a copy of your raw images and renamed them with station ID, date and time. 
 
 ## Writing a copyright tag into image metadata
 

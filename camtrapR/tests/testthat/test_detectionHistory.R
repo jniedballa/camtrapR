@@ -234,12 +234,12 @@ test_that("occasionLength error message works", {
                                 speciesCol           = "Species",
                                 recordDateTimeCol    = "DateTimeOriginal",
                                 species              = "VTA",
-                                occasionLength       = 25,
+                                occasionLength       = 47,
                                 day1                 = "station",
                                 datesAsOccasionNames = FALSE,
                                 includeEffort        = FALSE,
                                 timeZone             = "Asia/Kuala_Lumpur"), 
-               "occasionLength may not be greater than half the total number of days in camOp")
+               "occasionLength must be smaller than the total number of days in camOp")
   
   expect_error(detectionHistory(recordTable          = recordTableSample,
                                 camOp                = camop_no_problem,

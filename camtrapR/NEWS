@@ -1,3 +1,13 @@
+Changes in camtrapR 1.2.3 (2020-01-10)
+======================================
+
+other changes
+------------
+  o checkSpeciesNames: no error when ITIS server is not available
+  o minor fixes in vignettes
+  o detectionHistory: no error if occasionLength is greater than half the number of columns in camera operation matrix, as long as it is smaller than the total number of columns
+
+
 Changes in camtrapR 1.2.2 (2020-01-07)
 ======================================
 

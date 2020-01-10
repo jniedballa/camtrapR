@@ -74,13 +74,14 @@ detectionHistory <- function(recordTable,
   if(occasionStartTime < 0 | occasionStartTime >= 24){stop ("occasionStartTime must be between 0 and 23")}
   
   occasionLength <- as.integer(round(occasionLength))
-  if(occasionLength <= 0) stop("occasionLength must be a positive integer and not 0")
-  if(occasionLength > ncol(camOp)/2) stop("occasionLength may not be greater than half the total number of days in camOp")
   stopifnot(is.numeric(occasionLength))
+  if(occasionLength <= 0) stop("occasionLength must be a positive integer and not 0")
+  if(occasionLength > ncol(camOp)) stop("occasionLength must be smaller than the total number of days in camOp")
+  
   
   if(hasArg(maxNumberDays)){
     maxNumberDays <- as.integer(maxNumberDays)
-    if(maxNumberDays > ncol(camOp)) stop("maxNumberDays is larger than the number of columns of camOp")
+    if(maxNumberDays > ncol(camOp))    stop("maxNumberDays is larger than the number of columns of camOp")
     if(maxNumberDays < occasionLength) stop("maxNumberDays must be larger than or equal to occasionLength")
   }
   
@@ -99,7 +100,7 @@ detectionHistory <- function(recordTable,
   }
   
   if(includeEffort){
-    if(!hasArg(scaleEffort)) stop("scaleEffort must be defined if includeEffort is TRUE")
+    if(!hasArg(scaleEffort))     stop("scaleEffort must be defined if includeEffort is TRUE")
     if(!is.logical(scaleEffort)) stop("scaleEffort must be logical (TRUE or FALSE)")
   } else {scaleEffort <- FALSE}
   
