@@ -1,7 +1,7 @@
 Package: camtrapR
 Type: Package
 Title: Camera Trap Data Management and Preparation of Occupancy and Spatial Capture-Recapture Analyses
-Version: 1.2.3
+Version: 1.2.4
 Date: 2020-01-10
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre")),
@@ -16,7 +16,7 @@ Authors@R: c(
         )
 Depends: R (>= 3.1.0)
 Imports: methods, sp, overlap, secr, data.table
-Suggests: knitr, lubridate, raster,  rgdal, ritis, rmarkdown, taxize, testthat, tibble, unmarked
+Suggests: knitr, lubridate, raster,  rgdal, ritis, rmarkdown, taxize, testthat, tibble, unmarked, zip
 VignetteBuilder: knitr
 SystemRequirements: ExifTool (http://www.sno.phy.queensu.ca/~phil/exiftool/)
 Description: Management of and data extraction from camera trap photographs in wildlife studies. The package provides a workflow for storing and sorting camera trap photos, tabulates records of species and individuals, and creates detection/non-detection matrices for occupancy and spatial capture-recapture analyses with great flexibility. In addition, it provides simple mapping functions (number of species, number of independent species detections by station including GIS export) and can visualise species activity data.
