@@ -916,7 +916,8 @@ makeSurveyZip <- function(output,
                           Ycol,
                           recordDateTimeCol,
                           recordDateTimeFormat,
-                          sinkpath){
+                          sinkpath,
+                          usePackageZip){
   
   wd0 <- getwd()
   on.exit(setwd(wd0))
@@ -1150,15 +1151,25 @@ makeSurveyZip <- function(output,
   
   # write zip
   setwd(dir.tmp)
-  cat("compiling zip file \n",
-      paste(sinkpath, paste(dir.zip.short, ".zip\n\n", sep = ""), sep = file.sep))
   
-  suppressMessages(zip(zipfile = file.path(sinkpath,
+  if(isFALSE(usePackageZip)) {
+  zip(zipfile = file.path(sinkpath,
                                            paste(dir.zip.short, ".zip", sep = "")),
                        files   = files2zip,
-                       flags   = ""))
-  
-  
+                       flags   = "")
+  }
+  if(isTRUE(usePackageZip)) {
+    zipr(zipfile = file.path(sinkpath,
+                             paste(dir.zip.short, ".zip", sep = "")),
+         files   = files2zip)
+    }
+  if(file.exists(file.path(sinkpath,
+                           paste(dir.zip.short, ".zip", sep = "")))){
+  cat("zip file compiled \n",
+      paste(sinkpath, paste(dir.zip.short, ".zip\n\n", sep = ""), sep = file.sep))
+  } else {
+    cat("zip file creation failed")
+  }
   
   # remove temporary directory
   #unlink(dir.zip, recursive = TRUE)
