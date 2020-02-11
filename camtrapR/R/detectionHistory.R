@@ -233,7 +233,9 @@ detectionHistory <- function(recordTable,
                                                  / (occasionLength * 86400))))
   
   
-  if(max(subset_species$occasion) > ncol(effort)) {stop("encountered a bug. I'm Sorry. Please report it.")}
+  if(max(subset_species$occasion) > ncol(effort)) {stop("Occasions exceeding total number of occasions calculated. This is a bug. I'm Sorry. Please report it.")}
+  if(any(subset_species$occasion) == 0) {stop("Occasion 0 calculated for at least one record. This is a bug. I'm Sorry. Please report it.")}
+  if(min(subset_species$occasion) < 0) {stop("Negative occasions calculated for at least one record. This is a bug. I'm Sorry. Please report it.")}
   
   ############
   # make detection history
@@ -266,12 +268,15 @@ detectionHistory <- function(recordTable,
     rownames(record.hist) <- rownames(cam.op.worked)
     
     # identify occasions during which there were records (and how many)
+    # binary: values = occasion
+    # count: values = number of records, names = occasion
     if(output == "binary")  occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = unique, simplify = FALSE)
     if(output == "count")   occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = table, simplify = FALSE)
     
     # fill detection matrix with "1" (or count) in appropriate cells
     for(xyz in which(sapply(occasions.by.station, FUN = function(x){!is.null(x)}))){
-      if(output == "binary")  record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), occasions.by.station[[xyz]]] <- 1
+      if(output == "binary")  record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
+                                          occasions.by.station[[xyz]]] <- 1
       if(output == "count")   record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
                                           as.numeric(names(occasions.by.station[[xyz]]))] <- occasions.by.station[[xyz]]
       

@@ -1158,17 +1158,20 @@ makeSurveyZip <- function(output,
                        files   = files2zip,
                        flags   = "")
   }
+  
   if(isTRUE(usePackageZip)) {
-    zipr(zipfile = file.path(sinkpath,
-                             paste(dir.zip.short, ".zip", sep = "")),
-         files   = files2zip)
-    }
+    zip::zipr(zipfile = file.path(sinkpath,
+                                  paste(dir.zip.short, ".zip", sep = "")),
+              files   = files2zip)
+  }
+  
+  # check if output was created
   if(file.exists(file.path(sinkpath,
                            paste(dir.zip.short, ".zip", sep = "")))){
-  cat("zip file compiled \n",
+  message("zip file compiled \n",
       paste(sinkpath, paste(dir.zip.short, ".zip\n\n", sep = ""), sep = file.sep))
   } else {
-    cat("zip file creation failed")
+    message("zip file creation failed")
   }
   
   # remove temporary directory
