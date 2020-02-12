@@ -51,10 +51,11 @@ surveyReport <- function(recordTable,
   if(isTRUE(makezip)){
     if(hasArg(sinkpath) == FALSE) stop("if makezip is TRUE, please define sinkpath")
     if(!dir.exists(sinkpath)) stop("Could not find sinkpath:\n", sinkpath, call. = FALSE)
+    
     if(Sys.getenv("R_ZIPCMD") == "" & 
        Sys.getenv("zip") == "") {
       if(isFALSE(requireNamespace("zip", quietly = TRUE))) {
-        warning("cannot create zip file. Try install.packages('zip')", call. = FALSE)
+        stop('cannot create zip file. Try installing the package "zip" via:  install.packages("zip")', call. = FALSE)
       } else {
         requireNamespace("zip")
         usePackageZip <- TRUE
@@ -324,7 +325,7 @@ surveyReport <- function(recordTable,
                          CTHasProblems        = CTHasProblems,
                          recordDateTimeCol    = recordDateTimeCol,
                          recordDateTimeFormat = recordDateTimeFormat,
-                         sinkpath             = sinkpath, 
+                         sinkpath             = sinkpath,
                          usePackageZip        = usePackageZip)
     
     if(hasArg(Xcol) & hasArg(Ycol)) arglist_zip <- c(arglist_zip,  Xcol = Xcol, Ycol = Ycol)
