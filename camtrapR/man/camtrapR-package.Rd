@@ -109,12 +109,10 @@ These plots are generated from the record table and the camera trap table.
 
 \tabular{ll}{
 
-\href{https://CRAN.R-project.org/package=camtrapR/vignettes/ImageOrganisation.html}{1. Organising raw camera trap images}  \cr
-\href{https://CRAN.R-project.org/package=camtrapR/vignettes/SpeciesIndividualIdentification.html}{2. Identifying species and individuals}  \cr
-\href{https://CRAN.R-project.org/package=camtrapR/vignettes/DataExtraction.html}{3. Extracting Data from Camera Trapping Images}  \cr
-\href{https://CRAN.R-project.org/package=camtrapR/vignettes/DataExploration.html}{4. Data exploration and visualisation}  \cr
-
-
+\href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr1.html}{1. Organising raw camera trap images}  \cr
+\href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html}{2. Identifying species and individuals}  \cr
+\href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr3.html}{3. Extracting Data from Camera Trapping Images}  \cr
+\href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr4.html}{4. Data exploration and visualisation}  \cr
 
 }
 }

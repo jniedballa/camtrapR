@@ -105,11 +105,11 @@ A data frame containing species records and additional information about station
 }
 
 \section{Warning }{
-Custom image metadata must be organised hierarchically (tag group - tag; e.g. "Species" - "Leopard Cat"). Detailed information on how to set up and use metadata tags can be found in \href{https://CRAN.R-project.org/package=camtrapR/vignettes/SpeciesIndividualIdentification.html#metadata-tagging}{vignette 2: Species and Individual Identification}.
+Custom image metadata must be organised hierarchically (tag group - tag; e.g. "Species" - "Leopard Cat"). Detailed information on how to set up and use metadata tags can be found in \href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html#metadata-tagging}{vignette 2: Species and Individual Identification}.
 
 Custom image metadata tags must be written to the images. The function cannot read tags from .xmp sidecar files. Make sure you set the preferences accordingly. In DigiKam, go to Settings/Configure digiKam/Metadata. There, make sure "Write to sidecar files" is unchecked.
 
-Please note the section about defining argument \code{timeZone} in the vignette on data extraction (accessible via \code{vignette("DataExtraction")} or online (\url{https://cran.r-project.org/package=camtrapR/vignettes/DataExtraction.html})).
+Please note the section about defining argument \code{timeZone} in the vignette on data extraction (accessible via \code{vignette("DataExtraction")} or online (\url{https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html})).
 }
 \references{
 Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ }
@@ -133,6 +133,11 @@ The results of a number of other function will depend on the output of this func
 }
 
 \examples{
+
+
+\dontrun{   # the example  run too long to pass CRAN tests
+
+# set directory with camera trap images in station directories
 wd_images_ID_species <- system.file("pictures/sample_images", package = "camtrapR")
 
 if (Sys.which("exiftool") != ""){        # only run these examples if ExifTool is available
@@ -159,17 +164,14 @@ rec_table2 <- recordTable(inDir               = wd_images_ID_species,
                        eventSummaryFunction   = "unique"
                        )
                        
-# note the warning that the last tag in "additionalMetadataTags" was not found
+# note the warning that the last tag in "additionalMetadataTags" ("NonExistingTag") was not found
 
 
-any(rec_table1$Species == "NO_ID")
-any(rec_table2$Species == "NO_ID")
+any(rec_table1$Species == "NO_ID")    # TRUE
+any(rec_table2$Species == "NO_ID")    # FALSE
 
 
-#############
 # here's how the removeDuplicateRecords argument works
-
-\dontrun{   # otherwise the example would run too long to pass CRAN tests
 
 rec_table3a <- recordTable(inDir              = wd_images_ID_species,
                        IDfrom                 = "directory",
@@ -195,13 +197,12 @@ anyDuplicated(rec_table3b[, c("Station", "Species", "DateTimeOriginal")])   # no
 whichAreDuplicated <- which(duplicated(rec_table3a[, c("Station", "Species", "DateTimeOriginal")]))
 all(rec_table3a[-whichAreDuplicated,] == rec_table3b)
 
-}
-
 } else {                                # show function output if ExifTool is not available
 message("ExifTool is not available. Cannot test function. Loading recordTableSample instead")
 data(recordTableSample)
 }
 
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

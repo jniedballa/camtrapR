@@ -106,11 +106,11 @@ A data frame containing species records with individual IDs and additional infor
 }
 
 \section{Warning }{
-Be sure to read the section on individual identification in the package vignette (\url{https://CRAN.R-project.org/package=camtrapR/vignettes/SpeciesIndividualIdentification.html}).
+Be sure to read the section on individual identification in the package vignette (\url{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html}).
 
 Af you use image metadata tags for identification, the tags must be written to the image metadata. The function cannot read tags from .xmp sidecar files. Make sure you set the preferences of your image management software accordingly. In DigiKam, go to Settings/Configure digiKam/Metadata. There, make sure "Write to sidecar files" is unchecked.
 
-Please note the section about defining argument \code{timeZone} in the vignette on data extraction (accessible via \code{vignette("DataExtraction")} or online (\url{https://cran.r-project.org/package=camtrapR/vignettes/DataExtraction.html})).
+Please note the section about defining argument \code{timeZone} in the vignette on data extraction (accessible via \code{vignette("DataExtraction")} or online (\url{https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html})).
 }
 
 \references{
