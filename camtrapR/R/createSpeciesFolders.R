@@ -9,7 +9,7 @@ createSpeciesFolders <- function(inDir,
   
   if(!dir.exists(inDir)) stop("Could not find inDir:\n", inDir, call. = FALSE)
 
-  dirs <- list.dirs(inDir, full.names = TRUE, recursive = FALSE)
+  dirs       <- list.dirs(inDir, full.names = TRUE, recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE , recursive = FALSE)
 
   if(length(dirs) == 0) stop("inDir has no (station) subdirectories")

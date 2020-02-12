@@ -111,6 +111,8 @@ getSpeciesImages <- function(species,
       dirs <- list.dirs(inDir, recursive = FALSE, full.names = TRUE)     # exiftool will work through directory recursively, so set to FALSE here
       dirs_short <- list.dirs(inDir, recursive = FALSE, full.names = FALSE)
 
+      if(length(dirs) == 0) stop("inDir contains no station directories", call. = FALSE)
+
 
       for(i in 1:length(dirs_short)){
 

@@ -53,8 +53,10 @@ imageRename <- function(inDir,
   
   
   # list of subdirectories of inDir
-  dirs <- list.dirs(inDir, full.names = TRUE, recursive = FALSE)
-  dirs_short <- list.dirs(inDir, full.names = FALSE , recursive = FALSE)
+  dirs       <- list.dirs(inDir, full.names = TRUE,  recursive = FALSE)
+  dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
+  
+  if(length(dirs) == 0) stop("inDir contains no station directories", call. = FALSE)
   
   # make sure none is empty
   list_n_files <- lapply(dirs, list.files, pattern = ".jpg$|.JPG$", recursive = TRUE)
@@ -67,7 +69,7 @@ imageRename <- function(inDir,
   if(isFALSE(createEmptyDirectories)){
     stations2remove  <- which(lapply(list_n_files, length) == 0)
     if(length(stations2remove) >= 1){
-      dirs          <- dirs[-stations2remove]
+      dirs        <- dirs      [-stations2remove]
       dirs_short  <- dirs_short[-stations2remove]
     }
   }

@@ -117,7 +117,11 @@ recordTableIndividual <- function(inDir,
   } else {
     dirs       <- inDir
     dirs_short <- inDir
+
+    if(length(dirs) == 0) stop("inDir contains no station directories", call. = FALSE)
   }
+
+
   max_nchar_station <- max(nchar(dirs_short))
 
   record.table.list <- list()

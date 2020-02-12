@@ -34,6 +34,8 @@ multiple_tag_separator = "__"
   dirs       <- list.dirs(inDir, full.names = TRUE,  recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
 
+  if(length(dirs) == 0) stop("inDir contains no station directories", call. = FALSE)
+
   renaming.table <- data.frame()
   nrow.metadata.tmp <- vector()
 

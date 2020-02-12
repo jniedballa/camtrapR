@@ -50,6 +50,8 @@ checkSpeciesIdentification <- function(inDir,
   dirs       <- list.dirs(inDir, full.names = TRUE, recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
 
+  if(length(dirs) == 0) stop("inDir contains no station directories", call. = FALSE)
+
   check_table <- conflict_ID_table <-  data.frame(stringsAsFactors = FALSE)
 
   # if only checking certain station, subset dirs/dirs_short
