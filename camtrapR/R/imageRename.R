@@ -129,7 +129,7 @@ imageRename <- function(inDir,
                 call. = FALSE, immediate. = TRUE)
         metadata.tmp <- data.frame(metadata.tmp, DateReadable = NA)
         metadata.tmp$DateReadable[-na.date.rows] <- TRUE
-        metadata.tmp$DateReadable[na.date.rows]  <- FALSE
+        metadata.tmp$DateReadable[ na.date.rows] <- FALSE
       } else {
         metadata.tmp$DateReadable <- TRUE
       }
@@ -138,6 +138,13 @@ imageRename <- function(inDir,
       # rearrange column order
       metadata.tmp <- metadata.tmp[,c("Directory",  "FileName", stationCol, cameraCol,
                                       "DateTimeOriginal", "DateTimeOriginal2", "DateReadable")]
+      
+      # # sort images by Station, (Camera), Time and filename
+      # metadata.tmp <- metadata.tmp[order(metadata.tmp$Directory, 
+      #                                    metadata.tmp$Station,
+      #                                    metadata.tmp$Camera,
+      #                                    metadata.tmp$DateTimeOriginal,
+      #                                    metadata.tmp$FileName),]
       
       # find images taken within 1 minute of one another (to append number)
       metadata.tmp$DateTimeOriginal2$sec <- 0
