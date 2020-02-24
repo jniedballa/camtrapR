@@ -1,0 +1,46 @@
+Package: camtrapR
+Type: Package
+Title: Camera Trap Data Management and Preparation of Occupancy and
+        Spatial Capture-Recapture Analyses
+Version: 1.2.4
+Date: 2020-02-24
+Authors@R: c(
+        person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
+                comment = c(ORCID = "0000-0002-9187-2116")),
+        person("Alexandre", "Courtiol", role = "aut",
+                comment = c(ORCID = "0000-0003-0637-2959")),
+        person("Rahel", "Sollmann", role = "aut"),
+        person("John", "Mathai", role = "ctb"),
+        person("Seth Timothy", "Wong", role = "ctb"),
+        person("An The Truong", "Nguyen", role = "ctb"),
+        person("Azlan bin", "Mohamed", role = "ctb"),
+        person("Andrew", "Tilker", role = "ctb"),
+        person("Andreas", "Wilting", role = c("ctb", "ths"),
+                comment = c(ORCID = "0000-0001-5073-9186"))
+        )
+Depends: R (>= 3.1.0)
+Imports: methods, sp, overlap, secr, data.table
+Suggests: knitr, lubridate, raster, rgdal, ritis, rmarkdown, taxize,
+        testthat, tibble, unmarked, zip
+VignetteBuilder: knitr
+SystemRequirements: ExifTool
+        (http://www.sno.phy.queensu.ca/~phil/exiftool/)
+Description: Management of and data extraction from camera trap photographs in wildlife studies. The package provides a workflow for storing and sorting camera trap photos, tabulates records of species and individuals, and creates detection/non-detection matrices for occupancy and spatial capture-recapture analyses with great flexibility. In addition, it provides simple mapping functions (number of species, number of independent species detections by station including GIS export) and can visualise species activity data.
+URL: https://github.com/jniedballa/camtrapR,
+        https://groups.google.com/forum/#!forum/camtrapr
+BugReports: https://groups.google.com/forum/#!forum/camtrapr
+Encoding: UTF-8
+License: GPL (>= 2)
+NeedsCompilation: no
+Packaged: 2020-02-24 04:12:26 UTC; Juergen
+Author: Juergen Niedballa [aut, cre] (<https://orcid.org/0000-0002-9187-2116>),
+  Alexandre Courtiol [aut] (<https://orcid.org/0000-0003-0637-2959>),
+  Rahel Sollmann [aut],
+  John Mathai [ctb],
+  Seth Timothy Wong [ctb],
+  An The Truong Nguyen [ctb],
+  Azlan bin Mohamed [ctb],
+  Andrew Tilker [ctb],
+  Andreas Wilting [ctb, ths] (<https://orcid.org/0000-0001-5073-9186>)
+Maintainer: Juergen Niedballa <camtrapr@gmail.com>
+Built: R 3.6.1; ; 2020-02-24 04:12:36 UTC; windows
