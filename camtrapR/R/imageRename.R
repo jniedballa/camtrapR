@@ -14,6 +14,27 @@ imageRename <- function(inDir,
   stationCol <- "Station"
   cameraCol  <- "Camera"
   
+  # check inDir / outDir
+  stopifnot(length(inDir) == 1)
+  if(!dir.exists(inDir)) stop("Could not find inDir:\n", inDir, call. = FALSE)
+  
+  if(hasArg(outDir)){
+    stopifnot(length(outDir) == 1)
+    if(isTRUE(all(unlist(strsplit(tolower(inDir), split = file.sep)) %in%
+                  unlist(strsplit(tolower(outDir), split = file.sep))))) stop("outDir may not be identical to or a subdirectory of inDir", call. = FALSE)
+  }
+  if(copyImages == TRUE){
+    
+    if(any(c(grep("/$", inDir) == 1, grep("/$", outDir) == 1))) stop("inDir and outDir may not end with /", call. = FALSE)
+    
+  } else {
+    if(isTRUE(grepl("/$", inDir))) stop("inDir may not end with /", call. = FALSE)
+  }
+  
+  if(isTRUE(writecsv) & hasArg(outDir) == FALSE) stop("writecsv is TRUE. Please specify outDir", call. = FALSE)
+  
+  if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
+  
   # check call for consistency
   stopifnot(is.logical(copyImages))
   stopifnot(is.logical(writecsv))
@@ -31,24 +52,7 @@ imageRename <- function(inDir,
   }
   
   
-  stopifnot(length(inDir) == 1)
-  if(!dir.exists(inDir)) stop("Could not find inDir:\n", inDir, call. = FALSE)
-  
-  if(hasArg(outDir)){
-    stopifnot(length(outDir) == 1)
-    if(isTRUE(all(unlist(strsplit(tolower(inDir), split = file.sep)) %in%
-                  unlist(strsplit(tolower(outDir), split = file.sep))))) stop("outDir may not be identical to or a subdirectory of inDir", call. = FALSE)
-  }
-  if(copyImages == TRUE){
-    
-    if(any(c(grep("/$", inDir) == 1, grep("/$", outDir) == 1))) stop("inDir and outDir may not end with /", call. = FALSE)
-    
-  } else {
-    if(isTRUE(grepl("/$", inDir))) stop("inDir may not end with /", call. = FALSE)
-  }
-  if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
-  if(isTRUE(writecsv) & hasArg(outDir) == FALSE) stop("writecsv is TRUE. Please specify outDir", call. = FALSE)
-  
+
   
   
   
