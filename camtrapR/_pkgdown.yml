@@ -1,0 +1,55 @@
+destination: docs
+
+reference:
+  - title: Overview
+    desc: Overview of the camtrapR package
+    contents:
+      - '`camtrapR-package`'
+  - title: Image organisation and management
+    desc: Functions for image organisation and preprocessing
+    contents:
+      - '`createStationFolders`'
+      - '`fixDateTimeOriginal`'
+      - '`timeShiftImages`'
+      - '`imageRename`'
+      - '`addCopyrightTag`'
+      - '`appendSpeciesNames`'
+  - title: Species / individual identification
+    desc: Functions to assist identification of species and individuals
+    contents:
+      - '`checkSpeciesNames`'
+      - '`createSpeciesFolders`'
+      - '`checkSpeciesIdentification`'
+      - '`getSpeciesImages`'
+  - title: Image data extraction
+    desc: Functions to extract and tabulate data from images
+    contents:
+      - '`recordTable`'
+      - '`recordTableIndividual`'
+      - '`exifTagNames`'
+      - '`exiftoolPath`'
+  - title: Data exploration and visualisation
+    desc: Functions for plotting species activity, detection maps and exporting shapefiles
+    contents:
+      - '`detectionMaps`'
+      - '`activityHistogram`'
+      - '`activityDensity`'
+      - '`activityRadial`'
+      - '`activityOverlap`'
+  - title: Data export
+    desc: Functions to prepare occupancy and spatial capture-recapture analyses, and summarise surveys
+    contents:
+      - '`cameraOperation`'
+      - '`detectionHistory`'
+      - '`spatialDetectionHistory`'
+      - '`surveyReport`'
+  - title: Sample data
+    desc: Sample data sets included in camtrapR
+    contents:
+      - '`camtraps`'
+      - '`recordTableSample`'
+      - '`recordTableIndividualSample`'
+      - '`camtrapsMultiSeason`'
+      - '`recordTableSampleMultiSeason`'
+      - '`recordTableIndividualSampleMultiSeason`'
+      - '`timeShiftTable`'
