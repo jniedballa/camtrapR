@@ -234,7 +234,7 @@ detectionHistory <- function(recordTable,
   
   
   if(max(subset_species$occasion) > ncol(effort)) {stop("Occasions exceeding total number of occasions calculated. This is a bug. I'm Sorry. Please report it.")}
-  if(any(subset_species$occasion) == 0) {stop("Occasion 0 calculated for at least one record. This is a bug. I'm Sorry. Please report it.")}
+  if(any(subset_species$occasion == 0)) {stop("Occasion 0 calculated for at least one record. This is a bug. I'm Sorry. Please report it.")}
   if(min(subset_species$occasion) < 0) {stop("Negative occasions calculated for at least one record. This is a bug. I'm Sorry. Please report it.")}
   
   ############
