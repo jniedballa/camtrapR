@@ -1,15 +1,19 @@
 # camtrapR 1.2.4
 
+## new features
+
+* surveyReport: reliable creation of zip files via package "zip" (if installed, in Suggests now)
 
 ## bugfixes
 
-* error message when inDir in functions that call exiftool is empty (no subdirectories)
-* error message when zip file can't be created, and support for package "zip" (if installed, in Suggests now)
-* special characters in directory names now supported (but still best avoided)
+* detectionHistory: when recordDateTimeCol is a date without time, function assigns a time to avoid calculating occasion 0 for records taken on the camera setup day (with a warning)
+* error message when inDir in functions that call Exiftool is empty (no subdirectories)
+* surveyReport: error message when zip file can't be created
+* special characters in directory names now supported (but still best avoided; requires ExifTool 9.79 or later)
 
 ## other changes
 
-* vignette filenames changed, changed to html_document, added floating table of contents
+* vignette filenames changed, document type changed to html_document, added floating table of contents
 * added ORCID for authors
   
 

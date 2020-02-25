@@ -135,20 +135,28 @@
 <h1 class="page-header">
 <a href="#camtrapr-124" class="anchor"></a>camtrapR 1.2.4<small> Unreleased </small>
 </h1>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>new features</h2>
+<ul>
+<li>surveyReport: reliable creation of zip files via package “zip” (if installed, in Suggests now)</li>
+</ul>
+</div>
 <div id="bugfixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bugfixes" class="anchor"></a>bugfixes</h2>
 <ul>
-<li>error message when inDir in functions that call exiftool is empty (no subdirectories)</li>
-<li>error message when zip file can’t be created, and support for package “zip” (if installed, in Suggests now)</li>
-<li>special characters in directory names now supported (but still best avoided)</li>
+<li>detectionHistory: when recordDateTimeCol is a date without time, function assigns a time to avoid calculating occasion 0 for records taken on the camera setup day (with a warning)</li>
+<li>error message when inDir in functions that call Exiftool is empty (no subdirectories)</li>
+<li>surveyReport: error message when zip file can’t be created</li>
+<li>special characters in directory names now supported (but still best avoided; requires ExifTool 9.79 or later)</li>
 </ul>
 </div>
 <div id="other-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#other-changes" class="anchor"></a>other changes</h2>
 <ul>
-<li>vignette filenames changed, changed to html_document, added floating table of contents</li>
+<li>vignette filenames changed, document type changed to html_document, added floating table of contents</li>
 <li>added ORCID for authors</li>
 </ul>
 </div>
@@ -199,9 +207,9 @@
 <li>recordTable: fixed: ‘Error in <code>[.data.frame</code>(intable, , match(colnames(record.table), colnames(intable))) : undefined columns selected’ (when additionalMetadataTags are defined)</li>
 </ul>
 </div>
-<div id="new-features" class="section level2">
+<div id="new-features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>new features</h2>
+<a href="#new-features-1" class="anchor"></a>new features</h2>
 <ul>
 <li>multi-season sample data sets: camtrapsMultiSeason, recordTableSampleMultiSeason, recordTableIndividualSampleMultiSeason</li>
 </ul>
@@ -225,9 +233,9 @@
 <li>imageRename: fixed bug where fileExistsAlready in output table was FALSE when it should be TRUE</li>
 </ul>
 </div>
-<div id="new-features-1" class="section level2">
+<div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>new features</h2>
+<a href="#new-features-2" class="anchor"></a>new features</h2>
 <ul>
 <li>detectionHistory: support multi-season input and create detection histories for unmarkedFrameMult (from where users can create multi-season occupancy models with unmarked::colext), new argument “unmarkedFrameMultInput” (developed with support from Kirsten Weingarth)</li>
 <li>cameraOperation: new argument: sessionCol, to specify trapping sessions / seasons (with some changes to the row names in camera operation matrices if there are session and / or camera information)</li>
@@ -265,9 +273,9 @@
 <li>recordTableIndividual: fixed multiple individuals from same image being removed (except for one) when removeDuplicates = TRUE</li>
 </ul>
 </div>
-<div id="new-features-2" class="section level2">
+<div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>new features</h2>
+<a href="#new-features-3" class="anchor"></a>new features</h2>
 <ul>
 <li>detectionHistory can return counts of records per occasion (new argument “output”)</li>
 <li>activityOverlap can return different overlap estimators (new argument “overlapEstimator”)</li>
@@ -319,9 +327,9 @@
 <li>recordTable / recordTableIndividual: verbose warnings and better handling of situations in which date/time is unreadable (empty Exif:DateTimeOriginal metadata tag)</li>
 </ul>
 </div>
-<div id="new-features-3" class="section level2">
+<div id="new-features-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>new features</h2>
+<a href="#new-features-4" class="anchor"></a>new features</h2>
 <ul>
 <li>detectionHistory / activity plot functions: if date/time is unreadable function returns row IDs to facilitate checks</li>
 <li>activityDensity: warning instead of error if bandwidth estimation fails and argument allSpecies = TRUE (problem occurred with single records, or few records at similar time of day)</li>
@@ -365,9 +373,9 @@
 <li>recordTable: returned station ID as camera ID if IDfrom = “metadata” and cameraID = “directory”</li>
 </ul>
 </div>
-<div id="new-features-4" class="section level2">
+<div id="new-features-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-4" class="anchor"></a>new features</h2>
+<a href="#new-features-5" class="anchor"></a>new features</h2>
 <ul>
 <li>detectionMaps: gained argument ‘backgroundPolgygon’ for plotting a SpatialPolygon object in the background of the maps</li>
 <li>imageRename: new argument ‘createEmptyDirectories’ to control whether empty directories should be copied or not</li>
@@ -401,9 +409,9 @@
 <li>fixDateTimeOriginal: Makes DateTimeOriginal Exif metadata tag in Reconyx Hyperfire cameras readable</li>
 </ul>
 </div>
-<div id="new-features-5" class="section level2">
+<div id="new-features-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-5" class="anchor"></a>new features</h2>
+<a href="#new-features-6" class="anchor"></a>new features</h2>
 <ul>
 <li>spatialDetectionHistory: argument ‘sessionCol’ can now create multi-session capthist objects by either assigning individuals to different sessions or assigning stations to different sessions</li>
 <li>exifTagNames: gained argument ‘returnTagGroup’, and now by default returns metadata tag group in addition to metadata tag names (to unambiguously address specific metadata tags)</li>
@@ -432,9 +440,9 @@
 <li>all functions using Exiftool: JPG files beginning with “._” are now ignored with a warning (these are hidden, uninformative system files created on Macs and were quite capable of messing up function calls)</li>
 </ul>
 </div>
-<div id="new-features-6" class="section level2">
+<div id="new-features-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-6" class="anchor"></a>new features</h2>
+<a href="#new-features-7" class="anchor"></a>new features</h2>
 <ul>
 <li>getSpeciesImages can now also read image file paths from a record table provided by the user instead of reading species IDs anew in every function call. It gained 3 new arguments for that purpose.</li>
 <li>recordTable and recordTableIndividual both gained an argument (removeDuplicateRecords) to control whether duplicate records (same station, same species, exactly same time) should be collapsed into one record (former versions did that without asking)</li>
@@ -460,9 +468,9 @@
 <li>spatialDetectionHistory: argument “scaleEffort” can only be FALSE now (to avoid negative trapping effort values, which secr does not accept)</li>
 </ul>
 </div>
-<div id="new-features-7" class="section level2">
+<div id="new-features-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-7" class="anchor"></a>new features</h2>
+<a href="#new-features-8" class="anchor"></a>new features</h2>
 <ul>
 <li>spatialDetectionHistory gained argument “sessionCol”. It can be used to split data (i.e., create a list with multiple capthist objects) if captures come from different sessions).</li>
 </ul>
@@ -495,9 +503,9 @@
 <li>surveyReport: species column names other than “Species” are now supported, i.e. argument “speciesCol” is now respected (thanks to Valentine Herrmann and Stefano Anile for reporting)</li>
 </ul>
 </div>
-<div id="new-features-8" class="section level2">
+<div id="new-features-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-8" class="anchor"></a>new features</h2>
+<a href="#new-features-9" class="anchor"></a>new features</h2>
 <ul>
 <li>detectionHistory gained argument “minActiveDaysPerOccasion”. It can be used to define the minimum number of active trap days per occasion for that occasion be included (0/1 instead of NA)</li>
 </ul>
@@ -574,9 +582,9 @@
 <li>recordDatabaseIndividualSample -&gt; recordTableIndividualSample</li>
 </ul>
 </div>
-<div id="new-features-9" class="section level2">
+<div id="new-features-10" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-9" class="anchor"></a>new features</h2>
+<a href="#new-features-10" class="anchor"></a>new features</h2>
 <ul>
 <li>detectionHistory and spatialDetectionHistory:
 <ul>
@@ -631,9 +639,9 @@
 <li>spatialDetectionHistory: prepare a capthist object for spatial capture-recapture analyses</li>
 </ul>
 </div>
-<div id="new-features-10" class="section level2">
+<div id="new-features-11" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-10" class="anchor"></a>new features</h2>
+<a href="#new-features-11" class="anchor"></a>new features</h2>
 <ul>
 <li>support for camera subdirectories in species identification: Station/Camera/Species in the following function:
 <ul>
