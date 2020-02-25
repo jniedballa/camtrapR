@@ -71,11 +71,11 @@ detectionHistory <- function(recordTable,
   if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
   occasionStartTime <- as.integer(round(occasionStartTime))
   if(occasionStartTime != 0 & !is.integer(occasionStartTime)) {stop ("occasionStartTime must be between 0 and 23")}
-  if(occasionStartTime < 0 | occasionStartTime >= 24){stop ("occasionStartTime must be between 0 and 23")}
+  if(occasionStartTime < 0 | occasionStartTime >= 24){         stop ("occasionStartTime must be between 0 and 23")}
   
   occasionLength <- as.integer(round(occasionLength))
   stopifnot(is.numeric(occasionLength))
-  if(occasionLength <= 0) stop("occasionLength must be a positive integer and not 0")
+  if(occasionLength <= 0)          stop("occasionLength must be a positive integer and not 0")
   if(occasionLength > ncol(camOp)) stop("occasionLength must be smaller than the total number of days in camOp")
   
   
@@ -167,15 +167,15 @@ detectionHistory <- function(recordTable,
   
   ################################################
   # compute date range of stations and records
-  arg.list0 <- list(cam.op = cam.op.worked0, 
-                    subset_species_tmp = subset_species, 
-                    stationCol_tmp = stationCol, 
-                    day1_tmp = day1, 
+  arg.list0 <- list(cam.op                = cam.op.worked0, 
+                    subset_species_tmp    = subset_species, 
+                    stationCol_tmp        = stationCol, 
+                    day1_tmp              = day1, 
                     occasionStartTime_tmp = occasionStartTime, 
-                    timeZone_tmp = timeZone)
+                    timeZone_tmp          = timeZone)
   
-  if(hasArg(maxNumberDays))  arg.list0 <- c(arg.list0,   maxNumberDays_tmp = maxNumberDays)
-  if(hasArg(buffer))   arg.list0 <- c(arg.list0, buffer_tmp =  buffer)
+  if(hasArg(maxNumberDays))  arg.list0 <- c(arg.list0, maxNumberDays_tmp = maxNumberDays)
+  if(hasArg(buffer))         arg.list0 <- c(arg.list0, buffer_tmp =  buffer)
   
   date_ranges <- do.call(createDateRangeTable, arg.list0)
   
@@ -232,10 +232,27 @@ detectionHistory <- function(recordTable,
                                                           tz     = timeZone)
                                                  / (occasionLength * 86400))))
   
-  
-  if(max(subset_species$occasion) > ncol(effort)) {stop("Occasions exceeding total number of occasions calculated. This is a bug. I'm Sorry. Please report it.")}
-  if(any(subset_species$occasion == 0)) {stop("Occasion 0 calculated for at least one record. This is a bug. I'm Sorry. Please report it.")}
-  if(min(subset_species$occasion) < 0) {stop("Negative occasions calculated for at least one record. This is a bug. I'm Sorry. Please report it.")}
+  # check if occasions are valid
+  if(max(subset_species$occasion) > ncol(effort)) stop("Occasions exceeding total number of occasions calculated. This is a bug. I'm Sorry. Please report it.", call. = FALSE)
+  if(any(subset_species$occasion == 0)) {
+    if(all(subset_species$DateTime2$hour == 0) &
+       all(subset_species$DateTime2$min  == 0) &
+       all(subset_species$DateTime2$sec  == 0)) { 
+      warning(paste("recordDateTimeCol seems to be a date column without time. Please provide time also. I will assume time of ALL records was occasionStartTime + 1 second (",
+              occasionStartTime, ":00:01), but please treat this as experimental.", sep = ""), call. = FALSE)
+      subset_species$DateTime2$sec  <- 1
+      subset_species$DateTime2$hour <- occasionStartTime
+      # recalculate occasions with new date/time
+      subset_species$occasion <- as.numeric(ceiling((difftime(time1  = subset_species$DateTime2,
+                                                              time2  =  time2,
+                                                              units  = "secs",
+                                                              tz     = timeZone)
+                                                     / (occasionLength * 86400))))
+      if(any(subset_species$occasion == 0)) stop("I tried to fix the date-only recordDateTimeCol, but there is still occasions with value 0. Please provide date and time in recordDateTimeCol.", call. = FALSE)
+    } else {
+      stop("Occasion 0 calculated for at least one record. If recordDateTimeCol contains date and time (it seems they do), this is likely a bug. I am sorry. Please report it.", call. = FALSE)}
+  }
+  if(min(subset_species$occasion) < 0) {stop("Negative occasions calculated for at least one record. This is a bug. I'm Sorry. Please report it.", call. = FALSE)}
   
   ############
   # make detection history
