@@ -49,17 +49,17 @@ DetHist2 <- detectionHistory(recordTable          = recordTableSample,
 )
 
 DetHist2a <- detectionHistory(recordTable          = recordTableSample,
-                             camOp                = camop_no_problem,
-                             stationCol           = "Station",
-                             speciesCol           = "Species",
-                             recordDateTimeCol    = "DateTimeOriginal",
-                             species              = "VTA",
-                             occasionLength       = 7,
-                             day1                 = "station",
-                             datesAsOccasionNames = FALSE,
-                             includeEffort        = TRUE,
-                             scaleEffort          = TRUE,
-                             timeZone             = "Asia/Kuala_Lumpur"
+                              camOp                = camop_no_problem,
+                              stationCol           = "Station",
+                              speciesCol           = "Species",
+                              recordDateTimeCol    = "DateTimeOriginal",
+                              species              = "VTA",
+                              occasionLength       = 7,
+                              day1                 = "station",
+                              datesAsOccasionNames = FALSE,
+                              includeEffort        = TRUE,
+                              scaleEffort          = TRUE,
+                              timeZone             = "Asia/Kuala_Lumpur"
 )
 
 
@@ -82,31 +82,31 @@ DetHist2_lub <- detectionHistory(recordTable          = recordTableSample,
 
 
 DetHist1day <- detectionHistory(recordTable          = recordTableSample,
-                             camOp                = camop_no_problem,
-                             stationCol           = "Station",
-                             speciesCol           = "Species",
-                             recordDateTimeCol    = "DateTimeOriginal",
-                             species              = "VTA",
-                             occasionLength       = 1,
-                             day1                 = "station",
-                             datesAsOccasionNames = FALSE,
-                             includeEffort        = FALSE,
-                             timeZone             = "Asia/Kuala_Lumpur"
-)
-
-# day1 = "survey", datesAsOccasionNames = TRUE
-DetHist1day_survey <- detectionHistory(recordTable          = recordTableSample,
                                 camOp                = camop_no_problem,
                                 stationCol           = "Station",
                                 speciesCol           = "Species",
                                 recordDateTimeCol    = "DateTimeOriginal",
                                 species              = "VTA",
                                 occasionLength       = 1,
-                                day1                 = "survey",
-                                datesAsOccasionNames = TRUE,
-                                includeEffort        = TRUE,
-                                scaleEffort          = FALSE,
+                                day1                 = "station",
+                                datesAsOccasionNames = FALSE,
+                                includeEffort        = FALSE,
                                 timeZone             = "Asia/Kuala_Lumpur"
+)
+
+# day1 = "survey", datesAsOccasionNames = TRUE
+DetHist1day_survey <- detectionHistory(recordTable          = recordTableSample,
+                                       camOp                = camop_no_problem,
+                                       stationCol           = "Station",
+                                       speciesCol           = "Species",
+                                       recordDateTimeCol    = "DateTimeOriginal",
+                                       species              = "VTA",
+                                       occasionLength       = 1,
+                                       day1                 = "survey",
+                                       datesAsOccasionNames = TRUE,
+                                       includeEffort        = TRUE,
+                                       scaleEffort          = FALSE,
+                                       timeZone             = "Asia/Kuala_Lumpur"
 )
 
 # multi-season detection history
@@ -142,33 +142,33 @@ DetHist_multi <- detectionHistory(recordTable            = recordTableSampleMult
 
 # multi, unmarkedMultFrameInput = FALSE  
 DetHist_multi2 <- detectionHistory(recordTable            = recordTableSampleMultiSeason,
-                                  camOp                  = camop_season,
-                                  stationCol             = "Station",
-                                  speciesCol             = "Species",
-                                  species                = "VTA",
-                                  occasionLength         = 10,
-                                  day1                   = "station",
-                                  recordDateTimeCol      = "DateTimeOriginal",
-                                  includeEffort          = TRUE,
-                                  scaleEffort            = FALSE,
-                                  timeZone               = "UTC",
-                                  unmarkedMultFrameInput = FALSE  
+                                   camOp                  = camop_season,
+                                   stationCol             = "Station",
+                                   speciesCol             = "Species",
+                                   species                = "VTA",
+                                   occasionLength         = 10,
+                                   day1                   = "station",
+                                   recordDateTimeCol      = "DateTimeOriginal",
+                                   includeEffort          = TRUE,
+                                   scaleEffort            = FALSE,
+                                   timeZone               = "UTC",
+                                   unmarkedMultFrameInput = FALSE  
 )
 
 # multi, occasionLength = 1, day1 = "survey"
 DetHist_multi3 <- detectionHistory(recordTable            = recordTableSampleMultiSeason,
-                                  camOp                  = camop_season,
-                                  stationCol             = "Station",
-                                  speciesCol             = "Species",
-                                  species                = "VTA",
-                                  occasionLength         = 1,
-                                  day1                   = "survey",
-                                  recordDateTimeCol      = "DateTimeOriginal",
-                                  includeEffort          = TRUE,
-                                  scaleEffort            = FALSE,
-                                  timeZone               = "UTC",
-                                  datesAsOccasionNames   = TRUE,
-                                  unmarkedMultFrameInput = TRUE
+                                   camOp                  = camop_season,
+                                   stationCol             = "Station",
+                                   speciesCol             = "Species",
+                                   species                = "VTA",
+                                   occasionLength         = 1,
+                                   day1                   = "survey",
+                                   recordDateTimeCol      = "DateTimeOriginal",
+                                   includeEffort          = TRUE,
+                                   scaleEffort            = FALSE,
+                                   timeZone               = "UTC",
+                                   datesAsOccasionNames   = TRUE,
+                                   unmarkedMultFrameInput = TRUE
 )
 
 
@@ -254,3 +254,90 @@ test_that("occasionLength error message works", {
                                 timeZone             = "Asia/Kuala_Lumpur"), 
                "occasionLength must be a positive integer and not 0")
 })
+
+
+
+
+
+
+test_that("Warnings when day1 is a date and there are records before day1", {
+  expect_warning(detectionHistory(recordTable          = recordTableSample,
+                                  camOp                = camop_no_problem,
+                                  stationCol           = "Station",
+                                  speciesCol           = "Species",
+                                  recordDateTimeCol    = "DateTimeOriginal",
+                                  species              = "VTA",
+                                  occasionLength       = 7,
+                                  day1                 = "2009-05-01",
+                                  datesAsOccasionNames = FALSE,
+                                  includeEffort        = FALSE,
+                                  timeZone             = "Asia/Kuala_Lumpur"),
+                 "4 records (out of 5) were removed because they were taken before day1", fixed = TRUE)
+}                             
+)
+
+
+test_that("Error when day1 is after camera retrieval", {
+  expect_error(detectionHistory(recordTable          = recordTableSample,
+                                camOp                = camop_no_problem,
+                                stationCol           = "Station",
+                                speciesCol           = "Species",
+                                recordDateTimeCol    = "DateTimeOriginal",
+                                species              = "VTA",
+                                occasionLength       = 7,
+                                day1                 = "2009-06-01",
+                                datesAsOccasionNames = FALSE,
+                                includeEffort        = FALSE,
+                                timeZone             = "Asia/Kuala_Lumpur"),
+               "day1 (2009-06-01) is after the last station's retrieval date (2009-05-17)", fixed = TRUE)
+}                             
+)
+
+
+test_that("Error when day1 is before camera setup", {
+  expect_error(detectionHistory(recordTable          = recordTableSample,
+                                camOp                = camop_no_problem,
+                                stationCol           = "Station",
+                                speciesCol           = "Species",
+                                recordDateTimeCol    = "DateTimeOriginal",
+                                species              = "VTA",
+                                occasionLength       = 7,
+                                day1                 = "2009-04-01",
+                                maxNumberDays        = 10,
+                                datesAsOccasionNames = FALSE,
+                                includeEffort        = FALSE,
+                                timeZone             = "Asia/Kuala_Lumpur"),
+               "day1 (2009-04-01) is before the first station's setup date (2009-04-02)", fixed = TRUE)
+}                             
+)
+
+
+test_that("Warning when timeZone not defined", {
+  expect_warning(detectionHistory(recordTable          = recordTableSample,
+                                  camOp                = camop_no_problem,
+                                  stationCol           = "Station",
+                                  speciesCol           = "Species",
+                                  recordDateTimeCol    = "DateTimeOriginal",
+                                  species              = "VTA",
+                                  occasionLength       = 7,
+                                  day1                 = "station", 
+                                  includeEffort        = FALSE),
+                 "timeZone is not specified. Assuming UTC", fixed = TRUE)
+}                             
+)
+
+
+test_that("Error when includeEffort = TRUE but scaleEffort not defined", {
+  expect_error(detectionHistory(recordTable          = recordTableSample,
+                                camOp                = camop_no_problem,
+                                stationCol           = "Station",
+                                speciesCol           = "Species",
+                                recordDateTimeCol    = "DateTimeOriginal",
+                                species              = "VTA",
+                                occasionLength       = 7,
+                                day1                 = "station", 
+                                includeEffort        = TRUE,
+                                timeZone             = "Asia/Kuala_Lumpur"),
+               "scaleEffort must be defined if includeEffort is TRUE", fixed = TRUE)
+}                             
+)
