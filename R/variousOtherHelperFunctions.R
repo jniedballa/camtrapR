@@ -624,10 +624,18 @@ createDateRangeTable <- function(cam.op,
   rownames(date_ranges) <- rownames(cam.op)
   
   # check if images were taken between setup and retrieval dates (Error if images outside station date range)
-  if(any(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp), na.rm = TRUE)) warning(paste("record date before camera operation date range: ",
-                                                                                                             paste(rownames(date_ranges)[which(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp))], "\n", collapse = ", " )), call. = FALSE)
-  if(any(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp), na.rm = TRUE)) warning(paste("record date after camera operation date range: ",
-                                                                                                             paste(rownames(date_ranges)[which(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp))], "\n", collapse = ", " )), call. = FALSE)
+  if(any(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp), na.rm = TRUE)){
+    warning(paste("At", sum(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp), na.rm = TRUE), "stations",
+                  "there were records before camera operation date range: ",
+                  paste(rownames(date_ranges)[which(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp))], 
+                        sep = "\n", collapse = ", " )), call. = FALSE)
+  }
+  if(any(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp), na.rm = TRUE)) {
+    warning(paste("At", sum(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp), na.rm = TRUE), "stations",
+                  "there records after camera operation date range: ",
+                  paste(rownames(date_ranges)[which(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp))], 
+                        sep = "\n", collapse = ", " )), call. = FALSE)
+  }
   
   # define when first occasion begins (to afterwards remove prior records in function    cleanSubsetSpecies)
   if(!hasArg(buffer_tmp)) buffer_tmp <- 0
@@ -785,11 +793,19 @@ cleanSubsetSpecies <- function(subset_species2 ,
   remove.these <- which(subset_species2$DateTime2 < corrected_start_time_by_record)
   if(length(remove.these) >= 1){
     
-    warning(paste(length(remove.these), "records out of", nrow_subset_species2, "were removed because they were taken within the buffer period, before day1 (if a date was specified), or before occasionStartTime on the 1st day\n"),
-            paste(subset_species2[remove.these, stationCol2], subset_species2$DateTime2[remove.these], collapse = "\n", sep = ": "), call. = FALSE)
+    warning(paste(length(remove.these), 
+                  " records (out of ", 
+                  nrow_subset_species2, 
+                  ") were removed because they were taken before day1 (if a date was specified),  within the buffer period, or before occasionStartTime on the 1st day, e.g.:\n", sep = ""),
+            paste(head(subset_species2[remove.these, stationCol2]), 
+                       head(subset_species2$DateTime2[remove.these]), 
+                       collapse = "\n", 
+                       sep = ": "),
+            call. = FALSE)
     
     subset_species2 <- subset_species2[-remove.these,]
-    if(nrow(subset_species2) == 0) stop("No more records left. The detection history would be empty.")
+    if(nrow(subset_species2) == 0) stop("No more records after removing records before survey begin. The detection history would be empty.")
+    
     rm(corrected_start_time_by_record, remove.these)
   }
   
@@ -799,8 +815,16 @@ cleanSubsetSpecies <- function(subset_species2 ,
   remove.these2 <- which(subset_species2$DateTime2 > corrected_end_time_by_record)
   if(length(remove.these2) >= 1){
     
-    warning(paste(length(remove.these2), "records out of", nrow_subset_species2, "were removed because they were taken after the end of the last occasion\n"), 
-            paste(subset_species2[remove.these2, stationCol2], subset_species2$DateTime2[remove.these2], collapse = "\n", sep = ": "), call. = FALSE)
+    warning(paste(paste(length(remove.these2), 
+                        " records (out of ", 
+                        nrow_subset_species2, 
+                        ") were removed because they were taken after the end of the last occasion, e.g.:", sep = ""),
+                  paste(head(subset_species2[remove.these2, stationCol2]), 
+                        head(subset_species2$DateTime2[remove.these2]), 
+                        collapse = "\n", 
+                        sep = ": "), 
+                  sep = "\n"), 
+            call. = FALSE)
     
     subset_species2 <- subset_species2[-remove.these2,]
     
