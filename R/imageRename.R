@@ -31,31 +31,6 @@ imageRename <- function(inDir,
     if(isTRUE(grepl("/$", inDir))) stop("inDir may not end with /", call. = FALSE)
   }
   
-  if(isTRUE(writecsv) & hasArg(outDir) == FALSE) stop("writecsv is TRUE. Please specify outDir", call. = FALSE)
-  
-  if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
-  
-  # check call for consistency
-  stopifnot(is.logical(copyImages))
-  stopifnot(is.logical(writecsv))
-  stopifnot(is.logical(hasCameraFolders))
-  stopifnot(is.logical(createEmptyDirectories))
-  
-  if(isTRUE(hasCameraFolders)){
-    stopifnot(hasArg(keepCameraSubfolders))
-    stopifnot(is.logical(keepCameraSubfolders))
-  } else {
-    keepCameraSubfolders <- FALSE
-  }
-  if(hasArg(hasCameraFolders) & hasArg(keepCameraSubfolders)){
-    if(keepCameraSubfolders == TRUE & hasCameraFolders == FALSE){stop("If hasCameraFolders is FALSE, keepCameraSubfolders must be FALSE too", call. = FALSE)}
-  }
-  
-  
-
-  
-  
-  
   # list of subdirectories of inDir
   dirs       <- list.dirs(inDir, full.names = TRUE,  recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
@@ -69,6 +44,8 @@ imageRename <- function(inDir,
     warning("at least one station directory contains no JPEGs:  ", paste(dirs_short[which(lapply(list_n_files, length) == 0)], collapse = "; "), call. = FALSE, immediate. = TRUE)
   }
   
+  stopifnot(is.logical(createEmptyDirectories))
+  
   # remove dirs and dirs_short if they contain no images (and if user overrides default createEmptyDirectories = FALSE)
   if(isFALSE(createEmptyDirectories)){
     stations2remove  <- which(lapply(list_n_files, length) == 0)
@@ -77,6 +54,27 @@ imageRename <- function(inDir,
       dirs_short  <- dirs_short[-stations2remove]
     }
   }
+  
+  if(isTRUE(writecsv) & hasArg(outDir) == FALSE) stop("writecsv is TRUE. Please specify outDir", call. = FALSE)
+  
+  if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
+  
+  # check call for consistency
+  stopifnot(is.logical(copyImages))
+  stopifnot(is.logical(writecsv))
+  stopifnot(is.logical(hasCameraFolders))
+  
+  
+  if(isTRUE(hasCameraFolders)){
+    stopifnot(hasArg(keepCameraSubfolders))
+    stopifnot(is.logical(keepCameraSubfolders))
+  } else {
+    keepCameraSubfolders <- FALSE
+  }
+  if(hasArg(hasCameraFolders) & hasArg(keepCameraSubfolders)){
+    if(keepCameraSubfolders == TRUE & hasCameraFolders == FALSE){stop("If hasCameraFolders is FALSE, keepCameraSubfolders must be FALSE too", call. = FALSE)}
+  }
+  
   
   # function body
   
