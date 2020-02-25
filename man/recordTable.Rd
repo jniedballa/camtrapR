@@ -135,7 +135,7 @@ The results of a number of other function will depend on the output of this func
 \examples{
 
 
-\dontrun{   # the example  run too long to pass CRAN tests
+\dontrun{   # the examples run too long to pass CRAN tests
 
 # set directory with camera trap images in station directories
 wd_images_ID_species <- system.file("pictures/sample_images", package = "camtrapR")

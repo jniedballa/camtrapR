@@ -142,7 +142,7 @@ Juergen Niedballa
                                         timeZone               = "Asia/Kuala_Lumpur"
  )
  
- 
+ \dontrun{   # the examples run too long to pass CRAN tests
  # extracting some example summary stats too 
  # a nonsensical example, get all unique cameras with which the event was photographed
  
@@ -159,6 +159,7 @@ Juergen Niedballa
                                         eventSummaryColumn     = "EXIF:Make",
                                         eventSummaryFunction   = "unique"
  )
+ }
 
  } else {                                # show function output if ExifTool is not available
  message("ExifTool is not available. Cannot test function")
