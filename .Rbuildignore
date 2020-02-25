@@ -5,3 +5,4 @@
 ^pkgdown$
 ^README.Rmd
 ^.github
+^R/_not_for_CRAN$
