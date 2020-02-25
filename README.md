@@ -21,22 +21,40 @@ You can install the stable version of camtrapR from CRAN:
 install.packages("camtrapR")
 ```
 
+or you can install the latest development version from GitHub via:
+
+``` r
+library(devtools)
+install_github("jniedballa/camtrapR")
+```
+
 ## Exiftool
 
-Numerous camtrapR functions read EXIF metadata from JPG images. This is
-done via Exiftool, a free and open-source sofware tool developed by Phil
-Harvey and available for Windows, MacOS and Linux.
+Numerous important camtrapR functions read EXIF metadata from JPG
+images. This is done via Exiftool, a free and open-source sofware tool
+developed by Phil Harvey and available for Windows, MacOS and Linux.
 
 To make full use of camtrapR, you will need Exiftool on your system. You
 can download it from the [Exiftool homepage](https://exiftool.org/).
 Please follow the installation instruction in vignette 1.
 
-## Google Group
+You may not need Exiftool if you do not work with image files, but only
+use camtrapR to create input for occupancy or spatial capture-recapture
+models from existing record tables.
+
+## Help and Support
+
+### Google Group
 
 There is a [Google
 Group](https://groups.google.com/forum/#!forum/camtrapr) for all
 questions and problems regarding camtrapR. Please feel free to join the
 discussion there.
+
+### GitHub issues
+
+Alternatively, you can report bugs and problems as issues here on GitHub
+[(here)](https://github.com/jniedballa/camtrapR/issues).
 
 ## Further reading
 
