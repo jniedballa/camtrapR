@@ -258,27 +258,45 @@ Here is a little function for plotting the camera operation matrix. Imagine ther
 
 ```{r}
 camopPlot <- function(camOp, 
-                      palette = "Red-Yellow"){
+                      palette = "Heat"){
   
   which.tmp <- grep(as.Date(colnames(camOp)), pattern = "01$")
   label.tmp <- format(as.Date(colnames(camOp))[which.tmp], "%Y-%m")
   at.tmp <- which.tmp / ncol(camOp)
   
-  values_tmp <- na.omit(unique(c(camOp)))
+  values_tmp <- sort(na.omit(unique(c(camOp))))
 
-  image(t(as.matrix(camOp)), xaxt = "n", yaxt = "n", col = hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE))
+  # hcl.colors only exists in R >3.6.0, use heat.colors for earlier versions
+  image_colors <- if(exists("hcl.colors")) {
+    hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE)
+  } else {
+    heat.colors(n = length(values_tmp), rev = TRUE)
+  }
   
+  image(t(as.matrix(camOp)), xaxt = "n", yaxt = "n", col = image_colors)
   axis(1, at = at.tmp, labels = label.tmp)
   axis(2, at = seq(from = 0, to = 1, length.out = nrow(camOp)), labels = rownames(camOp), las = 1)
   abline(v = at.tmp, col = rgb(0,0,0, 0.2))
   box()
 }
 ```
-And this is what we get
+
+And this is what we get (in two different color palettes).
 
 ```{r}
+par(mfrow = c(1,2))
 camopPlot(camOp = camop_problem)
+camopPlot(camOp = camop_problem, palette = "Viridis")
 ```
+
+```{r include = FALSE}
+par(mfrow = c(1,2))
+```
+
+Note that the colors are stretched between the lowest and highest value. There is no dedicated color for 0, designating non-operational cameras. 
+
+For a list of color palettes, see [here](https://developer.r-project.org/Blog/public/2019/04/01/hcl-based-color-palettes-in-grdevices/index.html).
+
 
 ## Saving and loading camera operation matrices
 
