@@ -21,11 +21,34 @@ vignette: >
 
 **camtrapR** provides functions for organising and managing camera trap images and for the preparation of occupancy and (spatial) capture-recapture analyses. Currently the package handles JPG images only. Because of inconsistent metadata structure, there is no support for video files yet. 
 
-The vignettes demonstrate the **camtrapR** workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
+The four vignettes demonstrate the camtrapR workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
+
+## Installation
+
+You can install the newest stable version from CRAN via:
+
+```{r eval = FALSE}
+install.packages(camtrapR)
+```
+
+Alternatively, you can install the development version from GitHub (requires package devtools):
+
+```{r eval = FALSE}
+library(devtools)
+install_github("jniedballa/camtrapR")
+```
+
+
+Afterwards, load camtrapR via:
 
 ```{r eval = TRUE}
 library(camtrapR)
 ```
+
+
+## Documentation
+
+The latest vignettes, function reference and changelog can be found on the [camtrapR GitHub pages](https://jniedballa.github.io/camtrapR/) or the [camtrapR page on CRAN](https://CRAN.R-project.org/package=camtrapR). Source code can be found on [GitHub](https://github.com/jniedballa/camtrapR).
 
 
 ## Workflow
@@ -81,20 +104,20 @@ To facilitate understanding here is a glossary on how we use specific terms. It 
 
 ## ExifTool
 
-camtrapR relies on the free and open-source software **ExifTool** written by Phil Harvey to extract metadata from images. ExifTool is freely available [here](http://www.sno.phy.queensu.ca/~phil/exiftool/) and runs on Windows, Linux and MacOS. In order to use it, your system must be able to find the software. On MacOS, Linux and Unix it needs installation and should afterwards be found by the system without problems. How to set up Exiftool for Windows is detailed below. General installation instruction can be found [here]( http://www.sno.phy.queensu.ca/~phil/exiftool/install.html).
+camtrapR relies on the free and open-source software **ExifTool** written by Phil Harvey to extract metadata from images. ExifTool is freely available [here](http://www.sno.phy.queensu.ca/~phil/exiftool/) and runs on Windows, Linux and MacOS. In order to use it, your system must be able to find the software. On MacOS, Linux and Unix it needs installation and should afterwards be found by the system without problems. How to set up Exiftool for Windows is detailed below. General installation instruction can be found [here](http://www.sno.phy.queensu.ca/~phil/exiftool/install.html).
 
 ### ExifTool for Windows
 
-On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found [here]( http://www.sno.phy.queensu.ca/~phil/exiftool/install.html). Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained .exe file to exiftool.exe and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in Window's PATH variable (e.g. C:/Windows). 
+On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found [here]( http://www.sno.phy.queensu.ca/~phil/exiftool/install.html). Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained .exe file to exiftool.exe and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in Windows PATH variable (e.g. C:/Windows). 
 
 
 ```{r eval = FALSE}
-# Check which directories are in PATH (not shown here)
+# Check which directories are in PATH (output not shown here)
 Sys.getenv("PATH")
 ```
 
 ```{r}
-# Check if the system can find ExifTool
+# Check if the system can find Exiftool (if output is empty "", system can't find Exiftool)
 Sys.which("exiftool")
 ```
 
@@ -109,7 +132,7 @@ Afterwards, Windows (via R) should be able to find ExifTool during the active se
 
 ### ExifTool performance
 
-ExifTool is the performance bottleneck of the package functions. It can extract metadata at a rate of about 160 images per second (approx. 10,000 images per minute, measured on a laptop computer running Windows 7, Intel Core i5-2410M / 2.3 GHz, 6 GB RAM). Performance tends to be lower when ExifTool is first called and increases afterwards; and it decreases in situations with numerous camera trap stations with few images each (because ExifTool is called separately on every station directory). 
+ExifTool is the performance bottleneck of the package functions. It can extract metadata at a rate of about 160 images per second (approx. 10,000 images per minute, measured on a laptop computer running Windows 7, Intel Core i5-2410M / 2.3 GHz, 6 GB RAM). Performance tends to be lower when ExifTool is first called and increases afterwards; and it decreases in situations with numerous camera trap stations with few images each (because ExifTool is called separately on every station directory and the associated overhead of loading ExifTool each time). 
 
 # Camera trap station information
 
