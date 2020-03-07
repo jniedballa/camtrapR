@@ -147,11 +147,11 @@ Mapstest <- detectionMaps(CTtable           = camtraps,
 )
 
 
-\dontrun{
 
-# with a polygon in the background
+# with a polygon in the background, and for one species only
 
 # make a dummy polygon for the background
+library(sp)
 poly1 <- Polygon(cbind(c(521500,526500,527000, 521500),c(607500, 608000, 603500, 603500)))
 poly2 <- Polygons(list(poly1), "s1")
 poly3 <- SpatialPolygons(list(poly2))
@@ -161,6 +161,7 @@ Mapstest2 <- detectionMaps(CTtable           = camtraps,
                            Xcol              = "utm_x",
                            Ycol              = "utm_y",
                            backgroundPolygon = poly3,         # this was added
+                           speciesToShow     = "VTA",         # this was added
                            stationCol        = "Station",
                            speciesCol        = "Species",
                            writePNG          = FALSE,
@@ -170,7 +171,7 @@ Mapstest2 <- detectionMaps(CTtable           = camtraps,
                            addLegend         = TRUE
 )
 
-}
+
 }
 
 \references{
