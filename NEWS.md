@@ -10,6 +10,7 @@
 * error message when inDir in functions that call Exiftool is empty (no subdirectories)
 * surveyReport: error message when zip file can't be created
 * special characters in directory names now supported (but still best avoided; requires ExifTool 9.79 or later)
+* detectionMaps: fixed error when trying to plot backgroundPolygon (reported by Oliver Wearn)
 
 ## other changes
 
