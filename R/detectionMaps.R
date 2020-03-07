@@ -67,7 +67,10 @@ detectionMaps <- function(CTtable,
     stopifnot(file.exists(shapefileDirectory))
   }
 
-  if(hasArg(backgroundPolygon)) stopifnot(class(backgroundPolygon) %in% c("SpatialPolygons", "SpatialPolygonsDataFrame"))
+  if(hasArg(backgroundPolygon)){
+    if (!requireNamespace("sp", quietly = TRUE)) stop("package 'sp' is required to plot backgroundPolygon")
+    stopifnot(class(backgroundPolygon) %in% c("SpatialPolygons", "SpatialPolygonsDataFrame"))
+  }
 
   if(hasArg(speciesToShow)){
     stopifnot(is.character(speciesToShow))
@@ -178,7 +181,7 @@ detectionMaps <- function(CTtable,
              asp = 1,
              xaxs = "i", yaxs = "i")
 
-      if(hasArg(backgroundPolygon)){plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
+      if(hasArg(backgroundPolygon)){sp::plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
 
       # station points
       points(y = dat2[, Ycol], x = dat2[, Xcol], pch = pch1,  bg  = col_pt1_fill, col = col_pt1_border,
@@ -230,7 +233,7 @@ detectionMaps <- function(CTtable,
            asp = 1,
            xaxs = "i", yaxs = "i")
 
-      if(hasArg(backgroundPolygon)){plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
+      if(hasArg(backgroundPolygon)){sp::plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
 
       # station points
       points(y = dat2[, Ycol], x = dat2[, Xcol], pch = pch1,  bg  = col_pt1_fill, col = col_pt1_border,
@@ -280,7 +283,7 @@ detectionMaps <- function(CTtable,
              asp = 1,
              xaxs = "i", yaxs = "i")
 
-        if(hasArg(backgroundPolygon)){plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
+        if(hasArg(backgroundPolygon)){sp::plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
 
         # station points
         points(y = dat2[, Ycol], x = dat2[, Xcol], pch = pch1,  bg  = col_pt1_fill, col = col_pt1_border,
@@ -327,7 +330,7 @@ detectionMaps <- function(CTtable,
              asp = 1,
              xaxs = "i", yaxs = "i")
 
-        if(hasArg(backgroundPolygon)){plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
+        if(hasArg(backgroundPolygon)){sp::plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
 
         # station points
         points(y = dat2[, Ycol], x = dat2[, Xcol], pch = pch1,  bg  = col_pt1_fill, col = col_pt1_border,
