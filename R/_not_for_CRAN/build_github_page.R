@@ -6,5 +6,6 @@ require(devtools)
 pkgdown::build_site()   # build whole github page
 
 build_news()       # NEWS section
-build_article()    # vignettes
+build_articles()   # all vignettes 
+build_article(name = "camtrapr1")   # is for individual vignettes
 build_reference()  # funcion documentation
