@@ -126,7 +126,7 @@ detectionMaps <- function(CTtable,
     y.range <- extendrange(r = range(c(coordinates(backgroundPolygon@bbox)[2,], dat2[,Ycol])), f = range.expand.factor)
 
     X.tmp <- pngMaxPix / diff(range(c(coordinates(backgroundPolygon@bbox)[1,], dat2[,Xcol])))
-    Y.tmp <- pngMaxPix / diff(range(c(coordinates(backgroundPolygon@bbox)[1,], dat2[,Ycol])))
+    Y.tmp <- pngMaxPix / diff(range(c(coordinates(backgroundPolygon@bbox)[2,], dat2[,Ycol])))
 
   } else {
 
@@ -134,7 +134,8 @@ detectionMaps <- function(CTtable,
     y.range <- extendrange(r = range(range(dat2[,Ycol])), f = range.expand.factor)
 
     X.tmp <- pngMaxPix / diff(range(dat2[Xcol]))
-    Y.tmp <- pngMaxPix / diff(range(dat2[Ycol]))}
+    Y.tmp <- pngMaxPix / diff(range(dat2[Ycol]))
+    }
 
   par(mar = par.mar.tmp,
       xpd = TRUE,
@@ -176,10 +177,14 @@ detectionMaps <- function(CTtable,
           width = pngWidth, height = pngHeight, units = "px", res = 96, type = "cairo")
       par(mar = par.mar.tmp, xpd=TRUE, xaxs = "i")
 
-      plot(x = 0, type = "n", main = "Species Richness", ylab = Ycol, xlab = Xcol,
-             xlim = x.range, ylim = y.range,
-             asp = 1,
-             xaxs = "i", yaxs = "i")
+      plot(x = 0, type = "n", 
+           main = ifelse(hasArg(speciesToShow), 
+                         paste("Species Richness (out of subset of ", length(speciesToShow) , " species)", sep = ""), 
+                         "Species Richness"),
+           ylab = Ycol, xlab = Xcol,
+           xlim = x.range, ylim = y.range,
+           asp = 1,
+           xaxs = "i", yaxs = "i")
 
       if(hasArg(backgroundPolygon)){sp::plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
 
@@ -228,8 +233,14 @@ detectionMaps <- function(CTtable,
       #         scale_size_discrete(name = "n species")
 
 
-      plot(x = 0, type = "n", main = "Species Richness", ylab = Ycol, xlab = Xcol,
-           xlim = x.range, ylim = y.range,
+      plot(x = 0, type = "n", 
+           main = ifelse(hasArg(speciesToShow), 
+                         paste("Species Richness (out of subset of ", length(speciesToShow) , " species)", sep = ""), 
+                         "Species Richness"),
+           ylab = Ycol, 
+           xlab = Xcol,
+           xlim = x.range, 
+           ylim = y.range,
            asp = 1,
            xaxs = "i", yaxs = "i")
 
