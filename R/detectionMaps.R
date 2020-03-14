@@ -79,23 +79,38 @@ detectionMaps <- function(CTtable,
   }
 
   # data preparation
-  dat2 <- aggregate(CTtable[, c(Ycol, Xcol)], by = list(CTtable[,stationCol]), FUN = mean)    # get coordinates
+  dat2 <- aggregate(CTtable[, c(Ycol, Xcol)], 
+                    by = list(CTtable[,stationCol]), 
+                    FUN = mean)    # get coordinates
   colnames(dat2)[1] <- stationCol
 
-  t1 <- aggregate(recordTable[, speciesCol], by = list(recordTable[,stationCol]), FUN = table, simplify = FALSE)   # number of species records by station
-  t2 <- data.frame(as.character(t1[,1]), matrix(unlist(t1$x), nrow = length(unique(recordTable[,stationCol])), byrow = TRUE))
-  colnames(t2) <- c(stationCol, names(t1[,2][[1]]))
-
-  t3 <- t2[match(toupper(as.character(dat2[,stationCol])), toupper(as.character(t2[,stationCol]))),]    # matching IDs between recordTable and CTtable
-  cex.t3 <- data.frame(t3[,1], apply(data.frame(t3[,-1]), MARGIN = 2, FUN = function(x){x/max(x, na.rm = TRUE)}))
+  # number of records of each species at each station
+  t3 <- data.frame(rbind(table(recordTable[, stationCol], 
+                                 recordTable[, speciesCol])), 
+             check.names = FALSE)
+  t3 <- data.frame(rownames(t3), t3, row.names=NULL, check.names = FALSE)
+  colnames(t3)[1] <- stationCol
+  
+  t3 <- t3[match(toupper(as.character(dat2[,stationCol])), 
+                     toupper(as.character(t3[,stationCol]))),]
+  cex.t3 <- data.frame(t3[,1], apply(data.frame(t3[,-1]),
+                                     MARGIN = 2,
+                                     FUN = function(x){x/max(x, na.rm = TRUE)}))
   colnames(cex.t3)[1] <- stationCol
-
-  t4 <- data.frame(t3[,1], n_species = apply(as.data.frame(ifelse(t3[,-1] >=1, 1, 0)), 1, FUN = sum))    # number of species by station
-  cex.t4 <- data.frame(t4[,1], n_species_scaled = t4$n_species / max(t4$n_species, na.rm = TRUE))
-  colnames(t4)[1] <- colnames(cex.t4)[1] <- stationCol
-
-  rm(t1, t2)
-
+  
+  # number of species detected per station
+  t4 <- as.data.frame(tapply(X = recordTable[, speciesCol],
+                               INDEX = list(recordTable[, stationCol]),
+                               FUN = function(x) length(unique(x))))
+  colnames(t4) <- "n_species"
+  t4[,stationCol] <- rownames(t4)
+  t4 <- t4[,c(2,1)]
+  t4 <- t4[match(toupper(as.character(dat2[,stationCol])), 
+                 toupper(as.character(t4[,stationCol]))),]
+  
+  cex.t4 <- data.frame(t4[,1],
+                       n_species_scaled = t4$n_species / max(t4$n_species, na.rm = TRUE))
+  
   # set graphics  parameters and out directory
   if(hasArg(smallPoints) == FALSE) {smallPoints <- 0} else {
     if(smallPoints >  3 | smallPoints < 0 | !is.numeric(smallPoints)) stop("smallPoints must be a number between 0 and 3")
