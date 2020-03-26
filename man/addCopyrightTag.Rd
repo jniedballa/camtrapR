@@ -63,9 +63,10 @@ addCopyrightTag(inDir        = wd_images_ID_copy,
                 copyrightTag = copyrightTagToAdd)
 1     # we choose "YES", i.e., we want to add a copyright tag
                 
-# you can check the outcome with function exifTagNames (find the field "Copyright")
+# you can check the outcome with function exifTagNames
 
-exifTagNames(wd_images_ID_copy, returnMetadata = TRUE)
+metadat <- exifTagNames(wd_images_ID_copy)
+metadat [metadat$tag_name == "Copyright",]
 }
 
 
