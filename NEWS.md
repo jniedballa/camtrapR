@@ -3,6 +3,7 @@
 ## new features
 
 * surveyReport: reliable creation of zip files via package "zip" (if installed, in Suggests now)
+* exifTagNames returns a data frame containing all relevant information at once: tag group names, tag descriptions, tag names and values. Arguments returnMetadata and returnTagGroup are ignored now
 
 ## bugfixes
 
