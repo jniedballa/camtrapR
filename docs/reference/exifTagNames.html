@@ -36,7 +36,7 @@
 
 
 <meta property="og:title" content="Show Exif metadata tags and tag names from JPEG images — exifTagNames" />
-<meta property="og:description" content="The function will return sample metadata and tag names of Exif metadata of JPEG images. It uses the first JPEG image it finds in a subdirectory of the specified directory." />
+<meta property="og:description" content="The function will return metadata values, metadata tag names and group names of Exif metadata of JPEG images or other formats." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -92,7 +92,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/camtrapR1.html">1. Organising raw camera trap images in camtrapR</a>
+      <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
@@ -135,14 +135,14 @@
     </div>
 
     <div class="ref-description">
-    <p>The function will return sample metadata and tag names of Exif metadata of JPEG images. It uses the first JPEG image it finds in a subdirectory of the specified directory.</p>
+    <p>The function will return metadata values, metadata tag names and group names of Exif metadata of JPEG images or other formats.</p>
     </div>
 
     <pre class="usage"><span class='fu'>exifTagNames</span>(<span class='no'>inDir</span>,
   <span class='kw'>whichSubDir</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='no'>fileName</span>,
-  <span class='kw'>returnMetadata</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnTagGroup</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='no'>returnMetadata</span>,
+  <span class='no'>returnTagGroup</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -161,11 +161,11 @@
     </tr>
     <tr>
       <th>returnMetadata</th>
-      <td><p>logical. Return actual metadata (TRUE) or metadata tag names only (FALSE)</p></td>
+      <td><p>deprecated and ignored</p></td>
     </tr>
     <tr>
       <th>returnTagGroup</th>
-      <td><p>logical. Return tag group along with tag names (e.g. EXIF, IPTC, XMP, MakerNotes)</p></td>
+      <td><p>deprecated and ignored</p></td>
     </tr>
     </table>
 
@@ -175,7 +175,7 @@
 <p>By default the function returns both metadata tag names and the metadata group they belong to (via argument <code>returnTagGroup</code>). This is helpful to unambiguously address specific metadata tags, because different groups can contain tags of identical names, which may cause problems executing the functions <code><a href='recordTable.html'>recordTable</a></code> and <code><a href='recordTableIndividual.html'>recordTableIndividual</a></code>. The format is "GROUP:tag", e.g. "EXIF:Flash".</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A character vector containing available metadata or metadata tag names (and groups).</p>
+    <p>A data frame containing available metadata tag groups, descriptions, names and values.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Phil Harvey's ExifTool <a href='http://www.sno.phy.queensu.ca/~phil/exiftool/ '>http://www.sno.phy.queensu.ca/~phil/exiftool/ </a> <br /></p>
@@ -189,33 +189,24 @@
 
 <span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
 
-<span class='co'># return tag names only</span>
+<span class='co'># specify directory, camtrapR will automatically take first image from first subdirectory</span>
 <span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID</span>)
 
-<span class='co'># return tag names and metadata</span>
+<span class='co'># specify subdirectory by name, camtrapR will use first image</span>
 <span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
-             <span class='kw'>returnMetadata</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
-
-<span class='co'># specify directory by name</span>
-<span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
-             <span class='kw'>returnMetadata</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
              <span class='kw'>whichSubDir</span>    <span class='kw'>=</span> <span class='st'>"StationA"</span>)
+
+<span class='co'># specifying fileName only (line break due to R package policy)</span>
+<span class='fu'>exifTagNames</span>(<span class='kw'>fileName</span>       <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>wd_images_ID</span>, <span class='st'>"StationC"</span>, <span class='st'>"TRA"</span>,
+                                        <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span>))
 
 <span class='co'># specify inDir and fileName</span>
 <span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
-             <span class='kw'>returnMetadata</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
              <span class='kw'>fileName</span>       <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"StationC"</span>, <span class='st'>"TRA"</span>, <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span>))
 
 <span class='co'># it also works this way</span>
 <span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>wd_images_ID</span>, <span class='st'>"StationC"</span>, <span class='st'>"TRA"</span>),
-             <span class='kw'>returnMetadata</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
              <span class='kw'>fileName</span>       <span class='kw'>=</span> <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span>)
-
-<span class='co'># or by only specifying fileName (line break due to R package policy)</span>
-<span class='fu'>exifTagNames</span>(<span class='kw'>fileName</span>       <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>wd_images_ID</span>, <span class='st'>"StationC"</span>, <span class='st'>"TRA"</span>,
-                                        <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span>),
-             <span class='kw'>returnMetadata</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 }</div></pre>
   </div>
