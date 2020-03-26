@@ -92,7 +92,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/camtrapR1.html">1. Organising raw camera trap images in camtrapR</a>
+      <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
@@ -193,9 +193,10 @@
                 <span class='kw'>copyrightTag</span> <span class='kw'>=</span> <span class='no'>copyrightTagToAdd</span>)
 <span class='fl'>1</span>     <span class='co'># we choose "YES", i.e., we want to add a copyright tag</span>
 
-<span class='co'># you can check the outcome with function exifTagNames (find the field "Copyright")</span>
+<span class='co'># you can check the outcome with function exifTagNames</span>
 
-<span class='fu'><a href='exifTagNames.html'>exifTagNames</a></span>(<span class='no'>wd_images_ID_copy</span>, <span class='kw'>returnMetadata</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>metadat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='exifTagNames.html'>exifTagNames</a></span>(<span class='no'>wd_images_ID_copy</span>)
+<span class='no'>metadat</span> [<span class='no'>metadat</span>$<span class='no'>tag_name</span> <span class='kw'>==</span> <span class='st'>"Copyright"</span>,]
 }
 
 
