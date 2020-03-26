@@ -69,15 +69,13 @@ exifTagNames(fileName       = file.path(wd_images_ID, "StationC", "TRA",
                                         "StationC__2009-05-02__00-10-00(1).JPG"))
                                         
 # specify inDir and fileName
-exifTagNames(inDir          = wd_images_ID
+exifTagNames(inDir          = wd_images_ID,
              fileName       = file.path("StationC", "TRA", "StationC__2009-05-02__00-10-00(1).JPG"))
              
 # it also works this way
-exifTagNames(inDir          = file.path(wd_images_ID, "StationC", "TRA")
+exifTagNames(inDir          = file.path(wd_images_ID, "StationC", "TRA"),
              fileName       = "StationC__2009-05-02__00-10-00(1).JPG")
-             
 
-             
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
