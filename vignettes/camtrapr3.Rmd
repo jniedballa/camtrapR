@@ -161,7 +161,7 @@ table(rec.db.species60.exclude$Species)
 
 ```{r}
 wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
-exifTagNames(inDir = wd_images_ID, returnMetadata = FALSE)
+exifTagNames(inDir = wd_images_ID)
 ```
 
 The output table contains tag groups, tag descriptions, tag names and tag values. The values in `tag_group` help to unambiguously identify specific metadata tags.
