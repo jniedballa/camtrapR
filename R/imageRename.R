@@ -206,7 +206,7 @@ imageRename <- function(inDir,
   }
   
   # error if no date/time tag is readable
-  if(!any(copy.info.table$DateReadable)) stop("could not read DateTimeOriginal tag of any image. Check if the DateTimeOriginal tag is present in metadata with exifTagNames(..., returnMetadata = TRUE). If not, fixDateTimeOriginal() might help.",
+  if(!any(copy.info.table$DateReadable)) stop("could not read DateTimeOriginal tag of any image. Check if the DateTimeOriginal tag is present in metadata with exifTagNames(). If not, fixDateTimeOriginal() might help.",
                                               call. = FALSE)
   # warning if at least one date/time tag is not readable
   if(!all(copy.info.table$DateReadable)) warning(paste("Some DateTimeOriginal tags are unreadable, e.g. \n", 
