@@ -92,7 +92,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/camtrapR1.html">1. Organising raw camera trap images in camtrapR</a>
+      <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
@@ -289,20 +289,21 @@
                           <span class='kw'>addLegend</span>         <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</div><div class='img'><img src='detectionMaps-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='detectionMaps-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='detectionMaps-3.png' alt='' width='700' height='433' /></div><div class='img'><img src='detectionMaps-4.png' alt='' width='700' height='433' /></div><div class='img'><img src='detectionMaps-5.png' alt='' width='700' height='433' /></div><div class='img'><img src='detectionMaps-6.png' alt='' width='700' height='433' /></div><div class='input'>
 
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 
-<span class='co'># with a polygon in the background</span>
+<span class='co'># with a polygon in the background, and for one species only</span>
 
 <span class='co'># make a dummy polygon for the background</span>
-<span class='no'>poly1</span> <span class='kw'>&lt;-</span> <span class='fu'>Polygon</span>(<span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>521500</span>,<span class='fl'>526500</span>,<span class='fl'>527000</span>, <span class='fl'>521500</span>),<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>607500</span>, <span class='fl'>608000</span>, <span class='fl'>603500</span>, <span class='fl'>603500</span>)))
-<span class='no'>poly2</span> <span class='kw'>&lt;-</span> <span class='fu'>Polygons</span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>poly1</span>), <span class='st'>"s1"</span>)
-<span class='no'>poly3</span> <span class='kw'>&lt;-</span> <span class='fu'>SpatialPolygons</span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>poly2</span>))
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>sp</span>)
+<span class='no'>poly1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPolygons.html'>Polygon</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>521500</span>,<span class='fl'>526500</span>,<span class='fl'>527000</span>, <span class='fl'>521500</span>),<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>607500</span>, <span class='fl'>608000</span>, <span class='fl'>603500</span>, <span class='fl'>603500</span>)))
+<span class='no'>poly2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPolygons.html'>Polygons</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>poly1</span>), <span class='st'>"s1"</span>)
+<span class='no'>poly3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/sp/man/SpatialPolygons.html'>SpatialPolygons</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>poly2</span>))
 
 <span class='no'>Mapstest2</span> <span class='kw'>&lt;-</span> <span class='fu'>detectionMaps</span>(<span class='kw'>CTtable</span>           <span class='kw'>=</span> <span class='no'>camtraps</span>,
                            <span class='kw'>recordTable</span>       <span class='kw'>=</span> <span class='no'>recordTableSample</span>,
                            <span class='kw'>Xcol</span>              <span class='kw'>=</span> <span class='st'>"utm_x"</span>,
                            <span class='kw'>Ycol</span>              <span class='kw'>=</span> <span class='st'>"utm_y"</span>,
-                           <span class='kw'>backgroundPolygon</span> <span class='kw'>=</span> <span class='no'>poly3</span>,         <span class='co'># this was added</span>
+                           <span class='kw'>backgroundPolygon</span> <span class='kw'>=</span> <span class='no'>poly3</span>,             <span class='co'># this was added</span>
+                           <span class='kw'>speciesToShow</span>     <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"PBE"</span>, <span class='st'>"VTA"</span>),   <span class='co'># this was added</span>
                            <span class='kw'>stationCol</span>        <span class='kw'>=</span> <span class='st'>"Station"</span>,
                            <span class='kw'>speciesCol</span>        <span class='kw'>=</span> <span class='st'>"Species"</span>,
                            <span class='kw'>writePNG</span>          <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -310,9 +311,9 @@
                            <span class='kw'>printLabels</span>       <span class='kw'>=</span> <span class='fl'>TRUE</span>,
                            <span class='kw'>richnessPlot</span>      <span class='kw'>=</span> <span class='fl'>TRUE</span>,
                            <span class='kw'>addLegend</span>         <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
+)</div><div class='img'><img src='detectionMaps-7.png' alt='' width='700' height='433' /></div><div class='img'><img src='detectionMaps-8.png' alt='' width='700' height='433' /></div><div class='img'><img src='detectionMaps-9.png' alt='' width='700' height='433' /></div><div class='input'>
 
-}</div></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
