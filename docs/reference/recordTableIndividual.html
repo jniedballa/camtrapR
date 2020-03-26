@@ -279,7 +279,7 @@ Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPh
                                         <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
  )
 
-
+ <span class='kw'>if</span> (<span class='fl'>FALSE</span>)    <span class='co'># the examples run too long to pass CRAN tests</span>
  <span class='co'># extracting some example summary stats too </span>
  <span class='co'># a nonsensical example, get all unique cameras with which the event was photographed</span>
 
@@ -297,10 +297,11 @@ Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPh
                                         <span class='kw'>eventSummaryFunction</span>   <span class='kw'>=</span> <span class='st'>"unique"</span>
  )
 
+
  } <span class='kw'>else</span> {                                <span class='co'># show function output if ExifTool is not available</span>
  <span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span>(<span class='st'>"ExifTool is not available. Cannot test function"</span>)
  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableIndividualSample</span>)
- }</div><div class='output co'>#&gt; <span class='message'>StationA, StationB, StationC:     26 images    3 duplicates removed      |====================|  100%</span></div><div class='output co'>#&gt; <span class='message'>StationA, StationB, StationC:     26 images    3 duplicates removed      |====================|  100%</span></div></pre>
+ }</div><div class='output co'>#&gt; <span class='message'>StationA, StationB, StationC:     26 images    3 duplicates removed      |====================|  100%</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
