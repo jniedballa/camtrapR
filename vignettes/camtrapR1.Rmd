@@ -406,7 +406,7 @@ addCopyrightTag(inDir        = wd_images_ID_copy,
 
 When we check the outcome with function exifTagNames, we find field "Copyright" in line 27.
 ```{r}
-exifTagNames(wd_images_ID_copy, returnMetadata = TRUE)
+exifTagNames(wd_images_ID_copy)
 ```
 
 
