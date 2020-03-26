@@ -5,14 +5,14 @@
 Show Exif metadata tags and tag names from JPEG images
 }
 \description{
-The function will return sample metadata and tag names of Exif metadata of JPEG images. It uses the first JPEG image it finds in a subdirectory of the specified directory.
+The function will return metadata values, metadata tag names and group names of Exif metadata of JPEG images or other formats.
 }
 \usage{
 exifTagNames(inDir, 
   whichSubDir = 1,
   fileName,
-  returnMetadata = FALSE,
-  returnTagGroup = TRUE)
+  returnMetadata,
+  returnTagGroup)
 }
 
 \arguments{
@@ -26,10 +26,10 @@ exifTagNames(inDir,
   character. A filename, either the file name of an image in \code{inDir} or a full path with file name (in which case \code{inDir} is not needed)
 }
 \item{returnMetadata}{
-  logical. Return actual metadata (TRUE) or metadata tag names only (FALSE)
+  deprecated and ignored
 }
 \item{returnTagGroup}{
-  logical. Return tag group along with tag names (e.g. EXIF, IPTC, XMP, MakerNotes)
+  deprecated and ignored
 }
 }
 \details{
@@ -39,7 +39,7 @@ By default the function returns both metadata tag names and the metadata group t
 
 }
 \value{
-A character vector containing available metadata or metadata tag names (and groups).
+A data frame containing available metadata tag groups, descriptions, names and values.
 }
 \references{
 Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ } \cr
@@ -57,33 +57,26 @@ Juergen Niedballa
 
 wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
 
-# return tag names only
+# specify directory, camtrapR will automatically take first image from first subdirectory
 exifTagNames(inDir          = wd_images_ID)
 
-# return tag names and metadata
+# specify subdirectory by name, camtrapR will use first image
 exifTagNames(inDir          = wd_images_ID,
-             returnMetadata = TRUE)
-
-
-# specify directory by name
-exifTagNames(inDir          = wd_images_ID,
-             returnMetadata = TRUE,
              whichSubDir    = "StationA")
-             
+
+# specifying fileName only (line break due to R package policy)
+exifTagNames(fileName       = file.path(wd_images_ID, "StationC", "TRA", 
+                                        "StationC__2009-05-02__00-10-00(1).JPG"))
+                                        
 # specify inDir and fileName
-exifTagNames(inDir          = wd_images_ID,
-             returnMetadata = TRUE,
+exifTagNames(inDir          = wd_images_ID
              fileName       = file.path("StationC", "TRA", "StationC__2009-05-02__00-10-00(1).JPG"))
              
 # it also works this way
-exifTagNames(inDir          = file.path(wd_images_ID, "StationC", "TRA"),
-             returnMetadata = TRUE,
+exifTagNames(inDir          = file.path(wd_images_ID, "StationC", "TRA")
              fileName       = "StationC__2009-05-02__00-10-00(1).JPG")
              
-# or by only specifying fileName (line break due to R package policy)
-exifTagNames(fileName       = file.path(wd_images_ID, "StationC", "TRA", 
-                                        "StationC__2009-05-02__00-10-00(1).JPG"),
-             returnMetadata = TRUE)
+
              
 }
 }
