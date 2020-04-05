@@ -62,7 +62,12 @@ runExiftool <- function(command.tmp,
   tmp1 <- strsplit(system(command.tmp, intern=TRUE), split = "\t")
   
   if(length(tmp1) == 0) return(NULL) # if nothing returned (no images, no metadata)
-  
+  if(length(tmp1) == 1) {
+    if(grepl(tmp1[[1]], pattern = "^Error: ", perl = TRUE)){
+      warning(paste(unlist(tmp1)), call. = FALSE)
+      return(NULL)
+      }
+    }
   # if first entry is exiftool warning about FileName encoding remove (happens when there's special characters in directory name)
   if(any(grepl(pattern = "FileName encoding not specified", tmp1[[1]]))) tmp1[[1]] <- NULL
   
