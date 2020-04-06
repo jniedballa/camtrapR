@@ -162,30 +162,38 @@ assignSpeciesID <- function(intable,
   if(IDfrom == "directory"){
     intable[,speciesCol] <-  sapply(strsplit(intable$Directory, split = file.sep, fixed = TRUE), FUN = function(X){X[length(X)]})
     return(intable)
-  } else {
+  } else {           # if IDfrom = "metadata"
     if(hasArg(metadataSpeciesTag)){
       metadataSpeciesTag2 <- paste("metadata", metadataSpeciesTag, sep = "_")
+      
+      # if the metadata_Species tag is found in metadata.tmp1
       if(metadataSpeciesTag2 %in% colnames(intable)){
         
+        # copy to species column proper
         intable[,speciesCol] <- intable[,metadataSpeciesTag2]
-        nrow.intable <- nrow(intable)
+        
+        # find records without proper species tag, to be removes
         species_records_to_remove <- which(is.na(intable[,speciesCol]))
         
-        if(length(species_records_to_remove) >= 1){
+        # if there's records to remove
+        if(length(species_records_to_remove) >= 1){    
           
+          # give warnings
           if(isTRUE(returnFileNamesMissingTags)){
-            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "records out of", nrow.intable,
+            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "records out of", nrow(intable),
                                  "because of missing species metadata tag:\n"),
                           paste(head(paste(intable$Directory[species_records_to_remove], intable$FileName[species_records_to_remove], sep = file.sep)), collapse = "\n")),
                     call. = FALSE, immediate. = TRUE)
           } else {
-            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "records out of", nrow.intable,
+            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "records out of", nrow(intable),
                                  "because of missing species metadata tag")),
                     call. = FALSE, immediate. = TRUE)
           }
-          intable <- intable[-species_records_to_remove,]      #remove records without species tag
+          #remove records without species tag
+          intable <- intable[-species_records_to_remove,]      
         }
         
+        # duplicate records with multiple species (separate row for each species)
         intable <- separateMultipleSpecies (intable                = intable,
                                             speciesCol             = speciesCol,
                                             multiple_tag_separator = multiple_tag_separator)
@@ -1633,30 +1641,31 @@ accessDigiKamDatabase <- function(databaseDir,   # database directory
   Albums      <- dbReadTable(con, 'Albums')
   AlbumRoots  <- dbReadTable(con, 'AlbumRoots')
   
-  ImageInformation  <- dbReadTable(con, 'ImageInformation')
-  ImageMetadata     <- dbReadTable(con, 'ImageMetadata')
+#  ImageInformation  <- dbReadTable(con, 'ImageInformation')
+#  ImageMetadata     <- dbReadTable(con, 'ImageMetadata')
   
   # disconnect database  
   dbDisconnect(con)
   
   # make output
-  return(list(Albums = Albums,
-              AlbumRoots = AlbumRoots,
-              Images = Images, 
-              Tags = Tags,
-              ImageTags = ImageTags,
-              ImageInformation = ImageInformation,
-              ImageMetadata = ImageMetadata))
+  return(list(Albums           = Albums,
+              AlbumRoots       = AlbumRoots,
+              Images           = Images, 
+              Tags             = Tags,
+              ImageTags        = ImageTags#,
+#              ImageInformation = ImageInformation,
+#              ImageMetadata    = ImageMetadata
+))
 }
 
 
 
 # extract species tags of videos from digiKam database tables
 
-digiKamVideoSpeciesTags <- function(stationDir,
+digiKamVideoHierarchicalSubject <- function(stationDir,
                                     digiKamTablesList,    # output of accessDigiKamDatabase
-                                    videoFormat,          # character vector of desired video formats
-                                    metadataSpeciesTag
+                                    videoFormat#,          # character vector of desired video formats
+                                    #metadataSpeciesTag
 )
 {
   
@@ -1665,8 +1674,8 @@ digiKamVideoSpeciesTags <- function(stationDir,
   Images           <- digiKamTablesList$Images
   Tags             <- digiKamTablesList$Tags
   ImageTags        <- digiKamTablesList$ImageTags
-  ImageInformation <- digiKamTablesList$ImageInformation
-  ImageMetadata    <- digiKamTablesList$ImageMetadata
+# ImageInformation <- digiKamTablesList$ImageInformation
+#  ImageMetadata    <- digiKamTablesList$ImageMetadata
   
   # guess which AlbumRoot is correct, based on string distance (choose the smallest one)
   # adist(x = stationDir, y = AlbumRoots$specificPath)
@@ -1683,8 +1692,8 @@ digiKamVideoSpeciesTags <- function(stationDir,
   
   # see if stationDir exists in database
   if(!stationDir %in% Albums[, pathColumn]){
-    warning(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE)
-    next()
+    stop(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE)
+    # try to handle with a warning instead
   }
   
   # find current station in albums
@@ -1702,45 +1711,107 @@ digiKamVideoSpeciesTags <- function(stationDir,
   }
   
   # keep only desired video files
-  image_subset2 <- image_subset[grep(image_subset$name, pattern = paste(".", videoFormat, "$", sep = "")),]
   
+  image_subset2 <- image_subset[tolower(substr(image_subset$name, 
+                                               nchar(image_subset$name) - 3, 
+                                               nchar(image_subset$name))) %in% 
+                                  paste(".", videoFormat, sep = ""),]
   
   # find "Species" tag group and its children
+   
+   # subset image tags
+   ImageTags <- ImageTags[ImageTags$tagid %in% Tags$id,]
+   
+   # get proper labels for tags (with parent labels)
+   ImageTags$cleartext_child  <- Tags$name [match(ImageTags$tagid, Tags$id)]
+   ImageTags$cleartext_parent <- Tags$name [Tags$pid[match(ImageTags$tagid, Tags$id)]] 
+   
+   ImageTags$cleartext_full <- paste(ImageTags$cleartext_parent, ImageTags$cleartext_child, sep = "|")
+   
+   
+   
+   # remove unnecessary (internal) tags (not essential)
+    remove1 <- grep(Tags$name, pattern = "_Digikam_Internal_Tags_")
+    remove2 <- grep(Tags$name, pattern = "Color Label ")
+    remove3 <- grep(Tags$name, pattern = "Pick Label ")
+   # 
+    Tags <- Tags[!Tags$id %in% c(remove1, remove2, remove3),]
+    Tags <- Tags[!Tags$pid %in% c(remove1, remove2, remove3),]
+   
+   ImageTags <- ImageTags[!ImageTags$tagid %in% c(remove1, remove2, remove3),]
+   
+   ImageTags_aggregate <- aggregate(ImageTags$cleartext_full,
+             by = list(ImageTags$imageid),
+             FUN = paste, sep  = "", collapse = ", ")
+   colnames(ImageTags_aggregate) <- c("imageid", "HierarchicalSubject")
+   
+   # get parent and children of Species Tag
+   # parent   <- Tags[which(Tags$name == metadataSpeciesTag),]
+   # children <- Tags[which(Tags$pid == parent$id),]
+   #parent <- u
+   
+
   
-  # remove unnecessary (internal) tags (not essential)
-  # maybe later, can afterwards do unique(Tags$pid) to find all parents and the respective children to rebuild hierarchy and extract all tags
-  # remove1 <- grep(Tags$name, pattern = "_Digikam_Internal_Tags_")
-  # remove2 <- grep(Tags$name, pattern = "Color Label ")
-  # remove3 <- grep(Tags$name, pattern = "Pick Label ")
+  #children$name[match(ImageTags$tagid, children$id)]
+  #children$name[match(ImageTags$tagid, children$id)]
+  
+   image_subset2$HierarchicalSubject <- ImageTags_aggregate$HierarchicalSubject[match(image_subset2$id, ImageTags_aggregate$imageid)]
+
+   
+  # # subset ImageTags to image subset
+  # ImageTags_subset <- ImageTags[ImageTags$imageid  %in% image_subset2$id,]
   # 
-  # Tags <- Tags[!Tags$id %in% c(remove1, remove2, remove3),]
-  # Tags <- Tags[!Tags$pid %in% c(remove1, remove2, remove3),]
+  # # further subset to Species tags only
+  # ImageTags_subset2 <- ImageTags_subset[ImageTags_subset$tagid %in% children$id,]
+  # 
+  # # Add species names to tag table
+  # ImageTags_subset2$Species <- children$name [match(ImageTags_subset2$tagid, children$id)]
+  # 
+  # # aggregate if multiple tags assigned to same image (only needed with this approach)
+  # image_subset2$Species <- ImageTags_subset2$Species[match(image_subset2$id, ImageTags_subset2$imageid)] 
+  # 
+  # # add species names to Image table
+  # # aggregate not needed with this approach (but images without tags are lost)
+  # #image_subset2 <- cbind(image_subset[match(ImageTags_subset2$imageid, image_subset$id),], ImageTags_subset2)
+  # 
+  # # add directory to table (does it work with camera / station subdirectories?)
+  # image_subset2$stationDirectory <- album_of_interest$relativePath
+  # 
+  # image_subset3 <- cbind(image_subset2, 
+  #                        ImageInformation[match(image_subset2$id, ImageInformation$imageid),],
+  #                        ImageMetadata[match(image_subset2$id, ImageMetadata$imageid),])
+  return(image_subset2) 
+}
+
+# process the "video" argument of recordTable
+
+processVideoArgument <- function(IDfrom = IDfrom,
+                                 video = video){
   
-  # get parent and children of Species Tag
-  parent   <- Tags[which(Tags$name == metadataSpeciesTag),]
-  children <- Tags[which(Tags$pid == parent$id),]
+  stopifnot(exists("file_formats",  where = video))
+  stopifnot(exists("dateTimeTag",   where = video))
   
-  # subset ImageTags to image subset
-  ImageTags_subset <- ImageTags[ImageTags$imageid  %in% image_subset$id,]
+  file_formats <- video$file_formats
   
-  # further subset to Species tags only
-  ImageTags_subset2 <- ImageTags_subset[ImageTags_subset$tagid %in% children$id,]
+  # check file_formats argument
+  stopifnot(is.character(file_formats))
+  file_formats <- tolower(file_formats)
   
-  # Add species names to tag table
-  ImageTags_subset2$Species <- children$name [match(ImageTags_subset2$tagid, children$id)]
-  
-  # aggregate if multiple tags assigned to same image (only needed with this approach)
-  image_subset2$Species <- ImageTags_subset2$Species[match(image_subset2$id, ImageTags_subset2$imageid)] 
-  
-  # add species names to Image table
-  # aggregate not needed with this approach (but images without tags are lost)
-  #image_subset2 <- cbind(image_subset[match(ImageTags_subset2$imageid, image_subset$id),], ImageTags_subset2)
-  
-  # add directory to table (does it work with camera / station subdirectories?)
-  image_subset2$stationDirectory <- album_of_interest$relativePath
-  
-  image_subset3 <- cbind(image_subset2, 
-                         ImageInformation[match(image_subset2$id, ImageInformation$imageid),],
-                         ImageMetadata[match(image_subset2$id, ImageMetadata$imageid),])
-  return(image_subset3) 
+  # access digiKam database, if required
+  if(IDfrom == "metadata"){
+    stopifnot(exists("digiKam_db_directory", where = video))
+    stopifnot(exists("digiKam_db_filename",  where = video))
+    stopifnot(dir.exists(video$digiKam_db_directory))
+    
+    if (!requireNamespace("RSQLite", quietly = TRUE)) {
+      stop("the package 'RSQLite' is needed for extracting data from digiKam database,  you can install it via: install.packages('RSQLite')")
+    } 
+    # if (!requireNamespace("DBI", quietly = TRUE)) {
+    #   stop("the package 'DBI' is needed for extracting data from digiKam database,  you can install it via: install.packages('DBI')")
+    # } 
+    digiKam_data <- accessDigiKamDatabase (databaseDir = video$digiKam_db_directory,
+                                           db_file     = video$digiKam_db_filename)
+  }
+  return(list(digiKam_data = digiKam_data,
+              file_formats = file_formats))
 }
