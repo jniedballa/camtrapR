@@ -144,7 +144,6 @@ recordTable <- function(inDir,
   # create command line calls
   command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal', 
                         ifelse(hasArg(video), paste(" -", video$dateTimeTag, sep = ""), ""),    # if video requested, video date time tag
-                        #paste(" -", video$dateTimeTag, sep = ""),    # if video requested, video date time tag
                         ' -HierarchicalSubject',
                         ifelse(hasArg(additionalMetadataTags), paste(" -",additionalMetadataTags,  collapse = "", sep = ""), ""),
                         paste(" -ext", file_formats, collapse = " ", sep = " "),    # requested file extensions
@@ -164,10 +163,11 @@ recordTable <- function(inDir,
 
     if(class(metadata.tmp) == "NULL"){            # omit station if no images found
 
-      length.tmp <- length(list.files(dirs[i], pattern = ".jpg$|JPG$", ignore.case = TRUE, recursive = TRUE))
+      length.tmp <- length(list.files(dirs[i], pattern = paste(".", file_formats, "$", collapse = "|", sep = ""), 
+                                      ignore.case = TRUE, recursive = TRUE))
       message(paste(formatC(dirs_short[i], width = max_nchar_station, flag = "-"),  ":  ",
-                    formatC(length.tmp, width = 5), " images      Skipping", sep = ""))
-      warning(paste(dirs_short[i],  ":  contains no images and was omitted"), call. = FALSE,  immediate. = FALSE)
+                    formatC(length.tmp, width = 5), " files      Skipping", sep = ""))
+      warning(paste(dirs_short[i],  ":  contains no files of interest and was omitted"), call. = FALSE,  immediate. = FALSE)
     } else {
 
       # if video files extracted, add DateTimeOriginal and HierarchicalSubject
