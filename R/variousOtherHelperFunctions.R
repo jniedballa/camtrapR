@@ -1611,3 +1611,136 @@ makeProgressbar <- function(current,
               "|", 
               "  ", formatC(round(perc * 100), width = 3), "%", sep = "")
 }
+
+
+# access digiKam database and provide tables to extract species tags for videos
+# call before exiftool
+
+accessDigiKamDatabase <- function(databaseDir,   # database directory 
+                                  db_file        # database filename
+)
+{
+  # establish database connection
+  if(!dir.exists(databaseDir)) stop("Could not find digiKam_db_directory")
+  if(!file.exists(file.path(databaseDir, db_file))) stop("Could not find digiKam_db_file in digiKam_db_directory")
+  
+  con <- dbConnect(SQLite(), file.path(databaseDir, db_file))
+  
+  # read tables
+  Images      <- dbReadTable(con, 'Images')
+  Tags        <- dbReadTable(con, 'Tags')
+  ImageTags   <- dbReadTable(con, 'ImageTags')
+  Albums      <- dbReadTable(con, 'Albums')
+  AlbumRoots  <- dbReadTable(con, 'AlbumRoots')
+  
+  ImageInformation  <- dbReadTable(con, 'ImageInformation')
+  ImageMetadata     <- dbReadTable(con, 'ImageMetadata')
+  
+  # disconnect database  
+  dbDisconnect(con)
+  
+  # make output
+  return(list(Albums = Albums,
+              AlbumRoots = AlbumRoots,
+              Images = Images, 
+              Tags = Tags,
+              ImageTags = ImageTags,
+              ImageInformation = ImageInformation,
+              ImageMetadata = ImageMetadata))
+}
+
+
+
+# extract species tags of videos from digiKam database tables
+
+digiKamVideoSpeciesTags <- function(stationDir,
+                                    digiKamTablesList,    # output of accessDigiKamDatabase
+                                    videoFormat,          # character vector of desired video formats
+                                    metadataSpeciesTag
+)
+{
+  
+  Albums           <- digiKamTablesList$Albums
+  AlbumRoots       <- digiKamTablesList$AlbumRoots
+  Images           <- digiKamTablesList$Images
+  Tags             <- digiKamTablesList$Tags
+  ImageTags        <- digiKamTablesList$ImageTags
+  ImageInformation <- digiKamTablesList$ImageInformation
+  ImageMetadata    <- digiKamTablesList$ImageMetadata
+  
+  # guess which AlbumRoot is correct, based on string distance (choose the smallest one)
+  # adist(x = stationDir, y = AlbumRoots$specificPath)
+  
+  # combine album root and album path
+  Albums$albumPath_full <- paste(AlbumRoots[Albums$albumRoot, "specificPath"], 
+                                 Albums$relativePath, sep = "")
+  
+  # add drive letter (only relevant on Windows, and can potentially be wrong if there's Album roots on different drives)
+  Albums$albumPath_full2 <- paste(substr(stationDir, 1,2),   # the Drive letter, digiKam doesn't return it
+                                  Albums$albumPath_full, sep = "")
+  
+  pathColumn <- "albumPath_full2"
+  
+  # see if stationDir exists in database
+  if(!stationDir %in% Albums[, pathColumn]){
+    warning(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE)
+    next()
+  }
+  
+  # find current station in albums
+  album_of_interest <- Albums [which(Albums[, pathColumn] == stationDir),]
+  if(nrow(album_of_interest) == 0) {
+    warning("Could not locate album for", stationDir, ". Skipping")
+    
+  }
+  
+  # keep only images in the current album
+  image_subset <- Images[Images$album == album_of_interest$id,]
+  # NAs are possible, so remove them
+  if(any(is.na(image_subset$id))) {
+    image_subset <- image_subset[!is.na(image_subset$id),]
+  }
+  
+  # keep only desired video files
+  image_subset2 <- image_subset[grep(image_subset$name, pattern = paste(".", videoFormat, "$", sep = "")),]
+  
+  
+  # find "Species" tag group and its children
+  
+  # remove unnecessary (internal) tags (not essential)
+  # maybe later, can afterwards do unique(Tags$pid) to find all parents and the respective children to rebuild hierarchy and extract all tags
+  # remove1 <- grep(Tags$name, pattern = "_Digikam_Internal_Tags_")
+  # remove2 <- grep(Tags$name, pattern = "Color Label ")
+  # remove3 <- grep(Tags$name, pattern = "Pick Label ")
+  # 
+  # Tags <- Tags[!Tags$id %in% c(remove1, remove2, remove3),]
+  # Tags <- Tags[!Tags$pid %in% c(remove1, remove2, remove3),]
+  
+  # get parent and children of Species Tag
+  parent   <- Tags[which(Tags$name == metadataSpeciesTag),]
+  children <- Tags[which(Tags$pid == parent$id),]
+  
+  # subset ImageTags to image subset
+  ImageTags_subset <- ImageTags[ImageTags$imageid  %in% image_subset$id,]
+  
+  # further subset to Species tags only
+  ImageTags_subset2 <- ImageTags_subset[ImageTags_subset$tagid %in% children$id,]
+  
+  # Add species names to tag table
+  ImageTags_subset2$Species <- children$name [match(ImageTags_subset2$tagid, children$id)]
+  
+  # aggregate if multiple tags assigned to same image (only needed with this approach)
+  image_subset2$Species <- ImageTags_subset2$Species[match(image_subset2$id, ImageTags_subset2$imageid)] 
+  
+  # add species names to Image table
+  # aggregate not needed with this approach (but images without tags are lost)
+  #image_subset2 <- cbind(image_subset[match(ImageTags_subset2$imageid, image_subset$id),], ImageTags_subset2)
+  
+  # add directory to table (does it work with camera / station subdirectories?)
+  image_subset2$stationDirectory <- album_of_interest$relativePath
+  
+  image_subset3 <- cbind(image_subset2, 
+                         ImageInformation[match(image_subset2$id, ImageInformation$imageid),],
+                         ImageMetadata[match(image_subset2$id, ImageMetadata$imageid),])
+  return(image_subset3) 
+}
