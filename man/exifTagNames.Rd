@@ -2,7 +2,7 @@
 \alias{exifTagNames}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Show Exif metadata tags and tag names from JPEG images
+Show Exif metadata of JPEG images or other image or video formats
 }
 \description{
 The function will return metadata values, metadata tag names and group names of Exif metadata of JPEG images or other formats.
@@ -39,7 +39,7 @@ By default the function returns both metadata tag names and the metadata group t
 
 }
 \value{
-A data frame containing available metadata tag groups, descriptions, names and values.
+A data frame containing four columns: metadata tag group, tag name, tag description, and values.
 }
 \references{
 Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ } \cr
@@ -75,6 +75,11 @@ exifTagNames(inDir          = wd_images_ID,
 # it also works this way
 exifTagNames(inDir          = file.path(wd_images_ID, "StationC", "TRA"),
              fileName       = "StationC__2009-05-02__00-10-00(1).JPG")
+             
+
+# with tagged sample images
+wd_images_ID_tagged <- system.file("pictures/sample_images_tagged", package = "camtrapR")
+exifTagNames(inDir          = wd_images_ID_tagged)
 
 }
 }
