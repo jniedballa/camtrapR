@@ -15,7 +15,8 @@ recordTable <- function(inDir,
                         removeDuplicateRecords = TRUE,
                         returnFileNamesMissingTags = FALSE,
                         eventSummaryColumn,
-                        eventSummaryFunction
+                        eventSummaryFunction,
+                        video    # is a list with 4 components, see L 126
 )
 {
 
@@ -119,7 +120,37 @@ recordTable <- function(inDir,
     if(!is.character(eventSummaryColumn))     stop("eventSummaryColumn must be of class 'character'", call. = FALSE)
     if(!is.character(eventSummaryFunction))   stop("eventSummaryFunction must be of class 'character'", call. = FALSE)
   }
-
+  
+  
+  # check video argument (if present)
+  if(hasArg(video)){
+    stopifnot(exists("file_formats",  where = video))
+    stopifnot(exists("dateTimeTag",   where = video))
+    
+    file_formats <- video$file_formats
+    
+    # check file_formats argument
+    stopifnot(is.character(file_formats))
+    file_formats <- tolower(file_formats)
+    
+    # access digiKam database, if required
+    if(IDfrom == "metadata"){
+      stopifnot(exists("digiKam_db_directory", where = video))
+      stopifnot(exists("digiKam_db_filename",  where = video))
+      stopifnot(dir.exists(video$digiKam_db_directory))
+      
+      requireNamespace("RSQLite")
+      digiKam_data <- accessDigiKamDatabase (databaseDir = video$digiKam_db_directory,
+                                             db_file     = video$digiKam_db_filename)
+    }
+  } else {
+    file_formats <- "jpg"   # jpg, as the default if video not required
+  }
+  
+  
+  file_formats_for_exiftool_call <- paste(" -ext", file_formats, collapse = " ", sep = " ")
+ 
+  
   # find image directories
   dirs       <- list.dirs(inDir, full.names = TRUE, recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
@@ -128,16 +159,28 @@ recordTable <- function(inDir,
   
   max_nchar_station <- max(nchar(dirs_short))
   record.table.list <- list()
-
+  
    # create command line
   
   if(hasArg(additionalMetadataTags)){
-    command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject', paste(" -",additionalMetadataTags,  collapse = "", sep = ""), ' -ext JPG "', dirs, '"', sep = "")
-    colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject", additionalMetadataTags)
+    command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal', 
+                          ifelse(hasArg(video), paste(" -", video$dateTimeTag, sep = ""), ""),
+                          '-HierarchicalSubject',
+                          paste(" -",additionalMetadataTags,  collapse = "", sep = ""), 
+                          file_formats_for_exiftool_call, ' "', dirs, '"', sep = "")
+    #colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject", additionalMetadataTags)
   } else {
-    command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject -ext JPG "',dirs, '"', sep = "")
-    colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject")
+    command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal',
+                          ifelse(hasArg(video), paste(" -", video$dateTimeTag, sep = ""), ""), 
+                          ' -HierarchicalSubject', 
+                          file_formats_for_exiftool_call, ' "', dirs, '"', sep = "")
+    #colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject")
   }
+  colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal")
+  if(hasArg(video)) colnames.tmp <- c(colnames.tmp, video$dateTimeTag)
+  colnames.tmp <- c(colnames.tmp, "HierarchicalSubject")
+  if(hasArg(additionalMetadataTags)) colnames.tmp <- c(colnames.tmp, additionalMetadataTags)
+  
   
   for(i in 1:length(dirs)){   # loop through station directories
 
@@ -152,6 +195,16 @@ recordTable <- function(inDir,
       warning(paste(dirs_short[i],  ":  contains no images and was omitted"), call. = FALSE,  immediate. = FALSE)
     } else {
 
+      # if video files extracted, copy their date/time tag to DateTimeOriginal
+      if(hasArg(video)){
+        if(any(metadata.tmp$DateTimeOriginal == "-") & 
+           any(metadata.tmp[,video$dateTimeTag] != "-")) {
+          metadata.tmp$DateTimeOriginal[which(metadata.tmp[,video$dateTimeTag] != "-" &
+                                                metadata.tmp$DateTimeOriginal == "-")] <- metadata.tmp[which(metadata.tmp[,video$dateTimeTag] != "-" &
+                                                                                                               metadata.tmp$DateTimeOriginal == "-"), video$dateTimeTag] 
+        }
+      }
+      
       # check presence / consistency of DateTimeOriginal column, go to next station or remove records if necessary
       metadata.tmp <- checkDateTimeOriginal (intable    = metadata.tmp,
                                              dirs_short = dirs_short,
@@ -165,7 +218,8 @@ recordTable <- function(inDir,
                                             multiple_tag_separator     = multiple_tag_separator)
 
       # add species names to metadata table (from folders or metadata, otherwise NA)
-
+      
+      # BE MINDFUL OF VIDEO FILES when using metadata tags
       metadata.tmp <- assignSpeciesID (intable                = metadata.tmp,
                                        IDfrom                 = IDfrom,
                                        metadataSpeciesTag     = metadataSpeciesTag,
@@ -175,6 +229,7 @@ recordTable <- function(inDir,
                                        multiple_tag_separator = multiple_tag_separator,
                                        returnFileNamesMissingTags = returnFileNamesMissingTags
       )
+      
 
       # if images in station contain no metadata species tags, skip that station
       if(!is.data.frame(metadata.tmp)){
@@ -273,6 +328,8 @@ recordTable <- function(inDir,
     stop(paste("something went wrong. I looked through all those", length(dirs)  ,"folders and now your table is empty. Did you exclude too many species? Or were date/time information not readable?"), call. = FALSE)
   }
 
+  # # remove video Date/Time column if present (if video was included)
+  # if(hasArg(video)) record.table[, video$dateTimeTag] <- NULL
   
   # rearrange table, add date and time as separate columns. add additional column names as needed.
 
