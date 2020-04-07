@@ -1,14 +1,16 @@
-# camtrapR 1.2.4
+# camtrapR 2.0.0
 
 ## new features
 
-* surveyReport: reliable creation of zip files via package "zip" (if installed, in Suggests now)
-* exifTagNames returns a data frame containing all relevant information at once: tag group names, tag descriptions, tag names and values. Arguments returnMetadata and returnTagGroup are ignored now
+* recordTable / recordTableIndividual: video support via new argument "video" (requires package "RSQLite")
+* exifTagNames returns a data frame containing all relevant information at once: tag group names, tag descriptions, tag names and values. Arguments returnMetadata and returnTagGroup are ignored now.
+* surveyReport: reliable creation of zip files via package "zip" (if installed)
+
 
 ## bugfixes
 
 * detectionHistory: when recordDateTimeCol is a date without time, function assigns a time to avoid calculating occasion 0 for records taken on the camera setup day (with a warning)
-* error message when inDir in functions that call Exiftool is empty (no subdirectories)
+* error message in functions that call Exiftool when inDir is empty (no subdirectories)
 * surveyReport: error message when zip file can't be created
 * special characters in directory names now supported (but still best avoided; requires ExifTool 9.79 or later)
 * detectionMaps: fixed error when trying to plot backgroundPolygon (reported by Oliver Wearn)
@@ -17,7 +19,8 @@
 
 * vignette filenames changed, document type changed to html_document, added floating table of contents
 * added ORCID for authors
-  
+* packages "RSQLite" and "zip" in Suggests
+
 
 # camtrapR 1.2.3
 
