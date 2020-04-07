@@ -2,10 +2,10 @@
 \alias{recordTable}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Generate a species record table from camera trap images
+Generate a species record table from camera trap images and videos
 }
 \description{
-Generates a record table from camera trap images. Images must be sorted into station directories at least. The function can read species identification from a directory structure (Station/Species or Station/Camera/Species) or from image metadata tags.
+Generates a record table from camera trap images or videos. Images/videos must be sorted into station directories at least. The function can read species identification from a directory structure (Station/Species or Station/Camera/Species) or from image metadata tags.
 }
 \usage{
 recordTable(inDir,
@@ -25,7 +25,8 @@ recordTable(inDir,
   removeDuplicateRecords = TRUE,
   returnFileNamesMissingTags = FALSE,
   eventSummaryColumn,
-  eventSummaryFunction
+  eventSummaryFunction,
+  video
 )
 }
 %- maybe also 'usage' for other objects documented here.
@@ -84,6 +85,9 @@ recordTable(inDir,
 \item{eventSummaryFunction}{
   character. The function by which to summarise \code{eventSummaryColumn} of  non-independent records, e.g. "sum", "max" (optional)
 }
+\item{video}{
+  list. Contains information on how to handle video data (otional). See details.
+}
 }
 \details{
 The function can handle a number of different ways of storing images, and supports species identification by moving images into species directories as well as metadata tagging. In every case, images need to be stored into station directories. If images are identified by moving them into species directories, a camera directory is optional: "Station/Species/XY.JPG" or "Station/Camera/Species/XY.JPG". Likewise, if images are identified using metadata tagging, a camera directory can be used optionally: "Station/XY.JPG" or "Station/Camera/XY.JPG".
@@ -99,6 +103,22 @@ If images are identified by metadata tagging, \code{metadataSpeciesTag} specifie
 Many digital images contain  Exif metadata tags such as "AmbientTemperature" or "MoonPhase" that can be extracted if specified in \code{metadataTags}. Because these are manufacturer-specific and not standardized, function \code{\link{exifTagNames}} provides a vector of all available tag names. Multiple names can be specified as a character vector as: \code{c(Tag1, Tag2, ...)}. The metadata tags thus extracted may be used as covariates in modelling species distributions.
 
 \code{eventSummaryColumn} and \code{eventSummaryFunction} can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run \code{recordTable}. Set \code{eventSummaryColumn = "count"} and \code{eventSummaryFunction = "max"} to obtain the maximum number of \code{count} in all images within \code{minDeltaTime} minutes of a given record. The results is in a new column, in this example \code{count_max}. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. \code{eventSummaryColumn = c("count", "count", "camera")} and \code{eventSummaryFunction = c("min", "max", "unique")} to get minimum and maximum count and all unique camera IDs for that event. Note that \code{eventSummaryColumn} and \code{eventSummaryFunction} must be of same length. 
+
+Argument \code{video} is a named list with 2 or 4 items. 2 items (\code{file_formats}, \code{dateTimeTag}) are always required, and are sufficent if \code{IDfrom = "directory"}. In that case, no digiKam tags will be returned. 
+To return digiKam tags, two additional items are required (\code{digiKam_db_directory}, \code{digiKam_db_filename}). This is essential when using \code{IDfrom = "metadata"}. When using \code{IDfrom = "directory"}, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool.
+
+The items of argument \code{video} are:
+
+\tabular{ll}{
+\code{file_formats} \tab The video formats to extract (include "jpg" if you want .JPG image metadata) \cr
+\code{dateTimeTag}  \tab the metadata tag to extract date/time from (use \code{\link{exifTagNames}} to find out which tag is suitable) \cr
+\code{digiKam_db_directory} \tab The directory containing digiKam database (optional if \code{IDfrom = "directory"}) \cr
+\code{digiKam_db_filename}  \tab  The digiKam database file in \code{digiKam_db_directory} (optional if \code{IDfrom = "directory"}) \cr
+}
+
+
+See the examples below for for how to specify the argument \code{video}.
+
 }
 \value{
 A data frame containing species records and additional information about stations, date, time and (optionally) further metadata.
@@ -197,7 +217,27 @@ anyDuplicated(rec_table3b[, c("Station", "Species", "DateTimeOriginal")])   # no
 whichAreDuplicated <- which(duplicated(rec_table3a[, c("Station", "Species", "DateTimeOriginal")]))
 all(rec_table3a[-whichAreDuplicated,] == rec_table3b)
 
-} else {                                # show function output if ExifTool is not available
+###  Including videos
+# sample videos are not included in package
+
+# with videos, IDfrom = "directory", not extracting digiKam metadata
+rec_table4 <- recordTable(inDir  = wd_images_ID_species,
+                          IDfrom = "directory",
+                          video  = list(file_formats = c("jpg", "mp4"),
+                                        dateTimeTag  = "QuickTime:CreateDate")
+)
+
+# with videos, IDfrom = "metadata", extracting digiKam metadata
+rec_table5 <- recordTable(inDir  = wd_images_ID_species,
+                          IDfrom = "metadata",
+                          video  = list(file_formats = c("jpg", "mp4", "avi", "mov"),
+                                        dateTimeTag  = "QuickTime:CreateDate"
+                                        digiKam_db_directory = "C:/Users/YourName/Pictures",
+                                        digiKam_db_filename = "digikam4.db")
+)
+
+} else {  
+# show function output if ExifTool is not available
 message("ExifTool is not available. Cannot test function. Loading recordTableSample instead")
 data(recordTableSample)
 }

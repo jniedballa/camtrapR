@@ -2,7 +2,7 @@
 \alias{recordTableIndividual}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Generate a single-species record table with individual identification from camera trap images
+Generate a single-species record table with individual identification from camera trap images or videos
 }
 \description{
 The function generates a single-species record table containing individual IDs, e.g. for (spatial) capture-recapture analyses. It prepares input for the function \code{\link{spatialDetectionHistory}}.
@@ -25,7 +25,8 @@ recordTableIndividual(inDir,
   removeDuplicateRecords = TRUE,
   returnFileNamesMissingTags = FALSE,
   eventSummaryColumn,
-  eventSummaryFunction
+  eventSummaryFunction,
+  video
 )
 }
 %- maybe also 'usage' for other objects documented here.
@@ -84,10 +85,13 @@ recordTableIndividual(inDir,
 \item{eventSummaryFunction}{
   character. The function by which to summarise \code{eventSummaryColumn} of  non-independent records, e.g. "sum", "max" (optional)
 }
+\item{video}{
+  list. Contains information on how to handle video data (otional). See details.
+}
 }
 
 \details{
-The function can handle a number of different ways of storing images. In every case, images need to be stored in a species directory first (e.g. using function \code{\link{getSpeciesImages}}). Station subdirectories are optional. Camera subdirectories are not allowed. This directory structure can be created easily with function \code{\link{getSpeciesImages}}.
+The function can handle a number of different ways of storing images and videos. In every case, images need to be stored in a species directory first (e.g. using function \code{\link{getSpeciesImages}}). Station subdirectories are optional. Camera subdirectories are not supported. This directory structure can be created easily with function \code{\link{getSpeciesImages}}.
 
 As with species identification, individuals can be identified in 2 different ways: by moving images into individual directories ("Species/Station/Individual/XY.JPG" or "Species/Individual/XY.JPG") or by metadata tagging (without the need for individual directories: "Species/XY.JPG" or "Species/Station/XY.JPG").
 
@@ -98,6 +102,21 @@ If individual IDs were assigned with image metadata tags, \code{metadataIDTag} m
 Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPhase" can be extracted if specified in \code{additionalMetadataTags}. Multiple names can be specified as a character vector as: \code{c(Tag1, Tag2, ...)}. Because they are not standardized, function \code{\link{exifTagNames}} provides a vector of all available tag names. The metadata tags thus extracted may be used as individual covariates in spatial capture-recapture models.
 
 \code{eventSummaryColumn} and \code{eventSummaryFunction} can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run \code{recordTable}. Set \code{eventSummaryColumn = "count"} and \code{eventSummaryFunction = "max"} to obtain the maximum number of \code{count} in all images within \code{minDeltaTime} minutes of a given record. The results is in a new column, in this example \code{count_max}. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. \code{eventSummaryColumn = c("count", "count", "camera")} and \code{eventSummaryFunction = c("min", "max", "unique")} to get minimum and maximum count and all unique camera IDs for that event. Note that \code{eventSummaryColumn} and \code{eventSummaryFunction} must be of same length. 
+
+Argument \code{video} is analogous to \code{\link{recordTable}}, a named list with 2 or 4 items. 2 items (\code{file_formats}, \code{dateTimeTag}) are always required, and are sufficent if \code{IDfrom = "directory"}. In that case, no digiKam tags will be returned. 
+To return digiKam tags, two additional items are required (\code{digiKam_db_directory}, \code{digiKam_db_filename}). This is essential when using \code{IDfrom = "metadata"}. When using \code{IDfrom = "directory"}, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool.
+
+The items of argument \code{video} are:
+
+\tabular{ll}{
+\code{file_formats} \tab The video formats to extract (include "jpg" if you want .JPG image metadata) \cr
+\code{dateTimeTag}  \tab the metadata tag to extract date/time from (use \code{\link{exifTagNames}} to find out which tag is suitable) \cr
+\code{digiKam_db_directory} \tab The directory containing digiKam database (optional if \code{IDfrom = "directory"}) \cr
+\code{digiKam_db_filename}  \tab  The digiKam database file in \code{digiKam_db_directory} (optional if \code{IDfrom = "directory"}) \cr
+}
+
+
+See the example below for for how to specify the argument \code{video}.
 
 
 }
@@ -159,9 +178,23 @@ Juergen Niedballa
                                         eventSummaryColumn     = "EXIF:Make",
                                         eventSummaryFunction   = "unique"
  )
+ 
+ ### Video example (the sample data don't contain a video, this is hypothetical)
+ # with JPG, video mp4, avi, mov, ID = metadata
+rec_table_ind_video <- recordTableIndividual(inDir = wd_images_ID_individual,
+                          hasStationFolder  = FALSE,
+                          IDfrom            = "metadata", 
+                          metadataIDTag     = "individual",
+                          video = list(file_formats = c("jpg", "mp4", "avi", "mov"),
+                                       dateTimeTag = "QuickTime:CreateDate",
+                                       digiKam_db_directory = "C:/Users/YourName/Pictures",
+                                       digiKam_db_filename = "digikam4.db")
+)
+ 
  }
 
- } else {                                # show function output if ExifTool is not available
+ } else {
+  # show function output if ExifTool is not available
  message("ExifTool is not available. Cannot test function")
  data(recordTableIndividualSample)
  }
