@@ -15,7 +15,8 @@ recordTableIndividual <- function(inDir,
                                   removeDuplicateRecords = TRUE,
                                   returnFileNamesMissingTags = FALSE,
                                   eventSummaryColumn,
-                                  eventSummaryFunction
+                                  eventSummaryFunction,
+                                  video
 
 )
 {
@@ -114,27 +115,48 @@ recordTableIndividual <- function(inDir,
   if(hasStationFolders == TRUE){
     dirs       <- list.dirs(inDir, full.names = TRUE,  recursive = FALSE)
     dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
-  } else {
-    dirs       <- inDir
-    dirs_short <- inDir
-
     if(length(dirs) == 0) stop("inDir contains no station directories", call. = FALSE)
+  } else {
+    dirs <- dirs_short <- inDir
   }
-
 
   max_nchar_station <- max(nchar(dirs_short))
 
+  # process video argument (if present)
+  if(hasArg(video)){
+    video_out <- processVideoArgument(IDfrom = IDfrom,
+                                      video  = video)
+    digiKam_data <- video_out$digiKam_data
+    file_formats <- video_out$file_formats
+    # if(isFALSE("jpg" %in% file_formats)) file_formats <- c(file_formats, "jpg")
+  } else {
+    file_formats <- "jpg"   # jpg, as the default, if video not requested
+  }
+  
   record.table.list <- list()
 
-    # create command line and execute exiftool
-      if(hasArg(additionalMetadataTags)){
-        command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject', paste(" -",additionalMetadataTags,  collapse = "", sep = ""), ' -ext JPG "', dirs, '"', sep = "")
-        colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject", additionalMetadataTags)
-      } else {
-        command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject -ext JPG "',dirs, '"', sep = "")
-        colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject")
-      }
-
+    # # create command line and execute exiftool
+    #   if(hasArg(additionalMetadataTags)){
+    #     command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject', paste(" -",additionalMetadataTags,  collapse = "", sep = ""), ' -ext JPG "', dirs, '"', sep = "")
+    #     colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject", additionalMetadataTags)
+    #   } else {
+    #     command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -HierarchicalSubject -ext JPG "',dirs, '"', sep = "")
+    #     colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal", "HierarchicalSubject")
+    #   }
+  
+  command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal', 
+                        ifelse(hasArg(video), paste(" -", video$dateTimeTag, sep = ""), ""),    # if video requested, video date time tag
+                        ' -HierarchicalSubject',
+                        ifelse(hasArg(additionalMetadataTags), paste(" -",additionalMetadataTags,  collapse = "", sep = ""), ""),
+                        paste(" -ext", file_formats, collapse = " ", sep = " "),    # requested file extensions
+                        ' "', dirs, '"', sep = "")
+  
+  # construct column names for metadata table
+  colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal")
+  if(hasArg(video)) colnames.tmp <- c(colnames.tmp, video$dateTimeTag)
+  colnames.tmp <- c(colnames.tmp, "HierarchicalSubject")
+  if(hasArg(additionalMetadataTags)) colnames.tmp <- c(colnames.tmp, additionalMetadataTags)
+  
   for(i in 1:length(dirs)){   # loop through station directories
 
     # execute exiftool
@@ -143,16 +165,30 @@ recordTableIndividual <- function(inDir,
 
     if(class(metadata.tmp) == "NULL"){            # omit station if no images found
 
-      length.tmp <- length(list.files(dirs[i], pattern = ".jpg$|JPG$", ignore.case = TRUE, recursive = TRUE))
-      
+      length.tmp <- length(list.files(dirs[i], pattern = paste(".", file_formats, "$", collapse = "|", sep = ""), 
+                                      ignore.case = TRUE, recursive = TRUE))
       message(paste(formatC(dirs_short[i], width = max_nchar_station, flag = "-"),  ":  ",
                     formatC(length.tmp, width = 5), " images      Skipping", sep = ""))
       warning(paste(dirs_short[i],  ":  contains no images and was omitted"), call. = FALSE,  immediate. = FALSE)
 
     } else {
 
-      # message(paste(dirs_short[i], ":", nrow(metadata.tmp), "images"))
-
+      # if video files extracted, add DateTimeOriginal and HierarchicalSubject
+      if(hasArg(video)){
+        metadata.tmp <- addVideoDateTimeOriginal(metadata.tmp = metadata.tmp, video = video)
+        
+        # add HierachicalSubject for video files
+        if(!is.null(digiKam_data)){
+          digiKam_video_metadata <- digiKamVideoHierarchicalSubject(stationDir = dirs[i],
+                                                                    digiKamTablesList = digiKam_data,    # output of accessDigiKamDatabase
+                                                                    videoFormat = file_formats[!grepl(file_formats, pattern = "jpg")])
+          # add HierarchialSubject for video files (match by filename, must be unique)
+          metadata.tmp <- addVideoHierachicalSubject (metadata.tmp = metadata.tmp,
+                                                      video = video,
+                                                      digiKam_video_metadata = digiKam_video_metadata)
+        }
+      }
+      
       # check presence / consistency of DateTimeOriginal column, go to next station or remove records if necessary
       metadata.tmp <- checkDateTimeOriginal (intable    = metadata.tmp,
                                              dirs_short = dirs_short,
@@ -268,7 +304,7 @@ recordTableIndividual <- function(inDir,
   
   
   # combine all data frames from list into one data frame
-  record.table <- as.data.frame(rbindlist(record.table.list, fill = TRUE, use.names = TRUE))
+  record.table <- as.data.frame(data.table::rbindlist(record.table.list, fill = TRUE, use.names = TRUE))
 
   if(nrow(record.table) == 0){
     stop(paste("something went wrong. I looked through all those", length(dirs)  ,"folders and now your table is empty"), call. = FALSE)
