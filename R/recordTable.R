@@ -16,7 +16,7 @@ recordTable <- function(inDir,
                         returnFileNamesMissingTags = FALSE,
                         eventSummaryColumn,
                         eventSummaryFunction,
-                        video    # is a list with 4 components, see L 126
+                        video
 )
 {
 
@@ -133,7 +133,7 @@ recordTable <- function(inDir,
                                       video  = video)
     digiKam_data <- video_out$digiKam_data
     file_formats <- video_out$file_formats
-    if(isFALSE("jpg" %in% file_formats)) file_formats <- c(file_formats, "jpg")
+    # if(isFALSE("jpg" %in% file_formats)) file_formats <- c(file_formats, "jpg")
   } else {
     file_formats <- "jpg"   # jpg, as the default, if video not requested
   }
@@ -172,27 +172,18 @@ recordTable <- function(inDir,
 
       # if video files extracted, add DateTimeOriginal and HierarchicalSubject
       if(hasArg(video)){
-        # if there's missing entries in DateTimeOriginal that are present in the video date time tag, copy the video tags over
-        rows_of_interest1 <- which(metadata.tmp$DateTimeOriginal == "-" & 
-                                    metadata.tmp[,video$dateTimeTag] != "-")
-        if(length(rows_of_interest1) >= 1) {
-          metadata.tmp$DateTimeOriginal[rows_of_interest1] <- metadata.tmp[rows_of_interest1, video$dateTimeTag] 
-        }
-        metadata.tmp[, video$dateTimeTag] <- NULL
+        metadata.tmp <- addVideoDateTimeOriginal(metadata.tmp = metadata.tmp, video = video)
         
         # add HierachicalSubject for video files
-        digiKam_video_metadata <- digiKamVideoHierarchicalSubject(stationDir = dirs[i],
-                                                                  digiKamTablesList = digiKam_data,    # output of accessDigiKamDatabase
-                                                                  videoFormat = file_formats[!grepl(file_formats, pattern = "jpg")])
-        # add HierarchialSubject for video files (match by filename, must be unique)
-        metadata.tmp$HierarchicalSubject_video <- digiKam_video_metadata$HierarchicalSubject [match(metadata.tmp$FileName, digiKam_video_metadata$name)]
-        
-        rows_of_interest2 <- which(!is.na(metadata.tmp$HierarchicalSubject_video) & 
-                                    metadata.tmp$HierarchicalSubject == "-")
-        if(length(rows_of_interest2) >= 1) {
-          metadata.tmp$HierarchicalSubject[rows_of_interest2] <- metadata.tmp$HierarchicalSubject_video[rows_of_interest2] 
+        if(!is.null(digiKam_data)){
+          digiKam_video_metadata <- digiKamVideoHierarchicalSubject(stationDir = dirs[i],
+                                                                    digiKamTablesList = digiKam_data,    # output of accessDigiKamDatabase
+                                                                    videoFormat = file_formats[!grepl(file_formats, pattern = "jpg")])
+          # add HierarchialSubject for video files (match by filename, must be unique)
+          metadata.tmp <- addVideoHierachicalSubject (metadata.tmp = metadata.tmp,
+                                                      video = video,
+                                                      digiKam_video_metadata = digiKam_video_metadata)
         }
-        metadata.tmp$HierarchicalSubject_video <- NULL
       }
       
       # check presence / consistency of DateTimeOriginal column, go to next station or remove records if necessary
@@ -290,16 +281,6 @@ recordTable <- function(inDir,
         
         d1 <- do.call(assessTemporalIndependence, args = args.assessTemporalIndependence)
 
-
-      # # add potential new columns to global record.table
-      #   d2 <- addNewColumnsToGlobalTable (intable      = d1,
-      #                                     i            = i,
-      #                                     record.table = record.table)
-      # 
-      # 
-      # # append table of station i's images metadata to global record table
-      #   record.table <- rbind(d2[[2]], d2[[1]])
-        
         record.table.list[[i]] <- d1
 
         suppressWarnings(rm(d1))
@@ -309,15 +290,12 @@ recordTable <- function(inDir,
 
   
   # combine all data frames from list into one data frame
-  record.table <- as.data.frame(rbindlist(record.table.list, fill = TRUE, use.names = TRUE))
+  record.table <- as.data.frame(data.table::rbindlist(record.table.list, fill = TRUE, use.names = TRUE))
   
   if(nrow(record.table) == 0){
     stop(paste("something went wrong. I looked through all those", length(dirs)  ,"folders and now your table is empty. Did you exclude too many species? Or were date/time information not readable?"), call. = FALSE)
   }
 
-  # # remove video Date/Time column if present (if video was included)
-  # if(hasArg(video)) record.table[, video$dateTimeTag] <- NULL
-  
   # rearrange table, add date and time as separate columns. add additional column names as needed.
 
   record.table2  <-  data.frame(record.table[,c(stationCol, speciesCol, "DateTimeOriginal")],
