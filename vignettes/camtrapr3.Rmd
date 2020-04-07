@@ -1,5 +1,5 @@
 ---
-title: "3. Extracting Data from Camera Trapping Images, creating occupancy & secr input"
+title: "3. Extracting Data from Camera Trapping Images and videos, creating occupancy & secr input"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output:
@@ -22,12 +22,12 @@ library(secr)
 
 # Tabulating species and individual records: the recordTable functions
 
-There are 2 function to tabulate species records after identification of species from images: 
+There are 2 function to tabulate species records after identification of species from images and videos.
 
 * `recordTable` tabulates records of all images after species-level identification and 
 * `recordTableIndividual` tabulates individuals of one species. 
 
-Nevertheless, the underlying idea is the same. For each image, the date and time it was taken are read from the image's Exif metadata using ExifTool. Species or individual ID are read from the directory structure or image metadata (see vignette "Species and Individual Identification"). 
+Nevertheless, the underlying idea is the same. For each image, the date and time it was taken are read from the image's Exif metadata using ExifTool. Species or individual ID are read from the directory structure or image metadata (see vignette "Species and Individual Identification"). Video data are extracted analogously. 
 
 
 ## `recordTable`: tabulating species records
@@ -113,15 +113,18 @@ Now `r nrow(rec.db.species60)` records were returned instead of `r nrow(rec.db.s
 
 Note the warning about the missing time zone in the minimal example above. By default, camtrapR will assume UTC time zone. This should work well in most situations (even though the time zone may not be correct, strictly speaking), because UTC does not use daylight saving time (DST, aka 'summer time'), and camera traps normally don't use time zones (hence, camera traps will normally not respect DST of the area you work in and will not adjust image timestamps accordingly).
 
-Now, if you work in an area that uses DST, and your camera does not know about DST, things can go wrong in various ways and you may end up with a systematic 1-hour offset. If you set your cameras up during DST (in summer) and set the internal clock accordingly, all records taken in winter (non-DST period) will be recorded as 1 hour later than according to actual clock time. If you set your cameras up during winter (not DST) and set the internal clock accordingly, all records taken in summer (DST period) will be recorded as 1 hour earlier than according to actual clock time. In addition, records may fall into the non-existing hour when clocks are advanced in spring, leading to an error in interpreting the date/time.
+Now, if you work in an area that uses DST, and your camera does not know about DST, things can go wrong in various ways and you may end up with a systematic 1-hour offset. If you set your cameras up during DST (in summer) and set the internal clock accordingly, all records taken in winter (non-DST period) will be recorded as 1 hour later than according to actual clock time. If you set your cameras up during winter (not DST) and set the internal clock accordingly, all records taken in summer (DST period) will be recorded as 1 hour earlier than according to actual clock time. 
+
+In addition if you specify a time zone with DST and your cameras don't respect it, records may fall into the non-existing hour when clocks are advanced in spring, leading to an error in interpreting the date/time.
 
 So, the question whether or not your cameras record the time zone becomes very important. Here is some recommendations on how to use the argument `timeZone`.
 
-If your cameras save the time zone and adjust image timestamps accordingly, set argument `timeZone` to your study area time zone (both if your area has DST or not). 
 If your cameras don't save the time zone, and your time zone does not have DST, set argument `timeZone` to your study area time zone
 If your cameras don't save the time zone, and your time zone has DST, leave argument `timeZone` at the default UTC.
+If your cameras save the time zone and adjust image timestamps accordingly, set argument `timeZone` to your study area time zone (both if your area has DST or not). 
 
-In other words, it is strongly advised to set argument `timeZone` to your study area's time zone (one of `OlsonNames()`), *unless* your area has DST, but your cameras don't record it. 
+
+In other words, it is advised to set argument `timeZone` to your study area's time zone (one of `OlsonNames()`), *unless* the time zone of your study area has DST, but your cameras don't record it. 
 
 
 ### Independence between cameras within stations

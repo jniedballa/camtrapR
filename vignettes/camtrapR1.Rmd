@@ -10,7 +10,7 @@ output:
       smooth_scroll: false
     toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{1. Raw camera trap image organisation}
+  %\VignetteIndexEntry{1. Raw camera trap data organisation}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -19,7 +19,7 @@ vignette: >
 # Introduction
 
 
-**camtrapR** provides functions for organising and managing camera trap images and for the preparation of occupancy and (spatial) capture-recapture analyses. Currently the package handles JPG images only. Because of inconsistent metadata structure, there is no support for video files yet. 
+**camtrapR** provides functions for organising and managing camera trap images and for the preparation of occupancy and (spatial) capture-recapture analyses. The package handles JPG images and since camtrapR 2.0.0, provides limited support for video files.
 
 The four vignettes demonstrate the camtrapR workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
 
@@ -92,6 +92,28 @@ The workflow in camptrapR is made up of a number of function that build upon one
 
 camtrapR was designed for camera trapping surveys in which an array of camera trap stations (each consisting of one or more camera traps per station) is operated in a study area. The vignettes will provide a guideline for how to use camtrapR in different sampling situations. 
 
+## Video support (since version 2.0.0)
+
+Since version 2.0.0, the functions `recordTable` and `recordTableIndividual` support video files. In addition `exifTagNames` can read and display video metadata via ExifTool. 
+
+Video support allows you to process video files and identify species and individuals using the same workflow as for images. With minimal effort, you can extract and tabulate these information using the familiar functions within camtrapR.
+
+Since this is a new feature, please be sure to read the help files of the relevant functions and check the example code. Unfortunately, I could not include a sample video in the package due to file size constraints, but I hope if will give you the idea. And please, let me know about your experiences working with videos in camtrapR. I would really appreciate the feedback.
+
+
+### Video date/time
+
+Because there is no standardized date/time tag in the metadata of video files, users need to check if there is a suitable (i.e., persistent) tag available in the video metadata:
+
+1. find a usable video date/time tag with `exifTagNames`
+1. provide the name of the video date/time tag to `recordTable`
+
+This also means that if there is no suitable date/time tag in the video metadata, camtrapR will not be able to return information for these videos and will have to omit them. So if you consider using video for your surveys, please first check (with that specific camera model) if there is a suitable date/time tag in the video metadata. A suitabale date/time tag is one that doesn't change when the video file is moved, copied or otherwise modified. If a camera fails to record such a tag, camtrapR can't use the data.
+
+### digiKam tags & metadata
+
+In digiKam, it is possible to assign tags to videos. Just like images, videos can be tagged with species or individual IDs, group size, sex, age group or whatever information you are interested in. BUT, in contrast to JPG images, digiKam cannot write these tags directly into the video metadata. Instead, video tags are stored in the digiKam database on your hard disk. So to access tags assigned to videos, camtrapR has to read them directly from the digiKam database. To that end, users need to provide the filename of the digiKam database and the directory it is in (digiKam > Settings > configure digiKam > Database; the directory is stated there). In that menu, also ensure you use a SQLite database. When the digiKam database information are provided to camtrapR, all tags assigned to videos in digiKam will be extracted and tabulated just like image tags. See the help files of `recordTable` and `recordTableIndividual` for details.
+
 
 ## Nomenclature
 
@@ -108,7 +130,7 @@ camtrapR relies on the free and open-source software **ExifTool** written by Phi
 
 ### ExifTool for Windows
 
-On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found [here]( http://www.sno.phy.queensu.ca/~phil/exiftool/install.html). Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained .exe file to exiftool.exe and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in Windows PATH variable (e.g. C:/Windows). 
+On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found [here]( http://www.sno.phy.queensu.ca/~phil/exiftool/install.html). Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained "exiftool(-k).exe" file to "exiftool.exe" and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in Windows PATH variable (e.g. C:/Windows). 
 
 
 ```{r eval = FALSE}

@@ -24,13 +24,14 @@ data(camtraps)
 
 Having organised your camera trap images into station (and camera) directories as explained in the vignette "Organising raw camera trap images in camtrapR", you can begin with species (and individual) identification.
 
-Generally, species identification come before individual identification. camtrapR supports two different methods for identifying species and individuals:
+Generally, species identification comes before individual identification. camtrapR supports two different methods for identifying species and individuals:
 
 1. by moving renamed images into species/individual directories within station directories (drag & drop) or 
 2. by assigning metadata tags to images in image management software (metadata tagging). 
 
 It is recommended to to work with the renamed images (function `imageRename`), not the original generic file names. Species names are case-sensitive and must be spelled *exactly* the same in each station, including interpunction and white spaces. "Leopard" is not identical to "leopard" and "Pig-tailed Macaque" is different from "Pig-tailed Macaque ".
 
+Since version 2.0.0, camtrapR partially supports video files. You can use both of the following methods for identification (drag & drop, metadata) for video files as well.
 
 ## Drag & drop
 
@@ -45,15 +46,16 @@ Metadata tagging can be used to assign custom tags to images, e.g. species ID, i
 
 ### Image management software recommendations for metadata tagging
 
-
 Here is a list of suitable software for metadata tagging:
 
 * digiKam (http://www.digikam.org)
 * Adobe Bridge
 * Adobe Lightroom
 
-Among these, we recommend digiKam because it is free and open-source software. All of these programs offer customisable metadata structures and are easy to use. 
-We only tested these three programs and it is unlikely that other software will work smoothly, if at all. **Picasa is not suitable**, because it does not allow for hierarchical tags, the total number of tags is limited, and it may overwrite and permanently destroy your original metadata.
+Among these, we recommend digiKam because it is free and open-source software. Furthermore, if you wish to assign tags to videos and read them in camtrapR, tag the videos in digiKam. Extracting video tags only works if videos were tagged with digiKam.
+
+All of these programs offer customisable metadata structures and are easy to use. 
+We only tested these three programs and it is unclear what other software will work smoothly, if at all. 
 
 
 ### digiKam setup
@@ -116,7 +118,13 @@ Species|SpeciesB, Individual|Female1
 Species|SpeciesA, Species|SpeciesB
 
 
-Note that multiple tags are separated by commas and hierarchy levels are by default separated by a vertical bar ("|"). Adobe software also lets you use colon (":"); you can tell camtrapR which to use using argument `metadataHierarchyDelimitor` in a number of functions). camtrapR reads these lines and can automatically tabulate the contents.
+Note that multiple tags are separated by commas and hierarchy levels are by default separated by a vertical bar ("|"). Adobe software also lets you use colon (":"); you can tell camtrapR which to use using argument `metadataHierarchyDelimitor` in a number of functions. camtrapR reads the content of HierarchicalSubject and can automatically tabulate the contents.
+
+### And how about metadata extraction from videos?
+
+I'm glad you asked. In digiKam, it is possible to assign tags to videos, just like tagging images. BUT, in contrast to images, digiKam cannot write these tags directly into the video metadata. Instead, video tags are stored in the digiKam database on your hard disk. So camtrapR has to go straight to the digiKam database to read the tags directly from the there. After some internal magic, it will construct and return a HierarchicalSubject field as seen above for JPG images. camtrapR can then extract and tabulate the relevant information of images and videos alike.
+
+That means that video tags are not extracted from the metadata, but from the digiKam database. It also means that the tags are not part of the video files and that sharing data and even copying video files on your hard disk after tagging might cause the loss of metadata, so please check carefully each step of what you are doing.
 
 ### What if non-hierarchical metadata tags were assigned to images already?
 
@@ -134,7 +142,7 @@ Let's assume you have species tags (e.g. "Leopard Cat") that are not hierarchica
 1. To update the image metadata with your new tag structure (and to populate the image metadata tag "HierarchicalSubject" that camtrapR reads), select the images, click the "More" button in the bottom right corner of the screen, then "Write metadata to each file". 
 1. Repeat the last step for each station directory.
 
-Afterwards, the "HierarchicalSubject" of your image metadata should contain the tag structure. You can check using the `exifTagNames` function as described in the section above.
+Afterwards, the "HierarchicalSubject" of your image metadata should contain the tag structure. You can check using the `exifTagNames` function as described in vignette 1.
 
 This procedure also works for other tags, not only "Species".
 
