@@ -1632,20 +1632,20 @@ accessDigiKamDatabase <- function(databaseDir,   # database directory
   if(!dir.exists(databaseDir)) stop("Could not find digiKam_db_directory")
   if(!file.exists(file.path(databaseDir, db_file))) stop("Could not find digiKam_db_file in digiKam_db_directory")
   
-  con <- dbConnect(SQLite(), file.path(databaseDir, db_file))
+  con <- RSQLite::dbConnect(RSQLite::SQLite(), file.path(databaseDir, db_file))
   
   # read tables
-  Images      <- dbReadTable(con, 'Images')
-  Tags        <- dbReadTable(con, 'Tags')
-  ImageTags   <- dbReadTable(con, 'ImageTags')
-  Albums      <- dbReadTable(con, 'Albums')
-  AlbumRoots  <- dbReadTable(con, 'AlbumRoots')
+  Images      <- RSQLite::dbReadTable(con, 'Images')
+  Tags        <- RSQLite::dbReadTable(con, 'Tags')
+  ImageTags   <- RSQLite::dbReadTable(con, 'ImageTags')
+  Albums      <- RSQLite::dbReadTable(con, 'Albums')
+  AlbumRoots  <- RSQLite::dbReadTable(con, 'AlbumRoots')
   
-#  ImageInformation  <- dbReadTable(con, 'ImageInformation')
-#  ImageMetadata     <- dbReadTable(con, 'ImageMetadata')
+#  ImageInformation  <- RSQLite::dbReadTable(con, 'ImageInformation')
+#  ImageMetadata     <- RSQLite::dbReadTable(con, 'ImageMetadata')
   
   # disconnect database  
-  dbDisconnect(con)
+  RSQLite::dbDisconnect(con)
   
   # make output
   return(list(Albums           = Albums,
@@ -1664,8 +1664,7 @@ accessDigiKamDatabase <- function(databaseDir,   # database directory
 
 digiKamVideoHierarchicalSubject <- function(stationDir,
                                     digiKamTablesList,    # output of accessDigiKamDatabase
-                                    videoFormat#,          # character vector of desired video formats
-                                    #metadataSpeciesTag
+                                    videoFormat           # character vector of desired video formats
 )
 {
   
@@ -1802,6 +1801,7 @@ processVideoArgument <- function(IDfrom = IDfrom,
     stopifnot(exists("digiKam_db_directory", where = video))
     stopifnot(exists("digiKam_db_filename",  where = video))
     stopifnot(dir.exists(video$digiKam_db_directory))
+    stopifnot(file.exists(file.path(video$digiKam_db_directory, video$digiKam_db_filename)))
     
     if (!requireNamespace("RSQLite", quietly = TRUE)) {
       stop("the package 'RSQLite' is needed for extracting data from digiKam database,  you can install it via: install.packages('RSQLite')")
@@ -1811,7 +1811,42 @@ processVideoArgument <- function(IDfrom = IDfrom,
     # } 
     digiKam_data <- accessDigiKamDatabase (databaseDir = video$digiKam_db_directory,
                                            db_file     = video$digiKam_db_filename)
+  } else {
+    digiKam_data <- NULL
   }
   return(list(digiKam_data = digiKam_data,
               file_formats = file_formats))
+}
+
+
+# if video files extracted, add DateTimeOriginal and HierarchicalSubject
+
+addVideoDateTimeOriginal <- function(metadata.tmp,
+                                    video){
+  # if there's missing entries in DateTimeOriginal that are present in the video date time tag, copy the video tags over
+  rows_of_interest1 <- which(metadata.tmp$DateTimeOriginal == "-" & 
+                               metadata.tmp[,video$dateTimeTag] != "-")
+  if(length(rows_of_interest1) >= 1) {
+    metadata.tmp$DateTimeOriginal[rows_of_interest1] <- metadata.tmp[rows_of_interest1, video$dateTimeTag] 
+  }
+  metadata.tmp[, video$dateTimeTag] <- NULL
+ 
+  return(metadata.tmp) 
+}
+  # add HierachicalSubject for video files
+
+addVideoHierachicalSubject <- function(metadata.tmp,
+                                       video,
+                                       digiKam_video_metadata){
+  
+  # add HierarchialSubject for video files (match by filename, must be unique)
+  metadata.tmp$HierarchicalSubject_video <- digiKam_video_metadata$HierarchicalSubject [match(metadata.tmp$FileName, digiKam_video_metadata$name)]
+  
+  rows_of_interest2 <- which(!is.na(metadata.tmp$HierarchicalSubject_video) & 
+                               metadata.tmp$HierarchicalSubject == "-")
+  if(length(rows_of_interest2) >= 1) {
+    metadata.tmp$HierarchicalSubject[rows_of_interest2] <- metadata.tmp$HierarchicalSubject_video[rows_of_interest2] 
+  }
+  metadata.tmp$HierarchicalSubject_video <- NULL
+  return(metadata.tmp)
 }
