@@ -30,13 +30,15 @@ install_github("jniedballa/camtrapR")
 
 ## Exiftool
 
-Numerous important camtrapR functions read EXIF metadata from JPG
-images. This is done via Exiftool, a free and open-source sofware tool
-developed by Phil Harvey and available for Windows, MacOS and Linux.
+Numerous important camtrapR functions read EXIF metadata from JPG images
+(and videos). This is done via Exiftool, a free and open-source sofware
+tool developed by Phil Harvey and available for Windows, MacOS and
+Linux.
 
 To make full use of camtrapR, you will need Exiftool on your system. You
 can download it from the [Exiftool homepage](https://exiftool.org/).
-Please follow the installation instruction in vignette 1.
+Please follow the installation instruction in vignette 1 and the
+Exiftool website.
 
 You may not need Exiftool if you do not work with image files, but only
 use camtrapR to create input for occupancy or spatial capture-recapture
@@ -53,14 +55,15 @@ discussion there.
 
 ### GitHub issues
 
-Alternatively, you can report bugs and problems as issues here on GitHub
+Alternatively, you can report bugs and problems as issues on GitHub
 [(here)](https://github.com/jniedballa/camtrapR/issues).
 
 ## Further reading
 
 See the [Article in Methods in Ecology and
 Evolution](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600)
-for an overview of the package.
+for an overview of the package. The four package vignettes provide
+examples for the entire workflow.
 
 ## Citation
 
