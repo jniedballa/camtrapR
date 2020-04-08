@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate a single-species record table with individual identification from camera trap images — recordTableIndividual • camtrapR</title>
+<title>Generate a single-species record table with individual identification from camera trap images or videos — recordTableIndividual • camtrapR</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,7 @@
 
 
 
-<meta property="og:title" content="Generate a single-species record table with individual identification from camera trap images — recordTableIndividual" />
+<meta property="og:title" content="Generate a single-species record table with individual identification from camera trap images or videos — recordTableIndividual" />
 <meta property="og:description" content="The function generates a single-species record table containing individual IDs, e.g. for (spatial) capture-recapture analyses. It prepares input for the function spatialDetectionHistory." />
 <meta name="twitter:card" content="summary" />
 
@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -92,13 +92,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/camtrapR1.html">1. Organising raw camera trap images in camtrapR</a>
+      <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
@@ -129,7 +129,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate a single-species record table with individual identification from camera trap images</h1>
+    <h1>Generate a single-species record table with individual identification from camera trap images or videos</h1>
     
     <div class="hidden name"><code>recordTableIndividual.Rd</code></div>
     </div>
@@ -155,7 +155,8 @@
   <span class='kw'>removeDuplicateRecords</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>returnFileNamesMissingTags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>eventSummaryColumn</span>,
-  <span class='no'>eventSummaryFunction</span>
+  <span class='no'>eventSummaryFunction</span>,
+  <span class='no'>video</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -233,17 +234,34 @@
       <th>eventSummaryFunction</th>
       <td><p>character. The function by which to summarise <code>eventSummaryColumn</code> of  non-independent records, e.g. "sum", "max" (optional)</p></td>
     </tr>
+    <tr>
+      <th>video</th>
+      <td><p>list. Contains information on how to handle video data (otional). See details.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The function can handle a number of different ways of storing images. In every case, images need to be stored in a species directory first (e.g. using function <code><a href='getSpeciesImages.html'>getSpeciesImages</a></code>). Station subdirectories are optional. Camera subdirectories are not allowed. This directory structure can be created easily with function <code><a href='getSpeciesImages.html'>getSpeciesImages</a></code>.</p>
+    <p>The function can handle a number of different ways of storing images and videos. In every case, images need to be stored in a species directory first (e.g. using function <code><a href='getSpeciesImages.html'>getSpeciesImages</a></code>). Station subdirectories are optional. Camera subdirectories are not supported. This directory structure can be created easily with function <code><a href='getSpeciesImages.html'>getSpeciesImages</a></code>.</p>
 <p>As with species identification, individuals can be identified in 2 different ways: by moving images into individual directories ("Species/Station/Individual/XY.JPG" or "Species/Individual/XY.JPG") or by metadata tagging (without the need for individual directories: "Species/XY.JPG" or "Species/Station/XY.JPG").</p>
 <p><code>minDeltaTime</code> is a criterion for temporal independence of records of an individual at the same station/location. Setting it to 0 will make the function return all records. <code>camerasIndependent</code> defines if the cameras at a station are to be considered independent (e.g. <code>FALSE</code> if both cameras face each other and possibly <code>TRUE</code> if they face different trails).
 <code>stationCol</code> is the station column name to be used in the resulting table. Station IDs are read from the station directory names if <code>hasStationFolders = TRUE</code>. Otherwise, the function will try to extract station IDs from the image filenames (requires images renamed with <code><a href='imageRename.html'>imageRename</a></code>.</p>
 <p>If individual IDs were assigned with image metadata tags, <code>metadataIDTag</code> must be set to the name of the metadata tag group used for individual identification. <code>metadataHierarchyDelimitor</code> is "|" for images tagged in DigiKam and images tagged in Adobe Bridge/ Lightroom with the default settings.
 Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPhase" can be extracted if specified in <code>additionalMetadataTags</code>. Multiple names can be specified as a character vector as: <code><a href='https://rdrr.io/r/base/c.html'>c(Tag1, Tag2, ...)</a></code>. Because they are not standardized, function <code><a href='exifTagNames.html'>exifTagNames</a></code> provides a vector of all available tag names. The metadata tags thus extracted may be used as individual covariates in spatial capture-recapture models.</p>
 <p><code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run <code>recordTable</code>. Set <code>eventSummaryColumn = "count"</code> and <code>eventSummaryFunction = "max"</code> to obtain the maximum number of <code>count</code> in all images within <code>minDeltaTime</code> minutes of a given record. The results is in a new column, in this example <code>count_max</code>. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. <code>eventSummaryColumn = c("count", "count", "camera")</code> and <code>eventSummaryFunction = c("min", "max", "unique")</code> to get minimum and maximum count and all unique camera IDs for that event. Note that <code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> must be of same length.</p>
+<p>Argument <code>video</code> is analogous to <code><a href='recordTable.html'>recordTable</a></code>, a named list with 2 or 4 items. 2 items (<code>file_formats</code>, <code>dateTimeTag</code>) are always required, and are sufficent if <code>IDfrom = "directory"</code>. In that case, no digiKam tags will be returned. 
+To return digiKam tags, two additional items are required (<code>digiKam_db_directory</code>, <code>digiKam_db_filename</code>). This is essential when using <code>IDfrom = "metadata"</code>. When using <code>IDfrom = "directory"</code>, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool.</p>
+<p>The items of argument <code>video</code> are:</p>
+<table class='table'>
+<tr><td><code>file_formats</code></td><td>The video formats to extract (include "jpg" if you want .JPG image metadata)</td></tr>
+<tr><td><code>dateTimeTag</code></td><td>the metadata tag to extract date/time from (use <code><a href='exifTagNames.html'>exifTagNames</a></code> to find out which tag is suitable)</td></tr>
+<tr><td><code>digiKam_db_directory</code></td><td>The directory containing digiKam database (optional if <code>IDfrom = "directory"</code>)</td></tr>
+<tr><td><code>digiKam_db_filename</code></td><td>The digiKam database file in <code>digiKam_db_directory</code> (optional if <code>IDfrom = "directory"</code>)</td></tr>
+</table>
+
+
+
+<p>See the example below for for how to specify the argument <code>video</code>.</p>
 
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -260,6 +278,8 @@ Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPh
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>)    <span class='co'># the examples run too long to pass CRAN tests</span>
+
  <span class='no'>wd_images_ID_individual</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_tagged/LeopardCat"</span>,
                                         <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
  <span class='co'># missing space in species = "LeopardCat" is because of CRAN package policies</span>
@@ -279,7 +299,7 @@ Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPh
                                         <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
  )
 
- <span class='kw'>if</span> (<span class='fl'>FALSE</span>)    <span class='co'># the examples run too long to pass CRAN tests</span>
+
  <span class='co'># extracting some example summary stats too </span>
  <span class='co'># a nonsensical example, get all unique cameras with which the event was photographed</span>
 
@@ -297,11 +317,26 @@ Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPh
                                         <span class='kw'>eventSummaryFunction</span>   <span class='kw'>=</span> <span class='st'>"unique"</span>
  )
 
+ <span class='co'>### Video example (the sample data don't contain a video, this is hypothetical)</span>
+ <span class='co'># with JPG, video mp4, avi, mov, ID = metadata</span>
+<span class='no'>rec_table_ind_video</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTableIndividual</span>(<span class='kw'>inDir</span> <span class='kw'>=</span> <span class='no'>wd_images_ID_individual</span>,
+                          <span class='kw'>hasStationFolder</span>  <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+                          <span class='kw'>IDfrom</span>            <span class='kw'>=</span> <span class='st'>"metadata"</span>,
+                          <span class='kw'>metadataIDTag</span>     <span class='kw'>=</span> <span class='st'>"individual"</span>,
+                          <span class='kw'>video</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>file_formats</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"jpg"</span>, <span class='st'>"mp4"</span>, <span class='st'>"avi"</span>, <span class='st'>"mov"</span>),
+                                       <span class='kw'>dateTimeTag</span> <span class='kw'>=</span> <span class='st'>"QuickTime:CreateDate"</span>,
+                                       <span class='kw'>digiKam_db_directory</span> <span class='kw'>=</span> <span class='st'>"C:/Users/YourName/Pictures"</span>,
+                                       <span class='kw'>digiKam_db_filename</span> <span class='kw'>=</span> <span class='st'>"digikam4.db"</span>)
+)
 
- } <span class='kw'>else</span> {                                <span class='co'># show function output if ExifTool is not available</span>
- <span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span>(<span class='st'>"ExifTool is not available. Cannot test function"</span>)
- <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableIndividualSample</span>)
- }</div><div class='output co'>#&gt; <span class='message'>StationA, StationB, StationC:     26 images    3 duplicates removed      |====================|  100%</span></div></pre>
+
+} <span class='kw'>else</span> {
+<span class='co'># show function output if ExifTool is not available</span>
+<span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span>(<span class='st'>"ExifTool is not available. Cannot test function. Loading recordTableSample instead"</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableSample</span>)
+}</div><div class='output co'>#&gt; <span class='error'>Error in recordTableIndividual(inDir = wd_images_ID_individual, minDeltaTime = 60,     deltaTimeComparedTo = "lastRecord", hasStationFolders = FALSE,     IDfrom = "metadata", camerasIndependent = FALSE, writecsv = FALSE,     metadataIDTag = "individual", additionalMetadataTags = c("EXIF:Model",         "EXIF:Make"), timeZone = "Asia/Kuala_Lumpur"): object 'wd_images_ID_individual' not found</span></div><div class='input'>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

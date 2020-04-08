@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -54,13 +54,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/camtrapR1.html">1. Organising raw camera trap images in camtrapR</a>
+      <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
@@ -94,7 +94,7 @@
       <h1>2. Identifying species and individuals in camtrapR</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2020-02-25</h4>
+            <h4 class="date">2020-04-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr2.Rmd"><code>vignettes/camtrapr2.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr2.Rmd</code></div>
@@ -109,12 +109,13 @@
 <h1 class="hasAnchor">
 <a href="#methods-for-species-and-individual-identification---general" class="anchor"></a>Methods for species and individual identification - General</h1>
 <p>Having organised your camera trap images into station (and camera) directories as explained in the vignette “Organising raw camera trap images in camtrapR”, you can begin with species (and individual) identification.</p>
-<p>Generally, species identification come before individual identification. camtrapR supports two different methods for identifying species and individuals:</p>
+<p>Generally, species identification comes before individual identification. camtrapR supports two different methods for identifying species and individuals:</p>
 <ol style="list-style-type: decimal">
 <li>by moving renamed images into species/individual directories within station directories (drag &amp; drop) or</li>
 <li>by assigning metadata tags to images in image management software (metadata tagging).</li>
 </ol>
 <p>It is recommended to to work with the renamed images (function <code>imageRename</code>), not the original generic file names. Species names are case-sensitive and must be spelled <em>exactly</em> the same in each station, including interpunction and white spaces. “Leopard” is not identical to “leopard” and “Pig-tailed Macaque” is different from “Pig-tailed Macaque”.</p>
+<p>Since version 2.0.0, camtrapR partially supports video files. You can use both of the following methods for identification (drag &amp; drop, metadata) for video files as well.</p>
 <div id="drag-drop" class="section level2">
 <h2 class="hasAnchor">
 <a href="#drag-drop" class="anchor"></a>Drag &amp; drop</h2>
@@ -133,7 +134,8 @@
 <li>Adobe Bridge</li>
 <li>Adobe Lightroom</li>
 </ul>
-<p>Among these, we recommend digiKam because it is free and open-source software. All of these programs offer customisable metadata structures and are easy to use. We only tested these three programs and it is unlikely that other software will work smoothly, if at all. <strong>Picasa is not suitable</strong>, because it does not allow for hierarchical tags, the total number of tags is limited, and it may overwrite and permanently destroy your original metadata.</p>
+<p>Among these, we recommend digiKam because it is free and open-source software. Furthermore, if you wish to assign tags to videos and read them in camtrapR, tag the videos in digiKam. Extracting video tags only works if videos were tagged with digiKam.</p>
+<p>All of these programs offer customisable metadata structures and are easy to use. We only tested these three programs and it is unclear what other software will work smoothly, if at all.</p>
 </div>
 <div id="digikam-setup" class="section level3">
 <h3 class="hasAnchor">
@@ -204,7 +206,13 @@
 <p>Species|SpeciesA</p>
 <p>Species|SpeciesB, Individual|Female1</p>
 <p>Species|SpeciesA, Species|SpeciesB</p>
-<p>Note that multiple tags are separated by commas and hierarchy levels are by default separated by a vertical bar (“|”). Adobe software also lets you use colon (“:”); you can tell camtrapR which to use using argument <code>metadataHierarchyDelimitor</code> in a number of functions). camtrapR reads these lines and can automatically tabulate the contents.</p>
+<p>Note that multiple tags are separated by commas and hierarchy levels are by default separated by a vertical bar (“|”). Adobe software also lets you use colon (“:”); you can tell camtrapR which to use using argument <code>metadataHierarchyDelimitor</code> in a number of functions. camtrapR reads the content of HierarchicalSubject and can automatically tabulate the contents.</p>
+</div>
+<div id="and-how-about-metadata-extraction-from-videos" class="section level3">
+<h3 class="hasAnchor">
+<a href="#and-how-about-metadata-extraction-from-videos" class="anchor"></a>And how about metadata extraction from videos?</h3>
+<p>I’m glad you asked. In digiKam, it is possible to assign tags to videos, just like tagging images. BUT, in contrast to images, digiKam cannot write these tags directly into the video metadata. Instead, video tags are stored in the digiKam database on your hard disk. So camtrapR has to go straight to the digiKam database to read the tags directly from the there. After some internal magic, it will construct and return a HierarchicalSubject field as seen above for JPG images. camtrapR can then extract and tabulate the relevant information of images and videos alike.</p>
+<p>That means that video tags are not extracted from the metadata, but from the digiKam database. It also means that the tags are not part of the video files and that sharing data and even copying video files on your hard disk after tagging might cause the loss of metadata, so please check carefully each step of what you are doing.</p>
 </div>
 <div id="what-if-non-hierarchical-metadata-tags-were-assigned-to-images-already" class="section level3">
 <h3 class="hasAnchor">
@@ -223,7 +231,7 @@
 <li>To update the image metadata with your new tag structure (and to populate the image metadata tag “HierarchicalSubject” that camtrapR reads), select the images, click the “More” button in the bottom right corner of the screen, then “Write metadata to each file”.</li>
 <li>Repeat the last step for each station directory.</li>
 </ol>
-<p>Afterwards, the “HierarchicalSubject” of your image metadata should contain the tag structure. You can check using the <code>exifTagNames</code> function as described in the section above.</p>
+<p>Afterwards, the “HierarchicalSubject” of your image metadata should contain the tag structure. You can check using the <code>exifTagNames</code> function as described in vignette 1.</p>
 <p>This procedure also works for other tags, not only “Species”.</p>
 </div>
 <div id="how-to-import-a-metadata-tag-tree-into-digikam" class="section level3">
@@ -374,9 +382,9 @@
 ## 2 StationB
 ## 3 StationC
 ##                                                                                directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationB
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationC
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationB
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationC
 ##   created exists
 ## 1    TRUE   TRUE
 ## 2    TRUE   TRUE
@@ -392,12 +400,12 @@
 <pre><code>## created 6 directories</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">SpeciesFolderCreate1</a></code></pre></div>
 <pre><code>##                                                                                            directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationA/Sambar Deer
-## 2     C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationA/Bay Cat
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationB/Sambar Deer
-## 4     C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationB/Bay Cat
-## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationC/Sambar Deer
-## 6     C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationC/Bay Cat
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationA/Sambar Deer
+## 2     C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationA/Bay Cat
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationB/Sambar Deer
+## 4     C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationB/Bay Cat
+## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationC/Sambar Deer
+## 6     C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationC/Bay Cat
 ##   created exists
 ## 1    TRUE   TRUE
 ## 2    TRUE   TRUE
@@ -413,12 +421,12 @@
 <pre><code>## deleted 6 empty directories</code></pre>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">SpecFolderCreate2</a></code></pre></div>
 <pre><code>##                                                                                            directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationA/Sambar Deer
-## 2     C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationA/Bay Cat
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationB/Sambar Deer
-## 4     C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationB/Bay Cat
-## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationC/Sambar Deer
-## 6     C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/createSpeciesFoldersTest/StationC/Bay Cat
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationA/Sambar Deer
+## 2     C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationA/Bay Cat
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationB/Sambar Deer
+## 4     C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationB/Bay Cat
+## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationC/Sambar Deer
+## 6     C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/createSpeciesFoldersTest/StationC/Bay Cat
 ##   still.exists
 ## 1        FALSE
 ## 2        FALSE
@@ -477,9 +485,9 @@ inDir/Station/Camera</p>
 ##     station
 ## 7  StationC
 ## 29 StationC
-##                                                                                                               Directory
-## 7  C:/Users/Juergen/AppData/Local/Temp/RtmpYbH80S/temp_libpath1b143ff77a4d/camtrapR/pictures/sample_images/StationC/EGY
-## 29 C:/Users/Juergen/AppData/Local/Temp/RtmpYbH80S/temp_libpath1b143ff77a4d/camtrapR/pictures/sample_images/StationC/TRA
+##                                                                                                              Directory
+## 7  C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationC/EGY
+## 29 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationC/TRA
 ##                                 FileName species    DateTimeOriginal
 ## 7  StationC__2009-04-27__00-17-00(1).JPG     EGY 2009-04-27 00:17:00
 ## 29 StationC__2009-04-27__00-19-00(1).JPG     TRA 2009-04-27 00:19:00
@@ -535,15 +543,15 @@ inDir/Station/Camera</p>
 <a class="sourceLine" id="cb38-5" title="5">                                           <span class="dt">IDfrom              =</span> <span class="st">"directory"</span>,</a>
 <a class="sourceLine" id="cb38-6" title="6">                                           <span class="dt">hasCameraFolders    =</span> <span class="ot">FALSE</span></a>
 <a class="sourceLine" id="cb38-7" title="7">)</a></code></pre></div>
-<pre><code>## renamed 68 out of 68 images in C:\Users\Juergen\AppData\Local\Temp\Rtmpcz34Jd/sample_images</code></pre>
+<pre><code>## renamed 68 out of 68 images in C:\Users\Juergen\AppData\Local\Temp\RtmpuGhpSH/sample_images</code></pre>
 <div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(species_names_append)</a></code></pre></div>
 <pre><code>##                                                                         directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 6 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 6 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
 ##                            filename_old species
 ## 1 StationA__2009-04-21__00-40-00(1).JPG     PBE
 ## 2 StationA__2009-04-22__20-19-00(1).JPG     PBE
@@ -563,15 +571,15 @@ inDir/Station/Camera</p>
 <a class="sourceLine" id="cb42-3" title="3">                                           <span class="dt">hasCameraFolders    =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb42-4" title="4">                                           <span class="dt">removeNames         =</span> <span class="ot">TRUE</span></a>
 <a class="sourceLine" id="cb42-5" title="5">)</a></code></pre></div>
-<pre><code>## renamed 68 out of 68 images in C:\Users\Juergen\AppData\Local\Temp\Rtmpcz34Jd/sample_images</code></pre>
+<pre><code>## renamed 68 out of 68 images in C:\Users\Juergen\AppData\Local\Temp\RtmpuGhpSH/sample_images</code></pre>
 <div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(species_names_remove)</a></code></pre></div>
 <pre><code>##                                                                         directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
-## 6 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sample_images/StationA/PBE
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
+## 6 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sample_images/StationA/PBE
 ##                                 filename_old species
 ## 1 StationA__2009-04-21__00-40-00(1)__PBE.JPG     PBE
 ## 2 StationA__2009-04-22__20-19-00(1)__PBE.JPG     PBE
@@ -607,7 +615,7 @@ inDir/Station/Camera</p>
 <a class="sourceLine" id="cb46-9" title="9">                                  <span class="dt">outDir                  =</span> wd_images_species_copy,</a>
 <a class="sourceLine" id="cb46-10" title="10">                                  <span class="dt">createStationSubfolders =</span> <span class="ot">FALSE</span></a>
 <a class="sourceLine" id="cb46-11" title="11">  )</a></code></pre></div>
-<pre><code>## VTA  - copied 5 out of 5 images in C:/Users/Juergen/AppData/Local/Temp/RtmpYbH80S/temp_libpath1b143ff77a4d/camtrapR/pictures/sample_images   to   C:\Users\Juergen\AppData\Local\Temp\Rtmpcz34Jd/sampleSpeciesImages/VTA</code></pre>
+<pre><code>## VTA  - copied 5 out of 5 images in C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images   to   C:\Users\Juergen\AppData\Local\Temp\RtmpuGhpSH/sampleSpeciesImages/VTA</code></pre>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1">specImagecopy</a></code></pre></div>
 <pre><code>##   species
 ## 1     VTA
@@ -615,12 +623,12 @@ inDir/Station/Camera</p>
 ## 3     VTA
 ## 4     VTA
 ## 5     VTA
-##                                                                                                          DirectoryOrig
-## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpYbH80S/temp_libpath1b143ff77a4d/camtrapR/pictures/sample_images/StationA/VTA
-## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpYbH80S/temp_libpath1b143ff77a4d/camtrapR/pictures/sample_images/StationA/VTA
-## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpYbH80S/temp_libpath1b143ff77a4d/camtrapR/pictures/sample_images/StationB/VTA
-## 4 C:/Users/Juergen/AppData/Local/Temp/RtmpYbH80S/temp_libpath1b143ff77a4d/camtrapR/pictures/sample_images/StationB/VTA
-## 5 C:/Users/Juergen/AppData/Local/Temp/RtmpYbH80S/temp_libpath1b143ff77a4d/camtrapR/pictures/sample_images/StationC/VTA
+##                                                                                                         DirectoryOrig
+## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/VTA
+## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/VTA
+## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationB/VTA
+## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationB/VTA
+## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationC/VTA
 ##                            FilenameOrig
 ## 1 StationA__2009-04-10__05-07-00(1).JPG
 ## 2 StationA__2009-05-06__19-06-00(1).JPG
@@ -628,11 +636,11 @@ inDir/Station/Camera</p>
 ## 4 StationB__2009-04-27__05-07-00(1).JPG
 ## 5 StationC__2009-04-24__02-57-00(1).JPG
 ##                                                                  DirectoryCopy
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sampleSpeciesImages/VTA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sampleSpeciesImages/VTA
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sampleSpeciesImages/VTA
-## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sampleSpeciesImages/VTA
-## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\Rtmpcz34Jd/sampleSpeciesImages/VTA
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sampleSpeciesImages/VTA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sampleSpeciesImages/VTA
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sampleSpeciesImages/VTA
+## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sampleSpeciesImages/VTA
+## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpuGhpSH/sampleSpeciesImages/VTA
 ##                            FilenameCopy copy_ok
 ## 1 StationA__2009-04-10__05-07-00(1).JPG    TRUE
 ## 2 StationA__2009-05-06__19-06-00(1).JPG    TRUE

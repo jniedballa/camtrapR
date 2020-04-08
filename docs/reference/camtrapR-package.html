@@ -37,8 +37,8 @@
 
 <meta property="og:title" content="Overview of the functions in the camtrapR package — camtrapR-package" />
 <meta property="og:description" content="This package provides a streamlined workflow for processing data generated in camera trap-based wildlife studies and prepares input for further analyses, particularly in occupancy and spatial capture-recapture frameworks.
-It suggests a simple data structure and provides functions for managing digital camera trap photographs, generating record tables, maps of species richness and species detections and species activity diagrams. It further helps prepare subsequent analyses by creating detection/non-detection matrices for occupancy analyses, e.g. in the unmarked package, and capthist objects for spatial capture-recapture analyses in the secr package. In addition, basic survey statistics are computed. The functions build on one another in a logical sequence.
-The only manual input needed it species (and individual) identification, which is achieved by moving images into species directories or by tagging images in image management software. Besides, a table holding basic information about camera trap station IDs, locations and trapping periods must be created in spreadsheet software." />
+It suggests a simple data structure and provides functions for managing digital camera trap photographs (and videos), generating record tables, maps of species richness and species detections and species activity diagrams. It further helps prepare subsequent analyses by creating detection/non-detection matrices for occupancy analyses, e.g. in the unmarked package, and capthist objects for spatial capture-recapture analyses in the secr package. In addition, basic survey statistics are computed. The functions build on one another in a logical sequence.
+The only manual input needed is species (and individual) identification, which is achieved by moving images into species directories or by tagging images in image management software. Besides, a table holding basic information about camera trap station IDs, locations and trapping periods must be created in spreadsheet software." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -71,7 +71,7 @@ The only manual input needed it species (and individual) identification, which i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -94,13 +94,13 @@ The only manual input needed it species (and individual) identification, which i
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/camtrapR1.html">1. Organising raw camera trap images in camtrapR</a>
+      <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
@@ -138,8 +138,8 @@ The only manual input needed it species (and individual) identification, which i
 
     <div class="ref-description">
     <p>This package provides a streamlined workflow for processing data generated in camera trap-based wildlife studies and prepares input for further analyses, particularly in occupancy and spatial capture-recapture frameworks.
-It suggests a simple data structure and provides functions for managing digital camera trap photographs, generating record tables, maps of species richness and species detections and species activity diagrams. It further helps prepare subsequent analyses by creating detection/non-detection matrices for occupancy analyses, e.g. in the <span class="pkg">unmarked</span> package, and <code>capthist</code> objects for spatial capture-recapture analyses in the <span class="pkg">secr</span> package. In addition, basic survey statistics are computed. The functions build on one another in a logical sequence.
-The only manual input needed it species (and individual) identification, which is achieved by moving images into species directories or by tagging images in image management software. Besides, a table holding basic information about camera trap station IDs, locations and trapping periods must be created in spreadsheet software.</p>
+It suggests a simple data structure and provides functions for managing digital camera trap photographs (and videos), generating record tables, maps of species richness and species detections and species activity diagrams. It further helps prepare subsequent analyses by creating detection/non-detection matrices for occupancy analyses, e.g. in the <span class="pkg">unmarked</span> package, and <code>capthist</code> objects for spatial capture-recapture analyses in the <span class="pkg">secr</span> package. In addition, basic survey statistics are computed. The functions build on one another in a logical sequence.
+The only manual input needed is species (and individual) identification, which is achieved by moving images into species directories or by tagging images in image management software. Besides, a table holding basic information about camera trap station IDs, locations and trapping periods must be created in spreadsheet software.</p>
     </div>
 
 
@@ -150,7 +150,7 @@ The only manual input needed it species (and individual) identification, which i
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Image metadata (such as date and time or user-assigned tags) are extracted from the images using Phil Harvey's ExifTool (available from <a href='http://www.sno.phy.queensu.ca/~phil/exiftool/'>http://www.sno.phy.queensu.ca/~phil/exiftool/</a>) and the information is stored in a record table. An adjustable criterion for temporal independence of records can be applied. Maps of species presence and species richness can be generated. Several functions are available for plotting single- and two-species activity patterns.
-Information about the camera-specific trapping periods (and periods of malfunction) are summarized into information about camera trap operability. These, together with the record table, are used to generate species detection histories for occupancy and spatial capture-recapture analyses. The user has considerable freedom in generating the detection histories; sampling occasion length, beginning date and and occasion start times are adjustable. In addition, trapping effort (i.e. active trap nights per station and occasion) can be computed for use as a covariate / offset on detection probability.</p>
+Information about the camera-specific trapping periods (and periods of malfunction) are summarized into a matrix about camera trap operability. These, together with the record table, are used to generate species detection histories for occupancy and spatial capture-recapture analyses. The user has considerable freedom in generating the detection histories; sampling occasion length, beginning date and and occasion start times are adjustable. In addition, trapping effort (i.e. active trap nights per station and occasion) can be computed for use as a covariate / offset on detection probability.</p>
     <h2 class="hasAnchor" id="image-organisation-and-management"><a class="anchor" href="#image-organisation-and-management"></a>Image organisation and management</h2>
 
     
@@ -184,8 +184,8 @@ Information about the camera-specific trapping periods (and periods of malfuncti
     
 
 <p>These function use the directory structure built above (Section 'Image management workflow') and a table containing basic information about camera traps and/or stations (IDs, location, trapping period).</p><table class='table'>
-<tr><td><code><a href='recordTable.html'>recordTable</a></code></td><td>Create a species record table from camera trap images</td></tr>
-<tr><td><code><a href='recordTableIndividual.html'>recordTableIndividual</a></code></td><td>Create a single-species record table from camera trap images with individual IDs</td></tr>
+<tr><td><code><a href='recordTable.html'>recordTable</a></code></td><td>Create a species record table from camera trap images and videos</td></tr>
+<tr><td><code><a href='recordTableIndividual.html'>recordTableIndividual</a></code></td><td>Create a single-species record table from camera trap images and videos with individual IDs</td></tr>
 <tr><td><code><a href='exifTagNames.html'>exifTagNames</a></code></td><td>Return Exif metadata tags and tag names from JPEG images</td></tr>
 <tr><td><code><a href='exiftoolPath.html'>exiftoolPath</a></code></td><td>Add the directory containing exiftool.exe to PATH temporarily (Windows only)</td></tr>
 <tr><td>---------------------------</td><td>----------------------------------------------------------------------------------------------</td></tr>
@@ -241,7 +241,7 @@ Information about the camera-specific trapping periods (and periods of malfuncti
 
 <table class='table'>
 <tr><td><a href='https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr1.html'>1. Organising raw camera trap images</a></td><td><a href='https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html'>2. Identifying species and individuals</a></td></tr>
-<tr><td><a href='https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr3.html'>3. Extracting Data from Camera Trapping Images</a></td><td><a href='https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr4.html'>4. Data exploration and visualisation</a></td></tr>
+<tr><td><a href='https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr3.html'>3. Extracting Data from Camera Trapping Images and Videos</a></td><td><a href='https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr4.html'>4. Data exploration and visualisation</a></td></tr>
 </table>
 
 

@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input • camtrapR</title>
+<title>3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input • camtrapR</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input">
+<script src="../pkgdown.js"></script><meta property="og:title" content="3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -60,7 +60,7 @@
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
@@ -91,10 +91,10 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input</h1>
+      <h1>3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2020-03-26</h4>
+            <h4 class="date">2020-04-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr3.Rmd"><code>vignettes/camtrapr3.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr3.Rmd</code></div>
@@ -108,14 +108,14 @@
 <div id="tabulating-species-and-individual-records-the-recordtable-functions" class="section level1">
 <h1 class="hasAnchor">
 <a href="#tabulating-species-and-individual-records-the-recordtable-functions" class="anchor"></a>Tabulating species and individual records: the recordTable functions</h1>
-<p>There are 2 function to tabulate species records after identification of species from images:</p>
+<p>There are 2 function to tabulate species records after identification of species from images and videos.</p>
 <ul>
 <li>
 <code>recordTable</code> tabulates records of all images after species-level identification and</li>
 <li>
 <code>recordTableIndividual</code> tabulates individuals of one species.</li>
 </ul>
-<p>Nevertheless, the underlying idea is the same. For each image, the date and time it was taken are read from the image’s Exif metadata using ExifTool. Species or individual ID are read from the directory structure or image metadata (see vignette “Species and Individual Identification”).</p>
+<p>Nevertheless, the underlying idea is the same. For each image, the date and time it was taken are read from the image’s Exif metadata using ExifTool. Species or individual ID are read from the directory structure or image metadata (see vignette “Species and Individual Identification”). Video data are extracted analogously.</p>
 <div id="recordtable-tabulating-species-records" class="section level2">
 <h2 class="hasAnchor">
 <a href="#recordtable-tabulating-species-records" class="anchor"></a><code>recordTable</code>: tabulating species records</h2>
@@ -148,13 +148,13 @@
 ## 4             226              3.8             0.2
 ## 5               2              0.0             0.0
 ## 6           21182            353.0            14.7
-##                                                                                   Directory
-## 1 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 2 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 3 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 4 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 5 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 6 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
+##                                                                                                             Directory
+## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 6 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
 ##                                FileName n_images
 ## 1 StationA__2009-04-21__00-40-00(1).JPG        1
 ## 2 StationA__2009-04-22__20-19-00(1).JPG        1
@@ -257,10 +257,11 @@
 <h3 class="hasAnchor">
 <a href="#time-zones-and-daylight-saving-time" class="anchor"></a>Time zones and daylight saving time</h3>
 <p>Note the warning about the missing time zone in the minimal example above. By default, camtrapR will assume UTC time zone. This should work well in most situations (even though the time zone may not be correct, strictly speaking), because UTC does not use daylight saving time (DST, aka ‘summer time’), and camera traps normally don’t use time zones (hence, camera traps will normally not respect DST of the area you work in and will not adjust image timestamps accordingly).</p>
-<p>Now, if you work in an area that uses DST, and your camera does not know about DST, things can go wrong in various ways and you may end up with a systematic 1-hour offset. If you set your cameras up during DST (in summer) and set the internal clock accordingly, all records taken in winter (non-DST period) will be recorded as 1 hour later than according to actual clock time. If you set your cameras up during winter (not DST) and set the internal clock accordingly, all records taken in summer (DST period) will be recorded as 1 hour earlier than according to actual clock time. In addition, records may fall into the non-existing hour when clocks are advanced in spring, leading to an error in interpreting the date/time.</p>
+<p>Now, if you work in an area that uses DST, and your camera does not know about DST, things can go wrong in various ways and you may end up with a systematic 1-hour offset. If you set your cameras up during DST (in summer) and set the internal clock accordingly, all records taken in winter (non-DST period) will be recorded as 1 hour later than according to actual clock time. If you set your cameras up during winter (not DST) and set the internal clock accordingly, all records taken in summer (DST period) will be recorded as 1 hour earlier than according to actual clock time.</p>
+<p>In addition if you specify a time zone with DST and your cameras don’t respect it, records may fall into the non-existing hour when clocks are advanced in spring, leading to an error in interpreting the date/time.</p>
 <p>So, the question whether or not your cameras record the time zone becomes very important. Here is some recommendations on how to use the argument <code>timeZone</code>.</p>
-<p>If your cameras save the time zone and adjust image timestamps accordingly, set argument <code>timeZone</code> to your study area time zone (both if your area has DST or not). If your cameras don’t save the time zone, and your time zone does not have DST, set argument <code>timeZone</code> to your study area time zone If your cameras don’t save the time zone, and your time zone has DST, leave argument <code>timeZone</code> at the default UTC.</p>
-<p>In other words, it is strongly advised to set argument <code>timeZone</code> to your study area’s time zone (one of <code><a href="https://rdrr.io/r/base/timezones.html">OlsonNames()</a></code>), <em>unless</em> your area has DST, but your cameras don’t record it.</p>
+<p>If your cameras don’t save the time zone, and your time zone does not have DST, set argument <code>timeZone</code> to your study area time zone If your cameras don’t save the time zone, and your time zone has DST, leave argument <code>timeZone</code> at the default UTC. If your cameras save the time zone and adjust image timestamps accordingly, set argument <code>timeZone</code> to your study area time zone (both if your area has DST or not).</p>
+<p>In other words, it is advised to set argument <code>timeZone</code> to your study area’s time zone (one of <code><a href="https://rdrr.io/r/base/timezones.html">OlsonNames()</a></code>), <em>unless</em> the time zone of your study area has DST, but your cameras don’t record it.</p>
 </div>
 <div id="independence-between-cameras-within-stations" class="section level3">
 <h3 class="hasAnchor">
@@ -298,109 +299,108 @@
 <a href="#extracting-image-metadata" class="anchor"></a>Extracting image metadata</h3>
 <p><code>recordTable</code> and <code>recordTableIndividual</code> can both extract additional metadata from images (apart from date and time). For example, some camera models record ambient temperature or moon phase, which may be of interest. Metadata tags are stored in the images at the time they are taken and can be accessed and extracted if their tag names are known. Some tag names are standardised (e.g. “DateTimeOriginal”) while others are manufacturer-specific. Therefore, function <code>exifTagNames</code> returns all Exif metadata it finds in a sample image. Users can then choose which to extract with <code>recordTable</code> and <code>recordTableIndividual</code>.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">wd_images_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
-<a class="sourceLine" id="cb28-2" title="2"><span class="kw"><a href="../reference/exifTagNames.html">exifTagNames</a></span>(<span class="dt">inDir =</span> wd_images_ID, <span class="dt">returnMetadata =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
-<pre><code>## Argument returnMetadata is ignored since version 1.2.4</code></pre>
+<a class="sourceLine" id="cb28-2" title="2"><span class="kw"><a href="../reference/exifTagNames.html">exifTagNames</a></span>(<span class="dt">inDir =</span> wd_images_ID)</a></code></pre></div>
 <pre><code>## Metadata of:
-## C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
-<pre><code>##    tag_group             tag_description                tag_name
-## 1   ExifTool     ExifTool Version Number         ExifToolVersion
-## 2   ExifTool                     Warning                 Warning
-## 3       File                   File Name                FileName
-## 4       File                   Directory               Directory
-## 5       File                   File Size                FileSize
-## 6       File File Modification Date/Time          FileModifyDate
-## 7       File       File Access Date/Time          FileAccessDate
-## 8       File     File Creation Date/Time          FileCreateDate
-## 9       File            File Permissions         FilePermissions
-## 10      File                   File Type                FileType
-## 11      File         File Type Extension       FileTypeExtension
-## 12      File                   MIME Type                MIMEType
-## 13      File             Exif Byte Order           ExifByteOrder
-## 14      File                 Image Width              ImageWidth
-## 15      File                Image Height             ImageHeight
-## 16      File            Encoding Process         EncodingProcess
-## 17      File             Bits Per Sample           BitsPerSample
-## 18      File            Color Components         ColorComponents
-## 19      File        Y Cb Cr Sub Sampling        YCbCrSubSampling
-## 20      EXIF                        Make                    Make
-## 21      EXIF           Camera Model Name                   Model
-## 22      EXIF                X Resolution             XResolution
-## 23      EXIF                Y Resolution             YResolution
-## 24      EXIF                 Modify Date              ModifyDate
-## 25      EXIF             Resolution Unit          ResolutionUnit
-## 26      EXIF         Y Cb Cr Positioning        YCbCrPositioning
-## 27      EXIF                Exif Version             ExifVersion
-## 28      EXIF    Components Configuration ComponentsConfiguration
-## 29      EXIF            Flashpix Version         FlashpixVersion
-## 30      EXIF                 Color Space              ColorSpace
-## 31      EXIF            Exif Image Width          ExifImageWidth
-## 32      EXIF           Exif Image Height         ExifImageHeight
-## 33      EXIF          Date/Time Original        DateTimeOriginal
-## 34      EXIF                 Create Date              CreateDate
-## 35      EXIF                User Comment             UserComment
-## 36      EXIF         Shutter Speed Value       ShutterSpeedValue
-## 37      EXIF                 Compression             Compression
-## 38      EXIF            Thumbnail Offset         ThumbnailOffset
-## 39      EXIF            Thumbnail Length         ThumbnailLength
-## 40      EXIF             Thumbnail Image          ThumbnailImage
-## 41 Composite                  Image Size               ImageSize
-## 42 Composite                  Megapixels              Megapixels
-## 43 Composite               Shutter Speed            ShutterSpeed
-##                                                                                        value
-## 1                                                                                      11.80
-## 2                                                 Invalid EXIF text encoding for UserComment
-## 3                                                      StationA__2009-04-21__00-40-00(1).JPG
-## 4  C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 5                                                                                      27 kB
-## 6                                                                  2020:03:26 17:01:48+01:00
-## 7                                                                  2020:03:26 17:01:48+01:00
-## 8                                                                  2020:03:26 17:01:47+01:00
-## 9                                                                                  rw-rw-rw-
-## 10                                                                                      JPEG
-## 11                                                                                       jpg
-## 12                                                                                image/jpeg
-## 13                                                                 Little-endian (Intel, II)
-## 14                                                                                       100
-## 15                                                                                        75
-## 16                                                              Baseline DCT, Huffman coding
-## 17                                                                                         8
-## 18                                                                                         3
-## 19                                                                          YCbCr4:2:2 (2 1)
-## 20                                                                                        G4
-## 21                                                                                 CUDDEBACK
-## 22                                                                                        72
-## 23                                                                                        72
-## 24                                                                       2009:04:21 00:40:00
-## 25                                                                                    inches
-## 26                                                                                  Co-sited
-## 27                                                                                      0200
-## 28                                                                              Y, Cb, Cr, -
-## 29                                                                                      0100
-## 30                                                                                      sRGB
-## 31                                                                                       100
-## 32                                                                                        75
-## 33                                                                       2009:04:21 00:40:00
-## 34                                                                       2009:04:21 00:40:00
-## 35                                                                             1 ATTEMPT G1H
-## 36                                                                                         1
-## 37                                                                          JPEG (old-style)
-## 38                                                                                       408
-## 39                                                                                     25353
-## 40                                       (Binary data 25353 bytes, use -b option to extract)
-## 41                                                                                    100x75
-## 42                                                                                     0.007
-## 43                                                                                         1</code></pre>
+## C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
+<pre><code>##    tag_group                tag_name             tag_description
+## 1   ExifTool         ExifToolVersion     ExifTool Version Number
+## 2   ExifTool                 Warning                     Warning
+## 3       File                FileName                   File Name
+## 4       File               Directory                   Directory
+## 5       File                FileSize                   File Size
+## 6       File          FileModifyDate File Modification Date/Time
+## 7       File          FileAccessDate       File Access Date/Time
+## 8       File          FileCreateDate     File Creation Date/Time
+## 9       File         FilePermissions            File Permissions
+## 10      File                FileType                   File Type
+## 11      File       FileTypeExtension         File Type Extension
+## 12      File                MIMEType                   MIME Type
+## 13      File           ExifByteOrder             Exif Byte Order
+## 14      File              ImageWidth                 Image Width
+## 15      File             ImageHeight                Image Height
+## 16      File         EncodingProcess            Encoding Process
+## 17      File           BitsPerSample             Bits Per Sample
+## 18      File         ColorComponents            Color Components
+## 19      File        YCbCrSubSampling        Y Cb Cr Sub Sampling
+## 20      EXIF                    Make                        Make
+## 21      EXIF                   Model           Camera Model Name
+## 22      EXIF             XResolution                X Resolution
+## 23      EXIF             YResolution                Y Resolution
+## 24      EXIF              ModifyDate                 Modify Date
+## 25      EXIF          ResolutionUnit             Resolution Unit
+## 26      EXIF        YCbCrPositioning         Y Cb Cr Positioning
+## 27      EXIF             ExifVersion                Exif Version
+## 28      EXIF ComponentsConfiguration    Components Configuration
+## 29      EXIF         FlashpixVersion            Flashpix Version
+## 30      EXIF              ColorSpace                 Color Space
+## 31      EXIF          ExifImageWidth            Exif Image Width
+## 32      EXIF         ExifImageHeight           Exif Image Height
+## 33      EXIF        DateTimeOriginal          Date/Time Original
+## 34      EXIF              CreateDate                 Create Date
+## 35      EXIF             UserComment                User Comment
+## 36      EXIF       ShutterSpeedValue         Shutter Speed Value
+## 37      EXIF             Compression                 Compression
+## 38      EXIF         ThumbnailOffset            Thumbnail Offset
+## 39      EXIF         ThumbnailLength            Thumbnail Length
+## 40      EXIF          ThumbnailImage             Thumbnail Image
+## 41 Composite               ImageSize                  Image Size
+## 42 Composite              Megapixels                  Megapixels
+## 43 Composite            ShutterSpeed               Shutter Speed
+##                                                                                                                  value
+## 1                                                                                                                11.80
+## 2                                                                           Invalid EXIF text encoding for UserComment
+## 3                                                                                StationA__2009-04-21__00-40-00(1).JPG
+## 4  C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 5                                                                                                                27 kB
+## 6                                                                                            2020:04:08 12:25:02+02:00
+## 7                                                                                            2020:04:08 12:25:02+02:00
+## 8                                                                                            2020:04:08 12:25:02+02:00
+## 9                                                                                                            rw-rw-rw-
+## 10                                                                                                                JPEG
+## 11                                                                                                                 jpg
+## 12                                                                                                          image/jpeg
+## 13                                                                                           Little-endian (Intel, II)
+## 14                                                                                                                 100
+## 15                                                                                                                  75
+## 16                                                                                        Baseline DCT, Huffman coding
+## 17                                                                                                                   8
+## 18                                                                                                                   3
+## 19                                                                                                    YCbCr4:2:2 (2 1)
+## 20                                                                                                                  G4
+## 21                                                                                                           CUDDEBACK
+## 22                                                                                                                  72
+## 23                                                                                                                  72
+## 24                                                                                                 2009:04:21 00:40:00
+## 25                                                                                                              inches
+## 26                                                                                                            Co-sited
+## 27                                                                                                                0200
+## 28                                                                                                        Y, Cb, Cr, -
+## 29                                                                                                                0100
+## 30                                                                                                                sRGB
+## 31                                                                                                                 100
+## 32                                                                                                                  75
+## 33                                                                                                 2009:04:21 00:40:00
+## 34                                                                                                 2009:04:21 00:40:00
+## 35                                                                                                       1 ATTEMPT G1H
+## 36                                                                                                                   1
+## 37                                                                                                    JPEG (old-style)
+## 38                                                                                                                 408
+## 39                                                                                                               25353
+## 40                                                                 (Binary data 25353 bytes, use -b option to extract)
+## 41                                                                                                              100x75
+## 42                                                                                                               0.007
+## 43                                                                                                                   1</code></pre>
 <p>The output table contains tag groups, tag descriptions, tag names and tag values. The values in <code>tag_group</code> help to unambiguously identify specific metadata tags.</p>
 <p>Use the entries in <code>tag_name</code> (not <code>tag_description</code>) when providing values to the argument <code>additionalMetadataTags</code> in the<code>recordTable</code> functions.</p>
 <p>Of the tags shown here, “DateTimeOriginal” contains the date and time that camtrapR reads out. Apart from that, there is little information of ecological interest in the example data. However, for demonstration purposes, let’s extract information about the camera model and make. To be as precise as possible, we provide tags in the format: tag_group:tag_name (e.g. EXIF:Model)</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1">rec.db.species.metadata1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/recordTable.html">recordTable</a></span>(<span class="dt">inDir                  =</span> wd_images_ID,</a>
-<a class="sourceLine" id="cb32-2" title="2">                                        <span class="dt">IDfrom                 =</span> <span class="st">"directory"</span>,</a>
-<a class="sourceLine" id="cb32-3" title="3">                                        <span class="dt">timeZone               =</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</a>
-<a class="sourceLine" id="cb32-4" title="4">                                        <span class="dt">additionalMetadataTags =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"EXIF:Model"</span>, <span class="st">"EXIF:Make"</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">rec.db.species.metadata1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/recordTable.html">recordTable</a></span>(<span class="dt">inDir                  =</span> wd_images_ID,</a>
+<a class="sourceLine" id="cb31-2" title="2">                                        <span class="dt">IDfrom                 =</span> <span class="st">"directory"</span>,</a>
+<a class="sourceLine" id="cb31-3" title="3">                                        <span class="dt">timeZone               =</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</a>
+<a class="sourceLine" id="cb31-4" title="4">                                        <span class="dt">additionalMetadataTags =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"EXIF:Model"</span>, <span class="st">"EXIF:Make"</span>))</a></code></pre></div>
 <pre><code>## StationA:      8 images    0 duplicates removed      |=======             |   33%</code></pre>
 <pre><code>## StationB:     23 images    6 duplicates removed      |=============       |   67%</code></pre>
 <pre><code>## StationC:     37 images    6 duplicates removed      |====================|  100%</code></pre>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(rec.db.species.metadata1)</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(rec.db.species.metadata1)</a></code></pre></div>
 <pre><code>##    Station Species    DateTimeOriginal       Date     Time delta.time.secs
 ## 1 StationA     PBE 2009-04-21 00:40:00 2009-04-21 00:40:00               0
 ## 2 StationA     PBE 2009-04-22 20:19:00 2009-04-22 20:19:00          157140
@@ -415,13 +415,13 @@
 ## 4             226              3.8             0.2
 ## 5               2              0.0             0.0
 ## 6           21182            353.0            14.7
-##                                                                                   Directory
-## 1 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 2 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 3 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 4 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 5 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
-## 6 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images/StationA/PBE
+##                                                                                                             Directory
+## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+## 6 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
 ##                                FileName EXIF.Model EXIF.Make n_images
 ## 1 StationA__2009-04-21__00-40-00(1).JPG  CUDDEBACK        G4        1
 ## 2 StationA__2009-04-22__20-19-00(1).JPG  CUDDEBACK        G4        1
@@ -436,24 +436,24 @@
 <h2 class="hasAnchor">
 <a href="#recordtableindividual-tabulating-individuals-of-a-species" class="anchor"></a><code>recordTableIndividual</code>: tabulating individuals of a species</h2>
 <p>Individual identification of species is a prerequiste for running (spatial) capture-recapture models. <code>recordTableIndividual</code> and the subsequent <code>spatialDetectionHistory</code> function prepare data for these models.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1"><span class="co"># find the directory with tagged sample images contained in the package</span></a>
-<a class="sourceLine" id="cb38-2" title="2">wd_images_individual_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_tagged/LeopardCat"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
-<a class="sourceLine" id="cb38-3" title="3"> <span class="co"># missing space in species = "LeopardCat" is because of CRAN package policies</span></a>
-<a class="sourceLine" id="cb38-4" title="4"></a>
-<a class="sourceLine" id="cb38-5" title="5"> rec.db.pbe &lt;-<span class="st"> </span><span class="kw"><a href="../reference/recordTableIndividual.html">recordTableIndividual</a></span>(<span class="dt">inDir                  =</span> wd_images_individual_ID,</a>
-<a class="sourceLine" id="cb38-6" title="6">                                     <span class="dt">IDfrom                 =</span> <span class="st">"metadata"</span>,</a>
-<a class="sourceLine" id="cb38-7" title="7">                                     <span class="dt">minDeltaTime           =</span> <span class="dv">60</span>,</a>
-<a class="sourceLine" id="cb38-8" title="8">                                     <span class="dt">deltaTimeComparedTo    =</span> <span class="st">"lastIndependentRecord"</span>,</a>
-<a class="sourceLine" id="cb38-9" title="9">                                     <span class="dt">hasStationFolders      =</span> <span class="ot">FALSE</span>,         <span class="co"># images are not in station directories</span></a>
-<a class="sourceLine" id="cb38-10" title="10">                                     <span class="dt">metadataIDTag          =</span> <span class="st">"individual"</span>,  <span class="co"># the name of the metadata tag containing individual IDs</span></a>
-<a class="sourceLine" id="cb38-11" title="11">                                     <span class="dt">timeZone               =</span> <span class="st">"Asia/Kuala_Lumpur"</span></a>
-<a class="sourceLine" id="cb38-12" title="12"> )</a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1"><span class="co"># find the directory with tagged sample images contained in the package</span></a>
+<a class="sourceLine" id="cb37-2" title="2">wd_images_individual_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_tagged/LeopardCat"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
+<a class="sourceLine" id="cb37-3" title="3"> <span class="co"># missing space in species = "LeopardCat" is because of CRAN package policies</span></a>
+<a class="sourceLine" id="cb37-4" title="4"></a>
+<a class="sourceLine" id="cb37-5" title="5"> rec.db.pbe &lt;-<span class="st"> </span><span class="kw"><a href="../reference/recordTableIndividual.html">recordTableIndividual</a></span>(<span class="dt">inDir                  =</span> wd_images_individual_ID,</a>
+<a class="sourceLine" id="cb37-6" title="6">                                     <span class="dt">IDfrom                 =</span> <span class="st">"metadata"</span>,</a>
+<a class="sourceLine" id="cb37-7" title="7">                                     <span class="dt">minDeltaTime           =</span> <span class="dv">60</span>,</a>
+<a class="sourceLine" id="cb37-8" title="8">                                     <span class="dt">deltaTimeComparedTo    =</span> <span class="st">"lastIndependentRecord"</span>,</a>
+<a class="sourceLine" id="cb37-9" title="9">                                     <span class="dt">hasStationFolders      =</span> <span class="ot">FALSE</span>,         <span class="co"># images are not in station directories</span></a>
+<a class="sourceLine" id="cb37-10" title="10">                                     <span class="dt">metadataIDTag          =</span> <span class="st">"individual"</span>,  <span class="co"># the name of the metadata tag containing individual IDs</span></a>
+<a class="sourceLine" id="cb37-11" title="11">                                     <span class="dt">timeZone               =</span> <span class="st">"Asia/Kuala_Lumpur"</span></a>
+<a class="sourceLine" id="cb37-12" title="12"> )</a></code></pre></div>
 <pre><code>## StationA, StationB, StationC:     26 images    3 duplicates removed      |====================|  100%</code></pre>
 <div id="extracting-custom-image-metadata" class="section level3">
 <h3 class="hasAnchor">
 <a href="#extracting-custom-image-metadata" class="anchor"></a>Extracting custom image metadata</h3>
 <p>In addition to the metadata that were saved when the image was taken (see above), custom metadata tags assigned in image management software can also be extracted. These may contain species ID tags if species were identified using metadata tags (instead of moving images into species directories), but also individual IDs, animal counts, sex of animals recorded, etc..</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(rec.db.pbe)</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(rec.db.pbe)</a></code></pre></div>
 <pre><code>##    Station    Species Individual    DateTimeOriginal       Date     Time
 ## 1 StationA LeopardCat          1 2009-05-07 17:11:00 2009-05-07 17:11:00
 ## 2 StationA LeopardCat          2 2009-04-21 00:40:00 2009-04-21 00:40:00
@@ -468,13 +468,13 @@
 ## 4           13680             228              3.8             0.2
 ## 5               0               0              0.0             0.0
 ## 6          625800           10430            173.8             7.2
-##                                                                                        Directory
-## 1 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 2 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 3 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 4 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 5 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 6 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_tagged/LeopardCat
+##                                                                                                                  Directory
+## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
+## 6 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
 ##                                FileName metadata_Species metadata_individual
 ## 1 StationA__2009-05-07__17-11-00(1).JPG      Leopard Cat                   1
 ## 2 StationA__2009-04-21__00-40-00(1).JPG      Leopard Cat                   2
@@ -496,35 +496,35 @@
 <h1 class="hasAnchor">
 <a href="#camera-operation" class="anchor"></a>Camera Operation</h1>
 <p>The camera operation matrix is a day-by-station matrix that states how many cameras were active at a station on a given day. Rows represent stations and columns days, beginning with the day the first camera was set up and ending the day the last camera was retrieved.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1"> <span class="co"># first load the camera trap station table</span></a>
-<a class="sourceLine" id="cb42-2" title="2"></a>
-<a class="sourceLine" id="cb42-3" title="3"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(camtraps)</a>
-<a class="sourceLine" id="cb42-4" title="4"></a>
-<a class="sourceLine" id="cb42-5" title="5">dateFormat &lt;-<span class="st"> "%d/%m/%Y"</span></a>
-<a class="sourceLine" id="cb42-6" title="6"> </a>
-<a class="sourceLine" id="cb42-7" title="7">camop_problem &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable      =</span> camtraps,</a>
-<a class="sourceLine" id="cb42-8" title="8">                                 <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb42-9" title="9">                                 <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
-<a class="sourceLine" id="cb42-10" title="10">                                 <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
-<a class="sourceLine" id="cb42-11" title="11">                                 <span class="dt">writecsv     =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb42-12" title="12">                                 <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb42-13" title="13">                                 <span class="dt">dateFormat   =</span> dateFormat</a>
-<a class="sourceLine" id="cb42-14" title="14">)</a>
-<a class="sourceLine" id="cb42-15" title="15"></a>
-<a class="sourceLine" id="cb42-16" title="16"><span class="co"># as a reminder, these are the dates in our station information table</span></a>
-<a class="sourceLine" id="cb42-17" title="17">camtraps[,<span class="op">-</span><span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(camtraps) <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"utm_y"</span>, <span class="st">"utm_x"</span>))]</a></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" title="1"> <span class="co"># first load the camera trap station table</span></a>
+<a class="sourceLine" id="cb41-2" title="2"></a>
+<a class="sourceLine" id="cb41-3" title="3"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(camtraps)</a>
+<a class="sourceLine" id="cb41-4" title="4"></a>
+<a class="sourceLine" id="cb41-5" title="5">dateFormat &lt;-<span class="st"> "%d/%m/%Y"</span></a>
+<a class="sourceLine" id="cb41-6" title="6"> </a>
+<a class="sourceLine" id="cb41-7" title="7">camop_problem &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable      =</span> camtraps,</a>
+<a class="sourceLine" id="cb41-8" title="8">                                 <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb41-9" title="9">                                 <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
+<a class="sourceLine" id="cb41-10" title="10">                                 <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
+<a class="sourceLine" id="cb41-11" title="11">                                 <span class="dt">writecsv     =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb41-12" title="12">                                 <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb41-13" title="13">                                 <span class="dt">dateFormat   =</span> dateFormat</a>
+<a class="sourceLine" id="cb41-14" title="14">)</a>
+<a class="sourceLine" id="cb41-15" title="15"></a>
+<a class="sourceLine" id="cb41-16" title="16"><span class="co"># as a reminder, these are the dates in our station information table</span></a>
+<a class="sourceLine" id="cb41-17" title="17">camtraps[,<span class="op">-</span><span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(camtraps) <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"utm_y"</span>, <span class="st">"utm_x"</span>))]</a></code></pre></div>
 <pre><code>##    Station Setup_date Retrieval_date Problem1_from Problem1_to
 ## 1 StationA 02/04/2009     14/05/2009                          
 ## 2 StationB 03/04/2009     16/05/2009                          
 ## 3 StationC 04/04/2009     17/05/2009    12/05/2009  17/05/2009</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1"><span class="co"># now let's have a look at the first few columns of the camera operation matrix</span></a>
-<a class="sourceLine" id="cb44-2" title="2">camop_problem[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1"><span class="co"># now let's have a look at the first few columns of the camera operation matrix</span></a>
+<a class="sourceLine" id="cb43-2" title="2">camop_problem[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a></code></pre></div>
 <pre><code>##          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06
 ## StationA          1          1          1          1          1
 ## StationB         NA          1          1          1          1
 ## StationC         NA         NA          1          1          1</code></pre>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" title="1"><span class="co"># and the last few</span></a>
-<a class="sourceLine" id="cb46-2" title="2">camop_problem[, (<span class="kw"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(camop_problem)<span class="op">-</span><span class="dv">6</span>)<span class="op">:</span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(camop_problem)]</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1"><span class="co"># and the last few</span></a>
+<a class="sourceLine" id="cb45-2" title="2">camop_problem[, (<span class="kw"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(camop_problem)<span class="op">-</span><span class="dv">6</span>)<span class="op">:</span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(camop_problem)]</a></code></pre></div>
 <pre><code>##          2009-05-11 2009-05-12 2009-05-13 2009-05-14 2009-05-15 2009-05-16
 ## StationA          1          1          1          1         NA         NA
 ## StationB          1          1          1          1          1          1
@@ -535,32 +535,32 @@
 ## StationC          0</code></pre>
 <p>If stations were not set up, values are NA. If they were set up but malfunctioning, it is 0. Operational stations get value 1.</p>
 <p>Here is a little function for plotting the camera operation matrix. Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1">camopPlot &lt;-<span class="st"> </span><span class="cf">function</span>(camOp, </a>
-<a class="sourceLine" id="cb48-2" title="2">                      <span class="dt">palette =</span> <span class="st">"Heat"</span>){</a>
-<a class="sourceLine" id="cb48-3" title="3">  </a>
-<a class="sourceLine" id="cb48-4" title="4">  which.tmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(camOp)), <span class="dt">pattern =</span> <span class="st">"01$"</span>)</a>
-<a class="sourceLine" id="cb48-5" title="5">  label.tmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/format.html">format</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(camOp))[which.tmp], <span class="st">"%Y-%m"</span>)</a>
-<a class="sourceLine" id="cb48-6" title="6">  at.tmp &lt;-<span class="st"> </span>which.tmp <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(camOp)</a>
-<a class="sourceLine" id="cb48-7" title="7">  </a>
-<a class="sourceLine" id="cb48-8" title="8">  values_tmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sort.html">sort</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/na.fail.html">na.omit</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(camOp))))</a>
-<a class="sourceLine" id="cb48-9" title="9"></a>
-<a class="sourceLine" id="cb48-10" title="10">  <span class="co"># hcl.colors only exists in R &gt;3.6.0, use heat.colors for earlier versions</span></a>
-<a class="sourceLine" id="cb48-11" title="11">  image_colors &lt;-<span class="st"> </span><span class="cf">if</span>(<span class="kw"><a href="https://rdrr.io/r/base/exists.html">exists</a></span>(<span class="st">"hcl.colors"</span>)) {</a>
-<a class="sourceLine" id="cb48-12" title="12">    <span class="kw"><a href="https://rdrr.io/r/grDevices/palettes.html">hcl.colors</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(values_tmp), <span class="dt">palette =</span> palette, <span class="dt">rev =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb48-13" title="13">  } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb48-14" title="14">    <span class="kw"><a href="https://rdrr.io/r/grDevices/palettes.html">heat.colors</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(values_tmp), <span class="dt">rev =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb48-15" title="15">  }</a>
-<a class="sourceLine" id="cb48-16" title="16">  </a>
-<a class="sourceLine" id="cb48-17" title="17">  <span class="kw"><a href="https://rdrr.io/r/graphics/image.html">image</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(camOp)), <span class="dt">xaxt =</span> <span class="st">"n"</span>, <span class="dt">yaxt =</span> <span class="st">"n"</span>, <span class="dt">col =</span> image_colors)</a>
-<a class="sourceLine" id="cb48-18" title="18">  <span class="kw"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span>(<span class="dv">1</span>, <span class="dt">at =</span> at.tmp, <span class="dt">labels =</span> label.tmp)</a>
-<a class="sourceLine" id="cb48-19" title="19">  <span class="kw"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span>(<span class="dv">2</span>, <span class="dt">at =</span> <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="kw"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(camOp)), <span class="dt">labels =</span> <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(camOp), <span class="dt">las =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb48-20" title="20">  <span class="kw"><a href="https://rdrr.io/r/graphics/abline.html">abline</a></span>(<span class="dt">v =</span> at.tmp, <span class="dt">col =</span> <span class="kw"><a href="https://rdrr.io/r/grDevices/rgb.html">rgb</a></span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="fl">0.2</span>))</a>
-<a class="sourceLine" id="cb48-21" title="21">  <span class="kw"><a href="https://rdrr.io/r/graphics/box.html">box</a></span>()</a>
-<a class="sourceLine" id="cb48-22" title="22">}</a></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" title="1">camopPlot &lt;-<span class="st"> </span><span class="cf">function</span>(camOp, </a>
+<a class="sourceLine" id="cb47-2" title="2">                      <span class="dt">palette =</span> <span class="st">"Heat"</span>){</a>
+<a class="sourceLine" id="cb47-3" title="3">  </a>
+<a class="sourceLine" id="cb47-4" title="4">  which.tmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(camOp)), <span class="dt">pattern =</span> <span class="st">"01$"</span>)</a>
+<a class="sourceLine" id="cb47-5" title="5">  label.tmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/format.html">format</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(camOp))[which.tmp], <span class="st">"%Y-%m"</span>)</a>
+<a class="sourceLine" id="cb47-6" title="6">  at.tmp &lt;-<span class="st"> </span>which.tmp <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(camOp)</a>
+<a class="sourceLine" id="cb47-7" title="7">  </a>
+<a class="sourceLine" id="cb47-8" title="8">  values_tmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sort.html">sort</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/na.fail.html">na.omit</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(camOp))))</a>
+<a class="sourceLine" id="cb47-9" title="9"></a>
+<a class="sourceLine" id="cb47-10" title="10">  <span class="co"># hcl.colors only exists in R &gt;3.6.0, use heat.colors for earlier versions</span></a>
+<a class="sourceLine" id="cb47-11" title="11">  image_colors &lt;-<span class="st"> </span><span class="cf">if</span>(<span class="kw"><a href="https://rdrr.io/r/base/exists.html">exists</a></span>(<span class="st">"hcl.colors"</span>)) {</a>
+<a class="sourceLine" id="cb47-12" title="12">    <span class="kw"><a href="https://rdrr.io/r/grDevices/palettes.html">hcl.colors</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(values_tmp), <span class="dt">palette =</span> palette, <span class="dt">rev =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb47-13" title="13">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb47-14" title="14">    <span class="kw"><a href="https://rdrr.io/r/grDevices/palettes.html">heat.colors</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(values_tmp), <span class="dt">rev =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb47-15" title="15">  }</a>
+<a class="sourceLine" id="cb47-16" title="16">  </a>
+<a class="sourceLine" id="cb47-17" title="17">  <span class="kw"><a href="https://rdrr.io/r/graphics/image.html">image</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(camOp)), <span class="dt">xaxt =</span> <span class="st">"n"</span>, <span class="dt">yaxt =</span> <span class="st">"n"</span>, <span class="dt">col =</span> image_colors)</a>
+<a class="sourceLine" id="cb47-18" title="18">  <span class="kw"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span>(<span class="dv">1</span>, <span class="dt">at =</span> at.tmp, <span class="dt">labels =</span> label.tmp)</a>
+<a class="sourceLine" id="cb47-19" title="19">  <span class="kw"><a href="https://rdrr.io/r/graphics/axis.html">axis</a></span>(<span class="dv">2</span>, <span class="dt">at =</span> <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="kw"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(camOp)), <span class="dt">labels =</span> <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(camOp), <span class="dt">las =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb47-20" title="20">  <span class="kw"><a href="https://rdrr.io/r/graphics/abline.html">abline</a></span>(<span class="dt">v =</span> at.tmp, <span class="dt">col =</span> <span class="kw"><a href="https://rdrr.io/r/grDevices/rgb.html">rgb</a></span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>, <span class="fl">0.2</span>))</a>
+<a class="sourceLine" id="cb47-21" title="21">  <span class="kw"><a href="https://rdrr.io/r/graphics/box.html">box</a></span>()</a>
+<a class="sourceLine" id="cb47-22" title="22">}</a></code></pre></div>
 <p>And this is what we get (in two different color palettes).</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb49-2" title="2"><span class="kw">camopPlot</span>(<span class="dt">camOp =</span> camop_problem)</a>
-<a class="sourceLine" id="cb49-3" title="3"><span class="kw">camopPlot</span>(<span class="dt">camOp =</span> camop_problem, <span class="dt">palette =</span> <span class="st">"Viridis"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb48-2" title="2"><span class="kw">camopPlot</span>(<span class="dt">camOp =</span> camop_problem)</a>
+<a class="sourceLine" id="cb48-3" title="3"><span class="kw">camopPlot</span>(<span class="dt">camOp =</span> camop_problem, <span class="dt">palette =</span> <span class="st">"Viridis"</span>)</a></code></pre></div>
 <p><img src="camtrapr3_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 <p>Note that the colors are stretched between the lowest and highest value. There is no dedicated color for 0, designating non-operational cameras.</p>
 <p>For a list of color palettes, see <a href="https://developer.r-project.org/Blog/public/2019/04/01/hcl-based-color-palettes-in-grdevices/index.html">here</a>.</p>
@@ -568,7 +568,7 @@
 <h2 class="hasAnchor">
 <a href="#saving-and-loading-camera-operation-matrices" class="anchor"></a>Saving and loading camera operation matrices</h2>
 <p>The camera operation matrix can easily be saved as a csv file (by setting argument <code>writecsv = TRUE</code>, <code>check.names = FALSE</code> and defining <code>outdir</code>). In order to load the csv into R again, it is necessary to tell R to use the station IDs (the first column) as row names:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1">camOp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="dt">file =</span> ..., <span class="dt">row.names =</span> <span class="dv">1</span>, <span class="dt">check.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1">camOp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="dt">file =</span> ..., <span class="dt">row.names =</span> <span class="dv">1</span>, <span class="dt">check.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p><code>check.names = FALSE</code> ensures that column names (the dates) are read back into R as they are (e.g. “2015-12-01”). Otherwise one may end up with unreadable column names (at least for camtrapR) such as “X2015.12.01”.</p>
 </div>
 </div>
@@ -581,41 +581,41 @@
 <a href="#occupancy-analyses" class="anchor"></a>Occupancy analyses</h2>
 <p>Occupancy models use detection/non-detection matrices in which for every station and every occasion “1”" signifies a detection of a given species, “0”" signifies non-detecion, and NA missing data.</p>
 <p>Here is how to obtain a detection/non-detection matrix using function <code>detectionHistory</code>. Because the function builds on prior functions (<code>recordTable</code> and <code>cameraOperation</code>) we also show these function here to provide the context.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" title="1"><span class="co"># create camera operation matrix</span></a>
-<a class="sourceLine" id="cb51-2" title="2">camop_no_problem &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable      =</span> camtraps,</a>
-<a class="sourceLine" id="cb51-3" title="3">                                    <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb51-4" title="4">                                    <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
-<a class="sourceLine" id="cb51-5" title="5">                                    <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
-<a class="sourceLine" id="cb51-6" title="6">                                    <span class="dt">hasProblems  =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb51-7" title="7">                                    <span class="dt">dateFormat   =</span> dateFormat</a>
-<a class="sourceLine" id="cb51-8" title="8">)</a>
-<a class="sourceLine" id="cb51-9" title="9"></a>
-<a class="sourceLine" id="cb51-10" title="10"><span class="co"># define image directory</span></a>
-<a class="sourceLine" id="cb51-11" title="11">wd_images_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
-<a class="sourceLine" id="cb51-12" title="12"></a>
-<a class="sourceLine" id="cb51-13" title="13"><span class="co"># make record table</span></a>
-<a class="sourceLine" id="cb51-14" title="14">recordTableSample &lt;-<span class="st"> </span><span class="kw"><a href="../reference/recordTable.html">recordTable</a></span>(<span class="dt">inDir               =</span> wd_images_ID,</a>
-<a class="sourceLine" id="cb51-15" title="15">                                 <span class="dt">IDfrom              =</span> <span class="st">"directory"</span>,</a>
-<a class="sourceLine" id="cb51-16" title="16">                                 <span class="dt">minDeltaTime        =</span> <span class="dv">60</span>,</a>
-<a class="sourceLine" id="cb51-17" title="17">                                 <span class="dt">deltaTimeComparedTo =</span> <span class="st">"lastIndependentRecord"</span>,</a>
-<a class="sourceLine" id="cb51-18" title="18">                                 <span class="dt">timeZone            =</span> <span class="st">"Asia/Kuala_Lumpur"</span></a>
-<a class="sourceLine" id="cb51-19" title="19">)</a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1"><span class="co"># create camera operation matrix</span></a>
+<a class="sourceLine" id="cb50-2" title="2">camop_no_problem &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable      =</span> camtraps,</a>
+<a class="sourceLine" id="cb50-3" title="3">                                    <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb50-4" title="4">                                    <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
+<a class="sourceLine" id="cb50-5" title="5">                                    <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
+<a class="sourceLine" id="cb50-6" title="6">                                    <span class="dt">hasProblems  =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb50-7" title="7">                                    <span class="dt">dateFormat   =</span> dateFormat</a>
+<a class="sourceLine" id="cb50-8" title="8">)</a>
+<a class="sourceLine" id="cb50-9" title="9"></a>
+<a class="sourceLine" id="cb50-10" title="10"><span class="co"># define image directory</span></a>
+<a class="sourceLine" id="cb50-11" title="11">wd_images_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
+<a class="sourceLine" id="cb50-12" title="12"></a>
+<a class="sourceLine" id="cb50-13" title="13"><span class="co"># make record table</span></a>
+<a class="sourceLine" id="cb50-14" title="14">recordTableSample &lt;-<span class="st"> </span><span class="kw"><a href="../reference/recordTable.html">recordTable</a></span>(<span class="dt">inDir               =</span> wd_images_ID,</a>
+<a class="sourceLine" id="cb50-15" title="15">                                 <span class="dt">IDfrom              =</span> <span class="st">"directory"</span>,</a>
+<a class="sourceLine" id="cb50-16" title="16">                                 <span class="dt">minDeltaTime        =</span> <span class="dv">60</span>,</a>
+<a class="sourceLine" id="cb50-17" title="17">                                 <span class="dt">deltaTimeComparedTo =</span> <span class="st">"lastIndependentRecord"</span>,</a>
+<a class="sourceLine" id="cb50-18" title="18">                                 <span class="dt">timeZone            =</span> <span class="st">"Asia/Kuala_Lumpur"</span></a>
+<a class="sourceLine" id="cb50-19" title="19">)</a></code></pre></div>
 <pre><code>## StationA:      8 images    0 duplicates removed      |=======             |   33%</code></pre>
 <pre><code>## StationB:     23 images    6 duplicates removed      |=============       |   67%</code></pre>
 <pre><code>## StationC:     37 images    6 duplicates removed      |====================|  100%</code></pre>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" title="1"><span class="co"># make detection history (without trapping effort)</span></a>
-<a class="sourceLine" id="cb55-2" title="2">DetHist1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionHistory.html">detectionHistory</a></span>(<span class="dt">recordTable         =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb55-3" title="3">                            <span class="dt">camOp                =</span> camop_no_problem,</a>
-<a class="sourceLine" id="cb55-4" title="4">                            <span class="dt">stationCol           =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb55-5" title="5">                            <span class="dt">speciesCol           =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb55-6" title="6">                            <span class="dt">recordDateTimeCol    =</span> <span class="st">"DateTimeOriginal"</span>,</a>
-<a class="sourceLine" id="cb55-7" title="7">                            <span class="dt">species              =</span> <span class="st">"VTA"</span>,</a>
-<a class="sourceLine" id="cb55-8" title="8">                            <span class="dt">occasionLength       =</span> <span class="dv">7</span>,</a>
-<a class="sourceLine" id="cb55-9" title="9">                            <span class="dt">day1                 =</span> <span class="st">"station"</span>,</a>
-<a class="sourceLine" id="cb55-10" title="10">                            <span class="dt">includeEffort        =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb55-11" title="11">)</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1"><span class="co"># make detection history (without trapping effort)</span></a>
+<a class="sourceLine" id="cb54-2" title="2">DetHist1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionHistory.html">detectionHistory</a></span>(<span class="dt">recordTable         =</span> recordTableSample,</a>
+<a class="sourceLine" id="cb54-3" title="3">                            <span class="dt">camOp                =</span> camop_no_problem,</a>
+<a class="sourceLine" id="cb54-4" title="4">                            <span class="dt">stationCol           =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb54-5" title="5">                            <span class="dt">speciesCol           =</span> <span class="st">"Species"</span>,</a>
+<a class="sourceLine" id="cb54-6" title="6">                            <span class="dt">recordDateTimeCol    =</span> <span class="st">"DateTimeOriginal"</span>,</a>
+<a class="sourceLine" id="cb54-7" title="7">                            <span class="dt">species              =</span> <span class="st">"VTA"</span>,</a>
+<a class="sourceLine" id="cb54-8" title="8">                            <span class="dt">occasionLength       =</span> <span class="dv">7</span>,</a>
+<a class="sourceLine" id="cb54-9" title="9">                            <span class="dt">day1                 =</span> <span class="st">"station"</span>,</a>
+<a class="sourceLine" id="cb54-10" title="10">                            <span class="dt">includeEffort        =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb54-11" title="11">)</a></code></pre></div>
 <pre><code>## Warning: timeZone is not specified. Assuming UTC</code></pre>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1">DetHist1</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1">DetHist1</a></code></pre></div>
 <pre><code>## $detection_history
 ##          o1 o2 o3 o4 o5 o6 o7
 ## StationA  0  1  0  0  1  0 NA
@@ -623,54 +623,54 @@
 ## StationC  0  0  1  0  0  0 NA</code></pre>
 <p>Note the warning about the missing time zone (as in the functions <code>recordTable</code> and <code>recordTable</code>). Normally, it should be fine, but to be on the safe side, better set it to your study area’s time zone.</p>
 <p>If trapping effort is thought to influence detection probability, it can be returned by setting <code>includeEffort = TRUE</code>. This way the number of active trapping days per occasion and station is returned.</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" title="1"><span class="co"># make detection history (with trapping effort)</span></a>
-<a class="sourceLine" id="cb59-2" title="2">DetHist2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionHistory.html">detectionHistory</a></span>(<span class="dt">recordTable          =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb59-3" title="3">                             <span class="dt">camOp                =</span> camop_no_problem,</a>
-<a class="sourceLine" id="cb59-4" title="4">                             <span class="dt">stationCol           =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb59-5" title="5">                             <span class="dt">speciesCol           =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb59-6" title="6">                             <span class="dt">recordDateTimeCol    =</span> <span class="st">"DateTimeOriginal"</span>,</a>
-<a class="sourceLine" id="cb59-7" title="7">                             <span class="dt">species              =</span> <span class="st">"VTA"</span>,</a>
-<a class="sourceLine" id="cb59-8" title="8">                             <span class="dt">timeZone             =</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</a>
-<a class="sourceLine" id="cb59-9" title="9">                             <span class="dt">occasionLength       =</span> <span class="dv">7</span>,</a>
-<a class="sourceLine" id="cb59-10" title="10">                             <span class="dt">day1                 =</span> <span class="st">"station"</span>,</a>
-<a class="sourceLine" id="cb59-11" title="11">                             <span class="dt">includeEffort        =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb59-12" title="12">                             <span class="dt">scaleEffort          =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb59-13" title="13">)</a>
-<a class="sourceLine" id="cb59-14" title="14"></a>
-<a class="sourceLine" id="cb59-15" title="15">DetHist2[[<span class="dv">1</span>]]  <span class="co"># detection history</span></a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1"><span class="co"># make detection history (with trapping effort)</span></a>
+<a class="sourceLine" id="cb58-2" title="2">DetHist2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionHistory.html">detectionHistory</a></span>(<span class="dt">recordTable          =</span> recordTableSample,</a>
+<a class="sourceLine" id="cb58-3" title="3">                             <span class="dt">camOp                =</span> camop_no_problem,</a>
+<a class="sourceLine" id="cb58-4" title="4">                             <span class="dt">stationCol           =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb58-5" title="5">                             <span class="dt">speciesCol           =</span> <span class="st">"Species"</span>,</a>
+<a class="sourceLine" id="cb58-6" title="6">                             <span class="dt">recordDateTimeCol    =</span> <span class="st">"DateTimeOriginal"</span>,</a>
+<a class="sourceLine" id="cb58-7" title="7">                             <span class="dt">species              =</span> <span class="st">"VTA"</span>,</a>
+<a class="sourceLine" id="cb58-8" title="8">                             <span class="dt">timeZone             =</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</a>
+<a class="sourceLine" id="cb58-9" title="9">                             <span class="dt">occasionLength       =</span> <span class="dv">7</span>,</a>
+<a class="sourceLine" id="cb58-10" title="10">                             <span class="dt">day1                 =</span> <span class="st">"station"</span>,</a>
+<a class="sourceLine" id="cb58-11" title="11">                             <span class="dt">includeEffort        =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb58-12" title="12">                             <span class="dt">scaleEffort          =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb58-13" title="13">)</a>
+<a class="sourceLine" id="cb58-14" title="14"></a>
+<a class="sourceLine" id="cb58-15" title="15">DetHist2[[<span class="dv">1</span>]]  <span class="co"># detection history</span></a></code></pre></div>
 <pre><code>##          o1 o2 o3 o4 o5 o6 o7
 ## StationA  0  1  0  0  1  0  0
 ## StationB  0  1  0  1  0  0  0
 ## StationC  0  0  1  0  0  0  0</code></pre>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" title="1">DetHist2[[<span class="dv">2</span>]]  <span class="co"># effort (in days per occasion)</span></a></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1">DetHist2[[<span class="dv">2</span>]]  <span class="co"># effort (in days per occasion)</span></a></code></pre></div>
 <pre><code>##          o1 o2 o3 o4 o5 o6 o7
 ## StationA  7  7  7  7  7  7  1
 ## StationB  7  7  7  7  7  7  2
 ## StationC  7  7  7  7  7  7  2</code></pre>
 <p>To help with convergence of models, the effort matrix can be scaled to mean = 0 and sd = 1 by setting <code>scaleEffort = TRUE</code>. If <code>writecsv = TRUE</code>, the scaling parameters will also be saved in a separate csv file.</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1">DetHist3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionHistory.html">detectionHistory</a></span>(<span class="dt">recordTable          =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb63-2" title="2">                             <span class="dt">camOp                =</span> camop_no_problem,</a>
-<a class="sourceLine" id="cb63-3" title="3">                             <span class="dt">stationCol           =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb63-4" title="4">                             <span class="dt">speciesCol           =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb63-5" title="5">                             <span class="dt">recordDateTimeCol    =</span> <span class="st">"DateTimeOriginal"</span>,</a>
-<a class="sourceLine" id="cb63-6" title="6">                             <span class="dt">species              =</span> <span class="st">"VTA"</span>,</a>
-<a class="sourceLine" id="cb63-7" title="7">                             <span class="dt">timeZone             =</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</a>
-<a class="sourceLine" id="cb63-8" title="8">                             <span class="dt">occasionLength       =</span> <span class="dv">7</span>,</a>
-<a class="sourceLine" id="cb63-9" title="9">                             <span class="dt">day1                 =</span> <span class="st">"station"</span>,</a>
-<a class="sourceLine" id="cb63-10" title="10">                             <span class="dt">includeEffort        =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb63-11" title="11">                             <span class="dt">scaleEffort          =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb63-12" title="12">)</a>
-<a class="sourceLine" id="cb63-13" title="13"></a>
-<a class="sourceLine" id="cb63-14" title="14">DetHist3[[<span class="dv">2</span>]]  <span class="co"># effort (scaled)</span></a></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" title="1">DetHist3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionHistory.html">detectionHistory</a></span>(<span class="dt">recordTable          =</span> recordTableSample,</a>
+<a class="sourceLine" id="cb62-2" title="2">                             <span class="dt">camOp                =</span> camop_no_problem,</a>
+<a class="sourceLine" id="cb62-3" title="3">                             <span class="dt">stationCol           =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb62-4" title="4">                             <span class="dt">speciesCol           =</span> <span class="st">"Species"</span>,</a>
+<a class="sourceLine" id="cb62-5" title="5">                             <span class="dt">recordDateTimeCol    =</span> <span class="st">"DateTimeOriginal"</span>,</a>
+<a class="sourceLine" id="cb62-6" title="6">                             <span class="dt">species              =</span> <span class="st">"VTA"</span>,</a>
+<a class="sourceLine" id="cb62-7" title="7">                             <span class="dt">timeZone             =</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</a>
+<a class="sourceLine" id="cb62-8" title="8">                             <span class="dt">occasionLength       =</span> <span class="dv">7</span>,</a>
+<a class="sourceLine" id="cb62-9" title="9">                             <span class="dt">day1                 =</span> <span class="st">"station"</span>,</a>
+<a class="sourceLine" id="cb62-10" title="10">                             <span class="dt">includeEffort        =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb62-11" title="11">                             <span class="dt">scaleEffort          =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb62-12" title="12">)</a>
+<a class="sourceLine" id="cb62-13" title="13"></a>
+<a class="sourceLine" id="cb62-14" title="14">DetHist3[[<span class="dv">2</span>]]  <span class="co"># effort (scaled)</span></a></code></pre></div>
 <pre><code>##                 o1        o2        o3        o4        o5        o6        o7
 ## StationA 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062 -2.726668
 ## StationB 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062 -2.206122
 ## StationC 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062 0.3966062 -2.206122</code></pre>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" title="1">DetHist3[[<span class="dv">3</span>]]  <span class="co"># scaling parameters for back-transformation</span></a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" title="1">DetHist3[[<span class="dv">3</span>]]  <span class="co"># scaling parameters for back-transformation</span></a></code></pre></div>
 <pre><code>##   effort.scaled.center effort.scaled.scale
 ## 1             6.238095            1.921061</code></pre>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" title="1"><span class="co"># backtransform scaled effort like this if needed</span></a>
-<a class="sourceLine" id="cb67-2" title="2">(DetHist3[[<span class="dv">2</span>]] <span class="op">*</span><span class="st"> </span>DetHist3[[<span class="dv">3</span>]]<span class="op">$</span>effort.scaled.scale) <span class="op">+</span><span class="st"> </span>DetHist3[[<span class="dv">3</span>]]<span class="op">$</span>effort.scaled.center</a></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" title="1"><span class="co"># backtransform scaled effort like this if needed</span></a>
+<a class="sourceLine" id="cb66-2" title="2">(DetHist3[[<span class="dv">2</span>]] <span class="op">*</span><span class="st"> </span>DetHist3[[<span class="dv">3</span>]]<span class="op">$</span>effort.scaled.scale) <span class="op">+</span><span class="st"> </span>DetHist3[[<span class="dv">3</span>]]<span class="op">$</span>effort.scaled.center</a></code></pre></div>
 <pre><code>##          o1 o2 o3 o4 o5 o6 o7
 ## StationA  7  7  7  7  7  7  1
 ## StationB  7  7  7  7  7  7  2
@@ -750,49 +750,49 @@
 <h3 class="hasAnchor">
 <a href="#saving-and-loading-detection-histories" class="anchor"></a>Saving and loading detection histories</h3>
 <p>The detection history and effort matrices can easily be saved as csv files (by setting argument <code>writecsv = TRUE</code> and defining <code>outdir</code>). In order to load the csv into R again, it is necessary to tell R to use the station IDs as row names:</p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" title="1">detHist &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="dt">file =</span> ..., <span class="dt">row.names =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb69-2" title="2">effort  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="dt">file =</span> ..., <span class="dt">row.names =</span> <span class="dv">1</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" title="1">detHist &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="dt">file =</span> ..., <span class="dt">row.names =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb68-2" title="2">effort  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span>(<span class="dt">file =</span> ..., <span class="dt">row.names =</span> <span class="dv">1</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="spatial-capture-recapture-analyses" class="section level2">
 <h2 class="hasAnchor">
 <a href="#spatial-capture-recapture-analyses" class="anchor"></a>Spatial Capture-Recapture analyses</h2>
 <p>Input for spatial capture-recapture analyses can be generated in the form of <code>capthist</code>-objects as defined in the <code>secr</code> package with the function <code>spatialDetectionHistory</code>. Output can be in the form of counts (number of individual detections per occasion, argument, argument <code>output = "count"</code>) or binary (was an individual detected during an occasion, argument <code>output = "binary"</code>). note that the detector type will change accordingly: “proximity” if <code>output = "binary"</code> and “count” if <code>output = "count"</code>.</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(recordTableIndividualSample)</a>
-<a class="sourceLine" id="cb70-2" title="2"></a>
-<a class="sourceLine" id="cb70-3" title="3"><span class="co"># create camera operation matrix (with problems/malfunction)</span></a>
-<a class="sourceLine" id="cb70-4" title="4">camop_problem &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable      =</span> camtraps,</a>
-<a class="sourceLine" id="cb70-5" title="5">                                 <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb70-6" title="6">                                 <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
-<a class="sourceLine" id="cb70-7" title="7">                                 <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
-<a class="sourceLine" id="cb70-8" title="8">                                 <span class="dt">writecsv     =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb70-9" title="9">                                 <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb70-10" title="10">                                 <span class="dt">dateFormat   =</span> dateFormat</a>
-<a class="sourceLine" id="cb70-11" title="11">)</a>
-<a class="sourceLine" id="cb70-12" title="12"></a>
-<a class="sourceLine" id="cb70-13" title="13">sdh &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spatialDetectionHistory.html">spatialDetectionHistory</a></span>(<span class="dt">recordTableIndividual =</span> recordTableIndividualSample, </a>
-<a class="sourceLine" id="cb70-14" title="14">                               <span class="dt">species               =</span> <span class="st">"LeopardCat"</span>,  </a>
-<a class="sourceLine" id="cb70-15" title="15">                               <span class="dt">output                =</span> <span class="st">"binary"</span>,</a>
-<a class="sourceLine" id="cb70-16" title="16">                               <span class="dt">camOp                 =</span> camop_problem, </a>
-<a class="sourceLine" id="cb70-17" title="17">                               <span class="dt">CTtable               =</span> camtraps,</a>
-<a class="sourceLine" id="cb70-18" title="18">                               <span class="dt">stationCol            =</span> <span class="st">"Station"</span>, </a>
-<a class="sourceLine" id="cb70-19" title="19">                               <span class="dt">speciesCol            =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb70-20" title="20">                               <span class="dt">Xcol                  =</span> <span class="st">"utm_x"</span>,</a>
-<a class="sourceLine" id="cb70-21" title="21">                               <span class="dt">Ycol                  =</span> <span class="st">"utm_y"</span>,</a>
-<a class="sourceLine" id="cb70-22" title="22">                               <span class="dt">individualCol         =</span> <span class="st">"Individual"</span>,</a>
-<a class="sourceLine" id="cb70-23" title="23">                               <span class="dt">recordDateTimeCol     =</span> <span class="st">"DateTimeOriginal"</span>,</a>
-<a class="sourceLine" id="cb70-24" title="24">                               <span class="dt">recordDateTimeFormat  =</span> <span class="st">"%Y-%m-%d %H:%M:%S"</span>,</a>
-<a class="sourceLine" id="cb70-25" title="25">                               <span class="dt">occasionLength        =</span> <span class="dv">10</span>, </a>
-<a class="sourceLine" id="cb70-26" title="26">                               <span class="dt">day1                  =</span> <span class="st">"survey"</span>,</a>
-<a class="sourceLine" id="cb70-27" title="27">                               <span class="dt">includeEffort         =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb70-28" title="28">                               <span class="dt">timeZone              =</span> <span class="st">"Asia/Kuala_Lumpur"</span></a>
-<a class="sourceLine" id="cb70-29" title="29">  )</a>
-<a class="sourceLine" id="cb70-30" title="30">  </a>
-<a class="sourceLine" id="cb70-31" title="31"><span class="co"># missing space in species = "LeopardCat" was introduced by recordTableIndividual </span></a>
-<a class="sourceLine" id="cb70-32" title="32"><span class="co"># (because of CRAN package policies). </span></a>
-<a class="sourceLine" id="cb70-33" title="33"><span class="co"># In your own data you can have spaces in your directory names.</span></a>
-<a class="sourceLine" id="cb70-34" title="34"></a>
-<a class="sourceLine" id="cb70-35" title="35">  <span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(sdh)</a></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(recordTableIndividualSample)</a>
+<a class="sourceLine" id="cb69-2" title="2"></a>
+<a class="sourceLine" id="cb69-3" title="3"><span class="co"># create camera operation matrix (with problems/malfunction)</span></a>
+<a class="sourceLine" id="cb69-4" title="4">camop_problem &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable      =</span> camtraps,</a>
+<a class="sourceLine" id="cb69-5" title="5">                                 <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb69-6" title="6">                                 <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
+<a class="sourceLine" id="cb69-7" title="7">                                 <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
+<a class="sourceLine" id="cb69-8" title="8">                                 <span class="dt">writecsv     =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb69-9" title="9">                                 <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb69-10" title="10">                                 <span class="dt">dateFormat   =</span> dateFormat</a>
+<a class="sourceLine" id="cb69-11" title="11">)</a>
+<a class="sourceLine" id="cb69-12" title="12"></a>
+<a class="sourceLine" id="cb69-13" title="13">sdh &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spatialDetectionHistory.html">spatialDetectionHistory</a></span>(<span class="dt">recordTableIndividual =</span> recordTableIndividualSample, </a>
+<a class="sourceLine" id="cb69-14" title="14">                               <span class="dt">species               =</span> <span class="st">"LeopardCat"</span>,  </a>
+<a class="sourceLine" id="cb69-15" title="15">                               <span class="dt">output                =</span> <span class="st">"binary"</span>,</a>
+<a class="sourceLine" id="cb69-16" title="16">                               <span class="dt">camOp                 =</span> camop_problem, </a>
+<a class="sourceLine" id="cb69-17" title="17">                               <span class="dt">CTtable               =</span> camtraps,</a>
+<a class="sourceLine" id="cb69-18" title="18">                               <span class="dt">stationCol            =</span> <span class="st">"Station"</span>, </a>
+<a class="sourceLine" id="cb69-19" title="19">                               <span class="dt">speciesCol            =</span> <span class="st">"Species"</span>,</a>
+<a class="sourceLine" id="cb69-20" title="20">                               <span class="dt">Xcol                  =</span> <span class="st">"utm_x"</span>,</a>
+<a class="sourceLine" id="cb69-21" title="21">                               <span class="dt">Ycol                  =</span> <span class="st">"utm_y"</span>,</a>
+<a class="sourceLine" id="cb69-22" title="22">                               <span class="dt">individualCol         =</span> <span class="st">"Individual"</span>,</a>
+<a class="sourceLine" id="cb69-23" title="23">                               <span class="dt">recordDateTimeCol     =</span> <span class="st">"DateTimeOriginal"</span>,</a>
+<a class="sourceLine" id="cb69-24" title="24">                               <span class="dt">recordDateTimeFormat  =</span> <span class="st">"%Y-%m-%d %H:%M:%S"</span>,</a>
+<a class="sourceLine" id="cb69-25" title="25">                               <span class="dt">occasionLength        =</span> <span class="dv">10</span>, </a>
+<a class="sourceLine" id="cb69-26" title="26">                               <span class="dt">day1                  =</span> <span class="st">"survey"</span>,</a>
+<a class="sourceLine" id="cb69-27" title="27">                               <span class="dt">includeEffort         =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb69-28" title="28">                               <span class="dt">timeZone              =</span> <span class="st">"Asia/Kuala_Lumpur"</span></a>
+<a class="sourceLine" id="cb69-29" title="29">  )</a>
+<a class="sourceLine" id="cb69-30" title="30">  </a>
+<a class="sourceLine" id="cb69-31" title="31"><span class="co"># missing space in species = "LeopardCat" was introduced by recordTableIndividual </span></a>
+<a class="sourceLine" id="cb69-32" title="32"><span class="co"># (because of CRAN package policies). </span></a>
+<a class="sourceLine" id="cb69-33" title="33"><span class="co"># In your own data you can have spaces in your directory names.</span></a>
+<a class="sourceLine" id="cb69-34" title="34"></a>
+<a class="sourceLine" id="cb69-35" title="35">  <span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(sdh)</a></code></pre></div>
 <pre><code>## Object class       capthist 
 ## Detector type      proximity 
 ## Detector number    3 
@@ -815,7 +815,7 @@
 ## detections        3 4 4 3 1    15
 ## detectors visited 2 3 3 2 1    11
 ## detectors used    3 3 3 3 2    14</code></pre>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(sdh, <span class="dt">tracks =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(sdh, <span class="dt">tracks =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>## Warning in plot.capthist(sdh, tracks = TRUE): track for repeat detections on
 ## same occasion joins points in arbitrary sequence</code></pre>
 <p><img src="camtrapr3_files/figure-html/unnamed-chunk-21-1.png" width="700"></p>
@@ -831,43 +831,43 @@
 <p>camtrapR prepares detection histories that can be used as input for argument <code>y</code> in function <code>unmarkedMultFrame</code>. <code>unmarkedMultFrame</code> creates the input for function <code>colext</code> which fits multi-season occupancy models.</p>
 <p>For multi-season occupancy, we need a session column in the camera trap table. Records will be assigned to session automatically based on their dates.</p>
 <p>First we simulate data for 2 seasons by duplicating the existing sample data and adjusting the dates (add 1 year)</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" title="1"><span class="co"># load multi-season data</span></a>
-<a class="sourceLine" id="cb74-2" title="2"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(camtrapsMultiSeason)</a>
-<a class="sourceLine" id="cb74-3" title="3"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(recordTableSampleMultiSeason)</a>
-<a class="sourceLine" id="cb74-4" title="4"></a>
-<a class="sourceLine" id="cb74-5" title="5"><span class="co"># also, for clarity, lets remove all unnecessary columns from the record table</span></a>
-<a class="sourceLine" id="cb74-6" title="6">recordTableSampleMultiSeason &lt;-<span class="st"> </span>recordTableSampleMultiSeason[, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Station"</span>, <span class="st">"Species"</span>, <span class="st">"DateTimeOriginal"</span>)]</a>
-<a class="sourceLine" id="cb74-7" title="7"></a>
-<a class="sourceLine" id="cb74-8" title="8"><span class="co"># create camera operation matrix</span></a>
-<a class="sourceLine" id="cb74-9" title="9">camop_season &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable         =</span> camtrapsMultiSeason,</a>
-<a class="sourceLine" id="cb74-10" title="10">                                    <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb74-11" title="11">                                    <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
-<a class="sourceLine" id="cb74-12" title="12">                                    <span class="dt">sessionCol   =</span> <span class="st">"session"</span>,</a>
-<a class="sourceLine" id="cb74-13" title="13">                                    <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
-<a class="sourceLine" id="cb74-14" title="14">                                    <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb74-15" title="15">                                    <span class="dt">dateFormat   =</span> dateFormat</a>
-<a class="sourceLine" id="cb74-16" title="16">)</a>
-<a class="sourceLine" id="cb74-17" title="17"></a>
-<a class="sourceLine" id="cb74-18" title="18"><span class="co"># plot camera operation matrix</span></a>
-<a class="sourceLine" id="cb74-19" title="19"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">oma =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>,<span class="dv">7</span>,<span class="dv">0</span>,<span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb74-20" title="20"><span class="kw">camopPlot</span>(camop_season)</a></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" title="1"><span class="co"># load multi-season data</span></a>
+<a class="sourceLine" id="cb73-2" title="2"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(camtrapsMultiSeason)</a>
+<a class="sourceLine" id="cb73-3" title="3"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(recordTableSampleMultiSeason)</a>
+<a class="sourceLine" id="cb73-4" title="4"></a>
+<a class="sourceLine" id="cb73-5" title="5"><span class="co"># also, for clarity, lets remove all unnecessary columns from the record table</span></a>
+<a class="sourceLine" id="cb73-6" title="6">recordTableSampleMultiSeason &lt;-<span class="st"> </span>recordTableSampleMultiSeason[, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Station"</span>, <span class="st">"Species"</span>, <span class="st">"DateTimeOriginal"</span>)]</a>
+<a class="sourceLine" id="cb73-7" title="7"></a>
+<a class="sourceLine" id="cb73-8" title="8"><span class="co"># create camera operation matrix</span></a>
+<a class="sourceLine" id="cb73-9" title="9">camop_season &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable         =</span> camtrapsMultiSeason,</a>
+<a class="sourceLine" id="cb73-10" title="10">                                    <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb73-11" title="11">                                    <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
+<a class="sourceLine" id="cb73-12" title="12">                                    <span class="dt">sessionCol   =</span> <span class="st">"session"</span>,</a>
+<a class="sourceLine" id="cb73-13" title="13">                                    <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
+<a class="sourceLine" id="cb73-14" title="14">                                    <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb73-15" title="15">                                    <span class="dt">dateFormat   =</span> dateFormat</a>
+<a class="sourceLine" id="cb73-16" title="16">)</a>
+<a class="sourceLine" id="cb73-17" title="17"></a>
+<a class="sourceLine" id="cb73-18" title="18"><span class="co"># plot camera operation matrix</span></a>
+<a class="sourceLine" id="cb73-19" title="19"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">oma =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>,<span class="dv">7</span>,<span class="dv">0</span>,<span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb73-20" title="20"><span class="kw">camopPlot</span>(camop_season)</a></code></pre></div>
 <p><img src="camtrapr3_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" title="1"><span class="co"># make multi-season detection history</span></a>
-<a class="sourceLine" id="cb75-2" title="2">DetHist_multi &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionHistory.html">detectionHistory</a></span>(<span class="dt">recordTable   =</span> recordTableSampleMultiSeason,</a>
-<a class="sourceLine" id="cb75-3" title="3">                            <span class="dt">camOp                =</span> camop_season,</a>
-<a class="sourceLine" id="cb75-4" title="4">                            <span class="dt">stationCol           =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb75-5" title="5">                            <span class="dt">speciesCol           =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb75-6" title="6">                            <span class="dt">species              =</span> <span class="st">"VTA"</span>,</a>
-<a class="sourceLine" id="cb75-7" title="7">                            <span class="dt">occasionLength       =</span> <span class="dv">10</span>,</a>
-<a class="sourceLine" id="cb75-8" title="8">                            <span class="dt">day1                 =</span> <span class="st">"station"</span>,</a>
-<a class="sourceLine" id="cb75-9" title="9">                            <span class="dt">recordDateTimeCol     =</span> <span class="st">"DateTimeOriginal"</span>,</a>
-<a class="sourceLine" id="cb75-10" title="10">                            <span class="dt">includeEffort        =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb75-11" title="11">                            <span class="dt">scaleEffort          =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb75-12" title="12">                            <span class="dt">timeZone             =</span> <span class="st">"UTC"</span>,</a>
-<a class="sourceLine" id="cb75-13" title="13">                            <span class="dt">unmarkedMultFrameInput =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb75-14" title="14">)</a>
-<a class="sourceLine" id="cb75-15" title="15"></a>
-<a class="sourceLine" id="cb75-16" title="16">DetHist_multi</a></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" title="1"><span class="co"># make multi-season detection history</span></a>
+<a class="sourceLine" id="cb74-2" title="2">DetHist_multi &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionHistory.html">detectionHistory</a></span>(<span class="dt">recordTable   =</span> recordTableSampleMultiSeason,</a>
+<a class="sourceLine" id="cb74-3" title="3">                            <span class="dt">camOp                =</span> camop_season,</a>
+<a class="sourceLine" id="cb74-4" title="4">                            <span class="dt">stationCol           =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb74-5" title="5">                            <span class="dt">speciesCol           =</span> <span class="st">"Species"</span>,</a>
+<a class="sourceLine" id="cb74-6" title="6">                            <span class="dt">species              =</span> <span class="st">"VTA"</span>,</a>
+<a class="sourceLine" id="cb74-7" title="7">                            <span class="dt">occasionLength       =</span> <span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb74-8" title="8">                            <span class="dt">day1                 =</span> <span class="st">"station"</span>,</a>
+<a class="sourceLine" id="cb74-9" title="9">                            <span class="dt">recordDateTimeCol     =</span> <span class="st">"DateTimeOriginal"</span>,</a>
+<a class="sourceLine" id="cb74-10" title="10">                            <span class="dt">includeEffort        =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb74-11" title="11">                            <span class="dt">scaleEffort          =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb74-12" title="12">                            <span class="dt">timeZone             =</span> <span class="st">"UTC"</span>,</a>
+<a class="sourceLine" id="cb74-13" title="13">                            <span class="dt">unmarkedMultFrameInput =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb74-14" title="14">)</a>
+<a class="sourceLine" id="cb74-15" title="15"></a>
+<a class="sourceLine" id="cb74-16" title="16">DetHist_multi</a></code></pre></div>
 <pre><code>## $detection_history
 ##          o1 o2 o3 o4 o5 o6 o7 o8 o1 o2 o3 o4 o5 o6 o7 o8
 ## StationA  1  0  0  1  0 NA NA NA  1  0  0  1  0 NA NA NA
@@ -883,31 +883,31 @@
 ## StationD NA NA NA NA NA NA NA NA 10 10 10 10  6  3 10  5</code></pre>
 <p>Note that the function makes sure that all seasons have identical number of occasions, and that all stations are represented, even if they were not sampled in all seasons.</p>
 <p>From here, the resulting object can be used in unmarked.</p>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" title="1">year_matrix &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(camtrapsMultiSeason<span class="op">$</span>session)),</a>
-<a class="sourceLine" id="cb77-2" title="2">               <span class="dt">ncol =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(camtrapsMultiSeason<span class="op">$</span>session))),</a>
-<a class="sourceLine" id="cb77-3" title="3">               <span class="dt">nrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(camtrapsMultiSeason<span class="op">$</span>Station)),</a>
-<a class="sourceLine" id="cb77-4" title="4">               <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb77-5" title="5"></a>
-<a class="sourceLine" id="cb77-6" title="6"><span class="co"># this is a made up example table with station covariates for demonstration</span></a>
-<a class="sourceLine" id="cb77-7" title="7">site_covariates &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">Station =</span> <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(DetHist_multi<span class="op">$</span>detection_history),</a>
-<a class="sourceLine" id="cb77-8" title="8">                              <span class="dt">elevation =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">500</span>, <span class="dv">300</span>),</a>
-<a class="sourceLine" id="cb77-9" title="9">                              <span class="dt">treecover =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">80</span>, <span class="dv">100</span>, <span class="dv">50</span>, <span class="dv">10</span>))</a>
-<a class="sourceLine" id="cb77-10" title="10"></a>
-<a class="sourceLine" id="cb77-11" title="11">umf &lt;-<span class="st"> </span>unmarked<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/unmarked/man/unmarkedMultFrame.html">unmarkedMultFrame</a></span>(<span class="dt">y =</span> DetHist_multi<span class="op">$</span>detection_history,</a>
-<a class="sourceLine" id="cb77-12" title="12">                                   <span class="dt">siteCovs =</span> site_covariates,</a>
-<a class="sourceLine" id="cb77-13" title="13">                                   <span class="dt">yearlySiteCovs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">year =</span> year_matrix),</a>
-<a class="sourceLine" id="cb77-14" title="14">                                   <span class="dt">obsCovs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">effort =</span> DetHist_multi<span class="op">$</span>effort),</a>
-<a class="sourceLine" id="cb77-15" title="15">                                   <span class="dt">numPrimary =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb77-16" title="16"></a>
-<a class="sourceLine" id="cb77-17" title="17"></a>
-<a class="sourceLine" id="cb77-18" title="18"></a>
-<a class="sourceLine" id="cb77-19" title="19">colext_example &lt;-<span class="st"> </span>unmarked<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/unmarked/man/colext.html">colext</a></span>(<span class="dt">psiformula =</span> <span class="op">~</span><span class="st"> </span>treecover,    <span class="co"># First-year occupancy</span></a>
-<a class="sourceLine" id="cb77-20" title="20">                                   <span class="dt">gammaformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,          <span class="co"># Colonization</span></a>
-<a class="sourceLine" id="cb77-21" title="21">                                   <span class="dt">epsilonformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,        <span class="co"># Extinction</span></a>
-<a class="sourceLine" id="cb77-22" title="22">                                   <span class="dt">pformula =</span> <span class="op">~</span><span class="st"> </span>effort,         <span class="co"># Detection</span></a>
-<a class="sourceLine" id="cb77-23" title="23">                                   <span class="dt">data =</span> umf,</a>
-<a class="sourceLine" id="cb77-24" title="24">                                   <span class="dt">method=</span><span class="st">"BFGS"</span>)</a>
-<a class="sourceLine" id="cb77-25" title="25"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(colext_example)</a></code></pre></div>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" title="1">year_matrix &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(camtrapsMultiSeason<span class="op">$</span>session)),</a>
+<a class="sourceLine" id="cb76-2" title="2">               <span class="dt">ncol =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(camtrapsMultiSeason<span class="op">$</span>session))),</a>
+<a class="sourceLine" id="cb76-3" title="3">               <span class="dt">nrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(camtrapsMultiSeason<span class="op">$</span>Station)),</a>
+<a class="sourceLine" id="cb76-4" title="4">               <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb76-5" title="5"></a>
+<a class="sourceLine" id="cb76-6" title="6"><span class="co"># this is a made up example table with station covariates for demonstration</span></a>
+<a class="sourceLine" id="cb76-7" title="7">site_covariates &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">Station =</span> <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(DetHist_multi<span class="op">$</span>detection_history),</a>
+<a class="sourceLine" id="cb76-8" title="8">                              <span class="dt">elevation =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">500</span>, <span class="dv">300</span>),</a>
+<a class="sourceLine" id="cb76-9" title="9">                              <span class="dt">treecover =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">80</span>, <span class="dv">100</span>, <span class="dv">50</span>, <span class="dv">10</span>))</a>
+<a class="sourceLine" id="cb76-10" title="10"></a>
+<a class="sourceLine" id="cb76-11" title="11">umf &lt;-<span class="st"> </span>unmarked<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/unmarked/man/unmarkedMultFrame.html">unmarkedMultFrame</a></span>(<span class="dt">y =</span> DetHist_multi<span class="op">$</span>detection_history,</a>
+<a class="sourceLine" id="cb76-12" title="12">                                   <span class="dt">siteCovs =</span> site_covariates,</a>
+<a class="sourceLine" id="cb76-13" title="13">                                   <span class="dt">yearlySiteCovs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">year =</span> year_matrix),</a>
+<a class="sourceLine" id="cb76-14" title="14">                                   <span class="dt">obsCovs =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">effort =</span> DetHist_multi<span class="op">$</span>effort),</a>
+<a class="sourceLine" id="cb76-15" title="15">                                   <span class="dt">numPrimary =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb76-16" title="16"></a>
+<a class="sourceLine" id="cb76-17" title="17"></a>
+<a class="sourceLine" id="cb76-18" title="18"></a>
+<a class="sourceLine" id="cb76-19" title="19">colext_example &lt;-<span class="st"> </span>unmarked<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/unmarked/man/colext.html">colext</a></span>(<span class="dt">psiformula =</span> <span class="op">~</span><span class="st"> </span>treecover,    <span class="co"># First-year occupancy</span></a>
+<a class="sourceLine" id="cb76-20" title="20">                                   <span class="dt">gammaformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,          <span class="co"># Colonization</span></a>
+<a class="sourceLine" id="cb76-21" title="21">                                   <span class="dt">epsilonformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,        <span class="co"># Extinction</span></a>
+<a class="sourceLine" id="cb76-22" title="22">                                   <span class="dt">pformula =</span> <span class="op">~</span><span class="st"> </span>effort,         <span class="co"># Detection</span></a>
+<a class="sourceLine" id="cb76-23" title="23">                                   <span class="dt">data =</span> umf,</a>
+<a class="sourceLine" id="cb76-24" title="24">                                   <span class="dt">method=</span><span class="st">"BFGS"</span>)</a>
+<a class="sourceLine" id="cb76-25" title="25"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(colext_example)</a></code></pre></div>
 <pre><code>##            Length             Class              Mode 
 ##                 1 unmarkedFitColExt                S4</code></pre>
 </div>
@@ -915,52 +915,52 @@
 <h2 class="hasAnchor">
 <a href="#multi-season-spatial-capture-recapture" class="anchor"></a>Multi-season spatial capture-recapture</h2>
 <p>For secr, session IDs must be a gapless sequence of numbers beginning with 1. So 2009 becomes season 1 and 2010 season 2</p>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" title="1">camtrapsMultiSeason<span class="op">$</span>session[camtrapsMultiSeason<span class="op">$</span>session <span class="op">==</span><span class="st"> </span><span class="dv">2009</span>] &lt;-<span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb79-2" title="2">camtrapsMultiSeason<span class="op">$</span>session[camtrapsMultiSeason<span class="op">$</span>session <span class="op">==</span><span class="st"> </span><span class="dv">2010</span>] &lt;-<span class="st"> </span><span class="dv">2</span></a></code></pre></div>
-<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" title="1"><span class="co"># we also want a few records in season 2</span></a>
-<a class="sourceLine" id="cb80-2" title="2">recordTableIndividualSample_season2 &lt;-<span class="st"> </span>recordTableIndividualSample[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,]</a>
-<a class="sourceLine" id="cb80-3" title="3">recordTableIndividualSample_season2<span class="op">$</span>DateTimeOriginal &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/grep.html">gsub</a></span>(<span class="st">"2009"</span>, <span class="st">"2010"</span>, recordTableIndividualSample_season2<span class="op">$</span>DateTimeOriginal)</a>
-<a class="sourceLine" id="cb80-4" title="4">recordTableIndividualSample_season &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(recordTableIndividualSample, recordTableIndividualSample_season2)</a>
-<a class="sourceLine" id="cb80-5" title="5"></a>
-<a class="sourceLine" id="cb80-6" title="6"></a>
-<a class="sourceLine" id="cb80-7" title="7"></a>
-<a class="sourceLine" id="cb80-8" title="8"><span class="co"># for clarity, lets remove all unnecessary columns</span></a>
-<a class="sourceLine" id="cb80-9" title="9">recordTableIndividualSample_season &lt;-<span class="st"> </span>recordTableIndividualSample_season[, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Station"</span>, <span class="st">"Species"</span>, <span class="st">"Individual"</span>, <span class="st">"DateTimeOriginal"</span>)]</a></code></pre></div>
-<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" title="1"><span class="co"># create camera operation matrix (with problems/malfunction), same as above for multi-season occupancy</span></a>
-<a class="sourceLine" id="cb81-2" title="2">camop_season &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable         =</span> camtrapsMultiSeason,</a>
-<a class="sourceLine" id="cb81-3" title="3">                                    <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb81-4" title="4">                                    <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
-<a class="sourceLine" id="cb81-5" title="5">                                    <span class="dt">sessionCol   =</span> <span class="st">"session"</span>,</a>
-<a class="sourceLine" id="cb81-6" title="6">                                    <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
-<a class="sourceLine" id="cb81-7" title="7">                                    <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb81-8" title="8">                                    <span class="dt">dateFormat   =</span> dateFormat</a>
-<a class="sourceLine" id="cb81-9" title="9">)</a>
-<a class="sourceLine" id="cb81-10" title="10"></a>
-<a class="sourceLine" id="cb81-11" title="11"></a>
-<a class="sourceLine" id="cb81-12" title="12"><span class="co"># create capthist object</span></a>
-<a class="sourceLine" id="cb81-13" title="13">sdh_multi &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spatialDetectionHistory.html">spatialDetectionHistory</a></span>(<span class="dt">recordTableIndividual =</span> recordTableIndividualSample_season,</a>
-<a class="sourceLine" id="cb81-14" title="14">                               <span class="dt">species                 =</span> <span class="st">"LeopardCat"</span>,</a>
-<a class="sourceLine" id="cb81-15" title="15">                               <span class="dt">output                  =</span> <span class="st">"binary"</span>,</a>
-<a class="sourceLine" id="cb81-16" title="16">                               <span class="dt">camOp                   =</span> camop_season,</a>
-<a class="sourceLine" id="cb81-17" title="17">                               <span class="dt">CTtable                 =</span> camtrapsMultiSeason,</a>
-<a class="sourceLine" id="cb81-18" title="18">                               <span class="dt">stationCol              =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb81-19" title="19">                               <span class="dt">speciesCol              =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb81-20" title="20">                               <span class="dt">sessionCol              =</span> <span class="st">"session"</span>,</a>
-<a class="sourceLine" id="cb81-21" title="21">                               <span class="dt">Xcol                    =</span> <span class="st">"utm_x"</span>,</a>
-<a class="sourceLine" id="cb81-22" title="22">                               <span class="dt">Ycol                    =</span> <span class="st">"utm_y"</span>,</a>
-<a class="sourceLine" id="cb81-23" title="23">                               <span class="dt">individualCol           =</span> <span class="st">"Individual"</span>,</a>
-<a class="sourceLine" id="cb81-24" title="24">                               <span class="dt">recordDateTimeCol       =</span> <span class="st">"DateTimeOriginal"</span>,</a>
-<a class="sourceLine" id="cb81-25" title="25">                               <span class="dt">recordDateTimeFormat    =</span> <span class="st">"%Y-%m-%d %H:%M:%S"</span>,</a>
-<a class="sourceLine" id="cb81-26" title="26">                               <span class="dt">occasionLength          =</span> <span class="dv">10</span>,</a>
-<a class="sourceLine" id="cb81-27" title="27">                               <span class="dt">day1                    =</span> <span class="st">"survey"</span>,</a>
-<a class="sourceLine" id="cb81-28" title="28">                               <span class="dt">includeEffort           =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb81-29" title="29">                               <span class="dt">timeZone                =</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</a>
-<a class="sourceLine" id="cb81-30" title="30">                               <span class="dt">stationCovariateCols    =</span> <span class="st">"utm_y"</span>,       <span class="co"># made up, a potential site covariate from camtrapsMultiSeason</span></a>
-<a class="sourceLine" id="cb81-31" title="31">                               <span class="dt">individualCovariateCols =</span> <span class="st">"Individual"</span>   <span class="co"># made up, a potential individual covariate from recordTable</span></a>
-<a class="sourceLine" id="cb81-32" title="32">  )</a>
-<a class="sourceLine" id="cb81-33" title="33"></a>
-<a class="sourceLine" id="cb81-34" title="34"></a>
-<a class="sourceLine" id="cb81-35" title="35">  <span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(sdh_multi)</a></code></pre></div>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" title="1">camtrapsMultiSeason<span class="op">$</span>session[camtrapsMultiSeason<span class="op">$</span>session <span class="op">==</span><span class="st"> </span><span class="dv">2009</span>] &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb78-2" title="2">camtrapsMultiSeason<span class="op">$</span>session[camtrapsMultiSeason<span class="op">$</span>session <span class="op">==</span><span class="st"> </span><span class="dv">2010</span>] &lt;-<span class="st"> </span><span class="dv">2</span></a></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" title="1"><span class="co"># we also want a few records in season 2</span></a>
+<a class="sourceLine" id="cb79-2" title="2">recordTableIndividualSample_season2 &lt;-<span class="st"> </span>recordTableIndividualSample[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,]</a>
+<a class="sourceLine" id="cb79-3" title="3">recordTableIndividualSample_season2<span class="op">$</span>DateTimeOriginal &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/grep.html">gsub</a></span>(<span class="st">"2009"</span>, <span class="st">"2010"</span>, recordTableIndividualSample_season2<span class="op">$</span>DateTimeOriginal)</a>
+<a class="sourceLine" id="cb79-4" title="4">recordTableIndividualSample_season &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(recordTableIndividualSample, recordTableIndividualSample_season2)</a>
+<a class="sourceLine" id="cb79-5" title="5"></a>
+<a class="sourceLine" id="cb79-6" title="6"></a>
+<a class="sourceLine" id="cb79-7" title="7"></a>
+<a class="sourceLine" id="cb79-8" title="8"><span class="co"># for clarity, lets remove all unnecessary columns</span></a>
+<a class="sourceLine" id="cb79-9" title="9">recordTableIndividualSample_season &lt;-<span class="st"> </span>recordTableIndividualSample_season[, <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Station"</span>, <span class="st">"Species"</span>, <span class="st">"Individual"</span>, <span class="st">"DateTimeOriginal"</span>)]</a></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" title="1"><span class="co"># create camera operation matrix (with problems/malfunction), same as above for multi-season occupancy</span></a>
+<a class="sourceLine" id="cb80-2" title="2">camop_season &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cameraOperation.html">cameraOperation</a></span>(<span class="dt">CTtable         =</span> camtrapsMultiSeason,</a>
+<a class="sourceLine" id="cb80-3" title="3">                                    <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb80-4" title="4">                                    <span class="dt">setupCol     =</span> <span class="st">"Setup_date"</span>,</a>
+<a class="sourceLine" id="cb80-5" title="5">                                    <span class="dt">sessionCol   =</span> <span class="st">"session"</span>,</a>
+<a class="sourceLine" id="cb80-6" title="6">                                    <span class="dt">retrievalCol =</span> <span class="st">"Retrieval_date"</span>,</a>
+<a class="sourceLine" id="cb80-7" title="7">                                    <span class="dt">hasProblems  =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb80-8" title="8">                                    <span class="dt">dateFormat   =</span> dateFormat</a>
+<a class="sourceLine" id="cb80-9" title="9">)</a>
+<a class="sourceLine" id="cb80-10" title="10"></a>
+<a class="sourceLine" id="cb80-11" title="11"></a>
+<a class="sourceLine" id="cb80-12" title="12"><span class="co"># create capthist object</span></a>
+<a class="sourceLine" id="cb80-13" title="13">sdh_multi &lt;-<span class="st"> </span><span class="kw"><a href="../reference/spatialDetectionHistory.html">spatialDetectionHistory</a></span>(<span class="dt">recordTableIndividual =</span> recordTableIndividualSample_season,</a>
+<a class="sourceLine" id="cb80-14" title="14">                               <span class="dt">species                 =</span> <span class="st">"LeopardCat"</span>,</a>
+<a class="sourceLine" id="cb80-15" title="15">                               <span class="dt">output                  =</span> <span class="st">"binary"</span>,</a>
+<a class="sourceLine" id="cb80-16" title="16">                               <span class="dt">camOp                   =</span> camop_season,</a>
+<a class="sourceLine" id="cb80-17" title="17">                               <span class="dt">CTtable                 =</span> camtrapsMultiSeason,</a>
+<a class="sourceLine" id="cb80-18" title="18">                               <span class="dt">stationCol              =</span> <span class="st">"Station"</span>,</a>
+<a class="sourceLine" id="cb80-19" title="19">                               <span class="dt">speciesCol              =</span> <span class="st">"Species"</span>,</a>
+<a class="sourceLine" id="cb80-20" title="20">                               <span class="dt">sessionCol              =</span> <span class="st">"session"</span>,</a>
+<a class="sourceLine" id="cb80-21" title="21">                               <span class="dt">Xcol                    =</span> <span class="st">"utm_x"</span>,</a>
+<a class="sourceLine" id="cb80-22" title="22">                               <span class="dt">Ycol                    =</span> <span class="st">"utm_y"</span>,</a>
+<a class="sourceLine" id="cb80-23" title="23">                               <span class="dt">individualCol           =</span> <span class="st">"Individual"</span>,</a>
+<a class="sourceLine" id="cb80-24" title="24">                               <span class="dt">recordDateTimeCol       =</span> <span class="st">"DateTimeOriginal"</span>,</a>
+<a class="sourceLine" id="cb80-25" title="25">                               <span class="dt">recordDateTimeFormat    =</span> <span class="st">"%Y-%m-%d %H:%M:%S"</span>,</a>
+<a class="sourceLine" id="cb80-26" title="26">                               <span class="dt">occasionLength          =</span> <span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb80-27" title="27">                               <span class="dt">day1                    =</span> <span class="st">"survey"</span>,</a>
+<a class="sourceLine" id="cb80-28" title="28">                               <span class="dt">includeEffort           =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb80-29" title="29">                               <span class="dt">timeZone                =</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</a>
+<a class="sourceLine" id="cb80-30" title="30">                               <span class="dt">stationCovariateCols    =</span> <span class="st">"utm_y"</span>,       <span class="co"># made up, a potential site covariate from camtrapsMultiSeason</span></a>
+<a class="sourceLine" id="cb80-31" title="31">                               <span class="dt">individualCovariateCols =</span> <span class="st">"Individual"</span>   <span class="co"># made up, a potential individual covariate from recordTable</span></a>
+<a class="sourceLine" id="cb80-32" title="32">  )</a>
+<a class="sourceLine" id="cb80-33" title="33"></a>
+<a class="sourceLine" id="cb80-34" title="34"></a>
+<a class="sourceLine" id="cb80-35" title="35">  <span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(sdh_multi)</a></code></pre></div>
 <pre><code>## $`1`
 ## Object class       capthist 
 ## Detector type      proximity 
@@ -1020,13 +1020,13 @@
 ##  Individual
 ##  1:1       
 ##  2:1</code></pre>
-<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb83-2" title="2">  <span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(sdh_multi)</a></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb82-2" title="2">  <span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(sdh_multi)</a></code></pre></div>
 <p><img src="camtrapr3_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
 <pre><code>##  1  2 
 ## 15  6</code></pre>
-<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb85-1" title="1">  secr.fit.example &lt;-<span class="st"> </span><span class="kw">secr.fit</span>(<span class="dt">capthist =</span> sdh_multi,</a>
-<a class="sourceLine" id="cb85-2" title="2">                               <span class="dt">start =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">-2</span>, <span class="dv">10</span>))   <span class="co"># with starting values, since its only very little data</span></a></code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" title="1">  secr.fit.example &lt;-<span class="st"> </span><span class="kw">secr.fit</span>(<span class="dt">capthist =</span> sdh_multi,</a>
+<a class="sourceLine" id="cb84-2" title="2">                               <span class="dt">start =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">-2</span>, <span class="dv">10</span>))   <span class="co"># with starting values, since its only very little data</span></a></code></pre></div>
 <pre><code>## Checking data</code></pre>
 <pre><code>## Warning in verify.capthist(capthist, report = 1): Levels of factor covariate(s)
 ## differ between sessions</code></pre>
@@ -1182,10 +1182,10 @@
 ##  144    -26.492  -1.2627  -3.5678  14.9091 
 ##  145    -26.492  -1.2627  -3.5679  14.9106 
 ##  146    -26.492  -1.2627  -3.5680  14.9121 
-## Completed in 0.31 seconds at 17:04:20 26 Mrz 2020</code></pre>
-<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(secr.fit.example)</a></code></pre></div>
+## Completed in 0.25 seconds at 12:27:49 08 Apr 2020</code></pre>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(secr.fit.example)</a></code></pre></div>
 <pre><code>## $versiontime
-## [1] "4.1.0, run 17:04:20 26 Mrz 2020, elapsed 0.31 s"
+## [1] "4.1.0, run 12:27:48 08 Apr 2020, elapsed 0.25 s"
 ## 
 ## $capthist
 ##             1 2

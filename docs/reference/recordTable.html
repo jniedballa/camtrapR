@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate a species record table from camera trap images — recordTable • camtrapR</title>
+<title>Generate a species record table from camera trap images and videos — recordTable • camtrapR</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Generate a species record table from camera trap images — recordTable" />
-<meta property="og:description" content="Generates a record table from camera trap images. Images must be sorted into station directories at least. The function can read species identification from a directory structure (Station/Species or Station/Camera/Species) or from image metadata tags." />
+<meta property="og:title" content="Generate a species record table from camera trap images and videos — recordTable" />
+<meta property="og:description" content="Generates a record table from camera trap images or videos. Images/videos must be sorted into station directories at least. The function can read species identification from a directory structure (Station/Species or Station/Camera/Species) or from image metadata tags." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -92,13 +92,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/camtrapR1.html">1. Organising raw camera trap images in camtrapR</a>
+      <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
@@ -129,13 +129,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate a species record table from camera trap images</h1>
+    <h1>Generate a species record table from camera trap images and videos</h1>
     
     <div class="hidden name"><code>recordTable.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generates a record table from camera trap images. Images must be sorted into station directories at least. The function can read species identification from a directory structure (Station/Species or Station/Camera/Species) or from image metadata tags.</p>
+    <p>Generates a record table from camera trap images or videos. Images/videos must be sorted into station directories at least. The function can read species identification from a directory structure (Station/Species or Station/Camera/Species) or from image metadata tags.</p>
     </div>
 
     <pre class="usage"><span class='fu'>recordTable</span>(<span class='no'>inDir</span>,
@@ -155,7 +155,8 @@
   <span class='kw'>removeDuplicateRecords</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>returnFileNamesMissingTags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>eventSummaryColumn</span>,
-  <span class='no'>eventSummaryFunction</span>
+  <span class='no'>eventSummaryFunction</span>,
+  <span class='no'>video</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -233,6 +234,10 @@
       <th>eventSummaryFunction</th>
       <td><p>character. The function by which to summarise <code>eventSummaryColumn</code> of  non-independent records, e.g. "sum", "max" (optional)</p></td>
     </tr>
+    <tr>
+      <th>video</th>
+      <td><p>list. Contains information on how to handle video data (otional). See details.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -244,6 +249,19 @@
 <p><code>exclude</code> can be used to exclude "species" directories containing irrelevant images (e.g. "team", "blank", "unidentified"). <code>stationCol</code> can be set to match the station column name in the camera trap station table (see <code><a href='camtraps.html'>camtraps</a></code>).</p>
 <p>Many digital images contain  Exif metadata tags such as "AmbientTemperature" or "MoonPhase" that can be extracted if specified in <code>metadataTags</code>. Because these are manufacturer-specific and not standardized, function <code><a href='exifTagNames.html'>exifTagNames</a></code> provides a vector of all available tag names. Multiple names can be specified as a character vector as: <code><a href='https://rdrr.io/r/base/c.html'>c(Tag1, Tag2, ...)</a></code>. The metadata tags thus extracted may be used as covariates in modelling species distributions.</p>
 <p><code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run <code>recordTable</code>. Set <code>eventSummaryColumn = "count"</code> and <code>eventSummaryFunction = "max"</code> to obtain the maximum number of <code>count</code> in all images within <code>minDeltaTime</code> minutes of a given record. The results is in a new column, in this example <code>count_max</code>. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. <code>eventSummaryColumn = c("count", "count", "camera")</code> and <code>eventSummaryFunction = c("min", "max", "unique")</code> to get minimum and maximum count and all unique camera IDs for that event. Note that <code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> must be of same length.</p>
+<p>Argument <code>video</code> is a named list with 2 or 4 items. 2 items (<code>file_formats</code>, <code>dateTimeTag</code>) are always required, and are sufficent if <code>IDfrom = "directory"</code>. In that case, no digiKam tags will be returned. 
+To return digiKam tags, two additional items are required (<code>digiKam_db_directory</code>, <code>digiKam_db_filename</code>). This is essential when using <code>IDfrom = "metadata"</code>. When using <code>IDfrom = "directory"</code>, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool.</p>
+<p>The items of argument <code>video</code> are:</p>
+<table class='table'>
+<tr><td><code>file_formats</code></td><td>The video formats to extract (include "jpg" if you want .JPG image metadata)</td></tr>
+<tr><td><code>dateTimeTag</code></td><td>the metadata tag to extract date/time from (use <code><a href='exifTagNames.html'>exifTagNames</a></code> to find out which tag is suitable)</td></tr>
+<tr><td><code>digiKam_db_directory</code></td><td>The directory containing digiKam database (optional if <code>IDfrom = "directory"</code>)</td></tr>
+<tr><td><code>digiKam_db_filename</code></td><td>The digiKam database file in <code>digiKam_db_directory</code> (optional if <code>IDfrom = "directory"</code>)</td></tr>
+</table>
+
+
+
+<p>See the examples below for for how to specify the argument <code>video</code>.</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A data frame containing species records and additional information about stations, date, time and (optionally) further metadata.</p>
@@ -273,76 +291,7 @@
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>)    <span class='co'># the examples run too long to pass CRAN tests</span>
-
-<span class='co'># set directory with camera trap images in station directories</span>
-<span class='no'>wd_images_ID_species</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
-
-<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span>(<span class='st'>"exiftool"</span>) <span class='kw'>!=</span> <span class='st'>""</span>){        <span class='co'># only run these examples if ExifTool is available</span>
-
-
-<span class='no'>rec_table1</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>               <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
-                       <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"directory"</span>,
-                       <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>60</span>,
-                       <span class='kw'>deltaTimeComparedTo</span>    <span class='kw'>=</span> <span class='st'>"lastRecord"</span>,
-                       <span class='kw'>writecsv</span>               <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                       <span class='kw'>additionalMetadataTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"EXIF:Model"</span>, <span class='st'>"EXIF:Make"</span>)
-)
-<span class='co'># note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames</span>
-
-<span class='no'>rec_table2</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>               <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
-                       <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"directory"</span>,
-                       <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>60</span>,
-                       <span class='kw'>deltaTimeComparedTo</span>    <span class='kw'>=</span> <span class='st'>"lastRecord"</span>,
-                       <span class='kw'>exclude</span>                <span class='kw'>=</span> <span class='st'>"NO_ID"</span>,
-                       <span class='kw'>writecsv</span>               <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                       <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
-                       <span class='kw'>additionalMetadataTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"EXIF:Model"</span>, <span class='st'>"EXIF:Make"</span>, <span class='st'>"NonExistingTag"</span>),
-                       <span class='kw'>eventSummaryColumn</span>     <span class='kw'>=</span> <span class='st'>"EXIF:Make"</span>,
-                       <span class='kw'>eventSummaryFunction</span>   <span class='kw'>=</span> <span class='st'>"unique"</span>
-                       )
-
-<span class='co'># note the warning that the last tag in "additionalMetadataTags" ("NonExistingTag") was not found</span>
-
-
-<span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span>(<span class='no'>rec_table1</span>$<span class='no'>Species</span> <span class='kw'>==</span> <span class='st'>"NO_ID"</span>)    <span class='co'># TRUE</span>
-<span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span>(<span class='no'>rec_table2</span>$<span class='no'>Species</span> <span class='kw'>==</span> <span class='st'>"NO_ID"</span>)    <span class='co'># FALSE</span>
-
-
-<span class='co'># here's how the removeDuplicateRecords argument works</span>
-
-<span class='no'>rec_table3a</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>              <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
-                       <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"directory"</span>,
-                       <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>0</span>,
-                       <span class='kw'>exclude</span>                <span class='kw'>=</span> <span class='st'>"NO_ID"</span>,
-                       <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
-                       <span class='kw'>removeDuplicateRecords</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)
-
-<span class='no'>rec_table3b</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>              <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
-                       <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"directory"</span>,
-                       <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>0</span>,
-                       <span class='kw'>exclude</span>                <span class='kw'>=</span> <span class='st'>"NO_ID"</span>,
-                       <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
-                       <span class='kw'>removeDuplicateRecords</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
-
-
-<span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>anyDuplicated</a></span>(<span class='no'>rec_table3a</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Station"</span>, <span class='st'>"Species"</span>, <span class='st'>"DateTimeOriginal"</span>)])   <span class='co'># got duplicates</span>
-<span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>anyDuplicated</a></span>(<span class='no'>rec_table3b</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Station"</span>, <span class='st'>"Species"</span>, <span class='st'>"DateTimeOriginal"</span>)])   <span class='co'># no duplicates</span>
-
-<span class='co'># after removing duplicates, both are identical:</span>
-<span class='no'>whichAreDuplicated</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>duplicated</a></span>(<span class='no'>rec_table3a</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Station"</span>, <span class='st'>"Species"</span>, <span class='st'>"DateTimeOriginal"</span>)]))
-<span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span>(<span class='no'>rec_table3a</span>[-<span class='no'>whichAreDuplicated</span>,] <span class='kw'>==</span> <span class='no'>rec_table3b</span>)
-
-} <span class='kw'>else</span> {                                <span class='co'># show function output if ExifTool is not available</span>
-<span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span>(<span class='st'>"ExifTool is not available. Cannot test function. Loading recordTableSample instead"</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableSample</span>)
-}</div><div class='output co'>#&gt; <span class='warning'>Warning: timeZone is not specified. Assuming UTC</span></div><div class='output co'>#&gt; <span class='error'>Error in recordTable(inDir = wd_images_ID_species, IDfrom = "directory",     minDeltaTime = 60, deltaTimeComparedTo = "lastRecord", writecsv = FALSE,     additionalMetadataTags = c("EXIF:Model", "EXIF:Make")): Objekt 'wd_images_ID_species' nicht gefunden</span></div><div class='input'>
-
-</div></pre>
+    <pre class="examples"></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

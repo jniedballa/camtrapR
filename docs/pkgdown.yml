@@ -2,7 +2,7 @@ pandoc: 2.7.2
 pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
-  camtrapR1: camtrapR1.html
+  camtrapr1: camtrapr1.html
   camtrapr2: camtrapr2.html
   camtrapr3: camtrapr3.html
   camtrapr4: camtrapr4.html

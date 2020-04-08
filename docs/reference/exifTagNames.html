@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Show Exif metadata tags and tag names from JPEG images — exifTagNames • camtrapR</title>
+<title>Show Exif metadata of JPEG images or other image or video formats — exifTagNames • camtrapR</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,7 @@
 
 
 
-<meta property="og:title" content="Show Exif metadata tags and tag names from JPEG images — exifTagNames" />
+<meta property="og:title" content="Show Exif metadata of JPEG images or other image or video formats — exifTagNames" />
 <meta property="og:description" content="The function will return metadata values, metadata tag names and group names of Exif metadata of JPEG images or other formats." />
 <meta name="twitter:card" content="summary" />
 
@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -98,7 +98,7 @@
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
@@ -129,7 +129,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Show Exif metadata tags and tag names from JPEG images</h1>
+    <h1>Show Exif metadata of JPEG images or other image or video formats</h1>
     
     <div class="hidden name"><code>exifTagNames.Rd</code></div>
     </div>
@@ -175,7 +175,7 @@
 <p>By default the function returns both metadata tag names and the metadata group they belong to (via argument <code>returnTagGroup</code>). This is helpful to unambiguously address specific metadata tags, because different groups can contain tags of identical names, which may cause problems executing the functions <code><a href='recordTable.html'>recordTable</a></code> and <code><a href='recordTableIndividual.html'>recordTableIndividual</a></code>. The format is "GROUP:tag", e.g. "EXIF:Flash".</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame containing available metadata tag groups, descriptions, names and values.</p>
+    <p>A data frame containing four columns: metadata tag group, tag name, tag description, and values.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Phil Harvey's ExifTool <a href='http://www.sno.phy.queensu.ca/~phil/exiftool/ '>http://www.sno.phy.queensu.ca/~phil/exiftool/ </a> <br /></p>
@@ -207,6 +207,11 @@
 <span class='co'># it also works this way</span>
 <span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>wd_images_ID</span>, <span class='st'>"StationC"</span>, <span class='st'>"TRA"</span>),
              <span class='kw'>fileName</span>       <span class='kw'>=</span> <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span>)
+
+
+<span class='co'># with tagged sample images</span>
+<span class='no'>wd_images_ID_tagged</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_tagged"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID_tagged</span>)
 
 }</div></pre>
   </div>

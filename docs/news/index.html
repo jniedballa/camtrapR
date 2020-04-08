@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
       </span>
     </div>
 
@@ -96,7 +96,7 @@
       <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
@@ -131,16 +131,17 @@
       <small>Source: <a href='https://github.com/jniedballa/camtrapR/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="camtrapr-124" class="section level1">
+    <div id="camtrapr-200" class="section level1">
 <h1 class="page-header">
-<a href="#camtrapr-124" class="anchor"></a>camtrapR 1.2.4<small> Unreleased </small>
+<a href="#camtrapr-200" class="anchor"></a>camtrapR 2.0.0<small> Unreleased </small>
 </h1>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>new features</h2>
 <ul>
-<li>surveyReport: reliable creation of zip files via package “zip” (if installed, in Suggests now)</li>
-<li>exifTagNames returns a data frame containing all relevant information at once: tag group names, tag descriptions, tag names and values. Arguments returnMetadata and returnTagGroup are ignored now</li>
+<li>recordTable / recordTableIndividual: video support via new argument “video” (requires package “RSQLite”)</li>
+<li>exifTagNames returns a data frame containing all relevant information at once: tag group names, tag descriptions, tag names and values. Arguments returnMetadata and returnTagGroup are ignored now.</li>
+<li>surveyReport: reliable creation of zip files via package “zip” (if installed)</li>
 </ul>
 </div>
 <div id="bugfixes" class="section level2">
@@ -148,7 +149,7 @@
 <a href="#bugfixes" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>detectionHistory: when recordDateTimeCol is a date without time, function assigns a time to avoid calculating occasion 0 for records taken on the camera setup day (with a warning)</li>
-<li>error message when inDir in functions that call Exiftool is empty (no subdirectories)</li>
+<li>error message in functions that call Exiftool when inDir is empty (no subdirectories)</li>
 <li>surveyReport: error message when zip file can’t be created</li>
 <li>special characters in directory names now supported (but still best avoided; requires ExifTool 9.79 or later)</li>
 <li>detectionMaps: fixed error when trying to plot backgroundPolygon (reported by Oliver Wearn)</li>
@@ -160,6 +161,7 @@
 <ul>
 <li>vignette filenames changed, document type changed to html_document, added floating table of contents</li>
 <li>added ORCID for authors</li>
+<li>packages “RSQLite” and “zip” in Suggests</li>
 </ul>
 </div>
 </div>
@@ -703,7 +705,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-        <li><a href="#camtrapr-124">1.2.4</a></li>
+        <li><a href="#camtrapr-200">2.0.0</a></li>
         <li><a href="#camtrapr-123">1.2.3</a></li>
         <li><a href="#camtrapr-122">1.2.2</a></li>
         <li><a href="#camtrapr-121">1.2.1</a></li>
