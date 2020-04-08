@@ -140,7 +140,9 @@ Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/}
 Juergen Niedballa
 }
 
- \examples{
+\examples{
+
+\dontrun{   # the examples run too long to pass CRAN tests
 
  wd_images_ID_individual <- system.file("pictures/sample_images_tagged/LeopardCat", 
                                         package = "camtrapR")
@@ -161,7 +163,7 @@ Juergen Niedballa
                                         timeZone               = "Asia/Kuala_Lumpur"
  )
  
- \dontrun{   # the examples run too long to pass CRAN tests
+ 
  # extracting some example summary stats too 
  # a nonsensical example, get all unique cameras with which the event was photographed
  
@@ -190,14 +192,15 @@ rec_table_ind_video <- recordTableIndividual(inDir = wd_images_ID_individual,
                                        digiKam_db_directory = "C:/Users/YourName/Pictures",
                                        digiKam_db_filename = "digikam4.db")
 )
- 
- }
 
- } else {
-  # show function output if ExifTool is not available
- message("ExifTool is not available. Cannot test function")
- data(recordTableIndividualSample)
- }
+  
+} else {  
+# show function output if ExifTool is not available
+message("ExifTool is not available. Cannot test function. Loading recordTableSample instead")
+data(recordTableSample)
+}
+}
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
