@@ -183,6 +183,7 @@ Juergen Niedballa
  
  ### Video example (the sample data don't contain a video, this is hypothetical)
  # with JPG, video mp4, avi, mov, ID = metadata
+ 
 rec_table_ind_video <- recordTableIndividual(inDir = wd_images_ID_individual,
                           hasStationFolder  = FALSE,
                           IDfrom            = "metadata", 

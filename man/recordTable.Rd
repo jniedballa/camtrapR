@@ -235,6 +235,7 @@ rec_table4 <- recordTable(inDir               = wd_images_ID_species_tagged,
 # sample videos are not included in package
 
 # with videos, IDfrom = "directory", not extracting digiKam metadata
+
 rec_table4 <- recordTable(inDir  = wd_images_ID_species,
                           IDfrom = "directory",
                           video  = list(file_formats = c("jpg", "mp4"),
@@ -242,8 +243,10 @@ rec_table4 <- recordTable(inDir  = wd_images_ID_species,
 )
 
 # with videos, IDfrom = "metadata", extracting digiKam metadata
+
 rec_table5 <- recordTable(inDir  = wd_images_ID_species,
                           IDfrom = "metadata",
+                          metadataSpeciesTag = "Species",
                           video  = list(file_formats = c("jpg", "mp4", "avi", "mov"),
                                         dateTimeTag  = "QuickTime:CreateDate",
                                         db_directory = "C:/Users/YourName/Pictures",
