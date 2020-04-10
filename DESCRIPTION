@@ -40,7 +40,7 @@ Suggests:
         RSQLite
 VignetteBuilder: knitr
 SystemRequirements: ExifTool (http://www.sno.phy.queensu.ca/~phil/exiftool/)
-Description: Management of and data extraction from camera trap photographs in wildlife studies. The package provides a workflow for storing and sorting camera trap photos, tabulates records of species and individuals, and creates detection/non-detection matrices for occupancy and spatial capture-recapture analyses with great flexibility. In addition, it provides simple mapping functions (number of species, number of independent species detections by station including GIS export) and can visualise species activity data.
+Description: Management of and data extraction from camera trap data in wildlife studies. The package provides a workflow for storing and sorting camera trap photos (and videos), tabulates records of species and individuals, and creates detection/non-detection matrices for occupancy and spatial capture-recapture analyses with great flexibility. In addition, it can visualise species activity data and provides simple mapping functions with GIS export.
 URL: https://github.com/jniedballa/camtrapR, https://groups.google.com/forum/#!forum/camtrapr
 BugReports: https://groups.google.com/forum/#!forum/camtrapr
 Encoding: UTF-8
