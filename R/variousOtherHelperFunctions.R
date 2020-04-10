@@ -1624,15 +1624,15 @@ makeProgressbar <- function(current,
 # access digiKam database and provide tables to extract species tags for videos
 # call before exiftool
 
-accessDigiKamDatabase <- function(databaseDir,   # database directory 
-                                  db_file        # database filename
+accessDigiKamDatabase <- function(db_directory,   # database directory 
+                                  db_filename     # database filename
 )
 {
   # establish database connection
-  if(!dir.exists(databaseDir)) stop("Could not find digiKam_db_directory")
-  if(!file.exists(file.path(databaseDir, db_file))) stop("Could not find digiKam_db_file in digiKam_db_directory")
+  if(!dir.exists(db_directory)) stop("Could not find db_directory")
+  if(!file.exists(file.path(db_directory, db_filename))) stop("Could not find db_filename in db_directory") 
   
-  con <- RSQLite::dbConnect(RSQLite::SQLite(), file.path(databaseDir, db_file))
+  con <- RSQLite::dbConnect(RSQLite::SQLite(), file.path(db_directory, db_filename))
   
   # read tables
   Images      <- RSQLite::dbReadTable(con, 'Images')
@@ -1798,10 +1798,10 @@ processVideoArgument <- function(IDfrom = IDfrom,
   
   # access digiKam database, if required
   if(IDfrom == "metadata"){
-    stopifnot(exists("digiKam_db_directory", where = video))
-    stopifnot(exists("digiKam_db_filename",  where = video))
-    stopifnot(dir.exists(video$digiKam_db_directory))
-    stopifnot(file.exists(file.path(video$digiKam_db_directory, video$digiKam_db_filename)))
+    stopifnot(exists("db_directory", where = video))
+    stopifnot(exists("db_filename",  where = video))
+    stopifnot(dir.exists(video$db_directory))
+    stopifnot(file.exists(file.path(video$db_directory, video$db_filename)))
     
     if (!requireNamespace("RSQLite", quietly = TRUE)) {
       stop("the package 'RSQLite' is needed for extracting data from digiKam database,  you can install it via: install.packages('RSQLite')")
@@ -1809,8 +1809,8 @@ processVideoArgument <- function(IDfrom = IDfrom,
     # if (!requireNamespace("DBI", quietly = TRUE)) {
     #   stop("the package 'DBI' is needed for extracting data from digiKam database,  you can install it via: install.packages('DBI')")
     # } 
-    digiKam_data <- accessDigiKamDatabase (databaseDir = video$digiKam_db_directory,
-                                           db_file     = video$digiKam_db_filename)
+    digiKam_data <- accessDigiKamDatabase (db_directory = video$db_directory,
+                                           db_filename = video$db_filename)
   } else {
     digiKam_data <- NULL
   }
@@ -1837,10 +1837,10 @@ addVideoDateTimeOriginal <- function(metadata.tmp,
 
 addVideoHierachicalSubject <- function(metadata.tmp,
                                        video,
-                                       digiKam_video_metadata){
+                                       digiKamVideoMetadata){
   
   # add HierarchialSubject for video files (match by filename, must be unique)
-  metadata.tmp$HierarchicalSubject_video <- digiKam_video_metadata$HierarchicalSubject [match(metadata.tmp$FileName, digiKam_video_metadata$name)]
+  metadata.tmp$HierarchicalSubject_video <- digiKamVideoMetadata$HierarchicalSubject [match(metadata.tmp$FileName, digiKamVideoMetadata$name)]
   
   rows_of_interest2 <- which(!is.na(metadata.tmp$HierarchicalSubject_video) & 
                                metadata.tmp$HierarchicalSubject == "-")
