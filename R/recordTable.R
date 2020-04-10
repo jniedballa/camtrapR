@@ -176,13 +176,13 @@ recordTable <- function(inDir,
         
         # add HierachicalSubject for video files
         if(!is.null(digiKam_data)){
-          digiKam_video_metadata <- digiKamVideoHierarchicalSubject(stationDir = dirs[i],
+          digiKamVideoMetadata <- digiKamVideoHierarchicalSubject(stationDir = dirs[i],
                                                                     digiKamTablesList = digiKam_data,    # output of accessDigiKamDatabase
                                                                     videoFormat = file_formats[!grepl(file_formats, pattern = "jpg")])
           # add HierarchialSubject for video files (match by filename, must be unique)
           metadata.tmp <- addVideoHierachicalSubject (metadata.tmp = metadata.tmp,
                                                       video = video,
-                                                      digiKam_video_metadata = digiKam_video_metadata)
+                                                      digiKamVideoMetadata = digiKamVideoMetadata)
         }
       }
       
