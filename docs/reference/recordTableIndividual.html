@@ -250,13 +250,13 @@
 Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPhase" can be extracted if specified in <code>additionalMetadataTags</code>. Multiple names can be specified as a character vector as: <code><a href='https://rdrr.io/r/base/c.html'>c(Tag1, Tag2, ...)</a></code>. Because they are not standardized, function <code><a href='exifTagNames.html'>exifTagNames</a></code> provides a vector of all available tag names. The metadata tags thus extracted may be used as individual covariates in spatial capture-recapture models.</p>
 <p><code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run <code>recordTable</code>. Set <code>eventSummaryColumn = "count"</code> and <code>eventSummaryFunction = "max"</code> to obtain the maximum number of <code>count</code> in all images within <code>minDeltaTime</code> minutes of a given record. The results is in a new column, in this example <code>count_max</code>. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. <code>eventSummaryColumn = c("count", "count", "camera")</code> and <code>eventSummaryFunction = c("min", "max", "unique")</code> to get minimum and maximum count and all unique camera IDs for that event. Note that <code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> must be of same length.</p>
 <p>Argument <code>video</code> is analogous to <code><a href='recordTable.html'>recordTable</a></code>, a named list with 2 or 4 items. 2 items (<code>file_formats</code>, <code>dateTimeTag</code>) are always required, and are sufficent if <code>IDfrom = "directory"</code>. In that case, no digiKam tags will be returned. 
-To return digiKam tags, two additional items are required (<code>digiKam_db_directory</code>, <code>digiKam_db_filename</code>). This is essential when using <code>IDfrom = "metadata"</code>. When using <code>IDfrom = "directory"</code>, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool.</p>
+To return digiKam tags, two additional items are required (<code>db_directory</code>, <code>db_filename</code>). This is essential when using <code>IDfrom = "metadata"</code>. When using <code>IDfrom = "directory"</code>, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool.</p>
 <p>The items of argument <code>video</code> are:</p>
 <table class='table'>
 <tr><td><code>file_formats</code></td><td>The video formats to extract (include "jpg" if you want .JPG image metadata)</td></tr>
 <tr><td><code>dateTimeTag</code></td><td>the metadata tag to extract date/time from (use <code><a href='exifTagNames.html'>exifTagNames</a></code> to find out which tag is suitable)</td></tr>
-<tr><td><code>digiKam_db_directory</code></td><td>The directory containing digiKam database (optional if <code>IDfrom = "directory"</code>)</td></tr>
-<tr><td><code>digiKam_db_filename</code></td><td>The digiKam database file in <code>digiKam_db_directory</code> (optional if <code>IDfrom = "directory"</code>)</td></tr>
+<tr><td><code>db_directory</code></td><td>The directory containing digiKam database (optional if <code>IDfrom = "directory"</code>)</td></tr>
+<tr><td><code>db_filename</code></td><td>The digiKam database file in <code>db_directory</code> (optional if <code>IDfrom = "directory"</code>)</td></tr>
 </table>
 
 
@@ -325,8 +325,8 @@ To return digiKam tags, two additional items are required (<code>digiKam_db_dire
                           <span class='kw'>metadataIDTag</span>     <span class='kw'>=</span> <span class='st'>"individual"</span>,
                           <span class='kw'>video</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>file_formats</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"jpg"</span>, <span class='st'>"mp4"</span>, <span class='st'>"avi"</span>, <span class='st'>"mov"</span>),
                                        <span class='kw'>dateTimeTag</span> <span class='kw'>=</span> <span class='st'>"QuickTime:CreateDate"</span>,
-                                       <span class='kw'>digiKam_db_directory</span> <span class='kw'>=</span> <span class='st'>"C:/Users/YourName/Pictures"</span>,
-                                       <span class='kw'>digiKam_db_filename</span> <span class='kw'>=</span> <span class='st'>"digikam4.db"</span>)
+                                       <span class='kw'>db_directory</span> <span class='kw'>=</span> <span class='st'>"C:/Users/YourName/Pictures"</span>,
+                                       <span class='kw'>db_filename</span> <span class='kw'>=</span> <span class='st'>"digikam4.db"</span>)
 )
 
 
@@ -334,7 +334,7 @@ To return digiKam tags, two additional items are required (<code>digiKam_db_dire
 <span class='co'># show function output if ExifTool is not available</span>
 <span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span>(<span class='st'>"ExifTool is not available. Cannot test function. Loading recordTableSample instead"</span>)
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableSample</span>)
-}</div><div class='output co'>#&gt; <span class='error'>Error in recordTableIndividual(inDir = wd_images_ID_individual, minDeltaTime = 60,     deltaTimeComparedTo = "lastRecord", hasStationFolders = FALSE,     IDfrom = "metadata", camerasIndependent = FALSE, writecsv = FALSE,     metadataIDTag = "individual", additionalMetadataTags = c("EXIF:Model",         "EXIF:Make"), timeZone = "Asia/Kuala_Lumpur"): object 'wd_images_ID_individual' not found</span></div><div class='input'>
+}</div><div class='output co'>#&gt; <span class='error'>Error in recordTableIndividual(inDir = wd_images_ID_individual, minDeltaTime = 60,     deltaTimeComparedTo = "lastRecord", hasStationFolders = FALSE,     IDfrom = "metadata", camerasIndependent = FALSE, writecsv = FALSE,     metadataIDTag = "individual", additionalMetadataTags = c("EXIF:Model",         "EXIF:Make"), timeZone = "Asia/Kuala_Lumpur"): Objekt 'wd_images_ID_individual' nicht gefunden</span></div><div class='input'>
 
 </div></pre>
   </div>
