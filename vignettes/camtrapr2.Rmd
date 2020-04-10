@@ -353,7 +353,7 @@ Here is an example using images identified with the drag & drop method.
 
 
 ```{r}
-wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
+wd_images_ID <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
 
 # run check with 120 seconds (2 minutes) maximum time differnce
 check.folders <- checkSpeciesIdentification(inDir               = wd_images_ID,
@@ -395,9 +395,9 @@ A data frame will show directories, old and new file names.
 ```{r}
 
 # copy sample images to another location (so we don't mess around in the package directory)
-wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
+wd_images_ID <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
 file.copy(from = wd_images_ID, to = tempdir() , recursive = TRUE)
-wd_images_species_copy <- file.path(tempdir(), "sample_images")
+wd_images_species_copy <- file.path(tempdir(), "sample_images_species_folders")
 
 
 species_names_append <- appendSpeciesNames(inDir               = wd_images_species_copy,

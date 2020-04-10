@@ -38,7 +38,7 @@ First we define the directory containing our renamed, identified images
 
 ```{r}
 # find the directory with sample images contained in the package
-wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR", lib.loc = .libPaths())
+wd_images_ID <- system.file("pictures/sample_images_species_folders", package = "camtrapR", lib.loc = .libPaths())
 ```
 
 and see how many JPG images we have (this is not necessary, but informative here).
@@ -163,7 +163,7 @@ table(rec.db.species60.exclude$Species)
 
 
 ```{r}
-wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
+wd_images_ID <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
 exifTagNames(inDir = wd_images_ID)
 ```
 
@@ -194,7 +194,7 @@ Individual identification of species is a prerequiste for running (spatial) capt
 
 ```{r}
 # find the directory with tagged sample images contained in the package
-wd_images_individual_ID <- system.file("pictures/sample_images_tagged/LeopardCat", package = "camtrapR")
+wd_images_individual_ID <- system.file("pictures/sample_images_individuals_tagged/LeopardCat", package = "camtrapR")
  # missing space in species = "LeopardCat" is because of CRAN package policies
 
  rec.db.pbe <- recordTableIndividual(inDir                  = wd_images_individual_ID,
@@ -328,7 +328,7 @@ camop_no_problem <- cameraOperation(CTtable      = camtraps,
 )
 
 # define image directory
-wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
+wd_images_ID <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
 
 # make record table
 recordTableSample <- recordTable(inDir               = wd_images_ID,

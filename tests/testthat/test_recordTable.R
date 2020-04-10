@@ -3,7 +3,7 @@ library(camtrapR)
 
 # run recordTable
 
-wd_images_ID_species <- system.file("pictures/sample_images", package = "camtrapR")
+wd_images_ID_species <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
 
 rec_table0 <- recordTable(inDir               = wd_images_ID_species,
                           IDfrom                 = "directory",

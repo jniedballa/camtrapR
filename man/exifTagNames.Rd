@@ -55,7 +55,7 @@ Juergen Niedballa
 
 \dontrun{
 
-wd_images_ID <- system.file("pictures/sample_images", package = "camtrapR")
+wd_images_ID <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
 
 # specify directory, camtrapR will automatically take first image from first subdirectory
 exifTagNames(inDir          = wd_images_ID)
@@ -78,7 +78,7 @@ exifTagNames(inDir          = file.path(wd_images_ID, "StationC", "TRA"),
              
 
 # with tagged sample images
-wd_images_ID_tagged <- system.file("pictures/sample_images_tagged", package = "camtrapR")
+wd_images_ID_tagged <- system.file("pictures/sample_images_individuals_tagged", package = "camtrapR")
 exifTagNames(inDir          = wd_images_ID_tagged)
 
 }
