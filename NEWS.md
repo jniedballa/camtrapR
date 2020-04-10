@@ -2,9 +2,10 @@
 
 ## new features
 
-* recordTable / recordTableIndividual: video support via new argument "video" (requires package "RSQLite")
+* recordTable / recordTableIndividual: video support via new argument "video" (requires package "RSQLite", thanks to Ana Gracanin for a crucial tip)
 * exifTagNames returns a data frame containing all relevant information at once: tag group names, tag descriptions, tag names and values. Arguments returnMetadata and returnTagGroup are ignored now.
 * surveyReport: reliable creation of zip files via package "zip" (if installed)
+* added sample images with species tags
 
 
 ## bugfixes
@@ -20,6 +21,7 @@
 * vignette filenames changed, document type changed to html_document, added floating table of contents
 * added ORCID for authors
 * packages "RSQLite" and "zip" in Suggests
+* renamed sample picture folders
 
 
 # camtrapR 1.2.3
