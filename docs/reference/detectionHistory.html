@@ -277,7 +277,7 @@ The values of <code>stationCol</code> in <code>recordTable</code> must be matche
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># define image directory</span>
-<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_species_dir"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
 
 <span class='co'># load station information</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>camtraps</span>)
@@ -297,7 +297,7 @@ The values of <code>stationCol</code> in <code>recordTable</code> must be matche
                                  <span class='kw'>IDfrom</span>              <span class='kw'>=</span> <span class='st'>"directory"</span>,
                                  <span class='kw'>minDeltaTime</span>        <span class='kw'>=</span> <span class='fl'>60</span>,
                                  <span class='kw'>deltaTimeComparedTo</span> <span class='kw'>=</span> <span class='st'>"lastRecord"</span>,
-                                 <span class='kw'>exclude</span>             <span class='kw'>=</span> <span class='st'>"NO_ID"</span>,
+                                 <span class='kw'>exclude</span>             <span class='kw'>=</span> <span class='st'>"UNID"</span>,
                                  <span class='kw'>timeZone</span>            <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
 )
 }

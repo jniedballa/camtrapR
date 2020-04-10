@@ -93,8 +93,8 @@ Juergen Niedballa
 \examples{
 \dontrun{
 # define image directory
-wd_images_ID <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
-wd_images_ID_copy <- file.path(tempdir(), "sample_images_species_folders")
+wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
+wd_images_ID_copy <- file.path(tempdir(), "sample_images_species_dir")
 
 species_to_copy <- "VTA"    # = Viverra tangalunga, Malay Civet
 

@@ -104,7 +104,7 @@ Manufacturer-specific Exif metadata tags such as "AmbientTemperature" or "MoonPh
 \code{eventSummaryColumn} and \code{eventSummaryFunction} can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run \code{recordTable}. Set \code{eventSummaryColumn = "count"} and \code{eventSummaryFunction = "max"} to obtain the maximum number of \code{count} in all images within \code{minDeltaTime} minutes of a given record. The results is in a new column, in this example \code{count_max}. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. \code{eventSummaryColumn = c("count", "count", "camera")} and \code{eventSummaryFunction = c("min", "max", "unique")} to get minimum and maximum count and all unique camera IDs for that event. Note that \code{eventSummaryColumn} and \code{eventSummaryFunction} must be of same length. 
 
 Argument \code{video} is analogous to \code{\link{recordTable}}, a named list with 2 or 4 items. 2 items (\code{file_formats}, \code{dateTimeTag}) are always required, and are sufficent if \code{IDfrom = "directory"}. In that case, no digiKam tags will be returned. 
-To return digiKam tags, two additional items are required (\code{db_directory}, \code{db_filename}). This is essential when using \code{IDfrom = "metadata"}. When using \code{IDfrom = "directory"}, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool.
+To return digiKam tags, two additional items are required (\code{db_directory}, \code{db_filename}). This is essential when using \code{IDfrom = "metadata"}. When using \code{IDfrom = "directory"}, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool. It also requires that \code{inDir} is in your digiKam database.
 
 The items of argument \code{video} are:
 
@@ -144,10 +144,10 @@ Juergen Niedballa
 
 \dontrun{   # the examples run too long to pass CRAN tests
 
- wd_images_ID_individual <- system.file("pictures/sample_images_tagged/LeopardCat", 
+ wd_images_ID_individual <- system.file("pictures/sample_images_indiv_tag/LeopardCat", 
                                         package = "camtrapR")
  # missing space in species = "LeopardCat" is because of CRAN package policies
- # note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames
+ # note argument additionalMetadataTags: contains tag names as returned by function exifTagNames
 
  if (Sys.which("exiftool") != ""){        # only run these examples if ExifTool is available
 

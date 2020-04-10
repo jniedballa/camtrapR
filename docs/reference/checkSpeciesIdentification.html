@@ -216,7 +216,7 @@ From version 0.99.0, the function can also handle images identied with metadata 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># \donttest{</span>
-<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_species_dir"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
 
 <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span>(<span class='st'>"exiftool"</span>) <span class='kw'>!=</span> <span class='st'>""</span>){        <span class='co'># only run this example if ExifTool is available</span>
 <span class='no'>check.folders</span> <span class='kw'>&lt;-</span> <span class='fu'>checkSpeciesIdentification</span>(<span class='kw'>inDir</span>             <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
@@ -230,9 +230,9 @@ From version 0.99.0, the function can also handle images identied with metadata 
 #&gt;     station
 #&gt; 7  StationC
 #&gt; 29 StationC
-#&gt;                                                                                                              Directory
-#&gt; 7  C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationC/EGY
-#&gt; 29 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationC/TRA
+#&gt;                                                                    Directory
+#&gt; 7  D:/Projects/camtrapR/inst/pictures/sample_images_species_dir/StationC/EGY
+#&gt; 29 D:/Projects/camtrapR/inst/pictures/sample_images_species_dir/StationC/TRA
 #&gt;                                 FileName species    DateTimeOriginal
 #&gt; 7  StationC__2009-04-27__00-17-00(1).JPG     EGY 2009-04-27 00:17:00
 #&gt; 29 StationC__2009-04-27__00-19-00(1).JPG     TRA 2009-04-27 00:19:00

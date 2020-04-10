@@ -3,7 +3,7 @@ library(camtrapR)
 
 # run recordTable
 
-wd_images_ID_species <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
+wd_images_ID_species <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
 
 rec_table0 <- recordTable(inDir               = wd_images_ID_species,
                           IDfrom                 = "directory",
@@ -26,7 +26,7 @@ rec_table0 <- recordTable(inDir               = wd_images_ID_species,
                             IDfrom                 = "directory",
                             minDeltaTime           = 60,
                             deltaTimeComparedTo    = "lastRecord",
-                            exclude                = "NO_ID",
+                            exclude                = "UNID",
                             writecsv               = FALSE,
                             timeZone               = "Asia/Kuala_Lumpur",
                             additionalMetadataTags = c("EXIF:Model", "EXIF:Make"),
@@ -40,7 +40,7 @@ rec_table0 <- recordTable(inDir               = wd_images_ID_species,
                             IDfrom                 = "directory",
                             minDeltaTime           = 60,
                             deltaTimeComparedTo    = "lastRecord",
-                            exclude                = "NO_ID",
+                            exclude                = "UNID",
                             writecsv               = FALSE,
                             timeZone               = "Asia/Kuala_Lumpur",
                             additionalMetadataTags = c("EXIF:Model", "EXIF:Make"),
@@ -54,7 +54,7 @@ rec_table0 <- recordTable(inDir               = wd_images_ID_species,
    rec_table3a <- recordTable(inDir              = wd_images_ID_species,
                              IDfrom                 = "directory",
                              minDeltaTime           = 0,
-                             exclude                = "NO_ID",
+                             exclude                = "UNID",
                              timeZone               = "Asia/Kuala_Lumpur",
                              removeDuplicateRecords = FALSE
   )
@@ -62,7 +62,7 @@ rec_table0 <- recordTable(inDir               = wd_images_ID_species,
   rec_table3b <- recordTable(inDir              = wd_images_ID_species,
                              IDfrom                 = "directory",
                              minDeltaTime           = 0,
-                             exclude                = "NO_ID",
+                             exclude                = "UNID",
                              timeZone               = "Asia/Kuala_Lumpur",
                              removeDuplicateRecords = TRUE
   )

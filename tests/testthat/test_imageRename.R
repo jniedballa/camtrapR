@@ -2,7 +2,7 @@ context("imageRename")
 library(camtrapR)
 
 
-wd_images_ID_species <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
+wd_images_ID_species <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
 
 
 test_that("imageRename throws error if inDir doesn't exist", {

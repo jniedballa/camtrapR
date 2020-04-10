@@ -181,9 +181,10 @@
 <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span>(<span class='st'>"exiftool"</span>) <span class='kw'>!=</span> <span class='st'>""</span>){        <span class='co'># only run this example if ExifTool is available</span>
 
 <span class='co'># copy sample images to temporary directory (so we don't mess around in the package directory)</span>
-<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"pictures"</span>, <span class='st'>"sample_images"</span>), <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"pictures"</span>, <span class='st'>"sample_images_species_dir"</span>),
+                            <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
 <span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.copy</a></span>(<span class='kw'>from</span> <span class='kw'>=</span> <span class='no'>wd_images_ID</span>, <span class='kw'>to</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>wd_images_ID_copy</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"sample_images"</span>)
+<span class='no'>wd_images_ID_copy</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"sample_images_species_dir"</span>)
 
 <span class='co'># define a sample tag</span>
 <span class='no'>copyrightTagToAdd</span> <span class='kw'>&lt;-</span> <span class='st'>"Your Name (Your Organisation)"</span>

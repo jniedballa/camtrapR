@@ -250,7 +250,7 @@
 <p>Many digital images contain  Exif metadata tags such as "AmbientTemperature" or "MoonPhase" that can be extracted if specified in <code>metadataTags</code>. Because these are manufacturer-specific and not standardized, function <code><a href='exifTagNames.html'>exifTagNames</a></code> provides a vector of all available tag names. Multiple names can be specified as a character vector as: <code><a href='https://rdrr.io/r/base/c.html'>c(Tag1, Tag2, ...)</a></code>. The metadata tags thus extracted may be used as covariates in modelling species distributions.</p>
 <p><code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run <code>recordTable</code>. Set <code>eventSummaryColumn = "count"</code> and <code>eventSummaryFunction = "max"</code> to obtain the maximum number of <code>count</code> in all images within <code>minDeltaTime</code> minutes of a given record. The results is in a new column, in this example <code>count_max</code>. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. <code>eventSummaryColumn = c("count", "count", "camera")</code> and <code>eventSummaryFunction = c("min", "max", "unique")</code> to get minimum and maximum count and all unique camera IDs for that event. Note that <code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> must be of same length.</p>
 <p>Argument <code>video</code> is a named list with 2 or 4 items. 2 items (<code>file_formats</code>, <code>dateTimeTag</code>) are always required, and are sufficent if <code>IDfrom = "directory"</code>. In that case, no digiKam tags will be returned. 
-To return digiKam tags, two additional items are required (<code>db_directory</code>, <code>db_filename</code>). This is essential when using <code>IDfrom = "metadata"</code>. When using <code>IDfrom = "directory"</code>, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool.</p>
+To return digiKam tags, two additional items are required (<code>db_directory</code>, <code>db_filename</code>). This is essential when using <code>IDfrom = "metadata"</code>. When using <code>IDfrom = "directory"</code>, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool. It also requires that <code>inDir</code> is in your digiKam database.</p>
 <p>The items of argument <code>video</code> are:</p>
 <table class='table'>
 <tr><td><code>file_formats</code></td><td>The video formats to extract (include "jpg" if you want .JPG image metadata)</td></tr>
@@ -291,7 +291,110 @@ To return digiKam tags, two additional items are required (<code>db_directory</c
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"></pre>
+    <pre class="examples"><div class='input'>
+
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>)    <span class='co'># the examples take too long to pass CRAN tests</span>
+
+
+<span class='co'># set directory with camera trap images in station directories</span>
+<span class='no'>wd_images_ID_species</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_species_dir"</span>,
+                                    <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+
+<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span>(<span class='st'>"exiftool"</span>) <span class='kw'>!=</span> <span class='st'>""</span>){        <span class='co'># only run these examples if ExifTool is available</span>
+
+
+<span class='no'>rec_table1</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>               <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
+                       <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"directory"</span>,
+                       <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>60</span>,
+                       <span class='kw'>deltaTimeComparedTo</span>    <span class='kw'>=</span> <span class='st'>"lastRecord"</span>,
+                       <span class='kw'>writecsv</span>               <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+                       <span class='kw'>additionalMetadataTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"EXIF:Model"</span>, <span class='st'>"EXIF:Make"</span>)
+)
+<span class='co'># note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames</span>
+
+<span class='no'>rec_table2</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>               <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
+                       <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"directory"</span>,
+                       <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>60</span>,
+                       <span class='kw'>deltaTimeComparedTo</span>    <span class='kw'>=</span> <span class='st'>"lastRecord"</span>,
+                       <span class='kw'>exclude</span>                <span class='kw'>=</span> <span class='st'>"UNID"</span>,
+                       <span class='kw'>writecsv</span>               <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+                       <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
+                       <span class='kw'>additionalMetadataTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"EXIF:Model"</span>, <span class='st'>"EXIF:Make"</span>, <span class='st'>"NonExistingTag"</span>),
+                       <span class='kw'>eventSummaryColumn</span>     <span class='kw'>=</span> <span class='st'>"EXIF:Make"</span>,
+                       <span class='kw'>eventSummaryFunction</span>   <span class='kw'>=</span> <span class='st'>"unique"</span>
+                       )
+
+<span class='co'># note the warning that the last tag in "additionalMetadataTags" ("NonExistingTag") was not found</span>
+
+
+<span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span>(<span class='no'>rec_table1</span>$<span class='no'>Species</span> <span class='kw'>==</span> <span class='st'>"UNID"</span>)    <span class='co'># TRUE</span>
+<span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span>(<span class='no'>rec_table2</span>$<span class='no'>Species</span> <span class='kw'>==</span> <span class='st'>"UNID"</span>)    <span class='co'># FALSE</span>
+
+
+<span class='co'># here's how the removeDuplicateRecords argument works</span>
+
+<span class='no'>rec_table3a</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>              <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
+                       <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"directory"</span>,
+                       <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>0</span>,
+                       <span class='kw'>exclude</span>                <span class='kw'>=</span> <span class='st'>"UNID"</span>,
+                       <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
+                       <span class='kw'>removeDuplicateRecords</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
+
+<span class='no'>rec_table3b</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>              <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
+                       <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"directory"</span>,
+                       <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>0</span>,
+                       <span class='kw'>exclude</span>                <span class='kw'>=</span> <span class='st'>"UNID"</span>,
+                       <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
+                       <span class='kw'>removeDuplicateRecords</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)
+
+
+<span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>anyDuplicated</a></span>(<span class='no'>rec_table3a</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Station"</span>, <span class='st'>"Species"</span>, <span class='st'>"DateTimeOriginal"</span>)])   <span class='co'># got duplicates</span>
+<span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>anyDuplicated</a></span>(<span class='no'>rec_table3b</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Station"</span>, <span class='st'>"Species"</span>, <span class='st'>"DateTimeOriginal"</span>)])   <span class='co'># no duplicates</span>
+
+<span class='co'># after removing duplicates, both are identical:</span>
+<span class='no'>whichAreDuplicated</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>duplicated</a></span>(<span class='no'>rec_table3a</span>[,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Station"</span>, <span class='st'>"Species"</span>, <span class='st'>"DateTimeOriginal"</span>)]))
+<span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span>(<span class='no'>rec_table3a</span>[-<span class='no'>whichAreDuplicated</span>,] <span class='kw'>==</span> <span class='no'>rec_table3b</span>)
+
+
+<span class='co'>### extracting species IDs from metadata</span>
+
+<span class='no'>wd_images_ID_species_tagged</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_species_tag"</span>,
+                                           <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+
+<span class='no'>rec_table4</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>               <span class='kw'>=</span> <span class='no'>wd_images_ID_species_tagged</span>,
+                       <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"metadata"</span>,
+                       <span class='kw'>metadataSpeciesTag</span>     <span class='kw'>=</span> <span class='st'>"Species"</span>,
+                       <span class='kw'>exclude</span>                <span class='kw'>=</span> <span class='st'>"unidentified"</span>)
+
+
+<span class='co'>###  Including videos</span>
+<span class='co'># sample videos are not included in package</span>
+
+<span class='co'># with videos, IDfrom = "directory", not extracting digiKam metadata</span>
+<span class='no'>rec_table4</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>  <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
+                          <span class='kw'>IDfrom</span> <span class='kw'>=</span> <span class='st'>"directory"</span>,
+                          <span class='kw'>video</span>  <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>file_formats</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"jpg"</span>, <span class='st'>"mp4"</span>),
+                                        <span class='kw'>dateTimeTag</span>  <span class='kw'>=</span> <span class='st'>"QuickTime:CreateDate"</span>)
+)
+
+<span class='co'># with videos, IDfrom = "metadata", extracting digiKam metadata</span>
+<span class='no'>rec_table5</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTable</span>(<span class='kw'>inDir</span>  <span class='kw'>=</span> <span class='no'>wd_images_ID_species</span>,
+                          <span class='kw'>IDfrom</span> <span class='kw'>=</span> <span class='st'>"metadata"</span>,
+                          <span class='kw'>video</span>  <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>file_formats</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"jpg"</span>, <span class='st'>"mp4"</span>, <span class='st'>"avi"</span>, <span class='st'>"mov"</span>),
+                                        <span class='kw'>dateTimeTag</span>  <span class='kw'>=</span> <span class='st'>"QuickTime:CreateDate"</span>,
+                                        <span class='kw'>db_directory</span> <span class='kw'>=</span> <span class='st'>"C:/Users/YourName/Pictures"</span>,
+                                        <span class='kw'>db_filename</span> <span class='kw'>=</span> <span class='st'>"digikam4.db"</span>)
+)
+
+} <span class='kw'>else</span> {
+<span class='co'># show function output if ExifTool is not available</span>
+<span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span>(<span class='st'>"ExifTool is not available. Cannot test function. Loading recordTableSample instead"</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableSample</span>)
+}</div><div class='output co'>#&gt; <span class='warning'>Warning: timeZone is not specified. Assuming UTC</span></div><div class='output co'>#&gt; <span class='message'>StationA:      8 images    0 duplicates removed      |=======             |   33%</span></div><div class='output co'>#&gt; <span class='message'>StationB:     23 images    6 duplicates removed      |=============       |   67%</span></div><div class='output co'>#&gt; <span class='message'>StationC:     37 images    6 duplicates removed      |====================|  100%</span></div><div class='output co'>#&gt; <span class='message'>StationA:      8 images    0 duplicates removed      |=======             |   33%</span></div><div class='output co'>#&gt; <span class='message'>StationB:     23 images    6 duplicates removed      |=============       |   67%</span></div><div class='output co'>#&gt; <span class='message'>StationC:     37 images    6 duplicates removed      |====================|  100%</span></div><div class='output co'>#&gt; <span class='warning'>Warning: metadata tag(s)  not found in image metadata:  NonExistingTag</span></div><div class='output co'>#&gt; <span class='message'>StationA:      8 images      |=======             |   33%</span></div><div class='output co'>#&gt; <span class='message'>StationB:     23 images      |=============       |   67%</span></div><div class='output co'>#&gt; <span class='message'>StationC:     37 images      |====================|  100%</span></div><div class='output co'>#&gt; <span class='message'>StationA:      8 images    0 duplicates removed      |=======             |   33%</span></div><div class='output co'>#&gt; <span class='message'>StationB:     23 images    6 duplicates removed      |=============       |   67%</span></div><div class='output co'>#&gt; <span class='message'>StationC:     37 images    6 duplicates removed      |====================|  100%</span></div><div class='output co'>#&gt; <span class='warning'>Warning: timeZone is not specified. Assuming UTC</span></div><div class='output co'>#&gt; <span class='message'>StationA:      8 images    0 duplicates removed      |=======             |   33%</span></div><div class='output co'>#&gt; <span class='message'>StationB:     22 images    6 duplicates removed      |=============       |   67%</span></div><div class='output co'>#&gt; <span class='message'>StationC:     37 images    6 duplicates removed      |====================|  100%</span></div><div class='output co'>#&gt; <span class='warning'>Warning: timeZone is not specified. Assuming UTC</span></div><div class='output co'>#&gt; <span class='message'>StationA:      8 images    0 duplicates removed      |=======             |   33%</span></div><div class='output co'>#&gt; <span class='message'>StationB:     23 images    6 duplicates removed      |=============       |   67%</span></div><div class='output co'>#&gt; <span class='message'>StationC:     37 images    6 duplicates removed      |====================|  100%</span></div><div class='output co'>#&gt; <span class='error'>Error in recordTable(inDir = wd_images_ID_species, IDfrom = "metadata",     video = list(file_formats = c("jpg", "mp4", "avi", "mov"),         dateTimeTag = "QuickTime:CreateDate", db_directory = "C:/Users/YourName/Pictures",         db_filename = "digikam4.db")): 'metadataSpeciesTag' must be defined if IDfrom = 'metadata'</span></div><div class='input'>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

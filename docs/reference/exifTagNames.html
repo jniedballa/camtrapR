@@ -187,7 +187,7 @@
     <pre class="examples"><div class='input'>
 <span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 
-<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_species_dir"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
 
 <span class='co'># specify directory, camtrapR will automatically take first image from first subdirectory</span>
 <span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID</span>)
@@ -210,7 +210,7 @@
 
 
 <span class='co'># with tagged sample images</span>
-<span class='no'>wd_images_ID_tagged</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_tagged"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='no'>wd_images_ID_tagged</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_indiv_tag"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
 <span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID_tagged</span>)
 
 }</div></pre>

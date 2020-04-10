@@ -94,7 +94,7 @@
       <h1>3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2020-04-08</h4>
+            <h4 class="date">2020-04-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr3.Rmd"><code>vignettes/camtrapr3.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr3.Rmd</code></div>
@@ -122,7 +122,7 @@
 <p><code>recordTable</code> is typically run after identifying species from images. It reads species IDs from the directory structure the images are placed in or from image metadata tags.</p>
 <p>First we define the directory containing our renamed, identified images</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># find the directory with sample images contained in the package</span></a>
-<a class="sourceLine" id="cb2-2" title="2">wd_images_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>, <span class="dt">lib.loc =</span> <span class="kw"><a href="https://rdrr.io/r/base/libPaths.html">.libPaths</a></span>())</a></code></pre></div>
+<a class="sourceLine" id="cb2-2" title="2">wd_images_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_species_dir"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>, <span class="dt">lib.loc =</span> <span class="kw"><a href="https://rdrr.io/r/base/libPaths.html">.libPaths</a></span>())</a></code></pre></div>
 <p>and see how many JPG images we have (this is not necessary, but informative here).</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span>(wd_images_ID, <span class="dt">pattern =</span> <span class="st">"JPG"</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>## [1] 68</code></pre>
@@ -148,13 +148,13 @@
 ## 4             226              3.8             0.2
 ## 5               2              0.0             0.0
 ## 6           21182            353.0            14.7
-##                                                                                                             Directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 6 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+##                                                                                               Directory
+## 1 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 2 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 3 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 4 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 5 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 6 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
 ##                                FileName n_images
 ## 1 StationA__2009-04-21__00-40-00(1).JPG        1
 ## 2 StationA__2009-04-22__20-19-00(1).JPG        1
@@ -276,19 +276,19 @@
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co"># see what species  we recorded</span></a>
 <a class="sourceLine" id="cb20-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/table.html">table</a></span>(rec.db.species60<span class="op">$</span>Species)</a></code></pre></div>
 <pre><code>## 
-##   EGY   MNE NO_ID   PBE   TRA   VTA 
-##     6     2     1    18     8     5</code></pre>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="co"># remove "NO_ID" by setting argument exclude = "NO_ID"</span></a>
+##  EGY  MNE  PBE  TRA UNID  VTA 
+##    6    2   18    8    1    5</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="co"># remove "UNID" by setting argument exclude = "UNID"</span></a>
 <a class="sourceLine" id="cb22-2" title="2">rec.db.species60.exclude &lt;-<span class="st"> </span><span class="kw"><a href="../reference/recordTable.html">recordTable</a></span>(<span class="dt">inDir               =</span> wd_images_ID,</a>
 <a class="sourceLine" id="cb22-3" title="3">                                        <span class="dt">IDfrom              =</span> <span class="st">"directory"</span>,</a>
 <a class="sourceLine" id="cb22-4" title="4">                                        <span class="dt">minDeltaTime        =</span> <span class="dv">60</span>,</a>
 <a class="sourceLine" id="cb22-5" title="5">                                        <span class="dt">deltaTimeComparedTo =</span> <span class="st">"lastIndependentRecord"</span>,</a>
 <a class="sourceLine" id="cb22-6" title="6">                                        <span class="dt">timeZone            =</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</a>
-<a class="sourceLine" id="cb22-7" title="7">                                        <span class="dt">exclude             =</span> <span class="st">"NO_ID"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb22-7" title="7">                                        <span class="dt">exclude             =</span> <span class="st">"UNID"</span>)</a></code></pre></div>
 <pre><code>## StationA:      8 images    0 duplicates removed      |=======             |   33%</code></pre>
 <pre><code>## StationB:     22 images    6 duplicates removed      |=============       |   67%</code></pre>
 <pre><code>## StationC:     37 images    6 duplicates removed      |====================|  100%</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="co"># note that "NO_ID" is gone now</span></a>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="co"># note that "UNID" is gone now</span></a>
 <a class="sourceLine" id="cb26-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/table.html">table</a></span>(rec.db.species60.exclude<span class="op">$</span>Species)</a></code></pre></div>
 <pre><code>## 
 ## EGY MNE PBE TRA VTA 
@@ -298,10 +298,10 @@
 <h3 class="hasAnchor">
 <a href="#extracting-image-metadata" class="anchor"></a>Extracting image metadata</h3>
 <p><code>recordTable</code> and <code>recordTableIndividual</code> can both extract additional metadata from images (apart from date and time). For example, some camera models record ambient temperature or moon phase, which may be of interest. Metadata tags are stored in the images at the time they are taken and can be accessed and extracted if their tag names are known. Some tag names are standardised (e.g. “DateTimeOriginal”) while others are manufacturer-specific. Therefore, function <code>exifTagNames</code> returns all Exif metadata it finds in a sample image. Users can then choose which to extract with <code>recordTable</code> and <code>recordTableIndividual</code>.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">wd_images_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">wd_images_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_species_dir"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
 <a class="sourceLine" id="cb28-2" title="2"><span class="kw"><a href="../reference/exifTagNames.html">exifTagNames</a></span>(<span class="dt">inDir =</span> wd_images_ID)</a></code></pre></div>
 <pre><code>## Metadata of:
-## C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
+## C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
 <pre><code>##    tag_group                tag_name             tag_description
 ## 1   ExifTool         ExifToolVersion     ExifTool Version Number
 ## 2   ExifTool                 Warning                     Warning
@@ -346,50 +346,50 @@
 ## 41 Composite               ImageSize                  Image Size
 ## 42 Composite              Megapixels                  Megapixels
 ## 43 Composite            ShutterSpeed               Shutter Speed
-##                                                                                                                  value
-## 1                                                                                                                11.80
-## 2                                                                           Invalid EXIF text encoding for UserComment
-## 3                                                                                StationA__2009-04-21__00-40-00(1).JPG
-## 4  C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 5                                                                                                                27 kB
-## 6                                                                                            2020:04:08 12:25:02+02:00
-## 7                                                                                            2020:04:08 12:25:02+02:00
-## 8                                                                                            2020:04:08 12:25:02+02:00
-## 9                                                                                                            rw-rw-rw-
-## 10                                                                                                                JPEG
-## 11                                                                                                                 jpg
-## 12                                                                                                          image/jpeg
-## 13                                                                                           Little-endian (Intel, II)
-## 14                                                                                                                 100
-## 15                                                                                                                  75
-## 16                                                                                        Baseline DCT, Huffman coding
-## 17                                                                                                                   8
-## 18                                                                                                                   3
-## 19                                                                                                    YCbCr4:2:2 (2 1)
-## 20                                                                                                                  G4
-## 21                                                                                                           CUDDEBACK
-## 22                                                                                                                  72
-## 23                                                                                                                  72
-## 24                                                                                                 2009:04:21 00:40:00
-## 25                                                                                                              inches
-## 26                                                                                                            Co-sited
-## 27                                                                                                                0200
-## 28                                                                                                        Y, Cb, Cr, -
-## 29                                                                                                                0100
-## 30                                                                                                                sRGB
-## 31                                                                                                                 100
-## 32                                                                                                                  75
-## 33                                                                                                 2009:04:21 00:40:00
-## 34                                                                                                 2009:04:21 00:40:00
-## 35                                                                                                       1 ATTEMPT G1H
-## 36                                                                                                                   1
-## 37                                                                                                    JPEG (old-style)
-## 38                                                                                                                 408
-## 39                                                                                                               25353
-## 40                                                                 (Binary data 25353 bytes, use -b option to extract)
-## 41                                                                                                              100x75
-## 42                                                                                                               0.007
-## 43                                                                                                                   1</code></pre>
+##                                                                                                    value
+## 1                                                                                                  11.80
+## 2                                                             Invalid EXIF text encoding for UserComment
+## 3                                                                  StationA__2009-04-21__00-40-00(1).JPG
+## 4  C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 5                                                                                                  27 kB
+## 6                                                                              2020:04:10 20:25:08+02:00
+## 7                                                                              2020:04:10 20:25:08+02:00
+## 8                                                                              2020:04:10 20:25:07+02:00
+## 9                                                                                              rw-rw-rw-
+## 10                                                                                                  JPEG
+## 11                                                                                                   jpg
+## 12                                                                                            image/jpeg
+## 13                                                                             Little-endian (Intel, II)
+## 14                                                                                                   100
+## 15                                                                                                    75
+## 16                                                                          Baseline DCT, Huffman coding
+## 17                                                                                                     8
+## 18                                                                                                     3
+## 19                                                                                      YCbCr4:2:2 (2 1)
+## 20                                                                                                    G4
+## 21                                                                                             CUDDEBACK
+## 22                                                                                                    72
+## 23                                                                                                    72
+## 24                                                                                   2009:04:21 00:40:00
+## 25                                                                                                inches
+## 26                                                                                              Co-sited
+## 27                                                                                                  0200
+## 28                                                                                          Y, Cb, Cr, -
+## 29                                                                                                  0100
+## 30                                                                                                  sRGB
+## 31                                                                                                   100
+## 32                                                                                                    75
+## 33                                                                                   2009:04:21 00:40:00
+## 34                                                                                   2009:04:21 00:40:00
+## 35                                                                                         1 ATTEMPT G1H
+## 36                                                                                                     1
+## 37                                                                                      JPEG (old-style)
+## 38                                                                                                   408
+## 39                                                                                                 25353
+## 40                                                   (Binary data 25353 bytes, use -b option to extract)
+## 41                                                                                                100x75
+## 42                                                                                                 0.007
+## 43                                                                                                     1</code></pre>
 <p>The output table contains tag groups, tag descriptions, tag names and tag values. The values in <code>tag_group</code> help to unambiguously identify specific metadata tags.</p>
 <p>Use the entries in <code>tag_name</code> (not <code>tag_description</code>) when providing values to the argument <code>additionalMetadataTags</code> in the<code>recordTable</code> functions.</p>
 <p>Of the tags shown here, “DateTimeOriginal” contains the date and time that camtrapR reads out. Apart from that, there is little information of ecological interest in the example data. However, for demonstration purposes, let’s extract information about the camera model and make. To be as precise as possible, we provide tags in the format: tag_group:tag_name (e.g. EXIF:Model)</p>
@@ -415,13 +415,13 @@
 ## 4             226              3.8             0.2
 ## 5               2              0.0             0.0
 ## 6           21182            353.0            14.7
-##                                                                                                             Directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
-## 6 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images/StationA/PBE
+##                                                                                               Directory
+## 1 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 2 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 3 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 4 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 5 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
+## 6 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
 ##                                FileName EXIF.Model EXIF.Make n_images
 ## 1 StationA__2009-04-21__00-40-00(1).JPG  CUDDEBACK        G4        1
 ## 2 StationA__2009-04-22__20-19-00(1).JPG  CUDDEBACK        G4        1
@@ -437,7 +437,7 @@
 <a href="#recordtableindividual-tabulating-individuals-of-a-species" class="anchor"></a><code>recordTableIndividual</code>: tabulating individuals of a species</h2>
 <p>Individual identification of species is a prerequiste for running (spatial) capture-recapture models. <code>recordTableIndividual</code> and the subsequent <code>spatialDetectionHistory</code> function prepare data for these models.</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1"><span class="co"># find the directory with tagged sample images contained in the package</span></a>
-<a class="sourceLine" id="cb37-2" title="2">wd_images_individual_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_tagged/LeopardCat"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
+<a class="sourceLine" id="cb37-2" title="2">wd_images_individual_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_indiv_tag/LeopardCat"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
 <a class="sourceLine" id="cb37-3" title="3"> <span class="co"># missing space in species = "LeopardCat" is because of CRAN package policies</span></a>
 <a class="sourceLine" id="cb37-4" title="4"></a>
 <a class="sourceLine" id="cb37-5" title="5"> rec.db.pbe &lt;-<span class="st"> </span><span class="kw"><a href="../reference/recordTableIndividual.html">recordTableIndividual</a></span>(<span class="dt">inDir                  =</span> wd_images_individual_ID,</a>
@@ -468,13 +468,13 @@
 ## 4           13680             228              3.8             0.2
 ## 5               0               0              0.0             0.0
 ## 6          625800           10430            173.8             7.2
-##                                                                                                                  Directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
-## 6 C:/Users/Juergen/AppData/Local/Temp/Rtmp48Wt6g/temp_libpath688427e2509/camtrapR/pictures/sample_images_tagged/LeopardCat
+##                                                                                           Directory
+## 1 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_indiv_tag/LeopardCat
+## 2 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_indiv_tag/LeopardCat
+## 3 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_indiv_tag/LeopardCat
+## 4 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_indiv_tag/LeopardCat
+## 5 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_indiv_tag/LeopardCat
+## 6 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_indiv_tag/LeopardCat
 ##                                FileName metadata_Species metadata_individual
 ## 1 StationA__2009-05-07__17-11-00(1).JPG      Leopard Cat                   1
 ## 2 StationA__2009-04-21__00-40-00(1).JPG      Leopard Cat                   2
@@ -591,7 +591,7 @@
 <a class="sourceLine" id="cb50-8" title="8">)</a>
 <a class="sourceLine" id="cb50-9" title="9"></a>
 <a class="sourceLine" id="cb50-10" title="10"><span class="co"># define image directory</span></a>
-<a class="sourceLine" id="cb50-11" title="11">wd_images_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
+<a class="sourceLine" id="cb50-11" title="11">wd_images_ID &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_species_dir"</span>, <span class="dt">package =</span> <span class="st">"camtrapR"</span>)</a>
 <a class="sourceLine" id="cb50-12" title="12"></a>
 <a class="sourceLine" id="cb50-13" title="13"><span class="co"># make record table</span></a>
 <a class="sourceLine" id="cb50-14" title="14">recordTableSample &lt;-<span class="st"> </span><span class="kw"><a href="../reference/recordTable.html">recordTable</a></span>(<span class="dt">inDir               =</span> wd_images_ID,</a>
@@ -1182,10 +1182,10 @@
 ##  144    -26.492  -1.2627  -3.5678  14.9091 
 ##  145    -26.492  -1.2627  -3.5679  14.9106 
 ##  146    -26.492  -1.2627  -3.5680  14.9121 
-## Completed in 0.25 seconds at 12:27:49 08 Apr 2020</code></pre>
+## Completed in 0.29 seconds at 20:29:42 10 Apr 2020</code></pre>
 <div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(secr.fit.example)</a></code></pre></div>
 <pre><code>## $versiontime
-## [1] "4.1.0, run 12:27:48 08 Apr 2020, elapsed 0.25 s"
+## [1] "4.1.0, run 20:29:42 10 Apr 2020, elapsed 0.29 s"
 ## 
 ## $capthist
 ##             1 2

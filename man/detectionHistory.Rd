@@ -136,7 +136,7 @@ Juergen Niedballa
 \examples{
 
 # define image directory
-wd_images_ID <- system.file("pictures/sample_images_species_folders", package = "camtrapR")
+wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
 
 # load station information
 data(camtraps)
@@ -156,7 +156,7 @@ recordTableSample <- recordTable(inDir               = wd_images_ID,
                                  IDfrom              = "directory",
                                  minDeltaTime        = 60,
                                  deltaTimeComparedTo = "lastRecord",
-                                 exclude             = "NO_ID",
+                                 exclude             = "UNID",
                                  timeZone            = "Asia/Kuala_Lumpur"
 )
 }

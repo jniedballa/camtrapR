@@ -105,7 +105,7 @@ Many digital images contain  Exif metadata tags such as "AmbientTemperature" or 
 \code{eventSummaryColumn} and \code{eventSummaryFunction} can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run \code{recordTable}. Set \code{eventSummaryColumn = "count"} and \code{eventSummaryFunction = "max"} to obtain the maximum number of \code{count} in all images within \code{minDeltaTime} minutes of a given record. The results is in a new column, in this example \code{count_max}. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. \code{eventSummaryColumn = c("count", "count", "camera")} and \code{eventSummaryFunction = c("min", "max", "unique")} to get minimum and maximum count and all unique camera IDs for that event. Note that \code{eventSummaryColumn} and \code{eventSummaryFunction} must be of same length. 
 
 Argument \code{video} is a named list with 2 or 4 items. 2 items (\code{file_formats}, \code{dateTimeTag}) are always required, and are sufficent if \code{IDfrom = "directory"}. In that case, no digiKam tags will be returned. 
-To return digiKam tags, two additional items are required (\code{db_directory}, \code{db_filename}). This is essential when using \code{IDfrom = "metadata"}. When using \code{IDfrom = "directory"}, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool.
+To return digiKam tags, two additional items are required (\code{db_directory}, \code{db_filename}). This is essential when using \code{IDfrom = "metadata"}. When using \code{IDfrom = "directory"}, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool. It also requires that \code{inDir} is in your digiKam database.
 
 The items of argument \code{video} are:
 
@@ -157,8 +157,10 @@ The results of a number of other function will depend on the output of this func
 
 \dontrun{   # the examples take too long to pass CRAN tests
 
+
 # set directory with camera trap images in station directories
-wd_images_ID_species <- system.file("pictures/sample_images", package = "camtrapR")
+wd_images_ID_species <- system.file("pictures/sample_images_species_dir", 
+                                    package = "camtrapR")
 
 if (Sys.which("exiftool") != ""){        # only run these examples if ExifTool is available
 
@@ -176,7 +178,7 @@ rec_table2 <- recordTable(inDir               = wd_images_ID_species,
                        IDfrom                 = "directory",
                        minDeltaTime           = 60,
                        deltaTimeComparedTo    = "lastRecord",
-                       exclude                = "NO_ID",
+                       exclude                = "UNID",
                        writecsv               = FALSE,
                        timeZone               = "Asia/Kuala_Lumpur",
                        additionalMetadataTags = c("EXIF:Model", "EXIF:Make", "NonExistingTag"),
@@ -187,8 +189,8 @@ rec_table2 <- recordTable(inDir               = wd_images_ID_species,
 # note the warning that the last tag in "additionalMetadataTags" ("NonExistingTag") was not found
 
 
-any(rec_table1$Species == "NO_ID")    # TRUE
-any(rec_table2$Species == "NO_ID")    # FALSE
+any(rec_table1$Species == "UNID")    # TRUE
+any(rec_table2$Species == "UNID")    # FALSE
 
 
 # here's how the removeDuplicateRecords argument works
@@ -196,7 +198,7 @@ any(rec_table2$Species == "NO_ID")    # FALSE
 rec_table3a <- recordTable(inDir              = wd_images_ID_species,
                        IDfrom                 = "directory",
                        minDeltaTime           = 0,
-                       exclude                = "NO_ID",
+                       exclude                = "UNID",
                        timeZone               = "Asia/Kuala_Lumpur",
                        removeDuplicateRecords = FALSE
 )
@@ -204,7 +206,7 @@ rec_table3a <- recordTable(inDir              = wd_images_ID_species,
 rec_table3b <- recordTable(inDir              = wd_images_ID_species,
                        IDfrom                 = "directory",
                        minDeltaTime           = 0,
-                       exclude                = "NO_ID",
+                       exclude                = "UNID",
                        timeZone               = "Asia/Kuala_Lumpur",
                        removeDuplicateRecords = TRUE
 )
@@ -214,8 +216,20 @@ anyDuplicated(rec_table3a[, c("Station", "Species", "DateTimeOriginal")])   # go
 anyDuplicated(rec_table3b[, c("Station", "Species", "DateTimeOriginal")])   # no duplicates
 
 # after removing duplicates, both are identical:
-whichAreDuplicated <- which(duplicated(rec_table3a[, c("Station", "Species", "DateTimeOriginal")]))
+whichAreDuplicated <- which(duplicated(rec_table3a[,c("Station", "Species", "DateTimeOriginal")]))
 all(rec_table3a[-whichAreDuplicated,] == rec_table3b)
+
+
+### extracting species IDs from metadata
+
+wd_images_ID_species_tagged <- system.file("pictures/sample_images_species_tag", 
+                                           package = "camtrapR")
+
+rec_table4 <- recordTable(inDir               = wd_images_ID_species_tagged,
+                       IDfrom                 = "metadata",
+                       metadataSpeciesTag     = "Species",
+                       exclude                = "unidentified")
+
 
 ###  Including videos
 # sample videos are not included in package
@@ -231,7 +245,7 @@ rec_table4 <- recordTable(inDir  = wd_images_ID_species,
 rec_table5 <- recordTable(inDir  = wd_images_ID_species,
                           IDfrom = "metadata",
                           video  = list(file_formats = c("jpg", "mp4", "avi", "mov"),
-                                        dateTimeTag  = "QuickTime:CreateDate"
+                                        dateTimeTag  = "QuickTime:CreateDate",
                                         db_directory = "C:/Users/YourName/Pictures",
                                         db_filename = "digikam4.db")
 )
