@@ -84,13 +84,32 @@ cameraOperation <- function(CTtable,
   
   # return error if duplicate stations (i.e. more than 1 row per station)
   if(!cameraColInArgs & !sessionColInArgs){
-    if(any(duplicated(CTtable[,stationCol])))   stop("at least 1 station has more than 1 item in CTtable. Please specify 'cameraCol' or 'sessionCol'", call. = FALSE)
+    if(any(duplicated(CTtable[,stationCol]))){
+      tmp <- table(CTtable[,stationCol])
+      stop(paste("at least 1 station has more than 1 item in CTtable. Please specify 'cameraCol' or 'sessionCol'\n", 
+                 paste(names(tmp[tmp >= 2]),
+                       tmp[tmp >= 2], sep = ": ", collapse = "\n"),
+                 sep = ""), 
+           call. = FALSE)
+    }
   }
+  
   if(cameraColInArgs & !sessionColInArgs){
-    if(any(duplicated(CTtable[,c(stationCol, cameraCol)])))   stop("at least 1 station/camera has more than 1 item in CTtable. Specify 'sessionCol' if you have multiple sessions / seasons", call. = FALSE)
+    if(any(duplicated(CTtable[,c(stationCol, cameraCol)]))){
+      tmp <- table(paste(CTtable[,stationCol], CTtable[, cameraCol], sep = " - "))
+      stop(paste("at least 1 station/camera has more than 1 item in CTtable. Specify 'sessionCol' if you have multiple sessions / seasons\n",
+                 paste(names(tmp[tmp >= 2]), tmp[tmp >= 2], sep = ": ", collapse = "\n"), sep = ""),
+           call. = FALSE)
+    }
   }
+  
   if(!cameraColInArgs & sessionColInArgs){
-    if(any(duplicated(CTtable[,c(stationCol, sessionCol)])))   stop("at least 1 station/session has more than 1 item in CTtable. Specify 'cameraCol' if you have multiple cameras per station", call. = FALSE)
+    if(any(duplicated(CTtable[,c(stationCol, sessionCol)]))){
+      tmp <- table(paste(CTtable[,stationCol], CTtable[, sessionCol], sep = " - "))
+      stop(paste("at least 1 station/session has more than 1 item in CTtable. Specify 'cameraCol' if you have multiple cameras per station\n",
+                 paste(names(tmp[tmp >= 2]), tmp[tmp >= 2], sep = ": ", collapse = "\n"), sep = ""),
+           call. = FALSE)
+    }
   }
   
   if(hasArg(outDir)){
