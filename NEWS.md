@@ -2,7 +2,7 @@
 
 ## new features
 
-* recordTable / recordTableIndividual: video support via new argument "video" (requires package "RSQLite", thanks to Ana Gracanin for a crucial tip)
+* recordTable / recordTableIndividual: video support via new argument "video" (requires package "RSQLite", thanks to Ana Gracanin for a crucial tip that made date/time extraction possible)
 * exifTagNames returns a data frame containing all relevant information at once: tag group names, tag descriptions, tag names and values. Arguments returnMetadata and returnTagGroup are ignored now.
 * surveyReport: reliable creation of zip files via package "zip" (if installed)
 * added sample images with species tags

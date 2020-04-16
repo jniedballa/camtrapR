@@ -11,8 +11,8 @@ The function will return metadata values, metadata tag names and group names of 
 exifTagNames(inDir, 
   whichSubDir = 1,
   fileName,
-  returnMetadata,
-  returnTagGroup)
+  returnMetadata = "DEPRECATED",
+  returnTagGroup = "DEPRECATED")
 }
 
 \arguments{

@@ -1,12 +1,12 @@
 exifTagNames <- function(inDir, 
                          whichSubDir = 1, 
                          fileName,
-                         returnMetadata, 
-                         returnTagGroup){
+                         returnMetadata = "DEPRECATED", 
+                         returnTagGroup = "DEPRECATED"){
   
   
-  if(hasArg(returnMetadata)) message("Argument returnMetadata is ignored since version 1.2.4")
-  if(hasArg(returnTagGroup)) message("Argument returnTagGroup is ignored since version 1.2.4")
+  if(returnMetadata != "DEPRECATED") message("Argument returnMetadata is ignored since version 2.0.0")
+  if(returnTagGroup != "DEPRECATED") message("Argument returnTagGroup is ignored since version 2.0.0")
   
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
   

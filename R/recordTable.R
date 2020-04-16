@@ -243,7 +243,7 @@ recordTable <- function(inDir,
         # convert character vector extracted from images to time object and format for outfilename
         metadata.tmp$DateTimeOriginal <- as.POSIXct(strptime(x = metadata.tmp$DateTimeOriginal, format = "%Y:%m:%d %H:%M:%S", tz = timeZone))
 
-        # sort by (camera), species and time
+        # sort by station, (camera), species and time
         if(camerasIndependent == TRUE) {
           metadata.tmp <- metadata.tmp[order(metadata.tmp[,stationCol], metadata.tmp[,speciesCol], metadata.tmp[,cameraCol], metadata.tmp$DateTimeOriginal),]
         } else {
