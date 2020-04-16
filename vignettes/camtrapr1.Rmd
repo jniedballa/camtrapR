@@ -98,21 +98,27 @@ Since version 2.0.0, the functions `recordTable` and `recordTableIndividual` sup
 
 Video support allows you to process video files and identify species and individuals using the same workflow as for images. With minimal effort, you can extract and tabulate these information using the familiar functions within camtrapR.
 
-Since this is a new feature, please be sure to read the help files of the relevant functions and check the example code. Unfortunately, I could not include a sample video in the package due to file size constraints, but I hope if will give you the idea. And please, let me know about your experiences working with videos in camtrapR. I would really appreciate the feedback.
+Since this is a new feature, please be sure to read the vignette sections on video and the help files of the relevant functions and check the example code. Also, please test the workflow before working on larger amounts of data. Unfortunately, I could not include a sample video in the package due to file size constraints, but I hope you will get the idea. And please, let me know about your experiences working with videos in camtrapR and possible problems. I would really appreciate the feedback to inmprove and extend video support.
 
 
 ### Video date/time
 
-Because there is no standardized date/time tag in the metadata of video files, users need to check if there is a suitable (i.e., persistent) tag available in the video metadata:
+The main problem in working with videos is the lack of a standardized date/time tag in the metadata. Only if such a tag is present, camtrapR can successfully extract the video date/time. Not all cameras save date and time in a suitable format in the metadata, so before conducting a study using videos, please make sure that your cameras record a suitable (i.e., persistent) date/time tag in the metadata. You can check if there is a suitable tag available in the video metadata:
 
-1. find a usable video date/time tag with `exifTagNames`
+1. Use `exifTagNames` to identify a usable video date/time tag
 1. provide the name of the video date/time tag to `recordTable`
 
-This also means that if there is no suitable date/time tag in the video metadata, camtrapR will not be able to return information for these videos and will have to omit them. So if you consider using video for your surveys, please first check (with that specific camera model) if there is a suitable date/time tag in the video metadata. A suitabale date/time tag is one that doesn't change when the video file is moved, copied or otherwise modified. If a camera fails to record such a tag, camtrapR can't use the data.
+When using `exifTagNames`, make sure the date/time tag you choose is identical to the date/time shown in the data field of the video. In the example videos I tests, tags such as "QuickTime:CreateDate" worked well. The tags "File Creation Date/Time", "File Modification Date/Time" and "File Access Date/Time" are not suitable, since they are updated when the video files are moved or copied. 
+
+
+This also means that if there is no suitable date/time tag in the video metadata, camtrapR will not be able to return information for these videos and will omit them. It really depends on your camera model.
+So if you consider using video for your surveys, please first check (with that specific camera model) if there is a suitable date/time tag in the video metadata. A suitable date/time tag is one that doesn't change when the video file is moved, copied or otherwise modified. If a camera fails to record such a tag, camtrapR can't return proper date and time, making the videos useless.
 
 ### digiKam tags & metadata
 
-In digiKam, it is possible to assign tags to videos. Just like images, videos can be tagged with species or individual IDs, group size, sex, age group or whatever information you are interested in. BUT, in contrast to JPG images, digiKam cannot write these tags directly into the video metadata. Instead, video tags are stored in the digiKam database on your hard disk. So to access tags assigned to videos, camtrapR has to read them directly from the digiKam database. To that end, users need to provide the filename of the digiKam database and the directory it is in (digiKam > Settings > configure digiKam > Database; the directory is stated there). In that menu, also ensure you use a SQLite database. When the digiKam database information are provided to camtrapR, all tags assigned to videos in digiKam will be extracted and tabulated just like image tags. See the help files of `recordTable` and `recordTableIndividual` for details.
+In digiKam, it is possible to assign tags to videos. Just like images, videos can be tagged with species or individual IDs, group size, sex, age group or whatever information you are interested in. BUT, in contrast to JPG images, digiKam cannot write these tags directly into the video metadata. Instead, video tags are stored in the digiKam database on your hard disk. To access tags assigned to videos, camtrapR has to read them directly from the digiKam database. This means that in order for camtrapR to read video tags, the videos need to be included in the digiKam database. Moving or copying the videos to a different location will strip the tags you assigned.
+
+Users need to provide the filename of the digiKam database and the directory it is in (digiKam > Settings > configure digiKam > Database; the directory is stated there). In that menu, also ensure you use a SQLite database (the default). When the digiKam database information are provided to camtrapR, all the tags you assigned to videos in digiKam will be extracted and tabulated just like image tags. See the help files of `recordTable` and `recordTableIndividual` for details.
 
 
 ## Nomenclature

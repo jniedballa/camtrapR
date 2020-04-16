@@ -94,7 +94,7 @@
       <h1>1. Organising raw camera trap images in camtrapR</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2020-04-10</h4>
+            <h4 class="date">2020-04-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr1.Rmd"><code>vignettes/camtrapr1.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr1.Rmd</code></div>
@@ -190,23 +190,24 @@
 <a href="#video-support-since-version-2-0-0" class="anchor"></a>Video support (since version 2.0.0)</h2>
 <p>Since version 2.0.0, the functions <code>recordTable</code> and <code>recordTableIndividual</code> support video files. In addition <code>exifTagNames</code> can read and display video metadata via ExifTool.</p>
 <p>Video support allows you to process video files and identify species and individuals using the same workflow as for images. With minimal effort, you can extract and tabulate these information using the familiar functions within camtrapR.</p>
-<p>Since this is a new feature, please be sure to read the help files of the relevant functions and check the example code. Unfortunately, I could not include a sample video in the package due to file size constraints, but I hope if will give you the idea. And please, let me know about your experiences working with videos in camtrapR. I would really appreciate the feedback.</p>
+<p>Since this is a new feature, please be sure to read the vignette sections on video and the help files of the relevant functions and check the example code. Also, please test the workflow before working on larger amounts of data. Unfortunately, I could not include a sample video in the package due to file size constraints, but I hope you will get the idea. And please, let me know about your experiences working with videos in camtrapR and possible problems. I would really appreciate the feedback to inmprove and extend video support.</p>
 <div id="video-datetime" class="section level3">
 <h3 class="hasAnchor">
 <a href="#video-datetime" class="anchor"></a>Video date/time</h3>
-<p>Because there is no standardized date/time tag in the metadata of video files, users need to check if there is a suitable (i.e., persistent) tag available in the video metadata:</p>
+<p>The main problem in working with videos is the lack of a standardized date/time tag in the metadata. Only if such a tag is present, camtrapR can successfully extract the video date/time. Not all cameras save date and time in a suitable format in the metadata, so before conducting a study using videos, please make sure that your cameras record a suitable (i.e., persistent) date/time tag in the metadata. You can check if there is a suitable tag available in the video metadata:</p>
 <ol style="list-style-type: decimal">
-<li>find a usable video date/time tag with <code>exifTagNames</code>
-</li>
+<li>Use <code>exifTagNames</code> to identify a usable video date/time tag</li>
 <li>provide the name of the video date/time tag to <code>recordTable</code>
 </li>
 </ol>
-<p>This also means that if there is no suitable date/time tag in the video metadata, camtrapR will not be able to return information for these videos and will have to omit them. So if you consider using video for your surveys, please first check (with that specific camera model) if there is a suitable date/time tag in the video metadata. A suitabale date/time tag is one that doesn’t change when the video file is moved, copied or otherwise modified. If a camera fails to record such a tag, camtrapR can’t use the data.</p>
+<p>When using <code>exifTagNames</code>, make sure the date/time tag you choose is identical to the date/time shown in the data field of the video. In the example videos I tests, tags such as “QuickTime:CreateDate” worked well. The tags “File Creation Date/Time”, “File Modification Date/Time” and “File Access Date/Time” are not suitable, since they are updated when the video files are moved or copied.</p>
+<p>This also means that if there is no suitable date/time tag in the video metadata, camtrapR will not be able to return information for these videos and will omit them. It really depends on your camera model. So if you consider using video for your surveys, please first check (with that specific camera model) if there is a suitable date/time tag in the video metadata. A suitable date/time tag is one that doesn’t change when the video file is moved, copied or otherwise modified. If a camera fails to record such a tag, camtrapR can’t return proper date and time, making the videos useless.</p>
 </div>
 <div id="digikam-tags-metadata" class="section level3">
 <h3 class="hasAnchor">
 <a href="#digikam-tags-metadata" class="anchor"></a>digiKam tags &amp; metadata</h3>
-<p>In digiKam, it is possible to assign tags to videos. Just like images, videos can be tagged with species or individual IDs, group size, sex, age group or whatever information you are interested in. BUT, in contrast to JPG images, digiKam cannot write these tags directly into the video metadata. Instead, video tags are stored in the digiKam database on your hard disk. So to access tags assigned to videos, camtrapR has to read them directly from the digiKam database. To that end, users need to provide the filename of the digiKam database and the directory it is in (digiKam &gt; Settings &gt; configure digiKam &gt; Database; the directory is stated there). In that menu, also ensure you use a SQLite database. When the digiKam database information are provided to camtrapR, all tags assigned to videos in digiKam will be extracted and tabulated just like image tags. See the help files of <code>recordTable</code> and <code>recordTableIndividual</code> for details.</p>
+<p>In digiKam, it is possible to assign tags to videos. Just like images, videos can be tagged with species or individual IDs, group size, sex, age group or whatever information you are interested in. BUT, in contrast to JPG images, digiKam cannot write these tags directly into the video metadata. Instead, video tags are stored in the digiKam database on your hard disk. To access tags assigned to videos, camtrapR has to read them directly from the digiKam database. This means that in order for camtrapR to read video tags, the videos need to be included in the digiKam database. Moving or copying the videos to a different location will strip the tags you assigned.</p>
+<p>Users need to provide the filename of the digiKam database and the directory it is in (digiKam &gt; Settings &gt; configure digiKam &gt; Database; the directory is stated there). In that menu, also ensure you use a SQLite database (the default). When the digiKam database information are provided to camtrapR, all the tags you assigned to videos in digiKam will be extracted and tabulated just like image tags. See the help files of <code>recordTable</code> and <code>recordTableIndividual</code> for details.</p>
 </div>
 </div>
 <div id="nomenclature" class="section level2">
@@ -381,9 +382,9 @@
 ## 2 StationB
 ## 3 StationC
 ##                                                                                directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/createStationFoldersTest/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/createStationFoldersTest/StationB
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/createStationFoldersTest/StationC
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/createStationFoldersTest/StationA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/createStationFoldersTest/StationB
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/createStationFoldersTest/StationC
 ##   created exists
 ## 1    TRUE   TRUE
 ## 2    TRUE   TRUE
@@ -416,12 +417,12 @@
 <a class="sourceLine" id="cb18-7" title="7">                                 <span class="dt">timeShiftColumn      =</span> <span class="st">"timeshift"</span>,</a>
 <a class="sourceLine" id="cb18-8" title="8">                                 <span class="dt">timeShiftSignColumn  =</span> <span class="st">"sign"</span></a>
 <a class="sourceLine" id="cb18-9" title="9">)</a></code></pre></div>
-<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpiMF3sr/raw_images/StationA</code></pre>
-<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpiMF3sr/raw_images/StationB</code></pre>
+<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpOEolda/raw_images/StationA</code></pre>
+<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpOEolda/raw_images/StationB</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">timeshift_run</a></code></pre></div>
 <pre><code>##                                                                  directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images/StationB
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images/StationA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images/StationB
 ##               n_directories                  n_images
 ## 1     1 directories scanned     3 image files updated
 ## 2     1 directories scanned     3 image files updated</code></pre>
@@ -437,8 +438,8 @@
 <a class="sourceLine" id="cb23-9" title="9"></a>
 <a class="sourceLine" id="cb23-10" title="10">timeshift_undo</a></code></pre></div>
 <pre><code>##                                                                  directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images/StationB
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images/StationA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images/StationB
 ##   n_images_undo
 ## 1             3
 ## 2             3</code></pre>
@@ -517,12 +518,12 @@
 ## 5 IMG0002.JPG StationB     NA 2009-04-05 23:13:00         TRUE
 ## 6 IMG0003.JPG StationB     NA 2009-04-07 00:23:00         TRUE
 ##                                                                             outDir
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images_renamed/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images_renamed/StationA
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images_renamed/StationA
-## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images_renamed/StationB
-## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images_renamed/StationB
-## 6 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpiMF3sr/raw_images_renamed/StationB
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images_renamed/StationA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images_renamed/StationA
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images_renamed/StationA
+## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images_renamed/StationB
+## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images_renamed/StationB
+## 6 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpOEolda/raw_images_renamed/StationB
 ##                            filename_new fileExistsAlready CopyStatus
 ## 1 StationA__2009-04-10__05-07-00(1).JPG             FALSE      FALSE
 ## 2 StationA__2009-04-21__00-40-00(1).JPG             FALSE      FALSE
@@ -603,7 +604,7 @@
 <p>When we check the outcome with function exifTagNames, we find field “Copyright” in line 27.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1"><span class="kw"><a href="../reference/exifTagNames.html">exifTagNames</a></span>(wd_images_ID_copy)</a></code></pre></div>
 <pre><code>## Metadata of:
-## C:\Users\Juergen\AppData\Local\Temp\RtmpiMF3sr/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
+## C:\Users\Juergen\AppData\Local\Temp\RtmpOEolda/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
 <pre><code>##    tag_group                tag_name             tag_description
 ## 1   ExifTool         ExifToolVersion     ExifTool Version Number
 ## 2   ExifTool                 Warning                     Warning
@@ -653,11 +654,11 @@
 ## 1                                                                                  11.80
 ## 2                                             Invalid EXIF text encoding for UserComment
 ## 3                                                  StationA__2009-04-21__00-40-00(1).JPG
-## 4  C:/Users/Juergen/AppData/Local/Temp/RtmpiMF3sr/sample_images_species_dir/StationA/PBE
+## 4  C:/Users/Juergen/AppData/Local/Temp/RtmpOEolda/sample_images_species_dir/StationA/PBE
 ## 5                                                                                  27 kB
-## 6                                                              2020:04:10 20:27:55+02:00
-## 7                                                              2020:04:10 20:27:55+02:00
-## 8                                                              2020:04:10 20:27:51+02:00
+## 6                                                              2020:04:16 14:02:00+02:00
+## 7                                                              2020:04:16 14:02:00+02:00
+## 8                                                              2020:04:16 14:01:57+02:00
 ## 9                                                                              rw-rw-rw-
 ## 10                                                                                  JPEG
 ## 11                                                                                   jpg

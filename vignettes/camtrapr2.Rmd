@@ -52,7 +52,7 @@ Here is a list of suitable software for metadata tagging:
 * Adobe Bridge
 * Adobe Lightroom
 
-Among these, we recommend digiKam because it is free and open-source software. Furthermore, if you wish to assign tags to videos and read them in camtrapR, tag the videos in digiKam. Extracting video tags only works if videos were tagged with digiKam.
+Among these, we recommend digiKam because it is free and open-source software. Furthermore, if you wish to assign tags to videos and read them in camtrapR, tag the videos in digiKam. Extracting video tags currently only works if videos were tagged with digiKam (tested with version 6.1.0).
 
 All of these programs offer customisable metadata structures and are easy to use. 
 We only tested these three programs and it is unclear what other software will work smoothly, if at all. 
