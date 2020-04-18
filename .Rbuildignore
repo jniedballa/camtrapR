@@ -3,7 +3,9 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
-^README.Rmd
+^README\.Rmd
 ^.github
 ^R/_not_for_CRAN$
-^.travis.yml$
+^.travis\.yml$
+^Image-ExifTool-11.94\.tar\.gz$
+^Image-ExifTool-11.94$
