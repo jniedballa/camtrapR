@@ -264,10 +264,10 @@ camopPlot <- function(camOp,
   values_tmp <- sort(na.omit(unique(c(camOp))))
 
   # hcl.colors only exists in R >3.6.0, use heat.colors for earlier versions
-  image_colors <- if(exists("hcl.colors")) {
-    hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE)
+  if(exists("hcl.colors")) {
+    image_colors <- hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE)
   } else {
-    heat.colors(n = length(values_tmp), rev = TRUE)
+    image_colors <- heat.colors(n = length(values_tmp), rev = TRUE)
   }
   
   image(t(as.matrix(camOp)), xaxt = "n", yaxt = "n", col = image_colors)
