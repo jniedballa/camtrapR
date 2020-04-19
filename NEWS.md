@@ -1,3 +1,10 @@
+# camtrapR 2.0.1
+
+## bugfixes
+
+* exifTagNames: doesn't return tag description, it caused an error on some systems
+
+
 # camtrapR 2.0.0
 
 ## new features

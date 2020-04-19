@@ -58,27 +58,28 @@ exifTagNames <- function(inDir,
   
   command.tmp1  <- paste('exiftool -s1 -t ', groupHeadings_general, ' "', file.tmp, '"', sep = "")
   # run without -s1 option to extract tag descriptions instead of tag names
-  command.tmp2 <- paste('exiftool -t ', groupHeadings_general, ' "', file.tmp, '"', sep = "")
+  #command.tmp2 <- paste('exiftool -t ', groupHeadings_general, ' "', file.tmp, '"', sep = "")
   
   # run exiftool
   metadata.tmp1 <- system(command.tmp1, intern=TRUE)
-  metadata.tmp2 <- system(command.tmp2, intern=TRUE)
+  #metadata.tmp2 <- system(command.tmp2, intern=TRUE)
 
   # convert output to data frames
   out1 <- read.table(text = metadata.tmp1, header = FALSE, 
                      col.names = c("tag_group", "tag_name", "value"), sep = "\t",
                      stringsAsFactors = FALSE, fill = TRUE)
-  out2 <- read.table(text = metadata.tmp2, header = FALSE, 
-                     col.names = c("tag_group", "tag_description", "value"), sep = "\t",
-                     stringsAsFactors = FALSE, fill = TRUE)
+  # out2 <- read.table(text = metadata.tmp2, header = FALSE, 
+  #                    col.names = c("tag_group", "tag_description", "value"), sep = "\t",
+  #                    stringsAsFactors = FALSE, fill = TRUE)
 
   # make sure out1 and out2 are ordered identically
-  if(any(out1$value != out2$value))  stop("Order of exiftool-extracted metadata differs. Please report this bug.")
+  # if(any(out1$value != out2$value))  stop("Order of exiftool-extracted metadata differs. Please report this bug.")
+  # WHY DOES THIS FAIL ON CRAN (debian & fedora, but not on solaris/windows?)
   
   # combine data frames
   out <- cbind(tag_group       = out1$tag_group,
                tag_name        = out1$tag_name,
-               tag_description = out2$tag_description,
+               # tag_description = out2$tag_description,
                value           = out1$value)
   return(as.data.frame(out))
 }
