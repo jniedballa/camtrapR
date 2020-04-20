@@ -15,6 +15,14 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+```{r setup, echo=FALSE, message = FALSE, results = "hide"}
+exiftool_present <- Sys.which("exiftool") != ""
+```
+
+```{r , echo=FALSE, eval = !exiftool_present}
+print("WARNING: THIS VIGNETTE WAS CREATED WITHOUT EXIFTOOL. OUTPUT IS INCOMPLETE SINCE ESSENTIAL FUNCTIONS DID NOT RUN!")
+```
+
 ```{r message = FALSE, results = "hide"}
 library(camtrapR)
 library(secr)
@@ -49,7 +57,7 @@ length(list.files(wd_images_ID, pattern = "JPG", recursive = TRUE))
 
 Now we can run `recordTable`. Here is a minimal example:
 
-```{r}
+```{r eval = exiftool_present}
 rec.db.species0 <- recordTable(inDir  = wd_images_ID,
                                IDfrom = "directory")
 
@@ -58,7 +66,7 @@ head(rec.db.species0)
 
 Argument `IDfrom` tells the function to look for species directories within the station directories and to take species IDs from these. `IDfrom` must be set to "metadata" if metadata tagging was used for species identification.
 
-By default, the function returns all records. Nevertheless, we get a data frame containing `r nrow(rec.db.species0)` records, less than the number of images in the image directory. This is because a number of images were taken at the same time (measured with 1 minute precision by these cameras) and the function removes duplicate records.
+By default, the function returns all records. Nevertheless, we get a data frame containing `r ifelse(exiftool_present, nrow(rec.db.species0), 56)` records, less than the number of images in the image directory (`r length(list.files(wd_images_ID, pattern = "JPG", recursive = TRUE))`). This is because a number of images were taken at the same time (measured with 1 minute precision by these cameras) and the function removes duplicate records.
 
 It may suffice to illustrate this with the Pig-tailed macaque images from stationB:
 
@@ -96,7 +104,7 @@ The argument `deltaTimeComparedTo` further controls how independence between rec
 Let's now apply an 1-hour independence criterion and define a time zone.
 
 
-```{r}
+```{r eval = exiftool_present}
 rec.db.species60 <- recordTable(inDir               = wd_images_ID,
                                 IDfrom              = "directory",
                                 minDeltaTime        = 60,
@@ -106,7 +114,7 @@ rec.db.species60 <- recordTable(inDir               = wd_images_ID,
 nrow(rec.db.species60)
 ```
 
-Now `r nrow(rec.db.species60)` records were returned instead of `r nrow(rec.db.species0)`. The missing records were taken less than 1 hour after the prior record of the same species at the same station and therefore omitted.
+Now `r ifelse(exiftool_present, nrow(rec.db.species60), 40)` records were returned instead of `r ifelse(exiftool_present, nrow(rec.db.species0), 56)`. The missing records were taken less than 1 hour after the prior record of the same species at the same station and therefore omitted.
 
 
 ### Time zones and daylight saving time
@@ -138,7 +146,7 @@ The `cameraID` argument controls where camtrapR will look for camera IDs: in the
 
 Argument `exclude` can be used to ignore certain species. This is useful for omitting images in directories like "team" or "unidentified". Here is an example:
 
-```{r}
+```{r eval = exiftool_present}
 # see what species  we recorded
 table(rec.db.species60$Species)
 
@@ -162,7 +170,7 @@ table(rec.db.species60.exclude$Species)
 `recordTable` and `recordTableIndividual` can both extract additional metadata from images (apart from date and time). For example, some camera models record ambient temperature or moon phase, which may be of interest. Metadata tags are stored in the images at the time they are taken and can be accessed and extracted if their tag names are known. Some tag names are standardised (e.g. "DateTimeOriginal") while others are manufacturer-specific. Therefore, function `exifTagNames` returns all Exif metadata it finds in a sample image. Users can then choose which to extract with `recordTable` and `recordTableIndividual`.  
 
 
-```{r}
+```{r eval = exiftool_present}
 wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
 exifTagNames(inDir = wd_images_ID)
 ```
@@ -173,7 +181,7 @@ Use the entries in `tag_name` (not `tag_description`) when providing values to t
 
 Of the tags shown here, "DateTimeOriginal" contains the date and time that camtrapR reads out. Apart from that, there is little information of ecological interest in the example data. However, for demonstration purposes, let's extract information about the camera model and make. To be as precise as possible, we provide tags in the format: tag_group:tag_name (e.g. EXIF:Model)
 
-```{r}
+```{r eval = exiftool_present}
 rec.db.species.metadata1 <- recordTable(inDir                  = wd_images_ID,
                                         IDfrom                 = "directory",
                                         timeZone               = "Asia/Kuala_Lumpur",
@@ -192,7 +200,7 @@ Individual identification of species is a prerequiste for running (spatial) capt
 
 
 
-```{r}
+```{r eval = exiftool_present}
 # find the directory with tagged sample images contained in the package
 wd_images_individual_ID <- system.file("pictures/sample_images_indiv_tag/LeopardCat", package = "camtrapR")
  # missing space in species = "LeopardCat" is because of CRAN package policies
@@ -215,7 +223,7 @@ In addition to the metadata that were saved when the image was taken (see above)
 
 
 
-```{r}
+```{r eval = exiftool_present}
 head(rec.db.pbe)
 ```
 
@@ -316,7 +324,7 @@ Occupancy models use detection/non-detection matrices in which for every station
 Here is how to obtain a detection/non-detection matrix using function `detectionHistory`. Because the function builds on prior functions (`recordTable` and `cameraOperation`) we also show these function here to provide the context.
 
 
-```{r}
+```{r eval = exiftool_present}
 
 # create camera operation matrix
 camop_no_problem <- cameraOperation(CTtable      = camtraps,
@@ -359,7 +367,7 @@ Note the warning about the missing time zone (as in the functions `recordTable` 
 If trapping effort is thought to influence detection probability, it can be returned by setting `includeEffort = TRUE`. This way the number of active trapping days per occasion and station is returned. 
 
 
-```{r}
+```{r eval = exiftool_present}
 
 # make detection history (with trapping effort)
 DetHist2 <- detectionHistory(recordTable          = recordTableSample,
@@ -381,7 +389,7 @@ DetHist2[[2]]  # effort (in days per occasion)
 
 To help with convergence of models, the effort matrix can be scaled to mean = 0 and sd = 1 by setting `scaleEffort = TRUE`. If `writecsv = TRUE`, the scaling parameters will also be saved in a separate csv file.
 
-```{r}
+```{r eval = exiftool_present}
 
 DetHist3 <- detectionHistory(recordTable          = recordTableSample,
                              camOp                = camop_no_problem,

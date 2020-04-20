@@ -26,6 +26,7 @@ appendSpeciesNames <- function(inDir,
     if(!hasArg(metadataSpeciesTag))       stop("'metadataSpeciesTag' must be defined if IDfrom = 'metadata'")
     if(!is.character(metadataSpeciesTag)) stop("metadataSpeciesTag must be of class 'character'")
     if(length(metadataSpeciesTag) != 1)   stop("metadataSpeciesTag must be of length 1")
+    if(Sys.which("exiftool") == "")       stop("cannot find ExifTool")
   }
 
 multiple_tag_separator = "__"

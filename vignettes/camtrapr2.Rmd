@@ -15,6 +15,15 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+```{r setup, echo=FALSE, message = FALSE, results = "hide"}
+exiftool_present <- Sys.which("exiftool") != ""
+```
+
+
+```{r , echo=FALSE, eval = !exiftool_present}
+print("WARNING: THIS VIGNETTE WAS CREATED WITHOUT EXIFTOOL. OUTPUT IS INCOMPLETE SINCE ESSENTIAL FUNCTIONS DID NOT RUN!")
+```
+
 ```{r}
 library(camtrapR)
 data(camtraps)
@@ -352,7 +361,7 @@ The latter requires one of the following directory structures:
 Here is an example using images identified with the drag & drop method.
 
 
-```{r}
+```{r eval = exiftool_present}
 wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
 
 # run check with 120 seconds (2 minutes) maximum time differnce
@@ -366,7 +375,7 @@ check.folders
 The function returns a list with 2 elements. The first element (`temporalIndependenceCheck`) is the check on temporal proximity of different species (the second element `IDconflictCheck` is describes in the next paragraph). In our example, two images of different species were taken within 2 minutes of one another at StationC (a chevrotain and a moon rat in our example). Now one should check the species identity of these 2 images to make sure they were identified correctly. If not, the species ID in the incorrectly identified image is corrected. The function `checkSpeciesIdentification` can be re-run as often as desired. 
 The behaviour of the function can be further specified by arguments `excludeSpecies` and `stationsToCheck`. The first causes camtrapR to ignore certain species and the latter can be used to check only certain stations.
 
-```{r}
+```{r eval = exiftool_present}
 # check only station A and B (will give no results)
 checkSpeciesIdentification(inDir               = wd_images_ID,
                            IDfrom              = "directory",

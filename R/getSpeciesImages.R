@@ -28,6 +28,7 @@ getSpeciesImages <- function(species,
     if(IDfrom == "metadata"){
       stopifnot(metadataHierarchyDelimitor %in% c("|", ":"))
       metadata.tagname <- "HierarchicalSubject"
+      if(Sys.which("exiftool") == "")       stop("cannot find ExifTool")
     }
   }
 

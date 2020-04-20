@@ -1,2 +1,5 @@
 library(testthat)
-test_check("camtrapR")
+# test only if exiftool is available
+if(Sys.which("exiftool") != ""){
+  test_check("camtrapR")
+}

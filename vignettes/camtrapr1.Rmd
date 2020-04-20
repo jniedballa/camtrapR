@@ -15,6 +15,14 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
+```{r setup, echo=FALSE, message = FALSE, results = "hide"}
+exiftool_present <- Sys.which("exiftool") != ""
+```
+
+
+```{r , echo=FALSE, eval = !exiftool_present}
+print("WARNING: THIS VIGNETTE WAS CREATED WITHOUT EXIFTOOL. OUTPUT IS INCOMPLETE SINCE ESSENTIAL FUNCTIONS DID NOT RUN!")
+```
 
 # Introduction
 
@@ -284,7 +292,7 @@ There is a `station` column with station IDs, `camera` is NA because there was 1
 The function `timeShiftImages` should be run directly after saving the raw images on the hard disk. 
 
 
-```{r}
+```{r eval = exiftool_present}
 # copy sample images to another location (so we don't mess around in the package directory)
 wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")
 file.copy(from = wd_images_raw, to = tempdir() , recursive = TRUE)
@@ -304,7 +312,7 @@ timeshift_run
 
 ExifTool has now updated the time tag of all images in the directories specified in the `timeShiftTable`. The original images are preserved as XYZ.JPG_original files (XYZ being the original file name). By setting argument `undo = TRUE`, the orginals are restored and the modified images are deleted. The function will check if the number of JPG_original files and JPG files in folders is identical. If not, the function will not work. It does not check for consistency of file names. 
 
-```{r}
+```{r eval = exiftool_present}
 timeshift_undo <- timeShiftImages(inDir               = wd_images_raw_copy,
                                  timeShiftTable       = timeShiftTable,
                                  stationCol           = "Station",
@@ -376,7 +384,7 @@ Station ID and camera ID are derived from the raw image directory structure crea
 Again, please be aware that temporary directories are used in the example. Set `outDir` to a permanent directory.
 In addition, images are not actually copied (argument `copyImages = FALSE`), but copying and renaming is mererly simulated in out example. So, in real world data, set `copyImages = TRUE`.
 
-```{r}
+```{r eval = exiftool_present}
  # raw image location
 wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")   
  # destination for renamed images to be copied to
@@ -417,7 +425,7 @@ The function `addCopyrightTag` can write a copyright tag into image Exif metadat
 In doing so, Exiftool normally keeps the original images as .JPG_original files. Note that this behaviour will instantly double the number of images in inDir and the disk space required. If this is not desired, users can set the function argument `keepJPG_original = FALSE` (default is `TRUE`) in order to replace the original files without creating *.JPG_original files. I recommend to first try this on a copy of a subdataset and to then check the function output. If there are warnings like \"Warning: [minor] Maker notes could not be parsed\" image makernotes may be unreadable afterwards (they are proprietary, undocumented formats). On the other hand, you may never need these for analysing camera trapping data.
 
 
-```{r}
+```{r eval = exiftool_present}
 # copy sample images to temporary directory (so we don't mess around in the package directory)
 wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
 file.copy(from = wd_images_ID, to = tempdir(), recursive = TRUE)
@@ -433,7 +441,7 @@ addCopyrightTag(inDir        = wd_images_ID_copy,
 ```
 
 When we check the outcome with function exifTagNames, we find field "Copyright" in line 27.
-```{r}
+```{r eval = exiftool_present}
 exifTagNames(wd_images_ID_copy)
 ```
 

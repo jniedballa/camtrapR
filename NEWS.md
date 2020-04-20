@@ -1,3 +1,12 @@
+# camtrapR 2.0.2
+
+## bugfixes
+
+* vignette creation conditional on availability of Exiftool (for CRAN checks)
+* tests with testthat conditional on availability of Exiftool (for CRAN checks)
+* appendSpeciesNames / getSpeciesImages: error message if exiftool is not available
+
+
 # camtrapR 2.0.1
 
 ## bugfixes
@@ -7,6 +16,7 @@
 ## other changes
 
 * included tests with testthat
+
 
 # camtrapR 2.0.0
 

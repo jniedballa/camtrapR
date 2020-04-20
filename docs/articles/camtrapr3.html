@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
       </span>
     </div>
 
@@ -94,7 +94,7 @@
       <h1>3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2020-04-10</h4>
+            <h4 class="date">2020-04-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr3.Rmd"><code>vignettes/camtrapr3.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr3.Rmd</code></div>
@@ -163,7 +163,7 @@
 ## 5 StationA__2009-04-23__00-09-00(1).JPG        1
 ## 6 StationA__2009-05-07__17-11-00(1).JPG        1</code></pre>
 <p>Argument <code>IDfrom</code> tells the function to look for species directories within the station directories and to take species IDs from these. <code>IDfrom</code> must be set to “metadata” if metadata tagging was used for species identification.</p>
-<p>By default, the function returns all records. Nevertheless, we get a data frame containing 56 records, less than the number of images in the image directory. This is because a number of images were taken at the same time (measured with 1 minute precision by these cameras) and the function removes duplicate records.</p>
+<p>By default, the function returns all records. Nevertheless, we get a data frame containing 56 records, less than the number of images in the image directory (68). This is because a number of images were taken at the same time (measured with 1 minute precision by these cameras) and the function removes duplicate records.</p>
 <p>It may suffice to illustrate this with the Pig-tailed macaque images from stationB:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(wd_images_ID, <span class="st">"StationB"</span>, <span class="st">"MNE"</span>))</a></code></pre></div>
 <pre><code>##  [1] "StationB__2009-04-15__07-21-00(1).JPG"
@@ -352,9 +352,9 @@
 ## 3                                                                  StationA__2009-04-21__00-40-00(1).JPG
 ## 4  C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE
 ## 5                                                                                                  27 kB
-## 6                                                                              2020:04:10 20:25:08+02:00
-## 7                                                                              2020:04:10 20:25:08+02:00
-## 8                                                                              2020:04:10 20:25:07+02:00
+## 6                                                                              2020:04:18 14:42:42+02:00
+## 7                                                                              2020:04:18 14:42:42+02:00
+## 8                                                                              2020:04:18 14:42:42+02:00
 ## 9                                                                                              rw-rw-rw-
 ## 10                                                                                                  JPEG
 ## 11                                                                                                   jpg
@@ -545,10 +545,10 @@
 <a class="sourceLine" id="cb47-8" title="8">  values_tmp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sort.html">sort</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/na.fail.html">na.omit</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(camOp))))</a>
 <a class="sourceLine" id="cb47-9" title="9"></a>
 <a class="sourceLine" id="cb47-10" title="10">  <span class="co"># hcl.colors only exists in R &gt;3.6.0, use heat.colors for earlier versions</span></a>
-<a class="sourceLine" id="cb47-11" title="11">  image_colors &lt;-<span class="st"> </span><span class="cf">if</span>(<span class="kw"><a href="https://rdrr.io/r/base/exists.html">exists</a></span>(<span class="st">"hcl.colors"</span>)) {</a>
-<a class="sourceLine" id="cb47-12" title="12">    <span class="kw"><a href="https://rdrr.io/r/grDevices/palettes.html">hcl.colors</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(values_tmp), <span class="dt">palette =</span> palette, <span class="dt">rev =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb47-11" title="11">  <span class="cf">if</span>(<span class="kw"><a href="https://rdrr.io/r/base/exists.html">exists</a></span>(<span class="st">"hcl.colors"</span>)) {</a>
+<a class="sourceLine" id="cb47-12" title="12">    image_colors &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/grDevices/palettes.html">hcl.colors</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(values_tmp), <span class="dt">palette =</span> palette, <span class="dt">rev =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb47-13" title="13">  } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb47-14" title="14">    <span class="kw"><a href="https://rdrr.io/r/grDevices/palettes.html">heat.colors</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(values_tmp), <span class="dt">rev =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb47-14" title="14">    image_colors &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/grDevices/palettes.html">heat.colors</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(values_tmp), <span class="dt">rev =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb47-15" title="15">  }</a>
 <a class="sourceLine" id="cb47-16" title="16">  </a>
 <a class="sourceLine" id="cb47-17" title="17">  <span class="kw"><a href="https://rdrr.io/r/graphics/image.html">image</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(camOp)), <span class="dt">xaxt =</span> <span class="st">"n"</span>, <span class="dt">yaxt =</span> <span class="st">"n"</span>, <span class="dt">col =</span> image_colors)</a>
@@ -561,7 +561,7 @@
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb48-2" title="2"><span class="kw">camopPlot</span>(<span class="dt">camOp =</span> camop_problem)</a>
 <a class="sourceLine" id="cb48-3" title="3"><span class="kw">camopPlot</span>(<span class="dt">camOp =</span> camop_problem, <span class="dt">palette =</span> <span class="st">"Viridis"</span>)</a></code></pre></div>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <p>Note that the colors are stretched between the lowest and highest value. There is no dedicated color for 0, designating non-operational cameras.</p>
 <p>For a list of color palettes, see <a href="https://developer.r-project.org/Blog/public/2019/04/01/hcl-based-color-palettes-in-grdevices/index.html">here</a>.</p>
 <div id="saving-and-loading-camera-operation-matrices" class="section level2">
@@ -818,7 +818,7 @@
 <div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(sdh, <span class="dt">tracks =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>## Warning in plot.capthist(sdh, tracks = TRUE): track for repeat detections on
 ## same occasion joins points in arbitrary sequence</code></pre>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-21-1.png" width="700"></p>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>
 </div>
 </div>
 <div id="input-for-subsequent-analyses-multi-season" class="section level1">
@@ -851,7 +851,7 @@
 <a class="sourceLine" id="cb73-18" title="18"><span class="co"># plot camera operation matrix</span></a>
 <a class="sourceLine" id="cb73-19" title="19"><span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">oma =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>,<span class="dv">7</span>,<span class="dv">0</span>,<span class="dv">0</span>))</a>
 <a class="sourceLine" id="cb73-20" title="20"><span class="kw">camopPlot</span>(camop_season)</a></code></pre></div>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-23-1.png" width="700"></p>
 <div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" title="1"><span class="co"># make multi-season detection history</span></a>
 <a class="sourceLine" id="cb74-2" title="2">DetHist_multi &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionHistory.html">detectionHistory</a></span>(<span class="dt">recordTable   =</span> recordTableSampleMultiSeason,</a>
 <a class="sourceLine" id="cb74-3" title="3">                            <span class="dt">camOp                =</span> camop_season,</a>
@@ -1022,7 +1022,7 @@
 ##  2:1</code></pre>
 <div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb82-2" title="2">  <span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(sdh_multi)</a></code></pre></div>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-27-1.png" width="700"></p>
 <pre><code>##  1  2 
 ## 15  6</code></pre>
 <div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" title="1">  secr.fit.example &lt;-<span class="st"> </span><span class="kw">secr.fit</span>(<span class="dt">capthist =</span> sdh_multi,</a>
@@ -1182,10 +1182,10 @@
 ##  144    -26.492  -1.2627  -3.5678  14.9091 
 ##  145    -26.492  -1.2627  -3.5679  14.9106 
 ##  146    -26.492  -1.2627  -3.5680  14.9121 
-## Completed in 0.29 seconds at 20:29:42 10 Apr 2020</code></pre>
+## Completed in 0.43 seconds at 13:45:34 20 Apr 2020</code></pre>
 <div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1">  <span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(secr.fit.example)</a></code></pre></div>
 <pre><code>## $versiontime
-## [1] "4.1.0, run 20:29:42 10 Apr 2020, elapsed 0.29 s"
+## [1] "4.1.0, run 13:45:34 20 Apr 2020, elapsed 0.43 s"
 ## 
 ## $capthist
 ##             1 2
