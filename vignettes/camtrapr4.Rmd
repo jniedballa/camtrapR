@@ -136,7 +136,7 @@ The data frame that `detectionMaps` returns can be turned into a SpatialPointsDa
 
 This is how it works. We use the output of `detectionMaps` created above and make a SpatialPointsDataFrame. Afterwards, a sample raster is created, plotted together with the points and the values are extracted.
 
-```{r}
+```{r eval = "raster" %in% installed.packages()}
 detections_spdf <- SpatialPointsDataFrame(coords      = Mapstest3[,c("utm_x", "utm_y")],
                                           data        = Mapstest3,
                                           proj4string = CRS(shapefileProjection))
