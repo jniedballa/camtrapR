@@ -238,6 +238,7 @@ The camera operation matrix is a day-by-station matrix that states how many came
 data(camtraps)
 
 dateFormat <- "%d/%m/%Y"
+# alternatively, use "dmy" (requires package "lubridate")
  
 camop_problem <- cameraOperation(CTtable      = camtraps,
                                  stationCol   = "Station",
@@ -272,8 +273,8 @@ camopPlot <- function(camOp,
   values_tmp <- sort(na.omit(unique(c(camOp))))
 
   # hcl.colors only exists in R >3.6.0, use heat.colors for earlier versions
-  if(exists("hcl.colors")) {
-    image_colors <- hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE)
+  if(getRversion() >= "3.6.0") {
+    image_colors <- grDevices::hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE)
   } else {
     image_colors <- heat.colors(n = length(values_tmp), rev = TRUE)
   }
@@ -286,7 +287,7 @@ camopPlot <- function(camOp,
 }
 ```
 
-And this is what we get (in two different color palettes).
+And this is what we get (in two different color palettes, on R 3.6.0 or higher).
 
 ```{r}
 par(mfrow = c(1,2))
