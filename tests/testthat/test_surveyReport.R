@@ -78,3 +78,31 @@ test_that("errors about NAs in Date/Time are correct", {
                "there are NAs in recordTable[, recordDateTimeCol]", fixed = TRUE)
 })
 
+
+
+test_that("errors about all NAs in Date/Time are correct", {
+  expect_error(surveyReport (recordTable          = recordTableSample,
+                             CTtable              = camtraps,
+                             speciesCol           = "Species",
+                             stationCol           = "Station",
+                             setupCol             = "Setup_date",
+                             retrievalCol         = "Retrieval_date",
+                             CTDateFormat         = "%d-%m-%Y"),            # this is intentionally wrong
+               "Cannot read date format in CTtable[, setupCol]. Output is all NA.
+expected:  %d-%m-%Y
+actual:    02/04/2009", fixed = TRUE)
+  
+  expect_error(surveyReport (recordTable          = recordTableSample,
+                             CTtable              = camtraps,
+                             speciesCol           = "Species",
+                             stationCol           = "Station",
+                             setupCol             = "Setup_date",
+                             retrievalCol         = "Retrieval_date",
+                             CTDateFormat         = "%d/%m/%Y",
+                             recordDateTimeFormat = "%Y/%m/%d %H:%M:%S"),      # this is intentionally wrong
+               "Cannot read datetime format in recordTable[, recordDateTimeCol]. Output is all NA.
+expected:  %Y/%m/%d %H:%M:%S
+actual:    2009-04-21 00:40:00", fixed = TRUE)
+
+})
+

@@ -1413,7 +1413,10 @@ parseDateObject <- function(inputColumn,
     out <- lubridate::date(lubridate::parse_date_time(inputColumn.char, orders = dateFormat))
   }
   
-  if(all(is.na(out))) stop(paste("Cannot read date format in", deparse(substitute(inputColumn)), ". Output is all NA."), call. = FALSE)
+ # if(all(is.na(out))) stop(paste0("Cannot read date format in", deparse(substitute(inputColumn)), ". Output is all NA."), call. = FALSE)
+  
+  if(all(is.na(out))) stop(paste0("Cannot read date format in ", deparse(substitute(inputColumn)), ". Output is all NA.\n",
+                                  "expected:  ", dateFormat, "\nactual:    ", inputColumn[1]), call. = FALSE)
   
   if(checkNA & any(is.na(out))) stop(paste("At least one entry in", deparse(substitute(inputColumn)), "cannot be interpreted using dateFormat:", dateFormat, "\n",
                                            "rows", paste(which(is.na(out)), collapse = ", ")), call. = FALSE)
@@ -1449,7 +1452,8 @@ parseDateTimeObject <- function(inputColumn,
     out <- lubridate::parse_date_time(inputColumn.char, orders = dateTimeFormat, tz = timeZone)
   }
   
-  if(all(is.na(out))) stop(paste("Cannot read datetime format in", deparse(substitute(inputColumn)), ". Output is all NA."), call. = FALSE)
+  if(all(is.na(out))) stop(paste0("Cannot read datetime format in ", deparse(substitute(inputColumn)), ". Output is all NA.\n",
+  "expected:  ", dateTimeFormat, "\nactual:    ", inputColumn[1]), call. = FALSE)
   
   if(checkNA_out & any(is.na(out))) stop(paste(sum(is.na(out)), "out of", length(out), "records in",
                                                deparse(substitute(inputColumn)), "cannot be interpreted using dateTimeFormat:", dateTimeFormat, "\n",
