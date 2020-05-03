@@ -1396,20 +1396,21 @@ parseDateObject <- function(inputColumn,
                             checkEmpty    # throw error if there are blank values in input  (only setup / retrieval, not problems)
 ){
   
-  inputColumn <- as.character(inputColumn)
   #if(!class(inputColumn) %in% c("factor", "character")) stop(paste("date column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
   
   if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
   if(checkEmpty & any(inputColumn == "")) stop(paste("there are blank values in", deparse(substitute(inputColumn))), call. = FALSE)
   
+  inputColumn.char <- as.character(inputColumn)
+  
   # option 1: base functions for dates as per strptime (identified by "%")
   if(grepl(pattern = "%", x = dateFormat, fixed = TRUE)){
-    out <- as.Date(inputColumn,     format = dateFormat)
+    out <- as.Date(inputColumn.char,     format = dateFormat)
   } else {
     # option 2: lubridate functions (identified by absence of "%")
     if(!requireNamespace("lubridate", quietly = TRUE)) stop(paste("package 'lubridate' is required for the specified dateFormat", dateFormat))
     
-    out <- lubridate::date(lubridate::parse_date_time(inputColumn, orders = dateFormat))
+    out <- lubridate::date(lubridate::parse_date_time(inputColumn.char, orders = dateFormat))
   }
   
   if(all(is.na(out))) stop(paste("Cannot read date format in", deparse(substitute(inputColumn)), ". Output is all NA."), call. = FALSE)
@@ -1430,20 +1431,22 @@ parseDateTimeObject <- function(inputColumn,
                                 checkNA_out = TRUE  # throw error when there is NAs in output (FALSE so reporting is done by detectionHistory, which returns correct row numbers)
 ){
   
-  inputColumn <- as.character(inputColumn)
+  
   if(!class(inputColumn) %in% c("factor", "character")) stop(paste("datetime column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
   
   if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
   if(checkEmpty & any(inputColumn == "")) stop(paste("there are blank values in", deparse(substitute(inputColumn))), call. = FALSE)
   
+  inputColumn.char <- as.character(inputColumn)
+  
   # option 1: base functions for dates as per strptime (identified by "%")
   if(grepl(pattern = "%", x = dateTimeFormat, fixed = TRUE)){
-    out <- as.POSIXlt(inputColumn, tz = timeZone, format = dateTimeFormat)
+    out <- as.POSIXlt(inputColumn.char, tz = timeZone, format = dateTimeFormat)
   } else {
     # option 2: lubridate functions (identified by absence of "%")
     if(!requireNamespace("lubridate", quietly = TRUE)) stop(paste("package 'lubridate' is required for the specified dateTimeFormat", dateTimeFormat))
     
-    out <- lubridate::parse_date_time(inputColumn, orders = dateTimeFormat, tz = timeZone)
+    out <- lubridate::parse_date_time(inputColumn.char, orders = dateTimeFormat, tz = timeZone)
   }
   
   if(all(is.na(out))) stop(paste("Cannot read datetime format in", deparse(substitute(inputColumn)), ". Output is all NA."), call. = FALSE)
