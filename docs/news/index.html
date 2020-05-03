@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
       </span>
     </div>
 
@@ -131,13 +131,25 @@
       <small>Source: <a href='https://github.com/jniedballa/camtrapR/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="camtrapr-202" class="section level1">
+    <div id="camtrapr-203" class="section level1">
 <h1 class="page-header">
-<a href="#camtrapr-202" class="anchor"></a>camtrapR 2.0.2<small> Unreleased </small>
+<a href="#camtrapr-203" class="anchor"></a>camtrapR 2.0.3<small> Unreleased </small>
 </h1>
 <div id="bugfixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bugfixes" class="anchor"></a>bugfixes</h2>
+<ul>
+<li>fixed error messages if date or date/time columns contain blank values or NA</li>
+</ul>
+</div>
+</div>
+    <div id="camtrapr-202" class="section level1">
+<h1 class="page-header">
+<a href="#camtrapr-202" class="anchor"></a>camtrapR 2.0.2<small> 2020-04-22 </small>
+</h1>
+<div id="bugfixes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bugfixes-1" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>vignette creation conditional on availability of Exiftool (for CRAN checks)</li>
 <li>tests with testthat conditional on availability of Exiftool (for CRAN checks)</li>
@@ -149,9 +161,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-201" class="anchor"></a>camtrapR 2.0.1<small> 2020-04-19 </small>
 </h1>
-<div id="bugfixes-1" class="section level2">
+<div id="bugfixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-1" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-2" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>exifTagNames: doesn’t return tag description, it caused an error on some systems</li>
 </ul>
@@ -179,9 +191,9 @@
 <li>cameraOperation: detailed error messages if duplicate station / camera / session names</li>
 </ul>
 </div>
-<div id="bugfixes-2" class="section level2">
+<div id="bugfixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-2" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-3" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>detectionHistory: when recordDateTimeCol is a date without time, function assigns a time to avoid calculating occasion 0 for records taken on the camera setup day (with a warning)</li>
 <li>error message in functions that call Exiftool when inDir is empty (no subdirectories)</li>
@@ -219,9 +231,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-122" class="anchor"></a>camtrapR 1.2.2<small> 2020-01-07 </small>
 </h1>
-<div id="bugfixes-3" class="section level2">
+<div id="bugfixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-3" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-4" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>recordTable: fixed error: cameraID must be of class ‘character’ when it is character</li>
 <li>recordTable: fixed error: metadataSpeciesTag must be of class ‘character’ when it is character</li>
@@ -239,9 +251,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-121" class="anchor"></a>camtrapR 1.2.1<small> 2019-12-17 </small>
 </h1>
-<div id="bugfixes-4" class="section level2">
+<div id="bugfixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-4" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-5" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>recordTable: fixed error: metadataSpeciesTag must be of class ‘character’ when it is character and IDfrom = “metadata”</li>
 <li>recordTable: fixed: ‘Error in <code>[.data.frame</code>(intable, , match(colnames(record.table), colnames(intable))) : undefined columns selected’ (when additionalMetadataTags are defined)</li>
@@ -266,9 +278,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-12" class="anchor"></a>camtrapR 1.2<small> 2019-12-05 </small>
 </h1>
-<div id="bugfixes-5" class="section level2">
+<div id="bugfixes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-5" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-6" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>imageRename: fixed bug where fileExistsAlready in output table was FALSE when it should be TRUE</li>
 </ul>
@@ -305,9 +317,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-11" class="anchor"></a>camtrapR 1.1<small> 2019-03-13 </small>
 </h1>
-<div id="bugfixes-6" class="section level2">
+<div id="bugfixes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-6" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-7" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>appendSpeciesNames / checkSpeciesIdentification / getSpeciesImages: fixed error ‘argument “returnFileNamesMissingTags” is missing, with no default’</li>
 <li>recordTableIndividual: fixed multiple individuals from same image being removed (except for one) when removeDuplicates = TRUE</li>
@@ -335,9 +347,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-10" class="anchor"></a>camtrapR 1.0<small> 2018-10-27 </small>
 </h1>
-<div id="bugfixes-7" class="section level2">
+<div id="bugfixes-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-7" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-8" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>activityDensity: fixed problem with argument allSpecies = TRUE that caused output list to return values for one species only (reported by Sally Soo).</li>
 <li>appendSpeciesNames, checkSpeciesIdentification,getSpeciesImages, recordTableIndividual: fixed error in extracting species IDs from image metadata in directories in which no images are tagged. These stations are now skipped with a warning.</li>
@@ -359,9 +371,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-0999" class="anchor"></a>camtrapR 0.99.9<small> 2017-10-25 </small>
 </h1>
-<div id="bugfixes-8" class="section level2">
+<div id="bugfixes-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-8" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-9" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>camera operation: fixed bug with empty entries in cameraCol when cameraCol is defined (reported by Partha Sarathi Ghose)</li>
 <li>recordTable / recordTableIndividual: verbose warnings and better handling of situations in which date/time is unreadable (empty Exif:DateTimeOriginal metadata tag)</li>
@@ -387,9 +399,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-0998" class="anchor"></a>camtrapR 0.99.8<small> 2017-03-21 </small>
 </h1>
-<div id="bugfixes-9" class="section level2">
+<div id="bugfixes-10" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-9" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-10" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>recordTable / recordTableIndividual: column “HierarchicalSubject” (containing digiKam metadata tags in their native format) was called “record.table3[, col_to_move]” by mistake (thanks to Ross Pitman for reporting)</li>
 </ul>
@@ -406,9 +418,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-0997" class="anchor"></a>camtrapR 0.99.7<small> 2017-01-31 </small>
 </h1>
-<div id="bugfixes-10" class="section level2">
+<div id="bugfixes-11" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-10" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-11" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>recordTable: returned station ID as camera ID if IDfrom = “metadata” and cameraID = “directory”</li>
 </ul>
@@ -435,9 +447,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-0996" class="anchor"></a>camtrapR 0.99.6<small> 2016-12-19 </small>
 </h1>
-<div id="bugfixes-11" class="section level2">
+<div id="bugfixes-12" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-11" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-12" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>fixed crash in cameraOperation function caused by underscores in station / camera IDs (reported by Wyatt Petersen)</li>
 </ul>
@@ -471,9 +483,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-0995" class="anchor"></a>camtrapR 0.99.5<small> 2016-10-06 </small>
 </h1>
-<div id="bugfixes-12" class="section level2">
+<div id="bugfixes-13" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-12" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-13" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>recordTable/recordTableIndividual: give warning if Exif DateTimeOriginal tag of images is unreadable (error if all tags of a station are unreadable). May happen if images files are corrupted due to camera malfunctioning.</li>
 <li>recordTable/recordTableIndividual: 2 records of the same species at the same station and same time by different cameras are not collapsed into one record if camerasIndependent = TRUE</li>
@@ -500,9 +512,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-0994" class="anchor"></a>camtrapR 0.99.4<small> 2016-08-12 </small>
 </h1>
-<div id="bugfixes-13" class="section level2">
+<div id="bugfixes-14" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-13" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-14" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>spatialDetectionHistory: trap usage now codes malfunctioning cameras and cameras that were not set up as 0 instead of NA (as expected by the secr package)</li>
 <li>spatialDetectionHistory: argument “scaleEffort” can only be FALSE now (to avoid negative trapping effort values, which secr does not accept)</li>
@@ -534,9 +546,9 @@
 <li>addCopyrightTag: Write a copyright tag into image Exif metadata</li>
 </ul>
 </div>
-<div id="bugfixes-14" class="section level2">
+<div id="bugfixes-15" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-14" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-15" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>detectionHistory: malfunctioning cameras (0 in camera operation matrix) did not cause detection history matrix cells to be NA (even if includeEffort = FALSE; reported by Hsiang Ling Chen)</li>
 <li>detectionHistory: if the last occasion is shorter than occasionLength, the corresponding detection history matrix cells will now be NA if includeEffort = FALSE</li>
@@ -555,9 +567,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-0992" class="anchor"></a>camtrapR 0.99.2<small> 2016-06-24 </small>
 </h1>
-<div id="bugfixes-15" class="section level2">
+<div id="bugfixes-16" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-15" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-16" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>recordTable: fixed problem with appending camera IDs</li>
 <li>cameraOperation: improved messages to user</li>
@@ -575,9 +587,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-0991" class="anchor"></a>camtrapR 0.99.1<small> 2016-05-18 </small>
 </h1>
-<div id="bugfixes-16" class="section level2">
+<div id="bugfixes-17" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-16" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-17" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>detectionHistory and spatialDetectionHistory did not run correctly under some rare circumstances (combinations of input arguments)</li>
 <li>column names of detection histories were incorrect if occasionStartTime != 0 and datesAsOccasionNames = TRUE</li>
@@ -645,9 +657,9 @@
 <li>activity plot functions show number of records that were used</li>
 </ul>
 </div>
-<div id="bugfixes-17" class="section level2">
+<div id="bugfixes-18" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bugfixes-17" class="anchor"></a>bugfixes</h2>
+<a href="#bugfixes-18" class="anchor"></a>bugfixes</h2>
 <ul>
 <li>surveyReport returned an error when there were stations without records.</li>
 <li>detecionMaps: Xcol and Ycol have arbitrary names now.</li>
@@ -741,6 +753,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#camtrapr-203">2.0.3</a></li>
         <li><a href="#camtrapr-202">2.0.2</a></li>
         <li><a href="#camtrapr-201">2.0.1</a></li>
         <li><a href="#camtrapr-200">2.0.0</a></li>

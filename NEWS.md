@@ -1,3 +1,8 @@
+# camtrapR 2.0.3
+
+## bugfixes
+* fixed error messages if date or date/time columns contain blank values or NA
+
 # camtrapR 2.0.2
 
 ## bugfixes
