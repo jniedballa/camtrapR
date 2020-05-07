@@ -153,7 +153,8 @@ recordTable <- function(inDir,
   colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal")
   if(hasArg(video)) colnames.tmp <- c(colnames.tmp, video$dateTimeTag)
   colnames.tmp <- c(colnames.tmp, "HierarchicalSubject")
-  if(hasArg(additionalMetadataTags)) colnames.tmp <- c(colnames.tmp, additionalMetadataTags)
+  if(hasArg(additionalMetadataTags)) colnames.tmp <- c(colnames.tmp, additionalMetadataTags [nchar(additionalMetadataTags) >= 2]) 
+  # only add as new column if entry of additionalMetadataTag has more than 2 characters (to allow users to specify exiftool commands, e.g. -L)
   
   
   for(i in 1:length(dirs)){   # loop through station directories
