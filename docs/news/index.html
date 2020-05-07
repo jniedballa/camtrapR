@@ -142,6 +142,13 @@
 <li>fixed error messages if date or date/time columns contain blank values or NA</li>
 </ul>
 </div>
+<div id="other-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#other-changes" class="anchor"></a>other changes</h2>
+<ul>
+<li>recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with “L” for Latin character set, everything else will most likely break the code)</li>
+</ul>
+</div>
 </div>
     <div id="camtrapr-202" class="section level1">
 <h1 class="page-header">
@@ -168,9 +175,9 @@
 <li>exifTagNames: doesn’t return tag description, it caused an error on some systems</li>
 </ul>
 </div>
-<div id="other-changes" class="section level2">
+<div id="other-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes" class="anchor"></a>other changes</h2>
+<a href="#other-changes-1" class="anchor"></a>other changes</h2>
 <ul>
 <li>included tests with testthat</li>
 </ul>
@@ -202,9 +209,9 @@
 <li>detectionMaps: fixed error when trying to plot backgroundPolygon (reported by Oliver Wearn)</li>
 </ul>
 </div>
-<div id="other-changes-1" class="section level2">
+<div id="other-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-1" class="anchor"></a>other changes</h2>
+<a href="#other-changes-2" class="anchor"></a>other changes</h2>
 <ul>
 <li>vignette filenames changed, document type changed to html_document, added floating table of contents</li>
 <li>added ORCID for authors</li>
@@ -217,9 +224,9 @@
 <h1 class="page-header">
 <a href="#camtrapr-123" class="anchor"></a>camtrapR 1.2.3<small> 2020-01-10 </small>
 </h1>
-<div id="other-changes-2" class="section level2">
+<div id="other-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-2" class="anchor"></a>other changes</h2>
+<a href="#other-changes-3" class="anchor"></a>other changes</h2>
 <ul>
 <li>checkSpeciesNames: no error when ITIS server is not available</li>
 <li>minor fixes in vignettes</li>
@@ -239,9 +246,9 @@
 <li>recordTable: fixed error: metadataSpeciesTag must be of class ‘character’ when it is character</li>
 </ul>
 </div>
-<div id="other-changes-3" class="section level2">
+<div id="other-changes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-3" class="anchor"></a>other changes</h2>
+<a href="#other-changes-4" class="anchor"></a>other changes</h2>
 <ul>
 <li>cameraOperation: warning if date can be interpreted but is likely wrong (due to incorrectly set dateFormat argument)</li>
 </ul>
@@ -266,9 +273,9 @@
 <li>multi-season sample data sets: camtrapsMultiSeason, recordTableSampleMultiSeason, recordTableIndividualSampleMultiSeason</li>
 </ul>
 </div>
-<div id="other-changes-4" class="section level2">
+<div id="other-changes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-4" class="anchor"></a>other changes</h2>
+<a href="#other-changes-5" class="anchor"></a>other changes</h2>
 <ul>
 <li>package “data.table” is a dependency now (for more reliable assembly of record table when additionalMetadataTags are defined, see ## bugfixes)</li>
 </ul>
@@ -301,9 +308,9 @@
 <li>exifTagNames: more flexible, users can define subdirectories by name and give desired file names</li>
 </ul>
 </div>
-<div id="other-changes-5" class="section level2">
+<div id="other-changes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-5" class="anchor"></a>other changes</h2>
+<a href="#other-changes-6" class="anchor"></a>other changes</h2>
 <ul>
 <li>detectionHistory / spatialDetectionHistory: improved error message if date/time values are not readable (correct row in original recordTable is returned)</li>
 <li>detectionMaps: new error message when XCol or YCol are not numeric</li>
@@ -334,9 +341,9 @@
 <li>detectionHistory / spatialDetectionHistory: improved error messages when records fall outside camera trap operation range</li>
 </ul>
 </div>
-<div id="other-changes-6" class="section level2">
+<div id="other-changes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-6" class="anchor"></a>other changes</h2>
+<a href="#other-changes-7" class="anchor"></a>other changes</h2>
 <ul>
 <li>added citation (see: citation(“camtrapR”))</li>
 <li>added URLs to description</li>
@@ -356,9 +363,9 @@
 <li>detectionHistory / spatialDetectionHistory: fixed error with detection histories and effort matrix full of NAs arising if camera operation matrix had values &gt; 2 (after argument camerasIndependent = TRUE in cameraOperation)</li>
 </ul>
 </div>
-<div id="other-changes-7" class="section level2">
+<div id="other-changes-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-7" class="anchor"></a>other changes</h2>
+<a href="#other-changes-8" class="anchor"></a>other changes</h2>
 <ul>
 <li>imageRename: meaningful error message if no DateTimeOriginal tag was readable (e.g. all cameras were Reconyx HC500)</li>
 <li>recordTable/ recordTableIndividual: new argument: returnFileNamesMissingTags: file name of images with missing species tag are returned if TRUE (default = FALSE)</li>
@@ -387,9 +394,9 @@
 <li>activityDensity: warning instead of error if bandwidth estimation fails and argument allSpecies = TRUE (problem occurred with single records, or few records at similar time of day)</li>
 </ul>
 </div>
-<div id="other-changes-8" class="section level2">
+<div id="other-changes-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-8" class="anchor"></a>other changes</h2>
+<a href="#other-changes-9" class="anchor"></a>other changes</h2>
 <ul>
 <li>exifTagNames: returns name of image from which metadata were extracted as a message</li>
 </ul>
@@ -406,9 +413,9 @@
 <li>recordTable / recordTableIndividual: column “HierarchicalSubject” (containing digiKam metadata tags in their native format) was called “record.table3[, col_to_move]” by mistake (thanks to Ross Pitman for reporting)</li>
 </ul>
 </div>
-<div id="other-changes-9" class="section level2">
+<div id="other-changes-10" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-9" class="anchor"></a>other changes</h2>
+<a href="#other-changes-10" class="anchor"></a>other changes</h2>
 <ul>
 <li>improved checks that function input has correct class (to make sure data.frames are provided where the functions expect them)</li>
 </ul>
@@ -434,9 +441,9 @@
 <li>imageRename: if outDir contains images already, the function will not stop with an error, but asks you whether or not to copy new images (useful if data come in over time)</li>
 </ul>
 </div>
-<div id="other-changes-10" class="section level2">
+<div id="other-changes-11" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-10" class="anchor"></a>other changes</h2>
+<a href="#other-changes-11" class="anchor"></a>other changes</h2>
 <ul>
 <li>recordTable / recordTableIndividual: improved handling and reporting of stations without images (warning instead of error)</li>
 <li>recordTable / recordTableIndividual: improved handling and reporting of stations where all images lack species/individual metadata tags (only if using metadata ID, functions will throw warning instead of error, reported by Aditya Malgaonkar)</li>
@@ -469,9 +476,9 @@
 <li>exifTagNames: gained argument ‘returnTagGroup’, and now by default returns metadata tag group in addition to metadata tag names (to unambiguously address specific metadata tags)</li>
 </ul>
 </div>
-<div id="other-changes-11" class="section level2">
+<div id="other-changes-12" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-11" class="anchor"></a>other changes</h2>
+<a href="#other-changes-12" class="anchor"></a>other changes</h2>
 <ul>
 <li>new dependency: “ritis” - this is because parts of package taxize (used internally by function “checkSpeciesNames”) were migrated to ritis</li>
 <li>detectionHistory / spatialDetectionHistory: occasionLength can be any value between 1 and the number of columns in camOp (not half the number of columns in camOp as before)</li>
@@ -500,9 +507,9 @@
 <li>recordTable and recordTableIndividual both gained an argument (removeDuplicateRecords) to control whether duplicate records (same station, same species, exactly same time) should be collapsed into one record (former versions did that without asking)</li>
 </ul>
 </div>
-<div id="other-changes-12" class="section level2">
+<div id="other-changes-13" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-12" class="anchor"></a>other changes</h2>
+<a href="#other-changes-13" class="anchor"></a>other changes</h2>
 <ul>
 <li>imageRename will first check all directories before actually renaming anything. So the function won’t break halfway through, leaving you with a half-full directory of renamed images if something goes wrong (e.g. unreadable date/time tags).</li>
 </ul>
@@ -527,9 +534,9 @@
 <li>spatialDetectionHistory gained argument “sessionCol”. It can be used to split data (i.e., create a list with multiple capthist objects) if captures come from different sessions).</li>
 </ul>
 </div>
-<div id="other-changes-13" class="section level2">
+<div id="other-changes-14" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-13" class="anchor"></a>other changes</h2>
+<a href="#other-changes-14" class="anchor"></a>other changes</h2>
 <ul>
 <li>package shows startup message and checks automatically if local package version is up to date</li>
 </ul>
@@ -575,9 +582,9 @@
 <li>cameraOperation: improved messages to user</li>
 </ul>
 </div>
-<div id="other-changes-14" class="section level2">
+<div id="other-changes-15" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-14" class="anchor"></a>other changes</h2>
+<a href="#other-changes-15" class="anchor"></a>other changes</h2>
 <ul>
 <li>added section about defining date formats in camera station table to vignette 1 (Image Organisation)</li>
 </ul>
@@ -596,9 +603,9 @@
 <li>argument maxNumberDays in detectionHistory / spatialDetectionHistory works on each station individually if day1 = “survey” or “station”; and from the specified date if day1 is a date</li>
 </ul>
 </div>
-<div id="other-changes-15" class="section level2">
+<div id="other-changes-16" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-15" class="anchor"></a>other changes</h2>
+<a href="#other-changes-16" class="anchor"></a>other changes</h2>
 <ul>
 <li>additional checks for consistency of input in a number of functions</li>
 <li>code simplification invisible to the user</li>
@@ -665,9 +672,9 @@
 <li>detecionMaps: Xcol and Ycol have arbitrary names now.</li>
 </ul>
 </div>
-<div id="other-changes-16" class="section level2">
+<div id="other-changes-17" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-16" class="anchor"></a>other changes</h2>
+<a href="#other-changes-17" class="anchor"></a>other changes</h2>
 <ul>
 <li>arguments “customMetadataTags” and hasSpeciesFolders/ hasIndividualFolders was removed and replaced with argument “IDfrom”</li>
 <li>metadata tags assigned in image management software are always extracted and tabulated in recordTable functions (making argument “customMetadataTags” obsolete)</li>
@@ -723,9 +730,9 @@
 <li>checkSpeciesFolders: new argument stationsToCheck</li>
 </ul>
 </div>
-<div id="other-changes-17" class="section level2">
+<div id="other-changes-18" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-changes-17" class="anchor"></a>other changes</h2>
+<a href="#other-changes-18" class="anchor"></a>other changes</h2>
 <ul>
 <li>checkSpeciesFolders: renamed argument exclude -&gt; excludeSpecies</li>
 <li>detectionHistory: “session” in argument names was renamed to “occasion” (to be consistent with secr nomenclature)</li>

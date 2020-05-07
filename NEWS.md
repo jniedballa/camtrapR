@@ -3,6 +3,9 @@
 ## bugfixes
 * fixed error messages if date or date/time columns contain blank values or NA
 
+## other changes
+* recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with "L" for Latin character set, everything else will most likely break the code)
+
 # camtrapR 2.0.2
 
 ## bugfixes
