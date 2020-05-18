@@ -45,6 +45,7 @@ detectionHistory <- function(recordTable,
   stopifnot(hasArg(recordTable))
   stopifnot(is.data.frame(recordTable))
   stopifnot(hasArg(camOp))
+  if(!inherits(camOp, "matrix")) stop ("camOp must be a matrix", call. = FALSE)
   
   stopifnot(length(stationCol) == 1)
   recordTable[,stationCol] <- as.character(recordTable[,stationCol])

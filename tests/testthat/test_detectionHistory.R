@@ -341,3 +341,19 @@ test_that("Error when includeEffort = TRUE but scaleEffort not defined", {
                "scaleEffort must be defined if includeEffort is TRUE", fixed = TRUE)
 }                             
 )
+
+
+test_that("Error when camOp is not a matrix", {
+  expect_error(detectionHistory(recordTable          = recordTableSample,
+                                camOp                = "camop_no_problem",
+                                stationCol           = "Station",
+                                speciesCol           = "Species",
+                                recordDateTimeCol    = "DateTimeOriginal",
+                                species              = "VTA",
+                                occasionLength       = 7,
+                                day1                 = "station", 
+                                includeEffort        = TRUE,
+                                timeZone             = "Asia/Kuala_Lumpur"),
+               "camOp must be a matrix", fixed = TRUE)
+}                             
+)
