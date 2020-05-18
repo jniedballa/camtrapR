@@ -218,7 +218,7 @@ DetHist2_lub <- detectionHistory(recordTable          = recordTableSample,
                              timeZone             = "Asia/Kuala_Lumpur"
 )
 
-DetHist2_lub$detection_history  # detection history  (alternatively, use: DetHist2[[1]])
+DetHist2_lub$detection_history  # detection history  (alternatively, use: DetHist2_lub[[1]])
 DetHist2_lub$effort             # effort (alternatively, use: DetHist2_lub[[2]])
 
 
