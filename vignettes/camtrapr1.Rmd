@@ -36,7 +36,7 @@ The four vignettes demonstrate the camtrapR workflow using the sample data set t
 You can install the newest stable version from CRAN via:
 
 ```{r eval = FALSE}
-install.packages(camtrapR)
+install.packages("camtrapR")
 ```
 
 Alternatively, you can install the development version from GitHub (requires package devtools):

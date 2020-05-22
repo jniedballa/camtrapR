@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
       </span>
     </div>
 
@@ -94,7 +94,7 @@
       <h1>1. Organising raw camera trap images in camtrapR</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2020-04-20</h4>
+            <h4 class="date">2020-05-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr1.Rmd"><code>vignettes/camtrapr1.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr1.Rmd</code></div>
@@ -112,7 +112,7 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>You can install the newest stable version from CRAN via:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(camtrapR)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"camtrapR"</span>)</a></code></pre></div>
 <p>Alternatively, you can install the development version from GitHub (requires package devtools):</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(devtools)</a>
 <a class="sourceLine" id="cb2-2" title="2"><span class="kw">install_github</span>(<span class="st">"jniedballa/camtrapR"</span>)</a></code></pre></div>
@@ -382,9 +382,9 @@
 ## 2 StationB
 ## 3 StationC
 ##                                                                                directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/createStationFoldersTest/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/createStationFoldersTest/StationB
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/createStationFoldersTest/StationC
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/createStationFoldersTest/StationA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/createStationFoldersTest/StationB
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/createStationFoldersTest/StationC
 ##   created exists
 ## 1    TRUE   TRUE
 ## 2    TRUE   TRUE
@@ -417,12 +417,12 @@
 <a class="sourceLine" id="cb18-7" title="7">                                 <span class="dt">timeShiftColumn      =</span> <span class="st">"timeshift"</span>,</a>
 <a class="sourceLine" id="cb18-8" title="8">                                 <span class="dt">timeShiftSignColumn  =</span> <span class="st">"sign"</span></a>
 <a class="sourceLine" id="cb18-9" title="9">)</a></code></pre></div>
-<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpYLxS1y/raw_images/StationA</code></pre>
-<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpYLxS1y/raw_images/StationB</code></pre>
+<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpqUEQat/raw_images/StationA</code></pre>
+<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpqUEQat/raw_images/StationB</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">timeshift_run</a></code></pre></div>
 <pre><code>##                                                                  directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images/StationB
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images/StationA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images/StationB
 ##               n_directories                  n_images
 ## 1     1 directories scanned     3 image files updated
 ## 2     1 directories scanned     3 image files updated</code></pre>
@@ -438,8 +438,8 @@
 <a class="sourceLine" id="cb23-9" title="9"></a>
 <a class="sourceLine" id="cb23-10" title="10">timeshift_undo</a></code></pre></div>
 <pre><code>##                                                                  directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images/StationB
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images/StationA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images/StationB
 ##   n_images_undo
 ## 1             3
 ## 2             3</code></pre>
@@ -504,12 +504,12 @@
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="co"># here is the information for a few images </span></a>
 <a class="sourceLine" id="cb28-2" title="2"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(renaming.table2)</a></code></pre></div>
 <pre><code>##                                                                            Directory
-## 1 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/raw_images/StationA
-## 2 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/raw_images/StationA
-## 3 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/raw_images/StationA
-## 4 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/raw_images/StationB
-## 5 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/raw_images/StationB
-## 6 C:/Users/Juergen/Documents/R/win-library/3.6/camtrapR/pictures/raw_images/StationB
+## 1 C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/raw_images/StationA
+## 2 C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/raw_images/StationA
+## 3 C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/raw_images/StationA
+## 4 C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/raw_images/StationB
+## 5 C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/raw_images/StationB
+## 6 C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/raw_images/StationB
 ##      FileName  Station Camera    DateTimeOriginal DateReadable
 ## 1 IMG0001.JPG StationA     NA 2009-04-10 05:07:00         TRUE
 ## 2 IMG0002.JPG StationA     NA 2009-04-21 00:40:00         TRUE
@@ -518,12 +518,12 @@
 ## 5 IMG0002.JPG StationB     NA 2009-04-05 23:13:00         TRUE
 ## 6 IMG0003.JPG StationB     NA 2009-04-07 00:23:00         TRUE
 ##                                                                             outDir
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images_renamed/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images_renamed/StationA
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images_renamed/StationA
-## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images_renamed/StationB
-## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images_renamed/StationB
-## 6 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpYLxS1y/raw_images_renamed/StationB
+## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images_renamed/StationA
+## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images_renamed/StationA
+## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images_renamed/StationA
+## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images_renamed/StationB
+## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images_renamed/StationB
+## 6 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpqUEQat/raw_images_renamed/StationB
 ##                            filename_new fileExistsAlready CopyStatus
 ## 1 StationA__2009-04-10__05-07-00(1).JPG             FALSE      FALSE
 ## 2 StationA__2009-04-21__00-40-00(1).JPG             FALSE      FALSE
@@ -604,61 +604,61 @@
 <p>When we check the outcome with function exifTagNames, we find field “Copyright” in line 27.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1"><span class="kw"><a href="../reference/exifTagNames.html">exifTagNames</a></span>(wd_images_ID_copy)</a></code></pre></div>
 <pre><code>## Metadata of:
-## C:\Users\Juergen\AppData\Local\Temp\RtmpYLxS1y/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
-<pre><code>##    tag_group                tag_name             tag_description
-## 1   ExifTool         ExifToolVersion     ExifTool Version Number
-## 2   ExifTool                 Warning                     Warning
-## 3       File                FileName                   File Name
-## 4       File               Directory                   Directory
-## 5       File                FileSize                   File Size
-## 6       File          FileModifyDate File Modification Date/Time
-## 7       File          FileAccessDate       File Access Date/Time
-## 8       File          FileCreateDate     File Creation Date/Time
-## 9       File         FilePermissions            File Permissions
-## 10      File                FileType                   File Type
-## 11      File       FileTypeExtension         File Type Extension
-## 12      File                MIMEType                   MIME Type
-## 13      File           ExifByteOrder             Exif Byte Order
-## 14      File              ImageWidth                 Image Width
-## 15      File             ImageHeight                Image Height
-## 16      File         EncodingProcess            Encoding Process
-## 17      File           BitsPerSample             Bits Per Sample
-## 18      File         ColorComponents            Color Components
-## 19      File        YCbCrSubSampling        Y Cb Cr Sub Sampling
-## 20      EXIF                    Make                        Make
-## 21      EXIF                   Model           Camera Model Name
-## 22      EXIF             XResolution                X Resolution
-## 23      EXIF             YResolution                Y Resolution
-## 24      EXIF          ResolutionUnit             Resolution Unit
-## 25      EXIF              ModifyDate                 Modify Date
-## 26      EXIF        YCbCrPositioning         Y Cb Cr Positioning
-## 27      EXIF               Copyright                   Copyright
-## 28      EXIF             ExifVersion                Exif Version
-## 29      EXIF        DateTimeOriginal          Date/Time Original
-## 30      EXIF              CreateDate                 Create Date
-## 31      EXIF ComponentsConfiguration    Components Configuration
-## 32      EXIF       ShutterSpeedValue         Shutter Speed Value
-## 33      EXIF             UserComment                User Comment
-## 34      EXIF         FlashpixVersion            Flashpix Version
-## 35      EXIF              ColorSpace                 Color Space
-## 36      EXIF          ExifImageWidth            Exif Image Width
-## 37      EXIF         ExifImageHeight           Exif Image Height
-## 38      EXIF             Compression                 Compression
-## 39      EXIF         ThumbnailOffset            Thumbnail Offset
-## 40      EXIF         ThumbnailLength            Thumbnail Length
-## 41      EXIF          ThumbnailImage             Thumbnail Image
-## 42 Composite               ImageSize                  Image Size
-## 43 Composite              Megapixels                  Megapixels
-## 44 Composite            ShutterSpeed               Shutter Speed
+## C:\Users\Juergen\AppData\Local\Temp\RtmpqUEQat/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
+<pre><code>##    tag_group                tag_name
+## 1   ExifTool         ExifToolVersion
+## 2   ExifTool                 Warning
+## 3       File                FileName
+## 4       File               Directory
+## 5       File                FileSize
+## 6       File          FileModifyDate
+## 7       File          FileAccessDate
+## 8       File          FileCreateDate
+## 9       File         FilePermissions
+## 10      File                FileType
+## 11      File       FileTypeExtension
+## 12      File                MIMEType
+## 13      File           ExifByteOrder
+## 14      File              ImageWidth
+## 15      File             ImageHeight
+## 16      File         EncodingProcess
+## 17      File           BitsPerSample
+## 18      File         ColorComponents
+## 19      File        YCbCrSubSampling
+## 20      EXIF                    Make
+## 21      EXIF                   Model
+## 22      EXIF             XResolution
+## 23      EXIF             YResolution
+## 24      EXIF          ResolutionUnit
+## 25      EXIF              ModifyDate
+## 26      EXIF        YCbCrPositioning
+## 27      EXIF               Copyright
+## 28      EXIF             ExifVersion
+## 29      EXIF        DateTimeOriginal
+## 30      EXIF              CreateDate
+## 31      EXIF ComponentsConfiguration
+## 32      EXIF       ShutterSpeedValue
+## 33      EXIF             UserComment
+## 34      EXIF         FlashpixVersion
+## 35      EXIF              ColorSpace
+## 36      EXIF          ExifImageWidth
+## 37      EXIF         ExifImageHeight
+## 38      EXIF             Compression
+## 39      EXIF         ThumbnailOffset
+## 40      EXIF         ThumbnailLength
+## 41      EXIF          ThumbnailImage
+## 42 Composite               ImageSize
+## 43 Composite              Megapixels
+## 44 Composite            ShutterSpeed
 ##                                                                                    value
 ## 1                                                                                  11.80
 ## 2                                             Invalid EXIF text encoding for UserComment
 ## 3                                                  StationA__2009-04-21__00-40-00(1).JPG
-## 4  C:/Users/Juergen/AppData/Local/Temp/RtmpYLxS1y/sample_images_species_dir/StationA/PBE
+## 4  C:/Users/Juergen/AppData/Local/Temp/RtmpqUEQat/sample_images_species_dir/StationA/PBE
 ## 5                                                                                  27 kB
-## 6                                                              2020:04:20 13:43:41+02:00
-## 7                                                              2020:04:20 13:43:41+02:00
-## 8                                                              2020:04:20 13:43:38+02:00
+## 6                                                              2020:05:22 21:28:09+02:00
+## 7                                                              2020:05:22 21:28:09+02:00
+## 8                                                              2020:05:22 21:28:07+02:00
 ## 9                                                                              rw-rw-rw-
 ## 10                                                                                  JPEG
 ## 11                                                                                   jpg
