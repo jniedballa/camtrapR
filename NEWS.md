@@ -5,6 +5,7 @@
 
 ## other changes
 * recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with "L" for Latin character set, everything else will most likely break the code)
+* improved error messages in recordTable/recordTableIndividual and detectionHistory/spatialDetectionHistory functions
 
 # camtrapR 2.0.2
 
