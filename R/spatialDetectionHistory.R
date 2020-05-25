@@ -32,25 +32,29 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   #################
   # check input
-  stopifnot(hasArg(recordTableIndividual))
+  if(!hasArg(recordTableIndividual))  stop("'recordTableIndividual' is not defined", call. = FALSE)
   
   recordTableIndividual <- dataFrameTibbleCheck(df = recordTableIndividual)
   CTtable <- dataFrameTibbleCheck(df = CTtable)
 
-  stopifnot(hasArg(camOp))
+  if(!hasArg(camOp))               stop("'camOp' is not defined", call. = FALSE)
+  if(!inherits(camOp, "matrix"))   stop ("camOp must be a matrix", call. = FALSE)
 
-  stopifnot(hasArg(species))
-  stopifnot(is.character(species))
-  stopifnot(length(species) == 1)
+  if(!hasArg(species))        stop("'species' is not defined", call. = FALSE)
+  if(!is.character(species))  stop("species must be of class character", call. = FALSE)
+  if(!length(species) == 1)   stop("species may only contain one value", call. = FALSE)
 
-  if(hasArg(makeRMarkInput)) stopifnot(is.logical(makeRMarkInput))
+  if(hasArg(makeRMarkInput)) if(!is.logical(makeRMarkInput)) stop("makeRMarkInput must be logical", call. = FALSE)
 
   output <- match.arg(output)
 
-  stopifnot(hasArg(occasionLength))
+  if(!hasArg(occasionLength)) stop("'occasionLength' is not defined", call. = FALSE)
 
   # check recordTableIndividual
-  stopifnot(c(speciesCol, recordDateTimeCol, stationCol, individualCol) %in% colnames(recordTableIndividual))
+  if(!speciesCol %in% colnames(recordTableIndividual))        stop(paste("speciesCol", speciesCol, "is not a column name in recordTableIndividual"), call. = FALSE)
+  if(!recordDateTimeCol %in% colnames(recordTableIndividual)) stop(paste("recordDateTimeCol", recordDateTimeCol, "is not a column name in recordTableIndividual"), call. = FALSE)
+  if(!stationCol %in% colnames(recordTableIndividual))        stop(paste("stationCol", stationCol, "is not a column name in recordTableIndividual"), call. = FALSE)
+  if(!individualCol %in% colnames(recordTableIndividual))     stop(paste("individualCol", individualCol, "is not a column name in recordTableIndividual"), call. = FALSE)
 
   checkForSpacesInColumnNames(stationCol = stationCol, Xcol = Xcol, Ycol = Ycol, 
                                          recordDateTimeCol = recordDateTimeCol, speciesCol = speciesCol, individualCol = individualCol)
@@ -65,26 +69,27 @@ spatialDetectionHistory <- function(recordTableIndividual,
   if(!individualCol %in% colnames(recordTableIndividual))         stop(paste('individualCol = "', individualCol,  '" is not a column name in recordTableIndividual', sep = ''), call. = FALSE)
   
     
-  stopifnot(length(stationCol) == 1)
+  if(!length(stationCol) == 1)  stop("stationCol may only contain one value", call. = FALSE)
   recordTableIndividual[, stationCol] <- as.character(recordTableIndividual[, stationCol])
-  stopifnot(is.character(stationCol))
+  if(!is.character(stationCol)) stop("stationCol must be a character", call. = FALSE)
 
-  stopifnot(length(speciesCol) == 1)
+  if(!length(speciesCol) == 1)  stop("speciesCol may only contain one value", call. = FALSE)
   recordTableIndividual[, speciesCol] <- as.character(recordTableIndividual[, speciesCol])
-  stopifnot(is.character(speciesCol))
+  if(!is.character(speciesCol)) stop("speciesCol must be a character", call. = FALSE)
 
-  stopifnot(length(individualCol) == 1)
+  if(!length(individualCol) == 1)  stop("individualCol may only contain one value", call. = FALSE)
   recordTableIndividual[, individualCol] <- as.character(recordTableIndividual[, individualCol])
-  stopifnot(is.character(individualCol))
+  if(!is.character(individualCol)) stop("individualCol must be a character", call. = FALSE)
 
-  stopifnot(length(recordDateTimeCol) == 1)
+  if(!length(recordDateTimeCol) == 1)  stop("recordDateTimeCol may only contain one value", call. = FALSE)
   recordTableIndividual[, recordDateTimeCol] <- as.character(recordTableIndividual[, recordDateTimeCol])
-  stopifnot(is.character(recordDateTimeCol))
-
+  if(!is.character(recordDateTimeCol)) stop("recordDateTimeCol must be a character", call. = FALSE)
+  
+  
   # check CTtable
-  if(any(is.na(CTtable[,Xcol]))) stop("there are NAs in Xcol")
-  if(any(is.na(CTtable[,Ycol]))) stop("there are NAs in Ycol")
-  if(any(is.na(CTtable[,stationCol]))) stop("there are NAs in stationCol of CTtable")
+  if(any(is.na(CTtable[,Xcol]))) stop("there are NAs in Xcol", call. = FALSE)
+  if(any(is.na(CTtable[,Ycol]))) stop("there are NAs in Ycol", call. = FALSE)
+  if(any(is.na(CTtable[,stationCol]))) stop("there are NAs in stationCol of CTtable", call. = FALSE)
 
   if(hasArg(stationCovariateCols)){
   checkForSpacesInColumnNames(stationCovariateCols = stationCovariateCols)
@@ -105,15 +110,15 @@ spatialDetectionHistory <- function(recordTableIndividual,
        sessionCol %in% colnames(CTtable) == FALSE) stop(paste("neither CTtable nor recordTableIndividual contain sessionCol '", sessionCol, "'", sep = ""), call. = FALSE)
 
     if(sessionCol %in% colnames(recordTableIndividual)) {
-      stopifnot(is.numeric(recordTableIndividual[,sessionCol]))
+      if(!is.numeric(recordTableIndividual[,sessionCol])) stop("sessionCol in recordTableIndividual must be numeric", call. = FALSE)
       if(!all(sort(unique(recordTableIndividual[,sessionCol])) == seq.int(from = 1, to = max(recordTableIndividual[,sessionCol]), by = 1)))
-        stop("Problem in sessionCol: Values must come from a gapless sequence of integer numbers starting with 1", call. = FALSE)
+        stop("Problem in sessionCol of recordTableIndividual: Values must come from a gapless sequence of integer numbers starting with 1", call. = FALSE)
     }
 
     if(sessionCol %in% colnames(CTtable)){
-      stopifnot(is.numeric(CTtable[,sessionCol]))
+      if(!is.numeric(CTtable[,sessionCol])) stop("sessionCol in CTtable must be numeric", call. = FALSE)
       if(!all(sort(unique(CTtable[,sessionCol])) == seq.int(from = 1, to = max(CTtable[,sessionCol]), by = 1)))
-        stop("Problem in sessionCol: Values must come from a gapless sequence of integer numbers starting with 1", call. = FALSE)
+        stop("Problem in sessionCol of CTtable: Values must come from a gapless sequence of integer numbers starting with 1", call. = FALSE)
       
       # introduce sessionCol in recordTable by matching station IDs
       # first check if there is multiple sessions per station (with identical station IDs)
@@ -173,35 +178,35 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
 
   if(hasArg(minActiveDaysPerOccasion)){
-    stopifnot(is.numeric(minActiveDaysPerOccasion))
-    stopifnot(minActiveDaysPerOccasion <= occasionLength)
+    if(!is.numeric(minActiveDaysPerOccasion))       stop("minActiveDaysPerOccasion must be a number", call. = FALSE)
+    if(!minActiveDaysPerOccasion <= occasionLength) stop("minActiveDaysPerOccasion must be smaller than or equal to occasionLength", call. = FALSE)
   }
 
   if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
   occasionStartTime    <- as.integer(round(occasionStartTime))
-  if(occasionStartTime != 0 & !is.integer(occasionStartTime)) stop ("occasionStartTime must be between 0 and 23")
-  if(occasionStartTime < 0 | occasionStartTime >= 24)         stop ("occasionStartTime must be between 0 and 23")
+  if(occasionStartTime != 0 & !is.integer(occasionStartTime)) stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
+  if(occasionStartTime < 0 | occasionStartTime >= 24)         stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
 
   occasionLength    <- as.integer(round(occasionLength))
-  if(occasionLength <= 0)             stop("occasionLength must be a positive integer and not 0")
-  if(occasionLength > ncol(camOp)/2)  stop("occasionLength may not be greater than half the total number of days in camOp")
-  stopifnot(is.numeric(occasionLength))
+  if(length(occasionLength) != 1)  stop("occasionLength may only contain one value", call. = FALSE)
+  if(!is.numeric(occasionLength))  stop("occasionLength must be a positive integer", call. = FALSE)
+  if(occasionLength <= 0)             stop("occasionLength must be a positive integer and not 0", call. = FALSE)
+  if(occasionLength > ncol(camOp)/2)  stop("occasionLength may not be greater than half the total number of days in camOp", call. = FALSE)
 
   if(hasArg(maxNumberDays)){
     maxNumberDays    <- as.integer(maxNumberDays)
-    if(maxNumberDays > ncol(camOp))    stop("maxNumberDays must be smaller than the number of columns of camOp")
+    if(maxNumberDays > ncol(camOp))    stop("maxNumberDays must be smaller than the number of columns of camOp", call. = FALSE)
     if(maxNumberDays < occasionLength) stop("maxNumberDays must be larger than or equal to occasionLength")
   }
 
   if(hasArg(buffer)) {
-    stopifnot(is.numeric(buffer))
+    if(!is.numeric(buffer)) stop("buffer must be number", call. = FALSE)
     buffer <- round(buffer)
-    stopifnot(buffer >= 1)
+    if(!buffer >= 1)        stop("if buffer is defined, it must be 1 or higher", call. = FALSE)
   }
 
 
-  if(!species %in% recordTableIndividual[,speciesCol]) stop("species is not in speciesCol of recordTableIndividual")
-
+  if(!species %in% recordTableIndividual[,speciesCol]) stop("species", species, "not found in speciesCol of recordTableIndividual")
   # check all stations in recordTableIndividual are matched in CTtable
   if(!all(recordTableIndividual[,stationCol] %in% CTtable[,stationCol])) {
     stop(paste("items of stationCol in recordTableIndividual are not matched in stationCol of CTtable: ", paste(recordTableIndividual[-which(recordTableIndividual[,stationCol] %in% CTtable[,stationCol]),stationCol], collapse = ", ")))
@@ -266,7 +271,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
 
   # check consistency of argument day1
-  stopifnot(is.character(day1))
+  if(!is.character(day1)) stop("day1 must be a character", call. = FALSE)
 
   if(day1 == "survey") {day1switch <- 1} else {
     if(day1 == "station") {day1switch <- 2} else {

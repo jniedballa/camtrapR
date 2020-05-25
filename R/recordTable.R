@@ -72,8 +72,8 @@ recordTable <- function(inDir,
     if(!is.character(exclude)) stop("exclude must be of class 'character'", call. = FALSE)
   }
 
-  stopifnot(is.logical(removeDuplicateRecords))
-  stopifnot(is.logical(returnFileNamesMissingTags))
+  if(!is.logical(removeDuplicateRecords))     stop("'removeDuplicateRecords' must be logical (TRUE / FALSE)", call. = FALSE)
+  if(!is.logical(returnFileNamesMissingTags)) stop("'returnFileNamesMissingTags' must be logical (TRUE / FALSE)", call. = FALSE)
 
 
   metadata.tagname <- "HierarchicalSubject"    # for extracting metadata assigned in tagging software
@@ -88,7 +88,7 @@ recordTable <- function(inDir,
   }
 
   minDeltaTime <- as.integer(minDeltaTime)
-  stopifnot(is.integer(minDeltaTime))
+  if(!is.integer(minDeltaTime)) stop("'minDeltaTime' must be an integer", call. = FALSE)
 
   if(minDeltaTime != 0){
     if(isFALSE(removeDuplicateRecords)){

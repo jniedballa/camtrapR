@@ -1635,10 +1635,11 @@ accessDigiKamDatabase <- function(db_directory,   # database directory
                                   db_filename     # database filename
 )
 {
-  # establish database connection
-  if(!dir.exists(db_directory)) stop("Could not find db_directory")
-  if(!file.exists(file.path(db_directory, db_filename))) stop("Could not find db_filename in db_directory") 
+  # ensure database directory and file exist
+  if(!dir.exists(db_directory)) stop("Could not find directory 'db_directory'", call. = FALSE)
+  if(!file.exists(file.path(db_directory, db_filename))) stop("Could not find db_filename in db_directory", call. = FALSE)
   
+  # establish database connection
   con <- RSQLite::dbConnect(RSQLite::SQLite(), file.path(db_directory, db_filename))
   
   # read tables
@@ -1681,7 +1682,7 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   Tags             <- digiKamTablesList$Tags
   ImageTags        <- digiKamTablesList$ImageTags
 # ImageInformation <- digiKamTablesList$ImageInformation
-#  ImageMetadata    <- digiKamTablesList$ImageMetadata
+# ImageMetadata    <- digiKamTablesList$ImageMetadata
   
   # guess which AlbumRoot is correct, based on string distance (choose the smallest one)
   # adist(x = stationDir, y = AlbumRoots$specificPath)
@@ -1794,21 +1795,22 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
 processVideoArgument <- function(IDfrom = IDfrom,
                                  video = video){
   
-  stopifnot(exists("file_formats",  where = video))
-  stopifnot(exists("dateTimeTag",   where = video))
+  if(!exists("file_formats",  where = video)) stop("'file_formats' is missing in argument 'video'", call. = FALSE)
+  if(!exists("dateTimeTag",   where = video)) stop("'dateTimeTag' is missing in argument 'video'", call. = FALSE)
   
   file_formats <- video$file_formats
   
   # check file_formats argument
-  stopifnot(is.character(file_formats))
+  if(!is.character(file_formats)) stop("'file_formats' in argument 'video' must be of class 'character'", call. = FALSE)
   file_formats <- tolower(file_formats)
   
   # access digiKam database, if required
   if(IDfrom == "metadata"){
-    stopifnot(exists("db_directory", where = video))
-    stopifnot(exists("db_filename",  where = video))
-    stopifnot(dir.exists(video$db_directory))
-    stopifnot(file.exists(file.path(video$db_directory, video$db_filename)))
+    if(!exists("db_directory", where = video)) stop("'db_directory' is missing in argument 'video'", call. = FALSE)
+    if(!exists("db_filename",  where = video)) stop("'db_filename' is missing in argument 'video'", call. = FALSE)
+    if(!dir.exists(video$db_directory)) stop("directory 'db_directory' does not exist", call. = FALSE)
+    if(!file.exists(file.path(video$db_directory, video$db_filename))) stop(paste("file 'db_filename' in directory 'db_directory' does not exist\n",
+                                                                                  file.path(video$db_directory, video$db_filename)), call. = FALSE)
     
     if (!requireNamespace("RSQLite", quietly = TRUE)) {
       stop("the package 'RSQLite' is needed for extracting data from digiKam database,  you can install it via: install.packages('RSQLite')")

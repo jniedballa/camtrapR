@@ -80,13 +80,13 @@ recordTableIndividual <- function(inDir,
     }
   }
 
-  stopifnot(is.logical(removeDuplicateRecords))
-  stopifnot(is.logical(returnFileNamesMissingTags))
+  if(!is.logical(removeDuplicateRecords))     stop("'removeDuplicateRecords' must be logical (TRUE / FALSE)", call. = FALSE)
+  if(!is.logical(returnFileNamesMissingTags)) stop("'returnFileNamesMissingTags' must be logical (TRUE / FALSE)", call. = FALSE)
 
   metadata.tagname <- "HierarchicalSubject"    # for extracting metadata assigned in tagging software
 
   minDeltaTime <- as.integer(minDeltaTime)
-  stopifnot(is.integer(minDeltaTime))
+  if(!is.integer(minDeltaTime)) stop("'minDeltaTime' must be an integer", call. = FALSE)
 
   if(minDeltaTime != 0){
     if(removeDuplicateRecords == FALSE){
@@ -103,7 +103,7 @@ recordTableIndividual <- function(inDir,
     }
   }
 
-  stopifnot(is.logical(writecsv))
+  if(!is.logical(writecsv)) stop("writecsv must be logical")
 
   if(!is.character(inDir))  stop("inDir must be of class 'character'", call. = FALSE)
   if(length(inDir) != 1)    stop("inDir may only consist of 1 element only", call. = FALSE)

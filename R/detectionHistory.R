@@ -36,28 +36,28 @@ detectionHistory <- function(recordTable,
   
   output <- match.arg (output)
   
-  stopifnot(hasArg(species))
-  stopifnot(is.character(species))
-  stopifnot(length(species) == 1)
+  if(!hasArg(species)) stop("'species' is not defined", call. = FALSE)
+  if(!is.character(species))  stop("species must be of class character", call. = FALSE)
+  if(!length(species) == 1)   stop("species may only contain one value", call. = FALSE)
   
-  stopifnot(hasArg(occasionLength))
+  if(!hasArg(occasionLength)) stop("'occasionLength' is not defined", call. = FALSE)
   
-  stopifnot(hasArg(recordTable))
-  stopifnot(is.data.frame(recordTable))
-  stopifnot(hasArg(camOp))
-  if(!inherits(camOp, "matrix")) stop ("camOp must be a matrix", call. = FALSE)
+  if(!hasArg(recordTable))         stop("'recordTable' is not defined", call. = FALSE)
+  if(!is.data.frame(recordTable))  stop("'recordTable' must be a data.frame", call. = FALSE)
+  if(!hasArg(camOp))               stop("'camOp' is not defined", call. = FALSE)
+  if(!inherits(camOp, "matrix"))   stop ("camOp must be a matrix", call. = FALSE)
   
-  stopifnot(length(stationCol) == 1)
+  if(!length(stationCol) == 1)     stop("stationCol may only contain one value", call. = FALSE)
   recordTable[,stationCol] <- as.character(recordTable[,stationCol])
-  stopifnot(is.character(stationCol))
+  if(!is.character(stationCol))    stop("stationCol must be a character", call. = FALSE)
   
-  stopifnot(length(speciesCol) == 1)
+  if(!length(speciesCol) == 1)    stop("speciesCol may only contain one value", call. = FALSE)
   recordTable[,speciesCol] <- as.character(recordTable[,speciesCol])
-  stopifnot(is.character(speciesCol))
+  if(!is.character(speciesCol))   stop("speciesCol must be a character", call. = FALSE)
   
-  stopifnot(length(recordDateTimeCol) == 1)
+  if(!length(recordDateTimeCol) == 1)  stop("recordDateTimeCol may only contain one value", call. = FALSE)
   recordTable[,recordDateTimeCol] <- as.character(recordTable[,recordDateTimeCol])   # make character to get rid of attributes. Will later assign time zone again
-  stopifnot(is.character(recordDateTimeCol))
+  if(!is.character(recordDateTimeCol)) stop("recordDateTimeCol must be a character", call. = FALSE)
   
   
   if(hasArg(timeZone) == FALSE) {
@@ -67,7 +67,7 @@ detectionHistory <- function(recordTable,
   if(!is.element(timeZone , OlsonNames())){
     stop("timeZone must be an element of OlsonNames()")
   }
-  stopifnot(is.logical(writecsv))
+  if(!is.logical(writecsv)) stop("writecsv must be logical (TRUE / FALSE)", call. = FALSE)
   
   if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
   occasionStartTime <- as.integer(round(occasionStartTime))
@@ -75,9 +75,10 @@ detectionHistory <- function(recordTable,
   if(occasionStartTime < 0 | occasionStartTime >= 24){         stop ("occasionStartTime must be between 0 and 23")}
   
   occasionLength <- as.integer(round(occasionLength))
-  stopifnot(is.numeric(occasionLength))
-  if(occasionLength <= 0)          stop("occasionLength must be a positive integer and not 0")
-  if(occasionLength > ncol(camOp)) stop("occasionLength must be smaller than the total number of days in camOp")
+  if(length(occasionLength) != 1)  stop("occasionLength may only contain one value", call. = FALSE)
+  if(!is.numeric(occasionLength))  stop("occasionLength must be a positive integer", call. = FALSE)
+  if(occasionLength <= 0)          stop("occasionLength must be a positive integer and not 0", call. = FALSE)
+  if(occasionLength > ncol(camOp)) stop("occasionLength must be smaller than the total number of days in camOp", call. = FALSE)
   
   
   if(hasArg(maxNumberDays)){
@@ -87,14 +88,18 @@ detectionHistory <- function(recordTable,
   }
   
   if(hasArg(buffer)) {
-    stopifnot(is.numeric(buffer))
+    if(!is.numeric(buffer)) stop("buffer must be number", call. = FALSE)
     buffer <- round(buffer)
-    stopifnot(buffer >= 1)
+    if(!buffer >= 1)        stop("if buffer is defined, it must be 1 or higher", call. = FALSE)
   }
   
-  stopifnot(c(speciesCol, recordDateTimeCol, stationCol) %in% colnames(recordTable))
   
-  if(species %in% recordTable[,speciesCol] == FALSE) stop("species is not in speciesCol of recordTable")
+  if(!speciesCol %in% colnames(recordTable))        stop(paste("speciesCol", speciesCol, "is not a column name in recordTable"), call. = FALSE)
+  if(!recordDateTimeCol %in% colnames(recordTable)) stop(paste("recordDateTimeCol", recordDateTimeCol, "is not a column name in recordTable"), call. = FALSE)
+  if(!stationCol %in% colnames(recordTable))        stop(paste("stationCol", stationCol, "is not a column name in recordTable"), call. = FALSE)
+  
+  
+  if(!species %in% recordTable[,speciesCol]) stop("species ", species, " not found in speciesCol of recordTable")
   
   if(writecsv == TRUE){
     if(!file.exists(outDir)){stop("outDir does not exist")}
@@ -106,8 +111,8 @@ detectionHistory <- function(recordTable,
   } else {scaleEffort <- FALSE}
   
   if(hasArg(minActiveDaysPerOccasion)){
-    stopifnot(is.numeric(minActiveDaysPerOccasion))
-    stopifnot(minActiveDaysPerOccasion <= occasionLength)
+    if(!is.numeric(minActiveDaysPerOccasion))       stop("minActiveDaysPerOccasion must be a number", call. = FALSE)
+    if(!minActiveDaysPerOccasion <= occasionLength) stop("minActiveDaysPerOccasion must be smaller than or equal to occasionLength", call. = FALSE)
   }
   
   #############
@@ -126,7 +131,7 @@ detectionHistory <- function(recordTable,
   
   
   # check consistency of argument day1
-  stopifnot(is.character(day1))
+  if(!is.character(day1)) stop("day1 must be a character", call. = FALSE)
   day1 <- tolower(day1)
   if(day1 == "survey") {day1switch <- 1} else {
     if(day1 == "station") {day1switch <- 2} else {
@@ -147,7 +152,7 @@ detectionHistory <- function(recordTable,
   # get information about station / session / camera IDs
   if("session" %in% colnames(camop.info.df)){
     
-    stopifnot(is.logical(unmarkedMultFrameInput))
+    if(!is.logical(unmarkedMultFrameInput)) stop("unmarkedMultFrameInput must be logical (TRUE / FALSE)", call. = FALSE)
     
     # assign session IDs to record table (this will also change station ID to station__session)
     subset_species <- assignSessionIDtoRecordTable(recordTable_tmp = subset_species,
