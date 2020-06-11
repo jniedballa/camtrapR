@@ -30,10 +30,10 @@ cameraOperation <- function(CTtable,
   CTtable[,stationCol] <- as.character(CTtable[,stationCol])
   
   stopifnot(length(setupCol) == 1)
-  #CTtable[,setupCol] <- as.character(CTtable[,setupCol])
+  CTtable[,setupCol] <- as.character(CTtable[,setupCol])   # parse_date_time gives error if in Date format
   
   stopifnot(length(retrievalCol) == 1)
-  #CTtable[,retrievalCol] <- as.character(CTtable[,retrievalCol])
+  CTtable[,retrievalCol] <- as.character(CTtable[,retrievalCol])
   
   stopifnot(is.logical(writecsv))
   stopifnot(is.logical(hasProblems))
