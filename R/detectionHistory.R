@@ -71,8 +71,8 @@ detectionHistory <- function(recordTable,
   
   if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
   occasionStartTime <- as.integer(round(occasionStartTime))
-  if(occasionStartTime != 0 & !is.integer(occasionStartTime)) {stop ("occasionStartTime must be between 0 and 23")}
-  if(occasionStartTime < 0 | occasionStartTime >= 24){         stop ("occasionStartTime must be between 0 and 23")}
+  if(occasionStartTime != 0 & !is.integer(occasionStartTime)) {stop ("occasionStartTime must be between 0 and 23", call. = FALSE)}
+  if(occasionStartTime < 0 | occasionStartTime >= 24){         stop ("occasionStartTime must be between 0 and 23", call. = FALSE)}
   
   occasionLength <- as.integer(round(occasionLength))
   if(length(occasionLength) != 1)  stop("occasionLength may only contain one value", call. = FALSE)
@@ -83,8 +83,8 @@ detectionHistory <- function(recordTable,
   
   if(hasArg(maxNumberDays)){
     maxNumberDays <- as.integer(maxNumberDays)
-    if(maxNumberDays > ncol(camOp))    stop("maxNumberDays is larger than the number of columns of camOp")
-    if(maxNumberDays < occasionLength) stop("maxNumberDays must be larger than or equal to occasionLength")
+    if(maxNumberDays > ncol(camOp))    stop("maxNumberDays is larger than the number of columns of camOp", call. = FALSE)
+    if(maxNumberDays < occasionLength) stop("maxNumberDays must be larger than or equal to occasionLength", call. = FALSE)
   }
   
   if(hasArg(buffer)) {
@@ -99,15 +99,15 @@ detectionHistory <- function(recordTable,
   if(!stationCol %in% colnames(recordTable))        stop(paste("stationCol", stationCol, "is not a column name in recordTable"), call. = FALSE)
   
   
-  if(!species %in% recordTable[,speciesCol]) stop("species ", species, " not found in speciesCol of recordTable")
+  if(!species %in% recordTable[,speciesCol]) stop("species ", species, " not found in speciesCol of recordTable", call. = FALSE)
   
   if(writecsv == TRUE){
-    if(!file.exists(outDir)){stop("outDir does not exist")}
+    if(!file.exists(outDir)){stop("outDir does not exist", call. = FALSE)}
   }
   
   if(includeEffort){
-    if(!hasArg(scaleEffort))     stop("scaleEffort must be defined if includeEffort is TRUE")
-    if(!is.logical(scaleEffort)) stop("scaleEffort must be logical (TRUE or FALSE)")
+    if(!hasArg(scaleEffort))     stop("scaleEffort must be defined if includeEffort is TRUE", call. = FALSE)
+    if(!is.logical(scaleEffort)) stop("scaleEffort must be logical (TRUE or FALSE)", call. = FALSE)
   } else {scaleEffort <- FALSE}
   
   if(hasArg(minActiveDaysPerOccasion)){
@@ -161,7 +161,7 @@ detectionHistory <- function(recordTable,
                                                     stationCol = stationCol,
                                                     sessionCol = "session")
   } else {
-    if(hasArg(unmarkedMultFrameInput)) warning("'unmarkedMultFrameInput' is defined, but I cannot find session IDs in the rownames of camOp. Check the row names format and maybe run camtrapR:::deparseCamOpRownames(camOp)", call. = FALSE)
+    if(hasArg(unmarkedMultFrameInput)) warning("'unmarkedMultFrameInput' is defined, but I cannot find session IDs in the rownames of camOp. Check the row names format and maybe run camtrapR:::deparseCamOpRownames(camOp) to see if it can be interpreted", call. = FALSE)
   }
   
   cam.op.worked0 <- as.matrix(camOp)
@@ -274,12 +274,19 @@ detectionHistory <- function(recordTable,
     
     # fill detection matrix with 1 (or count) in appropriate cells
     for(xyz in which(sapply(occasions.by.station, FUN = function(x){!is.null(x)}))){
-      if(any(occasions.by.station[[xyz]] < 0)) stop("this is a bug in the function (DH_error1). Please report it.", call. = FALSE)
-      if(any(occasions.by.station[[xyz]] > ncol(record.hist))) stop("this is a bug in the function (DH_error2). Please report it.", call. = FALSE)
-      if(output == "binary") record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
-                                         occasions.by.station[[xyz]]] <- 1
-      if(output == "count")  record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
-                                         as.numeric(names(occasions.by.station[[xyz]]))] <- occasions.by.station[[xyz]]
+      
+      if(output == "binary"){
+        if(any(occasions.by.station[[xyz]] < 0)) stop("this is a bug in the function (DH_error1.binary). Please report it.", call. = FALSE)
+        if(any(occasions.by.station[[xyz]] > ncol(record.hist))) stop("this is a bug in the function (DH_error2.binary). Please report it.", call. = FALSE)
+        record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
+                    occasions.by.station[[xyz]]] <- 1
+      } 
+      if(output == "count") {
+        if(any(as.numeric(names(occasions.by.station[[xyz]])) < 0)) stop("this is a bug in the function (DH_error1.count). Please report it.", call. = FALSE)
+        if(any(as.numeric(names(occasions.by.station[[xyz]])) > ncol(record.hist))) stop("this is a bug in the function (DH_error2.count). Please report it.", call. = FALSE)
+        record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
+                    as.numeric(names(occasions.by.station[[xyz]]))] <- occasions.by.station[[xyz]]
+      } 
     }
     record.hist[is.na(cam.op.worked)] <- NA   # remove the records that were taken when cams were NA (redundant with above:   # remove records taken after day1 + maxNumberDays)
     
