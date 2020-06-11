@@ -2,6 +2,8 @@
 
 ## bugfixes
 * fixed error messages if date or date/time columns contain blank values or NA
+* fixed DH_error2 in detectionHistory() with output = "count"
+* cameraOperation failed if setupCol or retrievalCol were of class "Date". Now being converted to character.
 
 ## other changes
 * recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with "L" for Latin character set, everything else will most likely break the code)
