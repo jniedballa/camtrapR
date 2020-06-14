@@ -37,7 +37,7 @@ imageRename(inDir,
   logical. Copy images to \code{outDir}?
 }
   \item{writecsv}{
-  logical. Save a data frame with a summary as a .csv?
+  logical. Save a data frame with a summary as a .csv? The csv will be saved in \code{outDir}.
 }
 }
 \details{
