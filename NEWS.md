@@ -2,11 +2,12 @@
 
 ## bugfixes
 * fixed error messages if date or date/time columns contain blank values or NA
-* fixed DH_error2 in detectionHistory() with output = "count"
+* fixed DH_error2 in detectionHistory() with output = "count" (reported by Maddy Uetrecht)
 * cameraOperation failed if setupCol or retrievalCol were of class "Date". Now being converted to character.
+* imageRename: fixed camera IDs being assigned incorrectly in very rare cases on Mac (reported by Camille Coudrat)
 
 ## other changes
-* recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with "L" for Latin character set, everything else will most likely break the code)
+* recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with "L" for Latin character set, everything else will most likely break the code, suggested by Saloni Salaria)
 * improved error messages in recordTable/recordTableIndividual and detectionHistory/spatialDetectionHistory functions
 
 # camtrapR 2.0.2

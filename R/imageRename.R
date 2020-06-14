@@ -55,7 +55,6 @@ imageRename <- function(inDir,
     }
   }
   
-  if(isTRUE(writecsv) & hasArg(outDir) == FALSE) stop("writecsv is TRUE. Please specify outDir", call. = FALSE)
   
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
   
@@ -64,6 +63,7 @@ imageRename <- function(inDir,
   stopifnot(is.logical(writecsv))
   stopifnot(is.logical(hasCameraFolders))
   
+  if(isTRUE(writecsv) & isFALSE(hasArg(outDir))) stop("writecsv is TRUE. Please specify outDir", call. = FALSE)
   
   if(isTRUE(hasCameraFolders)){
     stopifnot(hasArg(keepCameraSubfolders))
@@ -103,18 +103,21 @@ imageRename <- function(inDir,
                     makeProgressbar(current = i, total = length(dirs_short)), sep = ""))
       
       if(isTRUE(hasCameraFolders)){
-        filenames_by_subfolder <- lapply(as.list(list.dirs(dirs[i], full.names =TRUE, recursive = FALSE)),
+        # sort by camera, then image name (in case cameras are not sorted alphabetically)
+        metadata.tmp <- metadata.tmp[order(metadata.tmp$Directory, metadata.tmp$FileName),]
+        
+        filenames_by_subfolder <- sapply(list.dirs(dirs[i], full.names =TRUE, recursive = FALSE),
                                          FUN = list.files, pattern = ".jpg$|.JPG$", recursive = TRUE, ignore.case = TRUE)
         metadata.tmp$CameraID <- rep(list.dirs(dirs[i], full.names = FALSE, recursive = FALSE),
-                                     times = unlist(lapply(filenames_by_subfolder, length)))
+                                     times = sapply(filenames_by_subfolder, length))
         metadata.tmp$Station <- rep(dirs_short[i], times = nrow(metadata.tmp))
         colnames(metadata.tmp)[grep("CameraID", colnames(metadata.tmp))] <- cameraCol
-        colnames(metadata.tmp)[grep("Station", colnames(metadata.tmp))] <- stationCol
+        colnames(metadata.tmp)[grep("Station", colnames(metadata.tmp))]  <- stationCol
       } else {
         metadata.tmp$CameraID <- "NA"                                                    # "camera" name if no camera id available (only station ids)
         metadata.tmp$Station <- rep(dirs_short[i], times = nrow(metadata.tmp))
         colnames(metadata.tmp)[grep("CameraID", colnames(metadata.tmp))] <- cameraCol
-        colnames(metadata.tmp)[grep("Station", colnames(metadata.tmp))] <- stationCol
+        colnames(metadata.tmp)[grep("Station", colnames(metadata.tmp))]  <- stationCol
       }
       
       # make time readable
@@ -123,19 +126,19 @@ imageRename <- function(inDir,
       metadata.tmp$DateTimeOriginal2 <- as.POSIXlt(metadata.tmp$DateTimeOriginal)
       
       # exclude images for which no DateTimeOriginal was found
-      suppressWarnings(na.date.rows <- which(is.na(metadata.tmp$DateTimeOriginal)))
-      if(length(na.date.rows) != 0){
-        #metadata.tmp.na.date <- metadata.tmp[na.date.rows,]
+      if(any(is.na(metadata.tmp$DateTimeOriginal))){
+        na.date.rows <- which(is.na(metadata.tmp$DateTimeOriginal))
         warning(paste("could not read DateTimeOriginal tag of: \n",
                       paste(paste(metadata.tmp$Directory,  metadata.tmp$FileName, sep = file.sep)[na.date.rows], collapse = "\n")),
                 call. = FALSE, immediate. = TRUE)
         metadata.tmp <- data.frame(metadata.tmp, DateReadable = NA)
         metadata.tmp$DateReadable[-na.date.rows] <- TRUE
         metadata.tmp$DateReadable[ na.date.rows] <- FALSE
+        rm(na.date.rows)
       } else {
         metadata.tmp$DateReadable <- TRUE
       }
-      rm(na.date.rows)
+
       
       # rearrange column order
       metadata.tmp <- metadata.tmp[,c("Directory",  "FileName", stationCol, cameraCol,
@@ -168,7 +171,7 @@ imageRename <- function(inDir,
       
       metadata.tmp2 <- do.call("rbind", metadata.tmp.split2)    # reassemble
       if(any(metadata.tmp$DateReadable == FALSE)){
-        metadata.tmp2 <- rbind(cbind(metadata.tmp[metadata.tmp$DateReadable == FALSE,], minute.append = NA) ,metadata.tmp2)
+        metadata.tmp2 <- rbind(cbind(metadata.tmp[metadata.tmp$DateReadable == FALSE,], minute.append = NA), metadata.tmp2)
       }
       rm(metadata.tmp.split, metadata.tmp.split2)
       
@@ -210,7 +213,7 @@ imageRename <- function(inDir,
                                               call. = FALSE)
   # warning if at least one date/time tag is not readable
   if(!all(copy.info.table$DateReadable)) warning(paste("Some DateTimeOriginal tags are unreadable, e.g. \n", 
-                                                   paste(apply(copy.info.table[!which(copy.info.table$DateReadable), c("Directory", "FileName")],  MARGIN = 1, FUN = paste, collapse = file.sep), collapse = "\n")),
+                                                   paste(apply(copy.info.table[!copy.info.table$DateReadable, c("Directory", "FileName")],  MARGIN = 1, FUN = paste, collapse = file.sep), collapse = "\n")),
                                               call. = FALSE)
   
   # create directory structure in outDir
@@ -291,7 +294,7 @@ imageRename <- function(inDir,
   if(writecsv == TRUE){
     dir.create(outDir, recursive = TRUE, showWarnings = FALSE)
     setwd(outDir)
-    write.csv(copy.info.table, file = paste("_renaming_table_", Sys.Date(), ".csv", sep = ""),
+    write.csv(copy.info.table, file =file.path(outDir, paste0("_renaming_table_", Sys.Date(), ".csv")),
               row.names = FALSE)
   }
   return(copy.info.table)
