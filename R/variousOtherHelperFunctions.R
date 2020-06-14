@@ -395,56 +395,70 @@ assessTemporalIndependence <- function(intable,
                         delta.time.days  = NA,
                         independent      = ifelse(minDeltaTime == 0, TRUE, NA),   # all independent if no temporal filtering
                         stringsAsFactors = FALSE,
-                        check.names = FALSE)        # to prevent ":" being converted to ".", e.g. in EXIF:Make
+                        check.names      = FALSE)        # to prevent ":" being converted to ".", e.g. in EXIF:Make
   
   # sort records by station, species, then time
   intable <- intable[order(intable[, stationCol], intable[, columnOfInterest], intable$DateTimeOriginal),]
   
   for(xy in 1:nrow(intable)){     # for every record
     
+    
+    which.columnOfInterest <- which(intable[, columnOfInterest]  == intable[xy, columnOfInterest])          # same species/individual
+    which.stationCol       <- which(intable[, stationCol]        == intable[xy, stationCol])                # at same station
+    which.independent      <- which(intable$independent          == TRUE)                                   # independent (first or only record of a species at a station)
+    which.earlier          <- which(intable$DateTimeOriginal     <  intable$DateTimeOriginal[xy])          # earlier than record xy (takes long)
+    #which.earlier          <- 1: (xy-1)                                                                  # earlier than record xy  (fast alternative, relies on table being sorted by date/time before anything else)
+    if(camerasIndependent) {
+      which.cameraCol      <- which(intable[, cameraCol]  == intable[xy, cameraCol])                        # at same camera
+    }
+    
     # set independent = TRUE and delta.time = 0 if it is the 1st/only  record of a species / individual
     
     if(camerasIndependent == TRUE){
-      if(intable$DateTimeOriginal[xy]  == min(intable$DateTimeOriginal[which(intable[, columnOfInterest] == intable[xy, columnOfInterest] &
-                                                                             intable[, stationCol]       == intable[xy, stationCol] &
-                                                                             intable[, cameraCol]        == intable[xy, cameraCol]) ])){    # cameras at same station assessed independently
+      which.tmp <- Reduce(intersect, list(which.columnOfInterest, 
+                                          which.stationCol, 
+                                          which.cameraCol))
+      if(intable$DateTimeOriginal[xy]  == min(intable$DateTimeOriginal[which.tmp])){    # cameras at same station assessed independently
         intable$independent[xy]       <- TRUE
         intable$delta.time.secs[xy]   <- 0
       }
     } else {
-      if(intable$DateTimeOriginal[xy]  == min(intable$DateTimeOriginal[which(intable[, columnOfInterest] == intable[xy, columnOfInterest] &
-                                                                             intable[, stationCol]       == intable[xy, stationCol]) ])){
+      which.tmp <- Reduce(intersect, list(which.columnOfInterest, 
+                                          which.stationCol))
+      if(intable$DateTimeOriginal[xy]  == min(intable$DateTimeOriginal[which.tmp])){
         intable$independent[xy]       <- TRUE
         intable$delta.time.secs[xy]   <- 0
       }
     }
     
-    if(is.na(intable$delta.time.secs[xy])) {   # calculate time difference to previous records of same species at this station (if not the 1st/only record)
+    # calculate time difference to previous records of same species at this station (if not the 1st/only record)
+    if(is.na(intable$delta.time.secs[xy])) {
       
       if(deltaTimeComparedTo == "lastIndependentRecord"){
         
         if(camerasIndependent == TRUE){
-          which_time2 <- which(intable[, columnOfInterest]       == intable[xy, columnOfInterest] &    # same species/individual
-                                 intable[, stationCol]              == intable[xy, stationCol] &          # at same station
-                                 intable[, cameraCol]               == intable[xy, cameraCol] &           # at same camera
-                                 intable$independent                == TRUE &                             # independent (first or only record of a species at a station)
-                                 intable$DateTimeOriginal           <  intable$DateTimeOriginal[xy])      # earlier than record xy
+          which_time2 <- Reduce(intersect, list(which.columnOfInterest, 
+                                              which.stationCol,
+                                              which.cameraCol,
+                                              which.independent,
+                                              which.earlier))
         } else {
-          which_time2 <- which(intable[, columnOfInterest]       == intable[xy, columnOfInterest] &
-                                 intable[, stationCol]             == intable[xy, stationCol] &
-                                 intable$independent               == TRUE &
-                                 intable$DateTimeOriginal          <  intable$DateTimeOriginal[xy])
+          
+          which_time2 <- Reduce(intersect, list(which.columnOfInterest, 
+                                                which.stationCol,
+                                                which.independent,
+                                                which.earlier))
         }
       }  else {    # if(deltaTimeComparedTo == "lastRecord"){'
         if(camerasIndependent  == TRUE){
-          which_time2 <- which(intable[, columnOfInterest]       == intable[xy, columnOfInterest] &
-                                 intable[, stationCol]             == intable[xy, stationCol] &
-                                 intable[, cameraCol]              == intable[xy, cameraCol] &
-                                 intable$DateTimeOriginal          <  intable$DateTimeOriginal[xy])
+          which_time2 <- Reduce(intersect, list(which.columnOfInterest, 
+                                                which.stationCol,
+                                                which.cameraCol,
+                                                which.earlier))
         } else {
-          which_time2 <- which(intable[, columnOfInterest]       == intable[xy, columnOfInterest] &
-                                 intable[, stationCol]             == intable[xy, stationCol] &
-                                 intable$DateTimeOriginal          <  intable$DateTimeOriginal[xy])
+          which_time2 <- Reduce(intersect, list(which.columnOfInterest, 
+                                                which.stationCol,
+                                                which.earlier))
         }
       }
       
@@ -495,17 +509,17 @@ assessTemporalIndependence <- function(intable,
     current_row <- which_independent[xy]
     
     if(camerasIndependent){
-      which_records_to_group <- which(intable[, columnOfInterest]       == intable[current_row, columnOfInterest] &   # same species
-                                        intable[, stationCol]           == intable[current_row, stationCol]  &        # same station
-                                        intable[, cameraCol]            == intable[current_row, cameraCol]   &        # same camera
-                                        intable$DateTimeOriginal        >= intable$DateTimeOriginal[current_row]  &
-                                        !isTRUE(intable$independent))                                        # not independent
+      which_records_to_group <- which(intable[, columnOfInterest]     == intable[current_row, columnOfInterest] &   # same species
+                                      intable[, stationCol]           == intable[current_row, stationCol]  &        # same station
+                                      intable[, cameraCol]            == intable[current_row, cameraCol]   &        # same camera
+                                      intable$DateTimeOriginal        >= intable$DateTimeOriginal[current_row] &    # later than current record
+                                      !isTRUE(intable$independent))                                        # not independent
       
     } else {
-      which_records_to_group <- which(intable[, columnOfInterest]       == intable[current_row, columnOfInterest] &   # same species
-                                        intable[, stationCol]           == intable[current_row, stationCol]  &        # same station
-                                        intable$DateTimeOriginal        >= intable$DateTimeOriginal[current_row] &
-                                        !isTRUE(intable$independent))                                        # not independent
+      which_records_to_group <- which(intable[, columnOfInterest]     == intable[current_row, columnOfInterest] &   # same species
+                                      intable[, stationCol]           == intable[current_row, stationCol]  &        # same station
+                                      intable$DateTimeOriginal        >= intable$DateTimeOriginal[current_row] &
+                                      !isTRUE(intable$independent))                                        # not independent
     }
     
     # subset to records before the next independent record
@@ -1360,7 +1374,7 @@ dataFrameTibbleCheck <- function(df,
     
     if(tibble::is_tibble(df)) {
       if(tibble_allowed) {
-        message (paste(substitute(df), "was converted from tibble to data.frame"), call. = FALSE)
+        message (paste(substitute(df), "was converted from tibble to data.frame"))
         df <- as.data.frame(df)
       } else {
         stop (paste(substitute(df), "is a tibble. Please provide a data.frame instead (use read.csv() or as.data.frame())"), call. = FALSE)
@@ -1374,7 +1388,7 @@ dataFrameTibbleCheck <- function(df,
     
     if(data.table::is.data.table(df)) {
       if(data_table_allowed) {
-        message (paste(substitute(df), "was converted from data.table to data.frame"), call. = FALSE)
+        message (paste(substitute(df), "was converted from data.table to data.frame"))
         #df <- as.data.frame(df)
         df <- setDF(df)
       } else {
