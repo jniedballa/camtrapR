@@ -81,15 +81,16 @@ Below, in the box "Reading and Writing Metadata", make sure that both "Read from
 Before assigning metadata tags, users need to set up a hierarchical tag structure in image management software. This structure is customisable and can be expanded as needed. In digiKam, this is done in the Tag Manager. Here's some examples:
 
 * Species
-    + SpeciesA
-    + SpeciesB
+    * SpeciesA
+    * SpeciesB
     
     
 * Individual
-    + Female1
-    + Female2
-	  + Male1
-	  * Male2
+    * Female1
+    * Female2
+    * Male1
+    * Male2
+	  
 
 
 Be careful to use one level of hierarchy in your tags only. The following example will not work:
@@ -101,6 +102,7 @@ Be careful to use one level of hierarchy in your tags only. The following exampl
     + Female
          * 1
          * 2
+
 
 The crucial point is to set up tag groups (e.g. "Species" for species identification) which then contain the desired tags (e.g. species tags such as "Leopard Cat", "Malay Civet" etc.). This is what is meant by hierarchical tag structure. For clarification, here is a screenshot of the digiKam tag tree in which an image was identified as showing a Leopard Cat.
 
