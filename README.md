@@ -26,7 +26,7 @@ install.packages("camtrapR")
 or you can install the latest development version from GitHub via:
 
 ``` r
-library(devtools)
+library(remotes)
 install_github("jniedballa/camtrapR")
 ```
 

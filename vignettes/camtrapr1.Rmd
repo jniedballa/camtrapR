@@ -42,7 +42,7 @@ install.packages("camtrapR")
 Alternatively, you can install the development version from GitHub (requires package devtools):
 
 ```{r eval = FALSE}
-library(devtools)
+library(remotes)
 install_github("jniedballa/camtrapR")
 ```
 
