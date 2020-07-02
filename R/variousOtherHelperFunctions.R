@@ -1344,8 +1344,10 @@ assignSessionIDtoRecordTable <- function(recordTable_tmp,
   which_na <- which(is.na(recordTable_tmp[, sessionCol]))
   
   if(length(which_na) > 0) {
-    recordTable_tmp <- recordTable_tmp[-which_na,]
-    warning(paste(length(which_na), "records were removed because they could not be assigned to an active station / session"), call. = FALSE)
+    recordTable_tmp_na <- recordTable_tmp[which_na, ]
+    recordTable_tmp <- recordTable_tmp[-which_na, ]
+    warning(paste(length(which_na), "records were removed because they could not be assigned to an active station / session:\n",
+                  file.path(recordTable_tmp_na$Directory, recordTable_tmp_na$FileName)), call. = FALSE)
   }
   
   separatorSession <- "__SESS_"
