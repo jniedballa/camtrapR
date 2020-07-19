@@ -140,11 +140,11 @@ To facilitate understanding here is a glossary on how we use specific terms. It 
 
 ## ExifTool
 
-camtrapR relies on the free and open-source software **ExifTool** written by Phil Harvey to extract metadata from images. ExifTool is freely available [here](http://www.sno.phy.queensu.ca/~phil/exiftool/) and runs on Windows, Linux and MacOS. In order to use it, your system must be able to find the software. On MacOS, Linux and Unix it needs installation and should afterwards be found by the system without problems. How to set up Exiftool for Windows is detailed below. General installation instruction can be found [here](http://www.sno.phy.queensu.ca/~phil/exiftool/install.html).
+camtrapR relies on the free and open-source software **ExifTool** written by Phil Harvey to extract metadata from images. ExifTool is freely available [here](https://exiftool.org/) and runs on Windows, Linux and MacOS. In order to use it, your system must be able to find the software. On MacOS, Linux and Unix it needs installation and should afterwards be found by the system without problems. How to set up Exiftool for Windows is detailed below. General installation instruction can be found [here](https://exiftool.org/install.html).
 
 ### ExifTool for Windows
 
-On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found [here]( http://www.sno.phy.queensu.ca/~phil/exiftool/install.html). Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained "exiftool(-k).exe" file to "exiftool.exe" and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in Windows PATH variable (e.g. C:/Windows). 
+On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found [here](https://exiftool.org/install.html). Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained "exiftool(-k).exe" file to "exiftool.exe" and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in Windows PATH variable (e.g. C:/Windows). 
 
 
 ```{r eval = FALSE}

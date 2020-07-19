@@ -65,7 +65,7 @@ Years can have 365 or 366 days, and months 28 to 31 days. Here is how the functi
  A \code{data.frame} containing the information about the processed directories and the number of images.
 }
 \references{
-\url{http://www.sno.phy.queensu.ca/~phil/exiftool/Shift.html}
+\url{https://exiftool.org/#shift}
 }
 \author{
 Juergen Niedballa

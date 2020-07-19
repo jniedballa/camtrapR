@@ -132,7 +132,7 @@ Custom image metadata tags must be written to the images. The function cannot re
 Please note the section about defining argument \code{timeZone} in the vignette on data extraction (accessible via \code{vignette("DataExtraction")} or online (\url{https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html})).
 }
 \references{
-Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ }
+Phil Harvey's ExifTool \url{https://exiftool.org/}
 }
 \author{
 Juergen Niedballa

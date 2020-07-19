@@ -133,7 +133,7 @@ Please note the section about defining argument \code{timeZone} in the vignette 
 }
 
 \references{
-Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/}
+Phil Harvey's ExifTool \url{https://exiftool.org/}
 }
 
 \author{

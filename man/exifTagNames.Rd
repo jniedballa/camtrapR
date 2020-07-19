@@ -42,7 +42,7 @@ By default the function returns both metadata tag names and the metadata group t
 A data frame containing three columns: metadata tag group, tag name, and values.
 }
 \references{
-Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ } \cr
+Phil Harvey's ExifTool \url{https://exiftool.org/} \cr
 }
 \author{
 Juergen Niedballa

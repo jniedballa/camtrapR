@@ -18,7 +18,7 @@ The camtrapR Google group is an online support and help forum for camtrapR users
 }
 
 \details{
-Image metadata (such as date and time or user-assigned tags) are extracted from the images using Phil Harvey's ExifTool (available from \url{http://www.sno.phy.queensu.ca/~phil/exiftool/}) and the information is stored in a record table. An adjustable criterion for temporal independence of records can be applied. Maps of species presence and species richness can be generated. Several functions are available for plotting single- and two-species activity patterns.
+Image metadata (such as date and time or user-assigned tags) are extracted from the images using Phil Harvey's ExifTool (available from \url{https://exiftool.org/}) and the information is stored in a record table. An adjustable criterion for temporal independence of records can be applied. Maps of species presence and species richness can be generated. Several functions are available for plotting single- and two-species activity patterns.
 Information about the camera-specific trapping periods (and periods of malfunction) are summarized into a matrix about camera trap operability. These, together with the record table, are used to generate species detection histories for occupancy and spatial capture-recapture analyses. The user has considerable freedom in generating the detection histories; sampling occasion length, beginning date and and occasion start times are adjustable. In addition, trapping effort (i.e. active trap nights per station and occasion) can be computed for use as a covariate / offset on detection probability.
 }
 
@@ -135,7 +135,7 @@ Lemon, J. (2006) Plotrix: a package in the red light district of R. R-News, 6(4)
 
 Mike Meredith and Martin Ridout (2018). overlap: Estimates of coefficient of overlapping for animal activity patterns. R package version 0.3.2. \url{https://CRAN.R-project.org/package=overlap} \cr
 
-Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ } \cr
+Phil Harvey's ExifTool \url{https://exiftool.org/} \cr
 }
 
 %~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~

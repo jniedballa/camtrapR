@@ -56,7 +56,7 @@ The function finds all JPEG images and extracts the image timestamp from the ima
 A \code{data.frame} with original directory and file names, new directory and file names and an indicator for whether images were copied successfully.
 }
 \references{
-Phil Harvey's ExifTool \url{http://www.sno.phy.queensu.ca/~phil/exiftool/ }
+Phil Harvey's ExifTool \url{https://exiftool.org/}
 }
 \author{
 Juergen Niedballa
