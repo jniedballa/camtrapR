@@ -185,9 +185,9 @@ recordTableIndividual <- function(inDir,
                                                                     digiKamTablesList = digiKam_data,    # output of accessDigiKamDatabase
                                                                     videoFormat = file_formats[!grepl(file_formats, pattern = "jpg")])
           # add HierarchialSubject for video files (match by filename, must be unique)
-          metadata.tmp <- addVideoHierachicalSubject (metadata.tmp = metadata.tmp,
-                                                      video = video,
-                                                      digiKamVideoMetadata = digiKamVideoMetadata)
+          metadata.tmp <- addVideoHierarchicalSubject (metadata.tmp = metadata.tmp,
+                                                       video = video,
+                                                       digiKamVideoMetadata = digiKamVideoMetadata)
         }
       }
       
