@@ -751,8 +751,8 @@ adjustCameraOperationMatrix <- function(cam.op,
   
   
   ####################################
-  # trim camera operation matrix (taking into account buffer, occasionStartTime, maxNumberDays)
-  # based on data frame   date_ranges   computed by    createDateRangeTable
+  # trim camera operation matrix (taking into account buffer, occasionStartTime(?), maxNumberDays)
+  # based on data frame   "date_ranges"   computed by function   createDateRangeTable
   
   if(day1_2 == "station") {    # 1st day of each station OR some specified date
     
@@ -1697,9 +1697,7 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   Images           <- digiKamTablesList$Images
   Tags             <- digiKamTablesList$Tags
   ImageTags        <- digiKamTablesList$ImageTags
-# ImageInformation <- digiKamTablesList$ImageInformation
-# ImageMetadata    <- digiKamTablesList$ImageMetadata
-  
+
   # guess which AlbumRoot is correct, based on string distance (choose the smallest one)
   # adist(x = stationDir, y = AlbumRoots$specificPath)
   
@@ -1722,19 +1720,19 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   # find current station in albums
   album_of_interest <- Albums [which(Albums[, pathColumn] == stationDir),]
   if(nrow(album_of_interest) == 0) {
-    warning("Could not locate album for", stationDir, ". Skipping")
+    warning("Could not locate album for ", stationDir, ". Skipping")   # NOTE TO SELF: DOESN'T SKIP OR BREAK. CHANGE?
     
   }
   
   # keep only images in the current album
   image_subset <- Images[Images$album == album_of_interest$id,]
+  
   # NAs are possible, so remove them
   if(any(is.na(image_subset$id))) {
     image_subset <- image_subset[!is.na(image_subset$id),]
   }
   
   # keep only desired video files
-  
   image_subset2 <- image_subset[tolower(substr(image_subset$name, 
                                                nchar(image_subset$name) - 3, 
                                                nchar(image_subset$name))) %in% 
@@ -1745,64 +1743,53 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
    # subset image tags
    ImageTags <- ImageTags[ImageTags$tagid %in% Tags$id,]
    
-   # get proper labels for tags (with parent labels)
+   # get proper labels for image tags (and their parent labels = tag group names)
    ImageTags$cleartext_child  <- Tags$name [match(ImageTags$tagid, Tags$id)]
-   ImageTags$cleartext_parent <- Tags$name [Tags$pid[match(ImageTags$tagid, Tags$id)]] 
+   #ImageTags$cleartext_parent <- Tags$name [Tags$pid[match(ImageTags$tagid, Tags$id)]]        # this is wrong!
+   # issue here: Tags$pid can be 0 if tag has no parent! Then indexing fails and functions errors
    
+   Tags$parent_name <- Tags$name[match(Tags$pid, Tags$id)]
+   ImageTags$cleartext_parent <- Tags$parent_name[match(ImageTags$tagid, Tags$id)]    #alternative to above, seems to work (and above seems wrong suddenly)
+   
+   
+   # # # solution by Joel Ruprecht (Google group 2020-07-21) - if a station has no tags with parent ID, doesn't seem to work yet, but should be identical to above solution
+   # parentNA <- which(is.na(Tags$name.parent))
+   # Tags$name.parent[parentNA] <- Tags$name[parentNA]
+   # ImageTags$cleartext_parent_Joel <- Tags$name.parent[match(ImageTags$tagid, Tags$id)]
+   
+   
+   
+   # combine parent and child to create HierarchicalTags
    ImageTags$cleartext_full <- paste(ImageTags$cleartext_parent, ImageTags$cleartext_child, sep = "|")
-   
    
    
    # remove unnecessary (internal) tags (not essential)
     remove1 <- grep(Tags$name, pattern = "_Digikam_Internal_Tags_")
     remove2 <- grep(Tags$name, pattern = "Color Label ")
     remove3 <- grep(Tags$name, pattern = "Pick Label ")
-   # 
-    Tags <- Tags[!Tags$id %in% c(remove1, remove2, remove3),]
+
+    Tags <- Tags[!Tags$id  %in% c(remove1, remove2, remove3),]
     Tags <- Tags[!Tags$pid %in% c(remove1, remove2, remove3),]
    
    ImageTags <- ImageTags[!ImageTags$tagid %in% c(remove1, remove2, remove3),]
+
+   # # if parent ID = NA (the tag has no parent), then save it without the NA|  (below works but will lead to problems parsing HierarchicalSubject). Requires some more testing
+   # ImageTags$cleartext_full[is.na(ImageTags$cleartext_parent)] <- gsub(pattern = "NA|",
+   #                                                                     replacement = "",
+   #                                                                     ImageTags$cleartext_full[is.na(ImageTags$cleartext_parent)],
+   #                                                                     fixed = TRUE)
    
+   # combine multiple tags for images into single field "HierarchicalSubject"
    ImageTags_aggregate <- aggregate(ImageTags$cleartext_full,
-             by = list(ImageTags$imageid),
-             FUN = paste, sep  = "", collapse = ", ")
+                                    by = list(ImageTags$imageid),
+                                    FUN = paste, sep  = "", collapse = ", ")
+
+   # assign column names to output
    colnames(ImageTags_aggregate) <- c("imageid", "HierarchicalSubject")
    
-   # get parent and children of Species Tag
-   # parent   <- Tags[which(Tags$name == metadataSpeciesTag),]
-   # children <- Tags[which(Tags$pid == parent$id),]
-   #parent <- u
-   
-
-  
-  #children$name[match(ImageTags$tagid, children$id)]
-  #children$name[match(ImageTags$tagid, children$id)]
-  
+   # assign HierarchicalSubject to matching images
    image_subset2$HierarchicalSubject <- ImageTags_aggregate$HierarchicalSubject[match(image_subset2$id, ImageTags_aggregate$imageid)]
 
-   
-  # # subset ImageTags to image subset
-  # ImageTags_subset <- ImageTags[ImageTags$imageid  %in% image_subset2$id,]
-  # 
-  # # further subset to Species tags only
-  # ImageTags_subset2 <- ImageTags_subset[ImageTags_subset$tagid %in% children$id,]
-  # 
-  # # Add species names to tag table
-  # ImageTags_subset2$Species <- children$name [match(ImageTags_subset2$tagid, children$id)]
-  # 
-  # # aggregate if multiple tags assigned to same image (only needed with this approach)
-  # image_subset2$Species <- ImageTags_subset2$Species[match(image_subset2$id, ImageTags_subset2$imageid)] 
-  # 
-  # # add species names to Image table
-  # # aggregate not needed with this approach (but images without tags are lost)
-  # #image_subset2 <- cbind(image_subset[match(ImageTags_subset2$imageid, image_subset$id),], ImageTags_subset2)
-  # 
-  # # add directory to table (does it work with camera / station subdirectories?)
-  # image_subset2$stationDirectory <- album_of_interest$relativePath
-  # 
-  # image_subset3 <- cbind(image_subset2, 
-  #                        ImageInformation[match(image_subset2$id, ImageInformation$imageid),],
-  #                        ImageMetadata[match(image_subset2$id, ImageMetadata$imageid),])
   return(image_subset2) 
 }
 
@@ -1831,12 +1818,11 @@ processVideoArgument <- function(IDfrom = IDfrom,
     if (!requireNamespace("RSQLite", quietly = TRUE)) {
       stop("the package 'RSQLite' is needed for extracting data from digiKam database,  you can install it via: install.packages('RSQLite')")
     } 
-    # if (!requireNamespace("DBI", quietly = TRUE)) {
-    #   stop("the package 'DBI' is needed for extracting data from digiKam database,  you can install it via: install.packages('DBI')")
-    # } 
+   
+    # read digiKam database with helper function
     digiKam_data <- accessDigiKamDatabase (db_directory = video$db_directory,
                                            db_filename = video$db_filename)
-  } else {
+  } else {    # if IDfrom != "metadata"
     digiKam_data <- NULL
   }
   return(list(digiKam_data = digiKam_data,
@@ -1847,7 +1833,7 @@ processVideoArgument <- function(IDfrom = IDfrom,
 # if video files extracted, add DateTimeOriginal and HierarchicalSubject
 
 addVideoDateTimeOriginal <- function(metadata.tmp,
-                                    video){
+                                     video){
   # if there's missing entries in DateTimeOriginal that are present in the video date time tag, copy the video tags over
   rows_of_interest1 <- which(metadata.tmp$DateTimeOriginal == "-" & 
                                metadata.tmp[,video$dateTimeTag] != "-")
@@ -1855,23 +1841,27 @@ addVideoDateTimeOriginal <- function(metadata.tmp,
     metadata.tmp$DateTimeOriginal[rows_of_interest1] <- metadata.tmp[rows_of_interest1, video$dateTimeTag] 
   }
   metadata.tmp[, video$dateTimeTag] <- NULL
- 
+  
   return(metadata.tmp) 
 }
-  # add HierachicalSubject for video files
 
-addVideoHierachicalSubject <- function(metadata.tmp,
-                                       video,
-                                       digiKamVideoMetadata){
+# add HierachicalSubject for video files
+addVideoHierarchicalSubject <- function(metadata.tmp,
+                                        video,
+                                        digiKamVideoMetadata){
   
   # add HierarchialSubject for video files (match by filename, must be unique)
   metadata.tmp$HierarchicalSubject_video <- digiKamVideoMetadata$HierarchicalSubject [match(metadata.tmp$FileName, digiKamVideoMetadata$name)]
   
+  # find rows that have video metadata
   rows_of_interest2 <- which(!is.na(metadata.tmp$HierarchicalSubject_video) & 
                                metadata.tmp$HierarchicalSubject == "-")
+  # write HierarchicalSubject of videos to the normal HierarchicalSubject column
   if(length(rows_of_interest2) >= 1) {
     metadata.tmp$HierarchicalSubject[rows_of_interest2] <- metadata.tmp$HierarchicalSubject_video[rows_of_interest2] 
   }
+  # remove column HierarchicalSubject_video
   metadata.tmp$HierarchicalSubject_video <- NULL
+  
   return(metadata.tmp)
 }
