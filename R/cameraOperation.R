@@ -21,9 +21,9 @@ cameraOperation <- function(CTtable,
   
   CTtable <- dataFrameTibbleCheck(df = CTtable)
   
-  if(!stationCol %in% colnames(CTtable))   stop(paste('stationCol = "',   stationCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
-  if(!setupCol %in% colnames(CTtable))     stop(paste('setupCol = "',     setupCol,       '" is not a column name in CTtable', sep = ''), call. = FALSE)
-  if(!retrievalCol %in% colnames(CTtable)) stop(paste('retrievalCol = "', retrievalCol, '" is not a column name in CTtable', sep = ''), call. = FALSE)
+  if(!stationCol   %in% colnames(CTtable))  stop(paste('stationCol = "',   stationCol,     '" is not a column name in CTtable', sep = ''), call. = FALSE)
+  if(!setupCol     %in% colnames(CTtable))  stop(paste('setupCol = "',     setupCol,       '" is not a column name in CTtable', sep = ''), call. = FALSE)
+  if(!retrievalCol %in% colnames(CTtable))  stop(paste('retrievalCol = "', retrievalCol,   '" is not a column name in CTtable', sep = ''), call. = FALSE)
   
   
   stopifnot(length(stationCol) == 1)
@@ -70,7 +70,10 @@ cameraOperation <- function(CTtable,
     if(hasArg(byCamera)) warning("If cameraCol is not defined, byCamera will have no effect")
   }
   
-  stopifnot(c(stationCol, setupCol, retrievalCol) %in% colnames(CTtable))
+  if(!stationCol %in% colnames(CTtable))   stop(paste0("stationCol '", stationCol, "' is not a column name in CTtable"))
+  if(!setupCol %in% colnames(CTtable))     stop(paste0("setupCol '", setupCol, "' is not a column name in CTtable"))
+  if(!retrievalCol %in% colnames(CTtable)) stop(paste0("retrievalCol '", retrievalCol, "' is not a column name in CTtable"))
+  #stopifnot(c(stationCol, setupCol, retrievalCol) %in% colnames(CTtable))
   
   # check argument sessionCol
   if(sessionColInArgs){
@@ -166,17 +169,17 @@ cameraOperation <- function(CTtable,
       CTtable[, problemToColumn] <- parseDateObject(inputColumn = CTtable[, problemToColumn], dateFormat, checkNA = FALSE, checkEmpty = FALSE)
     }
     
-    for(xyz in cols.prob.from){
-      if(any(CTtable[,setupCol] > CTtable[,xyz], na.rm = TRUE)){
-        stop(paste(paste(CTtable[which(CTtable[,setupCol] > CTtable[,xyz]), stationCol], collapse = ", "), ": Problem begins before Setup"))
+    for(cols.prob.from.index in cols.prob.from){
+      if(any(CTtable[,setupCol] > CTtable[,cols.prob.from.index], na.rm = TRUE)){
+        stop(paste(paste(CTtable[which(CTtable[,setupCol] > CTtable[,cols.prob.from.index]), stationCol], collapse = ", "), ": Problem begins before Setup"))
       }
     }
-    for(xyz2 in cols.prob.to){
-      if(any(CTtable[,retrievalCol] < CTtable[,xyz2], na.rm = TRUE)){
-        stop(paste(paste(CTtable[which(CTtable[,retrievalCol] < CTtable[,xyz2]), stationCol], collapse = ", "), ": Problem ends after retrieval"))
+    for(cols.prob.to.index in cols.prob.to){
+      if(any(CTtable[,retrievalCol] < CTtable[,cols.prob.to.index], na.rm = TRUE)){
+        stop(paste(paste(CTtable[which(CTtable[,retrievalCol] < CTtable[,cols.prob.to.index]), stationCol], collapse = ", "), ": Problem ends after retrieval"))
       }
     }
-    rm(problemFromColumn, problemToColumn, xyz, xyz2)
+    rm(problemFromColumn, problemToColumn, cols.prob.from.index, cols.prob.to.index)
   }
   
   # create empty matrix with desired dimensions (depending on presence of camera / session columns)
