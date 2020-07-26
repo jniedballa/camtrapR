@@ -7,7 +7,6 @@ before_install:
   # install library dependencies
   - sudo apt-get install libzbar0 make perl
   # Install exiftool
-  #- wget https://www.sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-11.76.tar.gz
   - wget https://exiftool.org/Image-ExifTool-11.94.tar.gz
   - tar -xzf Image-ExifTool-11.94.tar.gz 
   - pushd Image-ExifTool-11.94/
