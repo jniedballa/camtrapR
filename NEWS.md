@@ -5,6 +5,7 @@
 * fixed DH_error2 in detectionHistory() with output = "count" (reported by Maddy Uetrecht)
 * cameraOperation failed if setupCol or retrievalCol were of class "Date". Now being converted to character.
 * imageRename: fixed camera IDs being assigned incorrectly in very rare cases on Mac (reported by Camille Coudrat)
+* recordTable: fixed error when videos had metadata tags that were not in tag groups
 
 ## other changes
 * recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with "L" for Latin character set, everything else will most likely break the code, suggested by Saloni Salaria)
