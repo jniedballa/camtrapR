@@ -1296,6 +1296,8 @@ assignSessionIDtoRecordTableIndividual <- function(recordTableIndividual_tmp,
               CTtable     = cameraTrapTable_tmp))
 }
 
+
+
 assignSessionIDtoRecordTable <- function(recordTable_tmp,
                                          camOp,
                                          dateTimeCol,
@@ -1305,6 +1307,16 @@ assignSessionIDtoRecordTable <- function(recordTable_tmp,
   
   
   camop.info.df <- deparseCamOpRownames(camOp)
+  
+  # if there's records at stations that are not in the camop row names
+  if(!any(recordTable_tmp[, stationCol] %in% unique(camop.info.df$station))) {
+    stop("Stations in record table station column don't match stations in row names of camera operation matrix.")
+  }
+    
+  if(!all(recordTable_tmp[, stationCol] %in% unique(camop.info.df$station))) {
+    warning(paste("Some stations in the record table are not matched by stations in camOp row names:\n",
+                  paste(unique(recordTable_tmp[!recordTable_tmp[, stationCol] %in% unique(camop.info.df$station), stationCol]), collapse = ", ")))
+  }
   
   recordTable_tmp[, sessionCol] <- NA
   
@@ -1346,8 +1358,12 @@ assignSessionIDtoRecordTable <- function(recordTable_tmp,
   if(length(which_na) > 0) {
     recordTable_tmp_na <- recordTable_tmp[which_na, ]
     recordTable_tmp <- recordTable_tmp[-which_na, ]
-    warning(paste(length(which_na), "records were removed because they could not be assigned to an active station / session:\n",
-                  file.path(recordTable_tmp_na$Directory, recordTable_tmp_na$FileName)), call. = FALSE)
+    if(length(which_na) == nrow(recordTable_tmp)) {
+      stop("Could not assign session to any record. Please check format of column names of camOp and station column of record table")
+    } else {
+      warning(paste0(length(which_na), " records were removed because they could not be assigned to an active station / session:\n",
+                    paste(recordTable_tmp_na[, stationCol], recordTable_tmp_na[, dateTimeCol], sep = ": ", collapse = "\n")), call. = FALSE)
+    }
   }
   
   separatorSession <- "__SESS_"
@@ -1423,7 +1439,7 @@ parseDateObject <- function(inputColumn,
   if(grepl(pattern = "%", x = dateFormat, fixed = TRUE)){
     out <- as.Date(inputColumn.char,     format = dateFormat)
   } else {
-    # option 2: lubridate functions (identified by absence of "%")
+  # option 2: lubridate functions (identified by absence of "%")
     if(!requireNamespace("lubridate", quietly = TRUE)) stop(paste("package 'lubridate' is required for the specified dateFormat", dateFormat))
     
     out <- lubridate::date(lubridate::parse_date_time(inputColumn.char, orders = dateFormat))
@@ -1486,8 +1502,8 @@ stationSessionCamMatrix <- function(CTtable,
                                     cameraCol, 
                                     sessionCol, 
                                     setupCol,
-                                    retrievalCol,
-                                    separator
+                                    retrievalCol#,
+                                    #separator
 ){
   
   separatorCam     <- "__CAM_"
@@ -1496,6 +1512,12 @@ stationSessionCamMatrix <- function(CTtable,
   double_underscore <- "__"
   
   if(length(grep(pattern = double_underscore, x = CTtable[,stationCol])) >= 1) stop(paste("Station IDs may not contain double underscores", double_underscore), call. = FALSE)
+  
+  
+  # convert setup and retrievalCol to Dates (in case they contain times)
+  CTtable[,setupCol] <- as.Date(as.character(CTtable[,setupCol]))
+  CTtable[,retrievalCol] <- as.Date(as.character(CTtable[,retrievalCol]))
+  
   
   if(hasArg(sessionCol)){
     if(any(CTtable[,sessionCol] == "")) stop("there are empty cells in sessionCol Please provide camera IDs for all cameras",
@@ -1864,4 +1886,40 @@ addVideoHierarchicalSubject <- function(metadata.tmp,
   metadata.tmp$HierarchicalSubject_video <- NULL
   
   return(metadata.tmp)
+}
+
+
+# function to return fraction of day that has passed already at a given time (or its inverse, fraction of day remaining)
+fractionOfDay <- function(time, type) {
+  # time difference between time and midnight that day (fraction of the day that has passed already)
+  delta <- as.numeric(difftime(time, as.Date(time), units = "days"))
+  
+  # return fraction of day that remains (for setup day)
+  if(type == "after") return( 1 - delta)
+  # return fraction of day that has passed (for retrieval day)
+  if(type == "before")  return(delta)
+}
+
+# plot camera operation matrix (function from vignette 3)
+camopPlot <- function(camOp, 
+                      palette = "viridis"){
+  
+  which.tmp <- grep(as.Date(colnames(camOp)), pattern = "01$")
+  label.tmp <- format(as.Date(colnames(camOp))[which.tmp], "%Y-%m")
+  at.tmp <- which.tmp / ncol(camOp)
+  
+  values_tmp <- sort(na.omit(unique(c(camOp))))
+  
+  # hcl.colors only exists in R >3.6.0, use heat.colors for earlier versions
+  if(getRversion() >= "3.6.0") {
+    image_colors <- grDevices::hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE)
+  } else {
+    image_colors <- heat.colors(n = length(values_tmp), rev = TRUE)
+  }
+  
+  image(t(as.matrix(camOp)), xaxt = "n", yaxt = "n", col = image_colors)
+  axis(1, at = at.tmp, labels = label.tmp)
+  axis(2, at = seq(from = 0, to = 1, length.out = nrow(camOp)), labels = rownames(camOp), las = 1)
+  abline(v = at.tmp, col = rgb(0,0,0, 0.2))
+  box()
 }
