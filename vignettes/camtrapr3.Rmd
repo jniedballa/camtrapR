@@ -234,7 +234,6 @@ The camera operation matrix is a day-by-station matrix that states how many came
 
 ```{r}
  # first load the camera trap station table
-
 data(camtraps)
 
 dateFormat <- "%d/%m/%Y"
@@ -260,44 +259,38 @@ camop_problem[, (ncol(camop_problem)-6):ncol(camop_problem)]
 If stations were not set up, values are NA. If they were set up but malfunctioning, it is 0. Operational stations get value 1.
 
 
-Here is a little function for plotting the camera operation matrix. Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.
+There is a little function for plotting the camera operation matrix included in the package, but not exported in the Namespace. It is accessible with camtrapR:::camopPlot(). Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.
 
-```{r}
-camopPlot <- function(camOp, 
-                      palette = "Heat"){
-  
-  which.tmp <- grep(as.Date(colnames(camOp)), pattern = "01$")
-  label.tmp <- format(as.Date(colnames(camOp))[which.tmp], "%Y-%m")
-  at.tmp <- which.tmp / ncol(camOp)
-  
-  values_tmp <- sort(na.omit(unique(c(camOp))))
 
-  # hcl.colors only exists in R >3.6.0, use heat.colors for earlier versions
-  if(getRversion() >= "3.6.0") {
-    image_colors <- grDevices::hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE)
-  } else {
-    image_colors <- heat.colors(n = length(values_tmp), rev = TRUE)
-  }
-  
-  image(t(as.matrix(camOp)), xaxt = "n", yaxt = "n", col = image_colors)
-  axis(1, at = at.tmp, labels = label.tmp)
-  axis(2, at = seq(from = 0, to = 1, length.out = nrow(camOp)), labels = rownames(camOp), las = 1)
-  abline(v = at.tmp, col = rgb(0,0,0, 0.2))
-  box()
-}
-```
-
-And this is what we get (in two different color palettes, on R 3.6.0 or higher).
+Here is the camera operation matrix calculated above  (in two different color palettes, the default being the viridis palette - requires R 3.6.0 or higher).
 
 ```{r}
 par(mfrow = c(1,2))
-camopPlot(camOp = camop_problem)
-camopPlot(camOp = camop_problem, palette = "Viridis")
+camtrapR:::camopPlot(camOp = camop_problem)
+camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat")
 ```
 
 ```{r include = FALSE}
 par(mfrow = c(1,2))
 ```
+
+Here is what it would look like if the year is wrong for one station.
+```{r}
+camtraps_typo <- camtraps
+# replace 2009 with 2008 in setup date of station A
+camtraps_typo$Setup_date[1] <- gsub("2009", "2008", camtraps_typo$Setup_date[1])
+
+camop_typo <- cameraOperation(CTtable      = camtraps_typo,
+                                 stationCol   = "Station",
+                                 setupCol     = "Setup_date",
+                                 retrievalCol = "Retrieval_date",
+                                 writecsv     = FALSE,
+                                 hasProblems  = TRUE,
+                                 dateFormat   = dateFormat
+)
+camtrapR:::camopPlot(camop_typo)
+```
+
 
 Note that the colors are stretched between the lowest and highest value. There is no dedicated color for 0, designating non-operational cameras. 
 
