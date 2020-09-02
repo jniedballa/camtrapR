@@ -507,7 +507,7 @@ camop_season <- cameraOperation(CTtable         = camtrapsMultiSeason,
 
 # plot camera operation matrix
 par(oma = c(0,7,0,0))
-camopPlot(camop_season)
+camtrapR:::camopPlot(camop_season)
 
 
 # make multi-season detection history
