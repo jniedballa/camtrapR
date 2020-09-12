@@ -1723,6 +1723,9 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   # guess which AlbumRoot is correct, based on string distance (choose the smallest one)
   # adist(x = stationDir, y = AlbumRoots$specificPath)
   
+  # add platform file separator to stationDir
+  stationDir <- paste0(stationDir, .Platform$file.sep)
+  
   # combine album root and album path
   Albums$albumPath_full <- paste(AlbumRoots[Albums$albumRoot, "specificPath"], 
                                  Albums$relativePath, sep = "")
@@ -1730,7 +1733,13 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   # add drive letter (only relevant on Windows, and can potentially be wrong if there's Album roots on different drives)
   # also not sure if this works on Mac / Linux due to missing drive letters
   Albums$albumPath_full2 <- paste(substr(stationDir, 1,2),   # the Drive letter, digiKam doesn't return it
-                                  Albums$albumPath_full, sep = "")
+                                  Albums$albumPath_full,
+                                  sep = "")
+  
+  # add "/" to ensure Station1 doesn't include Station10 also. Also ensure all folders end with one / only
+  Albums$albumPath_full2 <- ifelse(endsWith(Albums$albumPath_full2, .Platform$file.sep),
+                                   Albums$albumPath_full2,
+                                   paste0(Albums$albumPath_full2, .Platform$file.sep)) 
   
   pathColumn <- "albumPath_full2"
   
