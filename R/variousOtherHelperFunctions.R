@@ -1574,7 +1574,7 @@ stationSessionCamMatrix <- function(CTtable,
   return(m)
 }
 
-
+# analyse row names of camera operation matrix to extract station, camera and session information (the latter two only if applicable)
 deparseCamOpRownames <- function(camOp){
   
   separatorCam <- "__CAM_"
@@ -1728,6 +1728,7 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
                                  Albums$relativePath, sep = "")
   
   # add drive letter (only relevant on Windows, and can potentially be wrong if there's Album roots on different drives)
+  # also not sure if this works on Mac / Linux due to missing drive letters
   Albums$albumPath_full2 <- paste(substr(stationDir, 1,2),   # the Drive letter, digiKam doesn't return it
                                   Albums$albumPath_full, sep = "")
   
@@ -1740,14 +1741,18 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   }
   
   # find current station in albums
-  album_of_interest <- Albums [which(Albums[, pathColumn] == stationDir),]
+  #album_of_interest <-Albums [which(Albums[, pathColumn] == stationDir),]   # only return the station directory, not camera subdirectories
+  album_of_interest <- Albums [grep(pattern = stationDir, Albums[, pathColumn]),]   # This one returns Station directory and camera subdirectories
   if(nrow(album_of_interest) == 0) {
     warning("Could not locate album for ", stationDir, ". Skipping")   # NOTE TO SELF: DOESN'T SKIP OR BREAK. CHANGE?
     
   }
   
   # keep only images in the current album
-  image_subset <- Images[Images$album == album_of_interest$id,]
+  #image_subset <- Images[Images$album == album_of_interest$id,]   # only returns matches for 1 directory, not many (only station dir, not camera subdirs). Also, may return NAs
+  image_subset <- Images[Images$album %in% album_of_interest$id,]  # returns matches for all directories. Also, no NAs apparently
+  
+  # to do: handle situation where there's no images in image_subset
   
   # NAs are possible, so remove them
   if(any(is.na(image_subset$id))) {
@@ -1852,7 +1857,7 @@ processVideoArgument <- function(IDfrom = IDfrom,
 }
 
 
-# if video files extracted, add DateTimeOriginal and HierarchicalSubject
+# if video files extracted, add DateTimeOriginal
 
 addVideoDateTimeOriginal <- function(metadata.tmp,
                                      video){
