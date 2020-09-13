@@ -633,6 +633,7 @@ createDateRangeTable <- function(cam.op,
   cam.tmp.min <- apply(cam.op, MARGIN = 1, function(X){min(which(!is.na(X)))})    # 1st day of each station
   cam.tmp.max <- apply(cam.op, MARGIN = 1, function(X){max(which(!is.na(X)))})    # last day of each station
   
+  # date of first / last record by station
   rec.tmp.min  <- aggregate(as.Date(subset_species_tmp$DateTime2, tz = timeZone_tmp),
                             list(subset_species_tmp[,stationCol_tmp]),
                             FUN = min)
@@ -641,7 +642,7 @@ createDateRangeTable <- function(cam.op,
                             FUN = max)
   
   
-  
+  # combine record dates and camera operation dates in one table
   date_ranges <- data.frame(rec.min = rec.tmp.min[match(rownames(cam.op), rec.tmp.min[,1]), 2],       # first record
                             rec.max = rec.tmp.max[match(rownames(cam.op), rec.tmp.max[,1]), 2],       # last record
                             cam.min = as.POSIXct(colnames(cam.op)[cam.tmp.min], tz = timeZone_tmp),   # station setup date
@@ -650,7 +651,7 @@ createDateRangeTable <- function(cam.op,
   
   rownames(date_ranges) <- rownames(cam.op)
   
-  # check if images were taken between setup and retrieval dates (Error if images outside station date range)
+  # check if images were taken between setup and retrieval dates (warning if images outside station date range)
   if(any(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp), na.rm = TRUE)){
     warning(paste("At", sum(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp), na.rm = TRUE), "stations",
                   "there were records before camera operation date range: ",
@@ -667,12 +668,10 @@ createDateRangeTable <- function(cam.op,
   # define when first occasion begins (to afterwards remove prior records in function    cleanSubsetSpecies)
   if(!hasArg(buffer_tmp)) buffer_tmp <- 0
   
-  #if(day1_tmp == "station") {
+  
   date_ranges$start_first_occasion <- date_ranges$cam.min + buffer_tmp * 86400 + occasionStartTime_tmp * 3600     #each stations setup  + buffer + starttime
-  #  } else {
-  #    if(day1_tmp == "survey") {
   date_ranges$start_first_occasion_survey <- min(date_ranges$cam.min) + buffer_tmp * 86400 + occasionStartTime_tmp * 3600    # first station's setup  + buffer + starttime
-  #      } else {
+
   
   if(day1_tmp %in% c("survey", "station") == FALSE) {
     if(as.Date(day1_tmp, tz = timeZone_tmp) < min(as.Date(date_ranges$cam.min,  tz = timeZone_tmp))) stop(paste("day1 (", day1_tmp, ") is before the first station's setup date (",  min(as.Date(date_ranges$cam.min,  tz = timeZone_tmp)), ")", sep = ""))
@@ -696,14 +695,18 @@ createDateRangeTable <- function(cam.op,
       date_ranges$start_first_occasion_plus_maxNumberDays <- date_ranges$start_first_occasion + (maxNumberDays_tmp * 86400) - 1   # -1 second ensures that last occasion does not spill into next day if occasionStartTime = 0
     }
     
+    # end of last occasion by staion (either end of retrieval day, or after maximum number of days)
     for(xy in 1:nrow(date_ranges)){
       date_ranges$end_last_occasion[xy] <- min(date_ranges$end_of_retrieval_day[xy], date_ranges$start_first_occasion_plus_maxNumberDays[xy])   # use smaller value
     }
-    attributes(date_ranges$end_last_occasion) <- attributes(date_ranges$start_first_occasion)   # assign the attributes: POSIX + time zone (to convert from numeric value back to date/time)
-  } else {
+    # assign the attributes: POSIX + time zone (to convert from numeric value back to date/time)
+    attributes(date_ranges$end_last_occasion) <- attributes(date_ranges$start_first_occasion)   
+  } 
+  
+  # if maxNumberDays is not defined, occasions end on station retrieval?
+  if(!hasArg(maxNumberDays_tmp)) {
     date_ranges$end_last_occasion <- date_ranges$end_of_retrieval_day
   }
-  
   
   return(date_ranges)
   
@@ -718,9 +721,7 @@ adjustCameraOperationMatrix <- function(cam.op,
                                         timeZone_tmp,
                                         day1_2
 ){
-  
-  
-  
+  # remove stations where occasions begin after end of last occasion (if buffer argument is too large)
   if(any(date_ranges2$start_first_occasion > date_ranges2$end_last_occasion)){
     remove.these.stations <- which(date_ranges2$start_first_occasion > date_ranges2$end_last_occasion)
     if(length(remove.these.stations) == nrow(date_ranges2)) stop("In all stations, the occasions begin after retrieval. Choose a smaller buffer argument.")
@@ -806,7 +807,7 @@ adjustCameraOperationMatrix <- function(cam.op,
 
 
 # check consistency of species record table before creating detection history (remove records outside date range etc)  ####
-cleanSubsetSpecies <- function(subset_species2 ,
+cleanSubsetSpecies <- function(subset_species2,
                                stationCol2,
                                date_ranges2
 ){
@@ -893,8 +894,11 @@ calculateTrappingEffort <- function(cam.op,
       effort[, m] <- ifelse(apply(as.matrix(cam.op[,index.tmp]), MARGIN = 1, FUN = function(X) {sum(is.na(X))}) == length(index.tmp), NA, effort[,m])
       # if full occasion = 0 in cam.op, make effort NA
       effort[, m] <- ifelse(apply(as.matrix(cam.op[,index.tmp]), MARGIN = 1, FUN = function(X) {all(X == 0)}),   NA, effort[,m])
-      # if full occasion is smaller than 1 (i.e. all 0 or NA), set effort NA
-      effort[, m] <- ifelse(apply(as.matrix(cam.op[,index.tmp]), MARGIN = 1, FUN = function(X) {all(X < 1)}),   NA, effort[,m])
+      
+      ## if full occasion is smaller than 1 (i.e. all 0 or NA), set effort NA
+      ## EDIT: 2020-09-12: This can cause problems if cameraOperation calculated fraction of days.
+      ## Also, the cases with 0 and NA are covered above. So I comment it for now.
+      #effort[, m] <- ifelse(apply(as.matrix(cam.op[,index.tmp]), MARGIN = 1, FUN = function(X) {all(X < 1)}),   NA, effort[,m])
       
       # set cells in effort matrix NA (according to input arguments)
       # this is later used to adjust the detection/non-detection matrix
@@ -913,8 +917,11 @@ calculateTrappingEffort <- function(cam.op,
           }
           
         }
-      } else {
-        if(hasArg(minActiveDaysPerOccasion2)){   # includeEffort = TRUE and minActiveDays is defined
+        
+        ## includeEffort = TRUE
+      } else {    
+        # if minActiveDays is defined
+        if(hasArg(minActiveDaysPerOccasion2)){   
           # if occasion has less actice days than minActiveDays, set NA
           effort[, m] <- ifelse(apply(as.matrix(cam.op[,index.tmp]), MARGIN = 1, FUN = function(X) {sum(X, na.rm = TRUE) < minActiveDaysPerOccasion2}), NA, effort[,m])
         } else {                                 # includeEffort = TRUE and minActiveDays not defined
@@ -1916,7 +1923,8 @@ fractionOfDay <- function(time, type) {
 
 # plot camera operation matrix (function from vignette 3)
 camopPlot <- function(camOp, 
-                      palette = "viridis"){
+                      palette = "viridis",
+                      lattice = FALSE){
   
   which.tmp <- grep(as.Date(colnames(camOp)), pattern = "01$")
   label.tmp <- format(as.Date(colnames(camOp))[which.tmp], "%Y-%m")
@@ -1930,10 +1938,40 @@ camopPlot <- function(camOp,
   } else {
     image_colors <- heat.colors(n = length(values_tmp), rev = TRUE)
   }
+
   
-  image(t(as.matrix(camOp)), xaxt = "n", yaxt = "n", col = image_colors)
-  axis(1, at = at.tmp, labels = label.tmp)
-  axis(2, at = seq(from = 0, to = 1, length.out = nrow(camOp)), labels = rownames(camOp), las = 1)
-  abline(v = at.tmp, col = rgb(0,0,0, 0.2))
-  box()
+  # transpose and reverse x axis to make sure it plots in the same row/column order as toe original matrix
+  if(nrow(camOp) > 1) {
+    camop_for_plotting <- t(as.matrix(camOp)[seq(nrow(camOp) ,1),])
+  } else {
+    camop_for_plotting <- t(as.matrix(camOp))
+  }
+  
+  # lattice::levelplot
+  if(isTRUE(lattice)) {
+    
+    # generate color ramp 
+    image_colors_lattice <- grDevices::hcl.colors(n = 100, palette = palette, rev = TRUE)
+    
+    
+    # levelplot in lattice
+    # to be improved: y axis labels (station IDs) are all drawn and can overlap. 
+    # this may help: https://stat.ethz.ch/R-manual/R-devel/library/lattice/html/axis.default.html
+    levelplot(camop_for_plotting,
+              col.regions = image_colors_lattice,
+              xlab = "", ylab ="",
+              scales = list(x = list(at = which.tmp,
+                                     labels = label.tmp, rot = 45)),
+              aspect = "fill", 
+    )
+
+  } else {
+    
+    # grDevices::image()    quite basic and no legend
+    image(camop_for_plotting, xaxt = "n", yaxt = "n", col = image_colors)
+    axis(1, at = at.tmp, labels = label.tmp)
+    axis(2, at = seq(from = 0, to = 1, length.out = nrow(camOp)), labels = rev(rownames(camOp)), las = 1)
+    abline(v = at.tmp, col = rgb(0,0,0, 0.2))
+    box()
+  }
 }
