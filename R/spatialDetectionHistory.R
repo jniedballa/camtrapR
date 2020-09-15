@@ -15,7 +15,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
                                     recordDateTimeFormat = "%Y-%m-%d %H:%M:%S",
                                     occasionLength,
                                     minActiveDaysPerOccasion,
-                                    occasionStartTime = 0,
+                                    occasionStartTime = "deprecated",
                                     maxNumberDays,
                                     day1,
                                     buffer,
@@ -134,6 +134,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
                                                stationCol = stationCol,
                                                sessionCol = sessionCol
       )
+
       
       # see if there are duplicate station#session IDs in CTtable (meaning multiple cameras per station/session)
       
@@ -182,10 +183,11 @@ spatialDetectionHistory <- function(recordTableIndividual,
     if(!minActiveDaysPerOccasion <= occasionLength) stop("minActiveDaysPerOccasion must be smaller than or equal to occasionLength", call. = FALSE)
   }
 
-  if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
-  occasionStartTime    <- as.integer(round(occasionStartTime))
-  if(occasionStartTime != 0 & !is.integer(occasionStartTime)) stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
-  if(occasionStartTime < 0 | occasionStartTime >= 24)         stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
+  if(hasArg(occasionStartTime)) warning("'occasionStartTime' is deprecated and will be removed in the next release. It is now found in cameraOperation()")
+  # if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
+  # occasionStartTime    <- as.integer(round(occasionStartTime))
+  # if(occasionStartTime != 0 & !is.integer(occasionStartTime)) stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
+  # if(occasionStartTime < 0 | occasionStartTime >= 24)         stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
 
   occasionLength    <- as.integer(round(occasionLength))
   if(length(occasionLength) != 1)  stop("occasionLength may only contain one value", call. = FALSE)
@@ -206,7 +208,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
 
 
-  if(!species %in% recordTableIndividual[,speciesCol]) stop("species", species, "not found in speciesCol of recordTableIndividual")
+  if(!species %in% recordTableIndividual[,speciesCol]) stop("species ", species, " not found in speciesCol of recordTableIndividual")
   # check all stations in recordTableIndividual are matched in CTtable
   if(!all(recordTableIndividual[,stationCol] %in% CTtable[,stationCol])) {
     stop(paste("items of stationCol in recordTableIndividual are not matched in stationCol of CTtable: ", paste(recordTableIndividual[-which(recordTableIndividual[,stationCol] %in% CTtable[,stationCol]),stationCol], collapse = ", ")))
@@ -285,8 +287,16 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
 
 
-  ####
-  checkCamOpColumnNames (cameraOperationMatrix = camOp)
+  
+  # check that column names can be interpreted as day, as extract occasionStartTime if relevant
+  camOp <- checkCamOpColumnNames (cameraOperationMatrix = camOp)
+  if(hasArg(occasionStartTime)){
+    if(occasionStartTime != attributes(camOp)$occasionStartTime){
+      stop(paste("occasionStartTime", occasionStartTime, "differs from occasionStartTime in camOp", attributes(camOp)$occasionStartTime)) 
+    }
+  }
+  occasionStartTime <- attributes(camOp)$occasionStartTime
+  
   cam.op.worked0 <- as.matrix(camOp)
   
   if(all(as.character(unique(subset_species[,stationCol])) %in% rownames(cam.op.worked0)) == FALSE){
