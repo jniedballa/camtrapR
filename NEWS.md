@@ -1,3 +1,17 @@
+# camtrapR 2.1.0
+
+## new features
+* cameraOperation: setup/ retrieval / problem columns can be interpreted as date-time format, then computes effort as fraction of day. (Thank you to Zoé Siegel for the suggestion, Fridolin Zimmermann and the Department of Ecology & Evolution from the University of Lausanne for funding the development of the feature)
+* function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument "lattice", which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)
+
+## bugfixes
+* cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character
+* recordTable: now supports extraction of metadata tags from video files in camera subdirectories
+
+## other changes
+* lubdidate is a dependency now (for cameraOperation)
+* lattice in Suggests (for camopPlot)
+
 # camtrapR 2.0.3
 
 ## bugfixes
