@@ -612,10 +612,28 @@ addNewColumnsToGlobalTable <- function(intable,
 # for detectionHistory functions
 
 # check column names of camera operation matrix  ####
+# if there's a time shift from cameraOperation, extract return number as attribute
 checkCamOpColumnNames <- function(cameraOperationMatrix){
-  camopTest <- try(as.Date(colnames(cameraOperationMatrix)), silent = TRUE)
-  if(class(camopTest) == "try-error") stop(paste('Could not interpret column names in camOp as Dates. Desired format is YYYY-MM-DD, e.g. "2016-12-31". First column name in your camera operation matrix is "', colnames(cameraOperationMatrix)[1], '"', sep = '' ), call. = FALSE)
+  
   if(any(is.na(colnames(cameraOperationMatrix)))) stop("There are NAs in the column names of camOp", call. = FALSE)
+  
+  # check if camera operration matrix has time shift
+  if(all(grepl(pattern = "+", colnames(cameraOperationMatrix), fixed = TRUE))){
+    colnames_as_dates <- sapply(strsplit(colnames(cameraOperationMatrix), split = "+", fixed = TRUE), FUN = function(x)x[1])
+    camopTest <- try(as.Date(colnames_as_dates), silent = TRUE)
+    occasionStartTime <- as.numeric(gsub("h", "", unique(sapply(strsplit(colnames(cameraOperationMatrix), split = "+", fixed = TRUE), FUN = function(x)x[2]))))
+  } else {
+    occasionStartTime <- 0
+    camopTest <- try(as.Date(colnames(cameraOperationMatrix)), silent = TRUE)
+  }
+  
+  if(class(camopTest) == "try-error") stop(paste('Could not interpret column names in camOp as Dates. Desired format is YYYY-MM-DD (e.g. "2016-12-31") YYYY-MM-DD+Xh (X being a number, e.g. "2016-12-31+12h"). First column name in your camera operation matrix is "', colnames(cameraOperationMatrix)[1], '"', sep = '' ), call. = FALSE)
+  
+  
+  colnames(cameraOperationMatrix) <- as.character(camopTest)
+  
+  attr(cameraOperationMatrix, "occasionStartTime") <- occasionStartTime   # return time shift extracted from the column names
+  return(cameraOperationMatrix)    
 }
 
 
@@ -630,8 +648,10 @@ createDateRangeTable <- function(cam.op,
                                  timeZone_tmp)
 {
   
-  cam.tmp.min <- apply(cam.op, MARGIN = 1, function(X){min(which(!is.na(X)))})    # 1st day of each station
-  cam.tmp.max <- apply(cam.op, MARGIN = 1, function(X){max(which(!is.na(X)))})    # last day of each station
+  # first day of each station
+  cam.tmp.min <- apply(cam.op, MARGIN = 1, function(X){min(which(!is.na(X)))})
+  # last day of each station
+  cam.tmp.max <- apply(cam.op, MARGIN = 1, function(X){max(which(!is.na(X)))})
   
   # date of first / last record by station
   rec.tmp.min  <- aggregate(as.Date(subset_species_tmp$DateTime2, tz = timeZone_tmp),
@@ -681,8 +701,23 @@ createDateRangeTable <- function(cam.op,
   
   
   
-  # define when last occasion ends
+  # # define when last occasion ends 
+  # the old way:
   date_ranges$end_of_retrieval_day <- as.POSIXct(paste(date_ranges$cam.max, "23:59:59"), tz = timeZone_tmp, format = "%Y-%m-%d %H:%M:%S")    # end of retrieval day
+  
+  # new possible solution:
+  # # Option 1: end of retrieval day
+  # end_of_retrieval_day <- as.POSIXct(paste(date_ranges$cam.max, "23:59:59"), tz = timeZone_tmp, format = "%Y-%m-%d %H:%M:%S")    # end of retrieval day
+  # # Option 2: exactly at retrieval hour (this only makes sense if value in camOp on retrieval day is fraction (if time of day was provided))
+  # # if there was a problem on the last day, it will be incorrect (return 0:0:0 if effort = 0)
+  # end_of_retrieval_day_hour <- date_ranges$cam.max + dhours(apply(cam.op, MARGIN = 1, function(X){X[max(which(!is.na(X)))] * 24}))
+  # 
+  # # define end of survey: exact retrieval time (if effort is a fraction of day)
+  # if(all(end_of_retrieval_day_hour < end_of_retrieval_day)) {
+  #   date_ranges$end_of_retrieval_day <- end_of_retrieval_day_hour
+  # } else{
+  #   date_ranges$end_of_retrieval_day <- end_of_retrieval_day
+  # }
   
   # if maxNumberDays is defined, find which is earlier: start + maxNumberDays or station retrieval?
   if(hasArg(maxNumberDays_tmp)) {
@@ -869,7 +904,8 @@ calculateTrappingEffort <- function(cam.op,
                                     occasionLength2,
                                     scaleEffort2,
                                     includeEffort2,
-                                    minActiveDaysPerOccasion2){
+                                    minActiveDaysPerOccasion2,
+                                    occasionStartTime2){
   
   ######################
   # calculate trapping effort by station and occasion
@@ -1522,7 +1558,7 @@ stationSessionCamMatrix <- function(CTtable,
   
   
   # convert setup and retrievalCol to Dates (in case they contain times)
-  CTtable[,setupCol] <- as.Date(as.character(CTtable[,setupCol]))
+  CTtable[,setupCol]     <- as.Date(as.character(CTtable[,setupCol]))
   CTtable[,retrievalCol] <- as.Date(as.character(CTtable[,retrievalCol]))
   
   
@@ -1950,6 +1986,7 @@ camopPlot <- function(camOp,
   # lattice::levelplot
   if(isTRUE(lattice)) {
     
+    if (!requireNamespace("tibble", quietly = TRUE)) stop("package 'lattice' is required for levelplot (lattice = TRUE)")
     # generate color ramp 
     image_colors_lattice <- grDevices::hcl.colors(n = 100, palette = palette, rev = TRUE)
     
@@ -1957,7 +1994,7 @@ camopPlot <- function(camOp,
     # levelplot in lattice
     # to be improved: y axis labels (station IDs) are all drawn and can overlap. 
     # this may help: https://stat.ethz.ch/R-manual/R-devel/library/lattice/html/axis.default.html
-    levelplot(camop_for_plotting,
+    lattice::levelplot(camop_for_plotting,
               col.regions = image_colors_lattice,
               xlab = "", ylab ="",
               scales = list(x = list(at = which.tmp,
@@ -1974,4 +2011,27 @@ camopPlot <- function(camOp,
     abline(v = at.tmp, col = rgb(0,0,0, 0.2))
     box()
   }
+}
+
+# intersect intervals, fast (adapted from lubridate)
+#https://github.com/tidyverse/lubridate/blob/master/R/intervals.r
+intersect.Interval.fast <- function(int1, int2, ...) {  # (x, y, ...) {
+  #int1 <- int_standardize(x)
+  #int2 <- int_standardize(y)
+  
+  starts <- pmax(int1@start, int2@start)
+  ends <- pmin(int1@start + int1@.Data, int2@start + int2@.Data)
+  spans <- as.numeric(ends) - as.numeric(starts)
+  
+  spans[spans < 0] <- NA
+  spans
+  # no.int <- ends < starts
+  # no.int <- is.na(no.int) | no.int
+  # spans[no.int] <- NA
+  # starts[no.int] <- NA
+  # 
+  # new.int <- new("Interval", spans, start = starts, tzone = x@tzone)
+  # negix <- !is.na(x@.Data) & (sign(x@.Data) == -1)
+  # new.int[negix] <- int_flip(new.int[negix])
+  # new.int
 }
