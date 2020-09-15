@@ -9,6 +9,7 @@ cameraOperation <- function(CTtable,
                             allCamsOn,
                             camerasIndependent,
                             dateFormat = "%Y-%m-%d",
+                            occasionStartTime = 0,   # check if this works and makes sense
                             writecsv = FALSE,
                             outDir){
   
@@ -44,6 +45,11 @@ cameraOperation <- function(CTtable,
       stop("if 'byCamera' is TRUE, 'cameraCol' needs to be specified")
     }
   } 
+  
+  if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
+  occasionStartTime    <- as.integer(round(occasionStartTime))
+  if(occasionStartTime != 0 & !is.integer(occasionStartTime)) stop ("occasionStartTime must be an integer between 0 and 23", call. = FALSE)
+  if(occasionStartTime < 0 | occasionStartTime >= 24)         stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
   
   myArgs <- match.call()
   cameraColInArgs  <- "cameraCol" %in% names(myArgs)
@@ -142,6 +148,12 @@ cameraOperation <- function(CTtable,
     CTtable[,retrievalCol] <- parseDateObject(inputColumn = CTtable[,retrievalCol], dateFormat, checkNA = TRUE, checkEmpty = TRUE)
   }
   
+  # if setup time was not defined, assume 12 noon
+  if(isFALSE(effortAsFraction)){
+    CTtable[,setupCol] <- CTtable[,setupCol] + dhours(12)
+    CTtable[,retrievalCol] <- CTtable[,retrievalCol] + dhours(12)
+  }
+  
   
   # check if dates make sense
   if(any(CTtable[,setupCol]     < as.Date("1970-01-01"))) warning("setup dates begin before 1970. If this is not intended please check dateFormat", call. = FALSE)
@@ -205,7 +217,7 @@ cameraOperation <- function(CTtable,
         stop(paste(paste(CTtable[which(CTtable[,setupCol] > CTtable[,cols.prob.from.index]), stationCol], collapse = ", "), ": Problem begins before Setup"), call. = FALSE)
       }
     }
-    # check that problems end before retrieval
+    # check that problems end before (or on) retrieval
     for(cols.prob.to.index in cols.prob.to){
       if(any(CTtable[,retrievalCol] < CTtable[,cols.prob.to.index], na.rm = TRUE)){
         stop(paste(paste(CTtable[which(CTtable[,retrievalCol] < CTtable[,cols.prob.to.index]), stationCol], collapse = ", "), ": Problem ends after retrieval"), call. = FALSE)
@@ -214,42 +226,34 @@ cameraOperation <- function(CTtable,
     
     
     # make list of Problem groups
-     
+    
     # loop over problem groups, save problem start and end date(time)
     # list item = Problem index (Problem1, Problem2, ...); vector items within = cameras
     problem_colnames_index_list <- vector(mode = "list", length = length(cols.prob.from))
     
     for(Problem_group in 1:length(problem_colnames_index_list)){
-      # problem_colnames_index_list[[Problem_group]]$col.prob.from <- cols.prob.from[order(colnames(CTtable)[cols.prob.from])][Problem_group]
-      # problem_colnames_index_list[[Problem_group]]$col.prob.to   <- cols.prob.to  [order(colnames(CTtable)[cols.prob.to])]  [Problem_group]
-      
       problem_colnames_index_list[[Problem_group]]$prob.from <- CTtable[, cols.prob.from [order(colnames(CTtable) [cols.prob.from])] [Problem_group]]
       problem_colnames_index_list[[Problem_group]]$prob.to   <- CTtable[, cols.prob.to   [order(colnames(CTtable) [cols.prob.to])]   [Problem_group]]
-      
-      # problem_colnames_index_list[[Problem_group]]$interval <- interval(start = CTtable[, problem_colnames_index_list[[Problem_group]]$col.prob.from],
-      #                                                                      end = CTtable[,problem_colnames_index_list[[Problem_group]]$col.prob.to])
-      
-      #Problem_groups[[Problem_group]] <- problem_colnames_index_list[[Problem_group]]$interval
     }
-    #names(problem_colnames_index_list) <- paste("Problem", seq(1:length(problem_colnames_index_list)))
     
-    # loop over cameras, make and concatenate the intervals by station
+    # loop over cameras, make and concatenate the problem intervals by station
     problem_intervals_by_row <- list()
     for(row_index in 1:nrow(CTtable)){
       
       tmp <- lapply(problem_colnames_index_list, FUN = function(x) {
         data.frame(start = x$prob.from[row_index],
-                 end = x$prob.to[row_index])
+                   end = x$prob.to[row_index])
       })
       tmp.rbind <- do.call(rbind, tmp)
-      problem_intervals_by_row[[row_index]] <- interval(start = tmp.rbind$start, tmp.rbind$end)
+      
+      problem_intervals_by_row[[row_index]] <- interval(start = tmp.rbind$start, tmp.rbind$end  - dseconds(1))   # -1 to avoid problems matching with camera operation date-time
+      if(any(time_length(problem_intervals_by_row[[row_index]]) < 0, na.rm = TRUE)) stop("row", row_index, ": Problem ends before it starts.")
     }
     
     rm(problemFromColumn, problemToColumn, cols.prob.from.index, cols.prob.to.index)
   }
   
   # create empty matrix with desired dimensions (depending on presence of camera / session columns)
-  
   arg_list <- list(CTtable = CTtable,
                    stationCol = stationCol,
                    setupCol = setupCol,
@@ -263,131 +267,103 @@ cameraOperation <- function(CTtable,
   
   
   
-  
-  #### EDIT
-  
-  # get all start / retrieval dates
+  # get start / retrieval dates of all cameras
   date0 <- sapply(CTtable[, setupCol],     FUN =  function(x) as.character(min(x)))
-  date1 <- sapply(CTtable[, retrievalCol], FUN =  function(x) as.character(max(x))) 
-
-  # trapping intervals for all cameras
-  start_to_end <- interval(date0, date1)
   
+  # if(isTRUE(effortAsFraction)){
+  #   date1 <- sapply(CTtable[, retrievalCol], FUN =  function(x) as.character(max(x))) 
+  # } else {
+    date1 <- sapply(CTtable[, retrievalCol], FUN =  function(x) as.character(max(x) - dseconds(1)))  # if not adding 1 day, last day with end on midnight when the day begins, leading to retrieval day being 0
+  # }
+  
+# interval from start to end of each camera
+  start_to_end <- interval(date0, date1)
+
+
+  #  trapping intervals for all cameras (setup to retrieval)
   # for each day in camop, make an interval covering the entire day
   camop_daily_intervals <- lapply(as.Date(colnames(camOp_empty)),
-                                  FUN = function(x) interval(start = paste(x, "00:00:00"),
-                                                             #end = paste(x, "23:59:59")   # time_length of that interval is 86399 s
-                                                             end = paste(x+1, "00:00:00")  # now it's 86400 s
-                                                             ))
+                                  FUN = function(x) interval(start = x + dhours(occasionStartTime),  #paste0(x, " ", occasionStartTime, ":00:00"),
+                                                             end =  x + ddays(1) + dhours(occasionStartTime) - dseconds(1) #paste0(x+1, " ", occasionStartTime, ":00:00")  # 86400 s. If 23:59:59 same day, it's 86399 s
+                                                             #end = paste0(x, " ", occasionStartTime, ":59:59")  #  86399 s
+                                  ))
+  names(camop_daily_intervals) <- colnames(camOp_empty)
+  
+  # get start / end date of the intervals
+  # days
+  int_start_daily <- lapply(camop_daily_intervals, FUN = function(x) int_start(x))
+  int_end_daily   <- lapply(camop_daily_intervals, FUN = function(x) int_end(x))
+  # camera trapping periody by camera
+  # int_start_total <- as_date(int_start(start_to_end))
+  # int_end_total   <- as_date(int_end(start_to_end))
+  int_start_total <- int_start(start_to_end)
+  int_end_total   <- int_end(start_to_end)
+
+  
+  
+  # identify overlapping intervals with data.table
+  # https://www.howtobuildsoftware.com/index.php/how-do/bzA9/r-intervals-lubridate-r-and-lubridate-do-the-intervals-in-x-fit-into-any-of-the-intervals-in-y
+  
+  #CTtable
+  int.total <- data.frame(start = sapply(int_start(start_to_end), as.POSIXct), 
+                          end   = sapply(int_end(start_to_end), as.POSIXct))
+  
+  # daily intervals
+  int.daily <- data.frame(start = sapply(int_start_daily, as.POSIXct), 
+                          end = sapply(int_end_daily, as.POSIXct))
+  
+  setDT(int.total)[, `:=`(start = start,
+                        end = end)]
+  setkey(setDT(int.daily)[, `:=`(start =start,
+                                 end = end)], start, end)
+  intervals_matched <- foverlaps(int.total, int.daily, type = "any", which = TRUE)
+  #intervals_matched.within <- foverlaps(int.total, int.daily, type = "within", which = TRUE)
+  
+  # equivalent to avove, only x/y exchanged
+  # setDT(int.daily)[, `:=`(start = start,
+  #                         end = end)]
+  # setkey(setDT(int.total)[, `:=`(start =start,
+  #                                end = end)], start, end)
+  # intervals_matched <- foverlaps(int.daily, int.total, type = "any", which = TRUE)
+  
+  
   # loop over cameras (= rows)
   for(i in 1:nrow(camOp_empty)){
-    # for each day, what fraction of day is covered by active camera?
-  out <- sapply(camop_daily_intervals, FUN = function(x) {
-    interval.tmp <- intersect(x, start_to_end[i])    # intersection of day and total trapping period
-    time_length(interval.tmp, unit = "days") 
-    })
-  # assign values to camera operation matrix
-  camOp_empty[i,] <- out
-  
-  # if problems are defined, subtract those from the camera operation values
-  if(hasProblems){
-    out.prob <- sapply(camop_daily_intervals, FUN = function(x) {
-      interval.tmp <- intersect(x, problem_intervals_by_row[[i]])   # intersection of day and problem intervals
-      sum(time_length(interval.tmp, unit = "days"), na.rm = TRUE)   # sum of fraction of day with malfunction (to account for multiple problem intervals)
-    })
-    camOp_empty[i,] <-  camOp_empty[i,] - out.prob
+    
+    run_these <- intervals_matched[intervals_matched$xid == i,]$yid
+    
+    # intersect daily intervals with interval from setup to retrieval
+    
+    interval.tmp <- sapply(camop_daily_intervals[run_these], intersect.Interval.fast, start_to_end[i])
+    # assign values to camera operation matrix
+    camOp_empty[i,run_these] <- time_length(interval.tmp, unit = "days")    # +1 is to correct of 
+    
+    
+    # if problems are defined, subtract those from the camera operation values
+    if(hasProblems) {
+      if(any(!is.na(problem_intervals_by_row[[i]]))){
+        if(!all(problem_intervals_by_row[[i]] %within% start_to_end[i], na.rm = TRUE)) stop(paste(CTtable[,stationCol], ": problem intervals are not within interval from setup to retrieval"))
+        
+        interval.tmp <- sapply(camop_daily_intervals[run_these], intersect.Interval.fast, problem_intervals_by_row[[i]])   # intersection of day and total trapping period
+        # total Problem value per day
+        if(inherits(interval.tmp, "array")) {
+          fraction_to_remove <- time_length(colSums(interval.tmp, na.rm = TRUE), unit = "days")   # if mutliple problem periods are defines, they show up as rows here and are combined with colSums
+        } else {
+          fraction_to_remove <- time_length(interval.tmp, unit = "days")
+        }
+        # replace NA with 0 
+        fraction_to_remove <- ifelse(is.na(fraction_to_remove), 0, fraction_to_remove)
+        # assign values to camera operation matrix
+        camOp_empty[i,run_these] <- camOp_empty[i,run_these] - fraction_to_remove
+      }
+    }
   }
   
-  #names(out) <- colnames(camOp_empty)
-
-  }
-  
-  #return(camOp_empty)
-  
-  #### END EDIT
+  #camOp_filled <- camOp_empty #
+  camOp_filled <- round(camOp_empty, 4)   # to account for slight imprecision because daily interval is 86399 seconds, not 86400s
   
   
-  
-  # # for each row (station/camera), assign daily effort where needed
-  # # integer when input columns are a date format, fraction when they are date-time
-  # for(i in 1:nrow(camOp_empty)){
-  #   
-  #   # camera setup date (min is to ensure that we get the first day if multiple cameras were set at a station on different days)
-  #   date0 <- as.character(as.Date(min(CTtable[i, setupCol])))
-  #   #date0 <- as.character(min(CTtable[i, setupCol]))
-  #   
-  #   # camera retrieval date
-  #   date1 <- as.character(as.Date(max(CTtable[i, retrievalCol])))
-  #   
-  #   
-  #   # # fill matrix between setup and retrieval with 1
-  #   # camOp_empty[i, seq(from = match(date0, colnames(camOp_empty)),
-  #   #                    to   = match(date1, colnames(camOp_empty)), by = 1)] <- 1
-  #   
-  #   # fill matrix between setup and retrieval with 1 (with lubridate)
-  #   camOp_empty[i, ymd(colnames(camOp_empty)) %within% interval(date0, date1)] <- 1
-  # 
-  # 
-  #   
-  #   
-  #   # if precise effort, calculate fraction in setup and retrieval day  (instead of 1)
-  #   if(effortAsFraction){
-  #     # setup day as fraction of day with camera active
-  #     camOp_empty[i, match(date0, colnames(camOp_empty))] <-  fractionOfDay(time = CTtable[i, setupCol], type = "after")
-  #     # retrieval day as fraction of day with camera active
-  #     camOp_empty[i, match(date1, colnames(camOp_empty))] <- fractionOfDay(time = CTtable[i, retrievalCol], type = "before")
-  #   }
-  #   
-  #   
-  #   # set non operational times to 0
-  #   if(hasProblems){
-  #     # loop over all problem periods
-  #     for(j in 1:length(cols.prob.to)){   
-  #       
-  #       # find first day of problem period j
-  #       date.p0.tmp <- as.character(as.Date(min(CTtable[i, cols.prob.from[j]])))   
-  #       # find last day of problem period j
-  #       date.p1.tmp <- as.character(as.Date(max(CTtable[i, cols.prob.to[j]])))   
-  #       
-  #       interval(date.p0.tmp, date.p1.tmp)
-  #       #camOp_empty[i, ymd(colnames(camOp_empty)) %within% interval(date.p0.tmp, date.p1.tmp)] <- 0
-  #       
-  #       if(!is.na(date.p0.tmp) & !is.na(date.p1.tmp)){
-  #         if(date.p1.tmp < date.p0.tmp) stop(paste("row", i, ", Problem ", j, ": 'to' is smaller than 'from'", sep = ""))
-  #         if(date.p1.tmp > date1)       stop(paste("row", i, ", Problem ", j, ": is outside date range of setup and retrieval", sep = ""))
-  #         if(date.p0.tmp < date0)       stop(paste("row", i, ", Problem ", j, ": is outside date range of setup and retrieval", sep = ""))
-  #         # 
-  #         camOp_empty[i, seq(from = match(date.p0.tmp, colnames(camOp_empty)),
-  #                            to   = match(date.p1.tmp, colnames(camOp_empty)), by = 1)] <- 0
-  #         
-  #         # fraction of problem days that the cameras were active
-  #         
-  #         # if problem began on setup day, % setup day active - % setup day affected by problem
-  #         if(date.p0.tmp == date0){   
-  #           camOp_empty[i, match(date.p0.tmp, colnames(camOp_empty))] <- fractionOfDay(time = CTtable[i, setupCol], type = "after") - 
-  #             fractionOfDay(time = CTtable[i, cols.prob.from[j]], type = "after")
-  #           
-  #         } else {   # otherwise fraction of day before problem began
-  #           camOp_empty[i, match(date.p0.tmp, colnames(camOp_empty))] <-  fractionOfDay(time = CTtable[i, cols.prob.from[j]], type = "before")
-  #         }
-  #         
-  #         # if problem ended on retrieval day, % retrieval day active - % retrieval day affected by problem
-  #         if(date.p1.tmp == date1){   
-  #           camOp_empty[i, match(date.p1.tmp, colnames(camOp_empty))] <- fractionOfDay(time = CTtable[i, retrievalCol], type = "before") - 
-  #             fractionOfDay(time = CTtable[i, cols.prob.to[j]], type = "before")
-  #           
-  #         } else {  # otherwise fraction of day after problem ended
-  #           camOp_empty[i, match(date.p1.tmp, colnames(camOp_empty))] <-  fractionOfDay(time = CTtable[i, cols.prob.to[j]], type = "after")
-  #         }
-  #       }
-  #       rm(date.p0.tmp, date.p1.tmp)
-  #     }
-  #   }   # end isTRUE(hasProblems)
-  #   rm(date0, date1)
-  # }
-  # 
-  camOp_filled <- camOp_empty
-  
+  if(occasionStartTime != 0) colnames(camOp_filled) <- paste0(colnames(camOp_filled), "+", occasionStartTime, "h")
   
   if(isTRUE(cameraColInArgs)){   # there is a camera column, i.e., potentially > 1 cameras per station
     
@@ -429,12 +405,6 @@ cameraOperation <- function(CTtable,
                               FUN = function(x) ifelse(all(x == 1), 1, 0))  
           }
         }
-        
-        # # return lowest value at that station (station will be "off" if at least one camera was off)
-        # dat2 <- aggregate(camOp_filled, by = list(CTtable[, c(stationCol)],
-        #                                           CTtable[, c(sessionCol)]), 
-        #                   FUN = min)
-        #                   #FUN = function(x) ifelse(all(x == 1), sum(x), 0))
         
         # asssign row names (adding session ID, if applicable)
         if(sessionColInArgs)  row.names(dat2) <- paste(dat2[,1], dat2[,2], sep = separatorSession)
