@@ -9,7 +9,7 @@ cameraOperation <- function(CTtable,
                             allCamsOn,
                             camerasIndependent,
                             dateFormat = "%Y-%m-%d",
-                            occasionStartTime = 0,   # check if this works and makes sense
+                            occasionStartTime = 0,
                             writecsv = FALSE,
                             outDir){
   
@@ -148,9 +148,9 @@ cameraOperation <- function(CTtable,
     CTtable[,retrievalCol] <- parseDateObject(inputColumn = CTtable[,retrievalCol], dateFormat, checkNA = TRUE, checkEmpty = TRUE)
   }
   
-  # if setup time was not defined, assume 12 noon
+  # if setup time was not defined, assume 12 noon (so effort on setup/retrieval day = 0.5)
   if(isFALSE(effortAsFraction)){
-    CTtable[,setupCol] <- CTtable[,setupCol] + dhours(12)
+    CTtable[,setupCol]     <- CTtable[,setupCol]     + dhours(12)
     CTtable[,retrievalCol] <- CTtable[,retrievalCol] + dhours(12)
   }
   
@@ -169,6 +169,14 @@ cameraOperation <- function(CTtable,
          paste(CTtable[which(CTtable[,setupCol] > CTtable[,retrievalCol]), stationCol],
                collapse = ", "))
   }
+  
+  # get start / retrieval dates of all cameras
+  date0 <- sapply(CTtable[, setupCol],     FUN =  function(x) as.character(min(x)))
+  date1 <- sapply(CTtable[, retrievalCol], FUN =  function(x) as.character(max(x) - dseconds(1)))  # if not removing 1 second, last day with end on midnight when the day begins, leading to retrieval day being 0
+  
+  # create interval from start to end of each camera
+  start_to_end <- interval(date0, date1)
+  
   
   if(isTRUE(hasProblems)){
     
@@ -228,6 +236,7 @@ cameraOperation <- function(CTtable,
     # make list of Problem groups
     
     # loop over problem groups, save problem start and end date(time)
+    # this is a bit hacky, but ensures that it works even if Problem columns are not ordered 
     # list item = Problem index (Problem1, Problem2, ...); vector items within = cameras
     problem_colnames_index_list <- vector(mode = "list", length = length(cols.prob.from))
     
@@ -239,15 +248,38 @@ cameraOperation <- function(CTtable,
     # loop over cameras, make and concatenate the problem intervals by station
     problem_intervals_by_row <- list()
     for(row_index in 1:nrow(CTtable)){
-      
+       
+      # make data frame of problem start / end times
       tmp <- lapply(problem_colnames_index_list, FUN = function(x) {
+        if(is.na( x$prob.from  [row_index]) & is.na( x$prob.to  [row_index])){
+          return(data.frame(start = NA, end   = NA))
+        }
+        
+        # when using ifelse, output is numeric, not POSIXct
+        if(effortAsFraction)  prob.to <- x$prob.to  [row_index] #- dseconds(1)           
+        # if Problem_to is defined as date, add 1 day - 1 second (so problem ends on midnight the same day)
+        if(!effortAsFraction) {
+          prob.to <- x$prob.to  [row_index] + ddays(1) - dseconds(1) 
+          # if problem period were to end after end of camera trapping period, replace the end of Problem with end of camera trapping period
+          if(prob.to > int_end(start_to_end[row_index])){
+            prob.to <- int_end(start_to_end[row_index])
+          }
+        }
         data.frame(start = x$prob.from[row_index],
-                   end = x$prob.to[row_index])
+                   end   = prob.to)
       })
+      
+      # combine date.frames for problem start end times (if multiple problem periods defines)
       tmp.rbind <- do.call(rbind, tmp)
       
-      problem_intervals_by_row[[row_index]] <- interval(start = tmp.rbind$start, tmp.rbind$end  - dseconds(1))   # -1 to avoid problems matching with camera operation date-time
-      if(any(time_length(problem_intervals_by_row[[row_index]]) < 0, na.rm = TRUE)) stop("row", row_index, ": Problem ends before it starts.")
+      
+      # make intervals for the problem periods
+      if(!all(is.na(tmp.rbind))) {
+        problem_intervals_by_row[[row_index]] <- interval(start = tmp.rbind$start, tmp.rbind$end  - dseconds(1))   # -1 to avoid problems matching with camera operation date-time
+        if(any(time_length(problem_intervals_by_row[[row_index]]) < 0, na.rm = TRUE)) stop("row", row_index, ": Problem ends before it starts.")
+      } else {
+        problem_intervals_by_row[[row_index]] <- NA
+      }
     }
     
     rm(problemFromColumn, problemToColumn, cols.prob.from.index, cols.prob.to.index)
@@ -267,33 +299,22 @@ cameraOperation <- function(CTtable,
   
   
   
-  # get start / retrieval dates of all cameras
-  date0 <- sapply(CTtable[, setupCol],     FUN =  function(x) as.character(min(x)))
-  
-  # if(isTRUE(effortAsFraction)){
-  #   date1 <- sapply(CTtable[, retrievalCol], FUN =  function(x) as.character(max(x))) 
-  # } else {
-    date1 <- sapply(CTtable[, retrievalCol], FUN =  function(x) as.character(max(x) - dseconds(1)))  # if not adding 1 day, last day with end on midnight when the day begins, leading to retrieval day being 0
-  # }
-  
-# interval from start to end of each camera
-  start_to_end <- interval(date0, date1)
 
-
+  
+  
   #  trapping intervals for all cameras (setup to retrieval)
   # for each day in camop, make an interval covering the entire day
   camop_daily_intervals <- lapply(as.Date(colnames(camOp_empty)),
                                   FUN = function(x) interval(start = x + dhours(occasionStartTime),  #paste0(x, " ", occasionStartTime, ":00:00"),
-                                                             end =  x + ddays(1) + dhours(occasionStartTime) - dseconds(1) #paste0(x+1, " ", occasionStartTime, ":00:00")  # 86400 s. If 23:59:59 same day, it's 86399 s
+                                                             end =   x + ddays(1) + dhours(occasionStartTime) - dseconds(1) #paste0(x+1, " ", occasionStartTime, ":00:00")  # 86400 s. If 23:59:59 same day, it's 86399 s
                                                              #end = paste0(x, " ", occasionStartTime, ":59:59")  #  86399 s
                                   ))
   names(camop_daily_intervals) <- colnames(camOp_empty)
   
-  # get start / end date of the intervals
-  # days
+  # get start / end of the days covered by the study (+ occasionStartTime, if defined)
   int_start_daily <- lapply(camop_daily_intervals, FUN = function(x) int_start(x))
   int_end_daily   <- lapply(camop_daily_intervals, FUN = function(x) int_end(x))
-  # camera trapping periody by camera
+  # get start / end of camera trapping period by camera
   # int_start_total <- as_date(int_start(start_to_end))
   # int_end_total   <- as_date(int_end(start_to_end))
   int_start_total <- int_start(start_to_end)
@@ -336,7 +357,7 @@ cameraOperation <- function(CTtable,
     
     interval.tmp <- sapply(camop_daily_intervals[run_these], intersect.Interval.fast, start_to_end[i])
     # assign values to camera operation matrix
-    camOp_empty[i,run_these] <- time_length(interval.tmp, unit = "days")    # +1 is to correct of 
+    camOp_empty[i,run_these] <- time_length(interval.tmp, unit = "days")
     
     
     # if problems are defined, subtract those from the camera operation values
@@ -344,12 +365,12 @@ cameraOperation <- function(CTtable,
       if(any(!is.na(problem_intervals_by_row[[i]]))){
         if(!all(problem_intervals_by_row[[i]] %within% start_to_end[i], na.rm = TRUE)) stop(paste(CTtable[,stationCol], ": problem intervals are not within interval from setup to retrieval"))
         
-        interval.tmp <- sapply(camop_daily_intervals[run_these], intersect.Interval.fast, problem_intervals_by_row[[i]])   # intersection of day and total trapping period
+        interval.tmp.prob <- sapply(camop_daily_intervals[run_these], intersect.Interval.fast, problem_intervals_by_row[[i]])   # intersection of day and total trapping period
         # total Problem value per day
-        if(inherits(interval.tmp, "array")) {
-          fraction_to_remove <- time_length(colSums(interval.tmp, na.rm = TRUE), unit = "days")   # if mutliple problem periods are defines, they show up as rows here and are combined with colSums
+        if(inherits(interval.tmp.prob, "array")) {
+          fraction_to_remove <- time_length(colSums(interval.tmp.prob, na.rm = TRUE), unit = "days")   # if mutliple problem periods are defined, they show up as rows here and are combined with colSums
         } else {
-          fraction_to_remove <- time_length(interval.tmp, unit = "days")
+          fraction_to_remove <- time_length(interval.tmp.prob, unit = "days")
         }
         # replace NA with 0 
         fraction_to_remove <- ifelse(is.na(fraction_to_remove), 0, fraction_to_remove)
