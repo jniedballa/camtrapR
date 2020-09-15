@@ -19,6 +19,7 @@ cameraOperation(CTtable,
   allCamsOn, 
   camerasIndependent,
   dateFormat = "\%Y-\%m-\%d", 
+  occasionStartTime = 0,
   writecsv = FALSE, 
   outDir
 )
@@ -57,6 +58,9 @@ cameraOperation(CTtable,
   }
   \item{dateFormat}{
   character. The format of columns \code{setupCol} and \code{retrievalCol} (and potential problem columns) in \code{CTtable}. Must be interpretable by either \code{as.Date} or the "orders" argument \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}.
+}
+\item{occasionStartTime}{
+  integer. time of day (the full hour) at which to begin occasions. Replaces \code{occasionStartTime} from \code{\link{detectionHistory}} and  \code{\link{spatialDetectionHistory}}.
 }
   \item{writecsv}{
   logical. Should the camera operability matrix be saved as a .csv?

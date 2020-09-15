@@ -12,7 +12,7 @@ spatialDetectionHistory(recordTableIndividual,
   species,
   camOp,
   CTtable,
-  output,
+  output = c("binary", "count"),
   stationCol = "Station",
   speciesCol = "Species",
   sessionCol,
@@ -25,13 +25,13 @@ spatialDetectionHistory(recordTableIndividual,
   recordDateTimeFormat = "\%Y-\%m-\%d \%H:\%M:\%S",
   occasionLength,
   minActiveDaysPerOccasion,
-  occasionStartTime = 0,
+  occasionStartTime = "deprecated",
   maxNumberDays,
   day1,
   buffer,
   includeEffort = TRUE,
   scaleEffort = FALSE,
-  binaryEffort,
+  binaryEffort = FALSE,
   timeZone,
   makeRMarkInput
 )
@@ -90,7 +90,7 @@ spatialDetectionHistory(recordTableIndividual,
   integer. minimum number of active trap days for occasions to be included (optional)
 }
   \item{occasionStartTime}{
-  integer. time of day (the full hour) at which to begin occasions.
+  (DEPRECATED) integer. time of day (the full hour) at which to begin occasions. Please use argument \code{occasionStartTime} in \code{\link{cameraOperation}} instead.
 }
   \item{maxNumberDays}{
   integer. maximum number of trap days per station (optional)
@@ -125,7 +125,8 @@ The function creates a \code{\link[secr]{capthist}} object by combining three di
 
 \code{includeEffort} controls whether an effort matrix is computed or not. If TRUE, effort will be used for object \code{\link[secr]{usage}} information in a \code{\link[secr]{traps}}. \code{binaryEffort} makes the effort information binary. \code{scaleEffort} is currently not used and must be set to FALSE. The reason is that \code{\link[secr]{usage}} can only be either binary, or nonnegative real values, whereas scaling effort would return negative values.
 
-The number of days that are aggregated is controlled by \code{occasionLength}. \code{occasionStartTime} can be used to make occasions begin another hour than midnight (the default). This may be relevant for nocturnal animals, in which 1 whole night would be considered an occasion.
+The number of days that are aggregated is controlled by \code{occasionLength}. \code{occasionStartTime} will be removed from the function. It has moved to \code{\link{cameraOperation}}, to ensure daily effort is computed correctly and takes the occasion start time into account.%\code{occasionStartTime} can be used to make occasions begin another hour than midnight (the default). This may be relevant for nocturnal animals, in which 1 whole night would be considered an occasion.
+
 Output can be returned as individual counts per occasion (\code{output = "count"}) or as binary observation (\code{output = "binary"}).
 
 Argument \code{sessionCol} can be used to a create multi-session \code{\link[secr]{capthist}} object. There are two different ways in which the argument is interpreted. It depends on whether a column with the name you specify in argument \code{sessionCol} exists in \code{recordTableIndividual} or in \code{CTtable}. If \code{sessionCol} is found in \code{recordTableIndividual}, the records will be assigned to the specified sessions, and it will be assumed that all camera trap station were used in all sessions. Alternatively, if \code{sessionCol} is found in\code{CTtable}, it will be assumed that only a subset of stations was used in each session, and the records will be assigned automatically (using the station IDs to identify which session they belong into). In both cases, session information must be provided as a sequence of integer numbers beginnign with 1, i.e., you provide the session number directly in \code{sessionCol}. See \code{\link[secr]{session}} for more information about sessions in \pkg{secr}.
