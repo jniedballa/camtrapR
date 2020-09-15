@@ -5,13 +5,14 @@ importFrom("graphics", abline, axis, box, grconvertX, grconvertY,
            hist, image, legend, lines, mtext, par, plot, plot.default, 
            points, polygon, rect, segments, strheight, strwidth,
            text)
-importFrom("stats", aggregate, na.omit)
+importFrom("stats", aggregate, na.omit, start, end)
 importFrom("utils", modifyList, write.csv, zip)
 importFrom("methods", hasArg, is)
 importFrom("utils", head, menu, read.table)
 importFrom("sp", CRS, SpatialPointsDataFrame, SpatialPolygonsDataFrame, coordinates)
 importFrom("secr", read.traps, make.capthist, traps, RMarkInput, usage, covariates)
-importFrom("data.table", rbindlist, setDF)
+importFrom("data.table", rbindlist, setDF, setDT, setkey, foverlaps, ":=")
+importFrom("lubridate", as_date, ddays, dhours, dseconds, interval, int_start, int_end, time_length, "%within%")
 
 
 export(activityDensity, activityHistogram, activityOverlap, activityRadial, addCopyrightTag,  appendSpeciesNames, cameraOperation, checkSpeciesIdentification, checkSpeciesNames, createSpeciesFolders, createStationFolders, detectionHistory, detectionMaps, exifTagNames, exiftoolPath, fixDateTimeOriginal, getSpeciesImages, imageRename, recordTable, recordTableIndividual, spatialDetectionHistory, surveyReport, timeShiftImages)
