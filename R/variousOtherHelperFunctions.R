@@ -1364,6 +1364,7 @@ assignSessionIDtoRecordTable <- function(recordTable_tmp,
   recordTable_tmp[, sessionCol] <- NA
   
   record_dates_tmp <- as.Date(recordTable_tmp[, dateTimeCol])
+  record_dates_backup <- record_dates_tmp
   camOp_dates_tmp  <- as.Date(colnames(camOp))
   
   # remove records before / after camOp date range
@@ -1383,6 +1384,8 @@ assignSessionIDtoRecordTable <- function(recordTable_tmp,
     record_dates_tmp <- as.Date(recordTable_tmp[, dateTimeCol])
   }
   
+  if(nrow(recordTable_tmp) == 0) stop(paste0("Date range mismatch between records (", paste(range(record_dates_backup), collapse = " - "),
+                                            ") and camera operation matrix (", paste(range(camOp_dates_tmp), collapse = " - "), ")"))
   
   for(i in 1:nrow(camop.info.df)){
     # for every row in camOp, find all records at that station  
