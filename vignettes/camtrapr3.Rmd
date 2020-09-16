@@ -1,16 +1,17 @@
 ---
-title: "3. Extracting Data from Camera Trapping Images and videos, creating occupancy & secr input"
+title: "3. Data Extraction from Images and videos, creating occupancy & secr input"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output:
-  html_document:
+    html_document:
     toc: true
     toc_float:
       collapsed: false
       smooth_scroll: false
     toc_depth: 2
+    df_print: kable
 vignette: >
-  %\VignetteIndexEntry{3. Extracting data from camera trap images, creating occupancy & secr input}
+  %\VignetteIndexEntry{3. Data Extraction from Images and videos, creating occupancy & secr input}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -397,18 +398,18 @@ Now with hasProblems = TRUE:
 ```
 
 
-Here's how the daily aggregates are calculate for the different combinations of allCamsOn and camerasIndependent, and depending on whether input columns are date or date-time (from v2.1.0):
+Here's how the daily aggregates are calculate for the different combinations of allCamsOn and camerasIndependent, and depending on whether input columns are date or date-time (from v2.1.0). In the table below, x is a vector of values at individual cameras for one day (e.g. c(1,0.5) when one camera was active the whole day, the other cameras half a day).
 
-| camerasIndependent | allCamsOn | input columns  | aggregate with |
-|---|---|---|---|
-| TRUE | TRUE | date-time | ifelse(all(x == 1), sum(x), min(x) * length(x)) |
-| TRUE | TRUE | date |  ifelse(all(x == 1), sum(x), 0) |
-| TRUE | FALSE | date-time | sum  |
-| TRUE | FALSE | date| sum |
-| FALSE |TRUE | date-time | min |
-| FALSE| TRUE | date | ifelse(all(x == 1), 1, 0) |
-| FALSE| FALSE | date-time | mean |
-| FALSE |FALSE | date| ifelse(sum(x, na.rm = TRUE) >= 1, 1, sum(x, na.rm = TRUE))  |
+| camerasIndependent | allCamsOn | input columns  | aggregate with | example c(1, 0.5) |  example c(1, 1) |
+|---|---|---|---|---|---|
+| TRUE | TRUE | date-time | ifelse(all(x == 1), sum(x), min(x) * length(x)) | 1  | 2  |
+| TRUE | TRUE | date |  ifelse(all(x == 1), sum(x), 0) | 0  | 2 |
+| TRUE | FALSE | date-time | sum  | 1.5 | 2 |
+| TRUE | FALSE | date| sum | 1.5 | 2 |
+| FALSE |TRUE | date-time | min | 0.5 | 1 |
+| FALSE| TRUE | date | ifelse(all(x == 1), 1, 0) | 0 | 1 |
+| FALSE| FALSE | date-time | mean | 0.75 | 2 |
+| FALSE |FALSE | date| ifelse(sum(x, na.rm = TRUE) >= 1, 1, sum(x, na.rm = TRUE))  | 1 | 1 |
 
 
 

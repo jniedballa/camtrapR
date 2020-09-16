@@ -1,5 +1,5 @@
 ---
-title: "2. Identifying species and individuals in camtrapR"
+title: "2. Species and Individual Identification"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output:
@@ -9,6 +9,7 @@ output:
       collapsed: false
       smooth_scroll: false
     toc_depth: 2
+    df_print: kable
 vignette: >
   %\VignetteIndexEntry{2. Species and Individual Identification}
   %\VignetteEngine{knitr::rmarkdown}
@@ -287,7 +288,7 @@ Here is an example in which we first create station directories and the then spe
 ```{r}
 
 # this dummy directory will be used as inDir (containing station directories with species subdirectories)
-wd_createSpeciesFoldersTest <- file.path(tempdir(), "createSpeciesFoldersTest")
+wd_createSpeciesFoldersTest <- file.path(normalizePath(tempdir(), winslash = "/"), "createSpeciesFoldersTest")
 
 # now first create the station directories
 # (normally, you'd create species directories in the station directories that 
@@ -407,8 +408,8 @@ A data frame will show directories, old and new file names.
 
 # copy sample images to another location (so we don't mess around in the package directory)
 wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
-file.copy(from = wd_images_ID, to = tempdir() , recursive = TRUE)
-wd_images_species_copy <- file.path(tempdir(), "sample_images_species_dir")
+file.copy(from = wd_images_ID, to = normalizePath(tempdir(), winslash = "/") , recursive = TRUE)
+wd_images_species_copy <- file.path(normalizePath(tempdir(), winslash = "/"), "sample_images_species_dir")
 
 
 species_names_append <- appendSpeciesNames(inDir               = wd_images_species_copy,
@@ -442,7 +443,7 @@ The images that are to be copied can be specified an a record table (as returned
 
 ```{r}
 # again, we use a temporary directory for demonstration. Change this in your own code!
-wd_images_species_copy <- file.path(tempdir(), "sampleSpeciesImages")
+wd_images_species_copy <- file.path(normalizePath(tempdir(), winslash = "/"), "sampleSpeciesImages")
 
 species_to_copy <- "VTA"    # = Viverra tangalunga, Malay Civet
 

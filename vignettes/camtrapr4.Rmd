@@ -1,14 +1,17 @@
 ---
-title: "4. Data exploration and visualisation in camtrapR"
+title: "4. Data exploration and visualisation"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output:
-  html_document:
+    html_document:
     toc: true
     toc_float:
       collapsed: false
       smooth_scroll: false
     toc_depth: 2
+    df_print: kable
+    # fig_width: 6
+    # fig_height: 5
 vignette: >
   %\VignetteIndexEntry{4. Data exploration and visualisation}
   %\VignetteEngine{knitr::rmarkdown}
@@ -141,7 +144,7 @@ detections_spdf <- SpatialPointsDataFrame(coords      = Mapstest3[,c("utm_x", "u
                                           data        = Mapstest3,
                                           proj4string = CRS(shapefileProjection))
 
-str(detections_spdf)
+detections_spdf
 
 # now we create a sample raster and extract data from it (if the raster package is available)
 if("raster" %in% installed.packages()){
@@ -174,6 +177,14 @@ if("raster" %in% installed.packages()){
 ```
 
 The same procedure also works with the camera trap station information table instead of the `detectionMaps` output.
+
+The SpatialPointsDataFrame can easily be converted to a sf object via 
+
+```{r eval = FALSE}
+library(sf)
+detections_sf <- as(detections_spdf, "sf")
+```
+
 
 
 # Visualising species activity data
@@ -228,7 +239,7 @@ activityRadial(recordTable  = recordTableSample,
 )
 ```
 
-One can also make the function show a polygon instead of the radial lines. `rp.type` is an argument to `radial.plot` and defaults to `"r"` (radial). Setting it to `"p"` gives a polygon.
+One can also make the function show a polygon instead of the radial lines. `rp.type` is an argument to `radial.plot` and defaults to `"r"` (radial). Setting it to `"p"` gives a polygon. poly.col is optional and defines the fill color of the polygon. 
 
 ```{r}
 activityRadial(recordTable       = recordTableSample,
@@ -239,7 +250,8 @@ activityRadial(recordTable       = recordTableSample,
                plotR             = TRUE,
                writePNG          = FALSE,
                lwd               = 3,
-               rp.type           = "p"      # plot type = polygon
+               rp.type           = "p",     # plot type = polygon
+               poly.col          = gray(0.5, alpha = 0.5)  # optional. remove for no fill 
 )
 ```
 
