@@ -207,7 +207,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
     if(!buffer >= 1)        stop("if buffer is defined, it must be 1 or higher", call. = FALSE)
   }
 
-
+  # check that species is in the speciesCol
   if(!species %in% recordTableIndividual[,speciesCol]) stop("species ", species, " not found in speciesCol of recordTableIndividual")
   # check all stations in recordTableIndividual are matched in CTtable
   if(!all(recordTableIndividual[,stationCol] %in% CTtable[,stationCol])) {
@@ -413,7 +413,6 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   ############
   # remove records for which effort was 0 or NA
-
   rowindex_sdh_to_remove <- vector()
 
   for(rowindex_sdh in 1:nrow(sdh2)){
@@ -424,10 +423,11 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
   
   
+  
   # if there were records in occasions with effort = 0/NA, remove these records
   if(length(rowindex_sdh_to_remove) != 0){
-    warning(paste("removed ", length(rowindex_sdh_to_remove), " record(s) because of effort = 0/NA, incomplete occasions (if includeEffort = FALSE), or effort < minActiveDaysPerOccasion \n(rownames: ",
-                  paste(rownames(sdh2)[rowindex_sdh_to_remove], collapse = ", "), ")", sep = ""),
+    warning("removed ", length(rowindex_sdh_to_remove), " record(s) because of effort = 0/NA, incomplete occasions (if includeEffort = FALSE), or effort < minActiveDaysPerOccasion:\n",
+            paste(capture.output(print(sdh2[rowindex_sdh_to_remove,])), collapse = "\n"),
             call. = FALSE)
     sdh2 <- sdh2[-rowindex_sdh_to_remove,]
   }
