@@ -251,13 +251,20 @@ cameraOperation <- function(CTtable,
        
       # make data frame of problem start / end times
       tmp <- lapply(problem_colnames_index_list, FUN = function(x) {
+        
         if(is.na( x$prob.from  [row_index]) & is.na( x$prob.to  [row_index])){
           return(data.frame(start = NA, end   = NA))
+        }
+        if(is.na( x$prob.from  [row_index]) & !is.na( x$prob.to  [row_index])){
+          stop("row ", row_index, ": Problem_from is NA, but Problem_to is ", x$prob.to  [row_index], call. = FALSE)
+        }
+        if(!is.na( x$prob.from  [row_index]) & is.na( x$prob.to  [row_index])){
+          stop("row ", row_index, ": Problem_from is ", x$prob.from  [row_index], " but Problem_to is NA", call. = FALSE)
         }
         
         # when using ifelse, output is numeric, not POSIXct
         if(effortAsFraction)  prob.to <- x$prob.to  [row_index] #- dseconds(1)           
-        # if Problem_to is defined as date, add 1 day - 1 second (so problem ends on midnight the same day)
+        # if Problem_to is defined as date, add 1 day - 1 second (so problem ends just before midnight the same day)
         if(!effortAsFraction) {
           prob.to <- x$prob.to  [row_index] + ddays(1) - dseconds(1) 
           # if problem period were to end after end of camera trapping period, replace the end of Problem with end of camera trapping period
