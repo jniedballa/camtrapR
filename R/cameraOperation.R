@@ -154,6 +154,7 @@ cameraOperation <- function(CTtable,
     CTtable[,retrievalCol] <- CTtable[,retrievalCol] + dhours(12)
   }
   
+  if(any(CTtable[,setupCol] == CTtable[,retrievalCol])) stop("row ", which(CTtable[,setupCol] == CTtable[,retrievalCol]), ": setup is identical to retrieval")
   
   # check if dates make sense
   if(any(CTtable[,setupCol]     < as.Date("1970-01-01"))) warning("setup dates begin before 1970. If this is not intended please check dateFormat", call. = FALSE)
@@ -176,7 +177,6 @@ cameraOperation <- function(CTtable,
   
   # create interval from start to end of each camera
   start_to_end <- interval(date0, date1)
-  
   
   if(isTRUE(hasProblems)){
     
