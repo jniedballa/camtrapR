@@ -1799,8 +1799,7 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   #album_of_interest <-Albums [which(Albums[, pathColumn] == stationDir),]   # only return the station directory, not camera subdirectories
   album_of_interest <- Albums [grep(pattern = stationDir, Albums[, pathColumn]),]   # This one returns Station directory and camera subdirectories
   if(nrow(album_of_interest) == 0) {
-    warning("Could not locate album for ", stationDir, ". Skipping")   # NOTE TO SELF: DOESN'T SKIP OR BREAK. CHANGE?
-    
+    warning("Could not locate album for ", stationDir, ". Skipping", call. = FALSE)   # NOTE TO SELF: DOESN'T SKIP OR BREAK. CHANGE?
   }
   
   # keep only images in the current album
@@ -1819,6 +1818,11 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
                                                nchar(image_subset$name) - 3, 
                                                nchar(image_subset$name))) %in% 
                                   paste(".", videoFormat, sep = ""),]
+  
+  #warning if no videos found
+  if(nrow(image_subset2) == 0) {
+    warning("Could not find any ", paste(videoFormat, collapse = "/"), " files in ", stationDir, call. = FALSE)
+  }
   
   # find "Species" tag group and its children
    
