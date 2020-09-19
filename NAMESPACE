@@ -6,7 +6,7 @@ importFrom("graphics", abline, axis, box, grconvertX, grconvertY,
            points, polygon, rect, segments, strheight, strwidth,
            text)
 importFrom("stats", aggregate, na.omit, start, end)
-importFrom("utils", modifyList, write.csv, zip)
+importFrom("utils", capture.output, modifyList, write.csv, zip)
 importFrom("methods", hasArg, is)
 importFrom("utils", head, menu, read.table)
 importFrom("sp", CRS, SpatialPointsDataFrame, SpatialPolygonsDataFrame, coordinates)
