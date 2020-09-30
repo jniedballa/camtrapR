@@ -1772,9 +1772,9 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   # add platform file separator to stationDir
   stationDir <- paste0(stationDir, .Platform$file.sep)
   
-  # combine album root and album path
-  Albums$albumPath_full <- paste(AlbumRoots[Albums$albumRoot, "specificPath"], 
-                                 Albums$relativePath, sep = "")
+  # combine album root and album path (match by albumRoot id, not index position)
+  Albums <- merge(Albums, AlbumRoots, by.x = "albumRoot", by.y = "id", sort = FALSE)
+  Albums$albumPath_full <- paste0(Albums$specificPath, Albums$relativePath)
   
   # add drive letter (only relevant on Windows, and can potentially be wrong if there's Album roots on different drives)
   # also not sure if this works on Mac / Linux due to missing drive letters
