@@ -6,7 +6,10 @@
 
 ## bugfixes
 * cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character
-* recordTable: now supports extraction of metadata tags from video files in camera subdirectories
+* recordTable: supports extraction of metadata tags from video files in camera subdirectories
+* recordTable: supports duplicate video file names in different camera subdirectories when extracting metadata
+* recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata)
+
 
 ## other changes
 * lubdidate is a dependency now (for cameraOperation)
