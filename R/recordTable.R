@@ -143,7 +143,9 @@ recordTable <- function(inDir,
   
   # create command line calls
   command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal', 
-                        ifelse(hasArg(video), paste(" -", video$dateTimeTag, sep = ""), ""),    # if video requested, video date time tag
+                        ifelse(hasArg(video), 
+                               paste(" -", video$dateTimeTag, sep = ""), 
+                               ""),    # if video requested, video date time tag
                         ' -HierarchicalSubject',
                         ifelse(hasArg(additionalMetadataTags), paste(" -",additionalMetadataTags,  collapse = "", sep = ""), ""),
                         paste(" -ext", file_formats, collapse = " ", sep = " "),    # requested file extensions
@@ -180,10 +182,12 @@ recordTable <- function(inDir,
           digiKamVideoMetadata <- digiKamVideoHierarchicalSubject(stationDir = dirs[i],
                                                                     digiKamTablesList = digiKam_data,    # output of accessDigiKamDatabase
                                                                     videoFormat = file_formats[!grepl(file_formats, pattern = "jpg")])
-          # add HierarchialSubject for video files (match by filename, must be unique)
+          # add HierarchialSubject for video files (match by filename and path)
           metadata.tmp <- addVideoHierarchicalSubject (metadata.tmp = metadata.tmp,
                                                        video = video,
-                                                       digiKamVideoMetadata = digiKamVideoMetadata)
+                                                       digiKamVideoMetadata = digiKamVideoMetadata,
+                                                       digiKamTablesList = digiKam_data,
+                                                       videoFormat = file_formats[!grepl(file_formats, pattern = "jpg")])
         }
       }
       
