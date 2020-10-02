@@ -297,7 +297,7 @@ checkDateTimeOriginal <- function (intable, dirs_short, i){
     # if date/time information is missing for some records only
     if(any(intable$DateTimeOriginal == "-")){
       which_no_time <- which(intable$DateTimeOriginal == "-")
-      warning(paste(dirs_short[i], ": omitting", length(which_no_time), "images because of missing/unreadable date/time information."), call. = FALSE,  immediate. = TRUE)
+      warning(paste(dirs_short[i], ": omitting", length(which_no_time), "images because of missing/unreadable date/time information."), call. = FALSE,  immediate. = FALSE)
       intable <-  intable[-which_no_time,]    # removing rows with missing date/time information
     }
   }
@@ -1770,6 +1770,7 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   # adist(x = stationDir, y = AlbumRoots$specificPath)
   
   # add platform file separator to stationDir
+  stationDir0 <- stationDir
   stationDir <- paste0(stationDir, .Platform$file.sep)
   
   # combine album root and album path (match by albumRoot id, not index position)
@@ -1806,6 +1807,9 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   #image_subset <- Images[Images$album == album_of_interest$id,]   # only returns matches for 1 directory, not many (only station dir, not camera subdirs). Also, may return NAs
   image_subset <- Images[Images$album %in% album_of_interest$id,]  # returns matches for all directories. Also, no NAs apparently
   
+  # add stationDirectory 
+  image_subset$stationDir <- stationDir0
+  
   # to do: handle situation where there's no images in image_subset
   
   # NAs are possible, so remove them
@@ -1815,6 +1819,11 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   
   # keep only desired video files
   image_subset2 <- image_subset[tolower(substr(image_subset$name, 
+                                               nchar(image_subset$name) - 3, 
+                                               nchar(image_subset$name))) %in% 
+                                  paste(".", videoFormat, sep = ""),]
+  
+  image_subset_others <- image_subset[!tolower(substr(image_subset$name, 
                                                nchar(image_subset$name) - 3, 
                                                nchar(image_subset$name))) %in% 
                                   paste(".", videoFormat, sep = ""),]
@@ -1875,6 +1884,9 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
    
    # assign HierarchicalSubject to matching images
    image_subset2$HierarchicalSubject <- ImageTags_aggregate$HierarchicalSubject[match(image_subset2$id, ImageTags_aggregate$imageid)]
+   
+   #data.frame(rbindlist(list(image_subset2, image_subset_others), fill = TRUE))
+
 
   return(image_subset2) 
 }
@@ -1888,6 +1900,8 @@ processVideoArgument <- function(IDfrom = IDfrom,
   if(!exists("dateTimeTag",   where = video)) stop("'dateTimeTag' is missing in argument 'video'", call. = FALSE)
   
   file_formats <- video$file_formats
+  
+  if(any(duplicated(file_formats))) stop("There are duplicates in file_formats (in the video argument")
   
   # check file_formats argument
   if(!is.character(file_formats)) stop("'file_formats' in argument 'video' must be of class 'character'", call. = FALSE)
@@ -1934,22 +1948,73 @@ addVideoDateTimeOriginal <- function(metadata.tmp,
 # add HierachicalSubject for video files
 addVideoHierarchicalSubject <- function(metadata.tmp,
                                         video,
-                                        digiKamVideoMetadata){
+                                        digiKamVideoMetadata,
+                                        digiKamTablesList,
+                                        videoFormat){
   
+  if(nrow(digiKamVideoMetadata) == 0) return(metadata.tmp)
   # add HierarchialSubject for video files (match by filename, must be unique)
-  metadata.tmp$HierarchicalSubject_video <- digiKamVideoMetadata$HierarchicalSubject [match(metadata.tmp$FileName, digiKamVideoMetadata$name)]
+  # Old Version, this doesn't work if filenames are not unique
+  #metadata.tmp$HierarchicalSubject_video <- digiKamVideoMetadata$HierarchicalSubject [match(metadata.tmp$FileName, digiKamVideoMetadata$name)]
+  
+  # new version, should match filenames AND paths in digiKamVideoMetadata with metadata.tmp (can deal with duplicate file names in separate folders)
+  # get (partial) album path for videos in digiKamVideoMetadata (for station / camera directory)
+  # NOTE: no idea how to get the drive letter from volumeid / uuid in AlbumRoots, so it is missing here
+  album_name_tmp  <- digiKamTablesList$Albums[match(digiKamVideoMetadata$album, digiKamTablesList$Albums$id), ]
+  album_name_tmp2 <- merge(digiKamTablesList$AlbumRoots, album_name_tmp, by.x = "id", by.y = "albumRoot")
+  album_name_tmp3 <- paste0(album_name_tmp2$specificPath, album_name_tmp2$relativePath)
+  
+  # combine partial path and filename of extracted videos 
+  digiKamVideoMetadata$almostFullPath <-  file.path(album_name_tmp3, digiKamVideoMetadata$name)
+  
+  
+  # subset metadata.tmp to video files only
+  metadata.tmp.video <- metadata.tmp[tolower(substr(metadata.tmp$FileName, 
+                                                    nchar(metadata.tmp$FileName) - 3, 
+                                                    nchar(metadata.tmp$FileName))) %in% 
+                                       paste(".", videoFormat, sep = ""), ]
+  
+  metadata.tmp.notvideo <- metadata.tmp[!tolower(substr(metadata.tmp$FileName, 
+                                                    nchar(metadata.tmp$FileName) - 3, 
+                                                    nchar(metadata.tmp$FileName))) %in% 
+                                       paste(".", videoFormat, sep = ""), ]
+  
+  
+  metadata.tmp.video$fullPath <- file.path(metadata.tmp.video$Directory, metadata.tmp.video$FileName)
+  
+  # order metadata.tmp.video.fullPath and metadata.tmp.video.fullPath
+  
+  metadata.tmp.video <- metadata.tmp.video[order(metadata.tmp.video$fullPath),]
+  digiKamVideoMetadata <- digiKamVideoMetadata[order(digiKamVideoMetadata$almostFullPath),]
+  #match(metadata.tmp.video.fullPath, digiKamVideoMetadata$almostFullPath)
+  
+  
+  # in metadata.tmp.video, strip drive letter (everything left of first forward slash)
+  metadata.tmp.almostFullPath <- substr(metadata.tmp.video$fullPath, 
+        start = (nchar(metadata.tmp.video$fullPath) - nchar(digiKamVideoMetadata$almostFullPath) + 1),
+        stop = nchar(metadata.tmp.video$fullPath))
+
+  # add metadata from digiKamVideoMetadata to metadata.tmp
+  metadata.tmp.video$HierarchicalSubject_video <- digiKamVideoMetadata$HierarchicalSubject [match(metadata.tmp.almostFullPath, 
+                                                                                              digiKamVideoMetadata$almostFullPath)]
+  
   
   # find rows that have video metadata
-  rows_of_interest2 <- which(!is.na(metadata.tmp$HierarchicalSubject_video) & 
-                               metadata.tmp$HierarchicalSubject == "-")
+  rows_of_interest2 <- which(!is.na(metadata.tmp.video$HierarchicalSubject_video) & 
+                               metadata.tmp.video$HierarchicalSubject == "-")
   # write HierarchicalSubject of videos to the normal HierarchicalSubject column
   if(length(rows_of_interest2) >= 1) {
-    metadata.tmp$HierarchicalSubject[rows_of_interest2] <- metadata.tmp$HierarchicalSubject_video[rows_of_interest2] 
+    metadata.tmp.video$HierarchicalSubject[rows_of_interest2] <- metadata.tmp.video$HierarchicalSubject_video[rows_of_interest2] 
   }
-  # remove column HierarchicalSubject_video
-  metadata.tmp$HierarchicalSubject_video <- NULL
   
-  return(metadata.tmp)
+  
+  metadata.tmp.out <- data.frame(rbindlist(list(metadata.tmp.video, metadata.tmp.notvideo), fill = TRUE))
+  
+  # remove column HierarchicalSubject_video
+  metadata.tmp.out$HierarchicalSubject_video <- NULL
+  metadata.tmp.out$fullPath <- NULL
+  
+  return(metadata.tmp.out)
 }
 
 
