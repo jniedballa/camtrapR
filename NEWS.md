@@ -9,6 +9,7 @@
 * recordTable: supports extraction of metadata tags from video files in camera subdirectories
 * recordTable: supports duplicate video file names in different camera subdirectories when extracting metadata
 * recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata)
+# imageRename: fixed error when hasCameraFolders is TRUE, but a stations has only 1 camera
 
 
 ## other changes
