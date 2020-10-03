@@ -432,7 +432,6 @@ camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat")
 
 One can also plot with the levelplot function from the lattice package:
 ```{r}
-#par(mfrow = c(1,2))
 camtrapR:::camopPlot(camOp = camop_problem, lattice = TRUE)
 camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat", lattice = TRUE)
 ```

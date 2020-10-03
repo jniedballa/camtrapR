@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.01</span>
       </span>
     </div>
 
@@ -57,13 +57,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -88,13 +88,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="camtrapr1_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>1. Organising raw camera trap images in camtrapR</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2020-07-19</h4>
+            <h4 class="date">2020-09-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr1.Rmd"><code>vignettes/camtrapr1.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr1.Rmd</code></div>
@@ -369,7 +369,7 @@
 <p>Here is an example in which station directories without camera subdirectories are created.</p>
 <div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># create a temporary dummy directory for tests</span>
 <span class="co"># (normally, you'd set up an empty directory in a proper place, e.g. .../myStudy/rawImages)</span>
-<span class="no">wd_createStationDir</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"createStationFoldersTest"</span>)
+<span class="no">wd_createStationDir</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>), <span class="st">"createStationFoldersTest"</span>)
 
 <span class="co"># create station directories in  wd_createStationDir</span>
 <span class="no">StationFolderCreate1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createStationFolders.html">createStationFolders</a></span> (<span class="kw">inDir</span>       <span class="kw">=</span> <span class="no">wd_createStationDir</span>,
@@ -381,10 +381,10 @@
 ## 1 StationA
 ## 2 StationB
 ## 3 StationC
-##                                                                                directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/createStationFoldersTest/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/createStationFoldersTest/StationB
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/createStationFoldersTest/StationC
+##                                                                          directory
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/createStationFoldersTest/StationA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/createStationFoldersTest/StationB
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/createStationFoldersTest/StationC
 ##   created exists
 ## 1    TRUE   TRUE
 ## 2    TRUE   TRUE
@@ -406,9 +406,9 @@
 <p>The function <code>timeShiftImages</code> should be run directly after saving the raw images on the hard disk.</p>
 <div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="co"># copy sample images to another location (so we don't mess around in the package directory)</span>
 <span class="no">wd_images_raw</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/raw_images"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"camtrapR"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span>(<span class="kw">from</span> <span class="kw">=</span> <span class="no">wd_images_raw</span>, <span class="kw">to</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>() , <span class="kw">recursive</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span>(<span class="kw">from</span> <span class="kw">=</span> <span class="no">wd_images_raw</span>, <span class="kw">to</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>) , <span class="kw">recursive</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">wd_images_raw_copy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"raw_images"</span>)
+<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">wd_images_raw_copy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>), <span class="st">"raw_images"</span>)
 
 <span class="no">timeshift_run</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/timeShiftImages.html">timeShiftImages</a></span>(<span class="kw">inDir</span>                <span class="kw">=</span> <span class="no">wd_images_raw_copy</span>,
                                  <span class="kw">timeShiftTable</span>       <span class="kw">=</span> <span class="no">timeShiftTable</span>,
@@ -417,12 +417,12 @@
                                  <span class="kw">timeShiftColumn</span>      <span class="kw">=</span> <span class="st">"timeshift"</span>,
                                  <span class="kw">timeShiftSignColumn</span>  <span class="kw">=</span> <span class="st">"sign"</span>
 )</pre></body></html></div>
-<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpE5UCWA/raw_images/StationA</code></pre>
-<pre><code>## C:\Users\Juergen\AppData\Local\Temp\RtmpE5UCWA/raw_images/StationB</code></pre>
+<pre><code>## C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images/StationA</code></pre>
+<pre><code>## C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images/StationB</code></pre>
 <div class="sourceCode" id="cb21"><html><body><pre class="r"><span class="no">timeshift_run</span></pre></body></html></div>
-<pre><code>##                                                                  directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images/StationB
+<pre><code>##                                                            directory
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images/StationA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images/StationB
 ##               n_directories                  n_images
 ## 1     1 directories scanned     3 image files updated
 ## 2     1 directories scanned     3 image files updated</code></pre>
@@ -437,9 +437,9 @@
 )
 
 <span class="no">timeshift_undo</span></pre></body></html></div>
-<pre><code>##                                                                  directory
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images/StationB
+<pre><code>##                                                            directory
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images/StationA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images/StationB
 ##   n_images_undo
 ## 1             3
 ## 2             3</code></pre>
@@ -492,7 +492,7 @@
 <div class="sourceCode" id="cb25"><html><body><pre class="r"> <span class="co"># raw image location</span>
 <span class="no">wd_images_raw</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/raw_images"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"camtrapR"</span>)
  <span class="co"># destination for renamed images to be copied to</span>
-<span class="no">wd_images_raw_renamed</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"raw_images_renamed"</span>)
+<span class="no">wd_images_raw_renamed</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>), <span class="st">"raw_images_renamed"</span>)
 
 <span class="no">renaming.table2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/imageRename.html">imageRename</a></span>(<span class="kw">inDir</span>               <span class="kw">=</span> <span class="no">wd_images_raw</span>,
                                <span class="kw">outDir</span>              <span class="kw">=</span> <span class="no">wd_images_raw_renamed</span>,
@@ -517,13 +517,13 @@
 ## 4 IMG0001.JPG StationB     NA 2009-04-05 00:11:00         TRUE
 ## 5 IMG0002.JPG StationB     NA 2009-04-05 23:13:00         TRUE
 ## 6 IMG0003.JPG StationB     NA 2009-04-07 00:23:00         TRUE
-##                                                                             outDir
-## 1 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images_renamed/StationA
-## 2 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images_renamed/StationA
-## 3 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images_renamed/StationA
-## 4 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images_renamed/StationB
-## 5 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images_renamed/StationB
-## 6 C:\\Users\\Juergen\\AppData\\Local\\Temp\\RtmpE5UCWA/raw_images_renamed/StationB
+##                                                                       outDir
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images_renamed/StationA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images_renamed/StationA
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images_renamed/StationA
+## 4 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images_renamed/StationB
+## 5 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images_renamed/StationB
+## 6 C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/raw_images_renamed/StationB
 ##                            filename_new fileExistsAlready CopyStatus
 ## 1 StationA__2009-04-10__05-07-00(1).JPG             FALSE      FALSE
 ## 2 StationA__2009-04-21__00-40-00(1).JPG             FALSE      FALSE
@@ -589,9 +589,9 @@
 <p>In doing so, Exiftool normally keeps the original images as .JPG_original files. Note that this behaviour will instantly double the number of images in inDir and the disk space required. If this is not desired, users can set the function argument <code>keepJPG_original = FALSE</code> (default is <code>TRUE</code>) in order to replace the original files without creating *.JPG_original files. I recommend to first try this on a copy of a subdataset and to then check the function output. If there are warnings like "Warning: [minor] Maker notes could not be parsed" image makernotes may be unreadable afterwards (they are proprietary, undocumented formats). On the other hand, you may never need these for analysing camera trapping data.</p>
 <div class="sourceCode" id="cb30"><html><body><pre class="r"><span class="co"># copy sample images to temporary directory (so we don't mess around in the package directory)</span>
 <span class="no">wd_images_ID</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_species_dir"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"camtrapR"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span>(<span class="kw">from</span> <span class="kw">=</span> <span class="no">wd_images_ID</span>, <span class="kw">to</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">recursive</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span>(<span class="kw">from</span> <span class="kw">=</span> <span class="no">wd_images_ID</span>, <span class="kw">to</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>), <span class="kw">recursive</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb32"><html><body><pre class="r"><span class="no">wd_images_ID_copy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="st">"sample_images_species_dir"</span>)
+<div class="sourceCode" id="cb32"><html><body><pre class="r"><span class="no">wd_images_ID_copy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>), <span class="st">"sample_images_species_dir"</span>)
 
 <span class="co"># define an example copyright tag</span>
 <span class="no">copyrightTagToAdd</span> <span class="kw">&lt;-</span> <span class="st">"Your Name (Your Organisation)"</span>
@@ -602,99 +602,290 @@
                 <span class="kw">askFirst</span>     <span class="kw">=</span> <span class="fl">FALSE</span>)                  <span class="co"># askFirst = FALSE prevents function from asking user to confirm action (which doesn't work in vignettes)</span></pre></body></html></div>
 <pre><code>##    14 directories scanned    68 image files updated</code></pre>
 <p>When we check the outcome with function exifTagNames, we find field “Copyright” in line 27.</p>
-<div class="sourceCode" id="cb34"><html><body><pre class="r"><span class="fu"><a href="../reference/exifTagNames.html">exifTagNames</a></span>(<span class="no">wd_images_ID_copy</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb34"><html><body><pre class="r"><span class="no">exiftagnames_extracted</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/exifTagNames.html">exifTagNames</a></span>(<span class="no">wd_images_ID_copy</span>)</pre></body></html></div>
 <pre><code>## Metadata of:
-## C:\Users\Juergen\AppData\Local\Temp\RtmpE5UCWA/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
-<pre><code>##    tag_group                tag_name
-## 1   ExifTool         ExifToolVersion
-## 2   ExifTool                 Warning
-## 3       File                FileName
-## 4       File               Directory
-## 5       File                FileSize
-## 6       File          FileModifyDate
-## 7       File          FileAccessDate
-## 8       File          FileCreateDate
-## 9       File         FilePermissions
-## 10      File                FileType
-## 11      File       FileTypeExtension
-## 12      File                MIMEType
-## 13      File           ExifByteOrder
-## 14      File              ImageWidth
-## 15      File             ImageHeight
-## 16      File         EncodingProcess
-## 17      File           BitsPerSample
-## 18      File         ColorComponents
-## 19      File        YCbCrSubSampling
-## 20      EXIF                    Make
-## 21      EXIF                   Model
-## 22      EXIF             XResolution
-## 23      EXIF             YResolution
-## 24      EXIF          ResolutionUnit
-## 25      EXIF              ModifyDate
-## 26      EXIF        YCbCrPositioning
-## 27      EXIF               Copyright
-## 28      EXIF             ExifVersion
-## 29      EXIF        DateTimeOriginal
-## 30      EXIF              CreateDate
-## 31      EXIF ComponentsConfiguration
-## 32      EXIF       ShutterSpeedValue
-## 33      EXIF             UserComment
-## 34      EXIF         FlashpixVersion
-## 35      EXIF              ColorSpace
-## 36      EXIF          ExifImageWidth
-## 37      EXIF         ExifImageHeight
-## 38      EXIF             Compression
-## 39      EXIF         ThumbnailOffset
-## 40      EXIF         ThumbnailLength
-## 41      EXIF          ThumbnailImage
-## 42 Composite               ImageSize
-## 43 Composite              Megapixels
-## 44 Composite            ShutterSpeed
-##                                                                                    value
-## 1                                                                                  11.80
-## 2                                             Invalid EXIF text encoding for UserComment
-## 3                                                  StationA__2009-04-21__00-40-00(1).JPG
-## 4  C:/Users/Juergen/AppData/Local/Temp/RtmpE5UCWA/sample_images_species_dir/StationA/PBE
-## 5                                                                                  27 kB
-## 6                                                              2020:07:19 14:36:53+02:00
-## 7                                                              2020:07:19 14:36:53+02:00
-## 8                                                              2020:07:19 14:36:51+02:00
-## 9                                                                              rw-rw-rw-
-## 10                                                                                  JPEG
-## 11                                                                                   jpg
-## 12                                                                            image/jpeg
-## 13                                                             Little-endian (Intel, II)
-## 14                                                                                   100
-## 15                                                                                    75
-## 16                                                          Baseline DCT, Huffman coding
-## 17                                                                                     8
-## 18                                                                                     3
-## 19                                                                      YCbCr4:2:2 (2 1)
-## 20                                                                                    G4
-## 21                                                                             CUDDEBACK
-## 22                                                                                    72
-## 23                                                                                    72
-## 24                                                                                inches
-## 25                                                                   2009:04:21 00:40:00
-## 26                                                                              Co-sited
-## 27                                                         Your Name (Your Organisation)
-## 28                                                                                  0200
-## 29                                                                   2009:04:21 00:40:00
-## 30                                                                   2009:04:21 00:40:00
-## 31                                                                          Y, Cb, Cr, -
-## 32                                                                                     1
-## 33                                                                         1 ATTEMPT G1H
-## 34                                                                                  0100
-## 35                                                                                  sRGB
-## 36                                                                                   100
-## 37                                                                                    75
-## 38                                                                      JPEG (old-style)
-## 39                                                                                   450
-## 40                                                                                 25353
-## 41                                   (Binary data 25353 bytes, use -b option to extract)
-## 42                                                                                100x75
-## 43                                                                                 0.007
-## 44                                                                                     1</code></pre>
+## C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
+<div class="sourceCode" id="cb36"><html><body><pre class="r"><span class="kw pkg">knitr</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(<span class="no">exiftagnames_extracted</span>, <span class="kw">row.names</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<table class="table">
+<colgroup>
+<col width="2%">
+<col width="8%">
+<col width="19%">
+<col width="69%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">tag_group</th>
+<th align="left">tag_name</th>
+<th align="left">value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">ExifTool</td>
+<td align="left">ExifToolVersion</td>
+<td align="left">11.80</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">ExifTool</td>
+<td align="left">Warning</td>
+<td align="left">Invalid EXIF text encoding for UserComment</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">File</td>
+<td align="left">FileName</td>
+<td align="left">StationA__2009-04-21__00-40-00(1).JPG</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">File</td>
+<td align="left">Directory</td>
+<td align="left">C:/Users/Juergen/AppData/Local/Temp/RtmpmWo94k/sample_images_species_dir/StationA/PBE</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">File</td>
+<td align="left">FileSize</td>
+<td align="left">27 kB</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">File</td>
+<td align="left">FileModifyDate</td>
+<td align="left">2020:09:16 14:50:09+02:00</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">File</td>
+<td align="left">FileAccessDate</td>
+<td align="left">2020:09:16 14:50:09+02:00</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">File</td>
+<td align="left">FileCreateDate</td>
+<td align="left">2020:09:16 14:50:07+02:00</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">File</td>
+<td align="left">FilePermissions</td>
+<td align="left">rw-rw-rw-</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">File</td>
+<td align="left">FileType</td>
+<td align="left">JPEG</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="left">File</td>
+<td align="left">FileTypeExtension</td>
+<td align="left">jpg</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="left">File</td>
+<td align="left">MIMEType</td>
+<td align="left">image/jpeg</td>
+</tr>
+<tr class="odd">
+<td align="left">13</td>
+<td align="left">File</td>
+<td align="left">ExifByteOrder</td>
+<td align="left">Little-endian (Intel, II)</td>
+</tr>
+<tr class="even">
+<td align="left">14</td>
+<td align="left">File</td>
+<td align="left">ImageWidth</td>
+<td align="left">100</td>
+</tr>
+<tr class="odd">
+<td align="left">15</td>
+<td align="left">File</td>
+<td align="left">ImageHeight</td>
+<td align="left">75</td>
+</tr>
+<tr class="even">
+<td align="left">16</td>
+<td align="left">File</td>
+<td align="left">EncodingProcess</td>
+<td align="left">Baseline DCT, Huffman coding</td>
+</tr>
+<tr class="odd">
+<td align="left">17</td>
+<td align="left">File</td>
+<td align="left">BitsPerSample</td>
+<td align="left">8</td>
+</tr>
+<tr class="even">
+<td align="left">18</td>
+<td align="left">File</td>
+<td align="left">ColorComponents</td>
+<td align="left">3</td>
+</tr>
+<tr class="odd">
+<td align="left">19</td>
+<td align="left">File</td>
+<td align="left">YCbCrSubSampling</td>
+<td align="left">YCbCr4:2:2 (2 1)</td>
+</tr>
+<tr class="even">
+<td align="left">20</td>
+<td align="left">EXIF</td>
+<td align="left">Make</td>
+<td align="left">G4</td>
+</tr>
+<tr class="odd">
+<td align="left">21</td>
+<td align="left">EXIF</td>
+<td align="left">Model</td>
+<td align="left">CUDDEBACK</td>
+</tr>
+<tr class="even">
+<td align="left">22</td>
+<td align="left">EXIF</td>
+<td align="left">XResolution</td>
+<td align="left">72</td>
+</tr>
+<tr class="odd">
+<td align="left">23</td>
+<td align="left">EXIF</td>
+<td align="left">YResolution</td>
+<td align="left">72</td>
+</tr>
+<tr class="even">
+<td align="left">24</td>
+<td align="left">EXIF</td>
+<td align="left">ResolutionUnit</td>
+<td align="left">inches</td>
+</tr>
+<tr class="odd">
+<td align="left">25</td>
+<td align="left">EXIF</td>
+<td align="left">ModifyDate</td>
+<td align="left">2009:04:21 00:40:00</td>
+</tr>
+<tr class="even">
+<td align="left">26</td>
+<td align="left">EXIF</td>
+<td align="left">YCbCrPositioning</td>
+<td align="left">Co-sited</td>
+</tr>
+<tr class="odd">
+<td align="left">27</td>
+<td align="left">EXIF</td>
+<td align="left">Copyright</td>
+<td align="left">Your Name (Your Organisation)</td>
+</tr>
+<tr class="even">
+<td align="left">28</td>
+<td align="left">EXIF</td>
+<td align="left">ExifVersion</td>
+<td align="left">0200</td>
+</tr>
+<tr class="odd">
+<td align="left">29</td>
+<td align="left">EXIF</td>
+<td align="left">DateTimeOriginal</td>
+<td align="left">2009:04:21 00:40:00</td>
+</tr>
+<tr class="even">
+<td align="left">30</td>
+<td align="left">EXIF</td>
+<td align="left">CreateDate</td>
+<td align="left">2009:04:21 00:40:00</td>
+</tr>
+<tr class="odd">
+<td align="left">31</td>
+<td align="left">EXIF</td>
+<td align="left">ComponentsConfiguration</td>
+<td align="left">Y, Cb, Cr, -</td>
+</tr>
+<tr class="even">
+<td align="left">32</td>
+<td align="left">EXIF</td>
+<td align="left">ShutterSpeedValue</td>
+<td align="left">1</td>
+</tr>
+<tr class="odd">
+<td align="left">33</td>
+<td align="left">EXIF</td>
+<td align="left">UserComment</td>
+<td align="left">1 ATTEMPT G1H</td>
+</tr>
+<tr class="even">
+<td align="left">34</td>
+<td align="left">EXIF</td>
+<td align="left">FlashpixVersion</td>
+<td align="left">0100</td>
+</tr>
+<tr class="odd">
+<td align="left">35</td>
+<td align="left">EXIF</td>
+<td align="left">ColorSpace</td>
+<td align="left">sRGB</td>
+</tr>
+<tr class="even">
+<td align="left">36</td>
+<td align="left">EXIF</td>
+<td align="left">ExifImageWidth</td>
+<td align="left">100</td>
+</tr>
+<tr class="odd">
+<td align="left">37</td>
+<td align="left">EXIF</td>
+<td align="left">ExifImageHeight</td>
+<td align="left">75</td>
+</tr>
+<tr class="even">
+<td align="left">38</td>
+<td align="left">EXIF</td>
+<td align="left">Compression</td>
+<td align="left">JPEG (old-style)</td>
+</tr>
+<tr class="odd">
+<td align="left">39</td>
+<td align="left">EXIF</td>
+<td align="left">ThumbnailOffset</td>
+<td align="left">450</td>
+</tr>
+<tr class="even">
+<td align="left">40</td>
+<td align="left">EXIF</td>
+<td align="left">ThumbnailLength</td>
+<td align="left">25353</td>
+</tr>
+<tr class="odd">
+<td align="left">41</td>
+<td align="left">EXIF</td>
+<td align="left">ThumbnailImage</td>
+<td align="left">(Binary data 25353 bytes, use -b option to extract)</td>
+</tr>
+<tr class="even">
+<td align="left">42</td>
+<td align="left">Composite</td>
+<td align="left">ImageSize</td>
+<td align="left">100x75</td>
+</tr>
+<tr class="odd">
+<td align="left">43</td>
+<td align="left">Composite</td>
+<td align="left">Megapixels</td>
+<td align="left">0.007</td>
+</tr>
+<tr class="even">
+<td align="left">44</td>
+<td align="left">Composite</td>
+<td align="left">ShutterSpeed</td>
+<td align="left">1</td>
+</tr>
+</tbody>
+</table>
 <p>The copyright tag will henceforth be visible in digiKam and other image management software.</p>
 <p>Now that the raw images are organised, the next step is species identification covered in the next vignette.</p>
 </div>

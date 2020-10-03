@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Generate a <code>capthist</code> object for spatial capture-recapture analyses from camera-trapping data — spatialDetectionHistory" />
 <meta property="og:description" content="This function generates spatial detection histories of individuals of a species for spatial capture-recapture analyses with package secr. Data are stored in a capthist object. The capthist object contains detection histories, camera-trap station location and possibly individual and station-level covariates. Detection histories can have adjustable occasion length and occasion start time (as in the function detectionHistory)." />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.01</span>
       </span>
     </div>
 
@@ -95,13 +98,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -111,7 +114,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jniedballa/camtrapR">
+  <a href="https://github.com/jniedballa/camtrapR/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -142,7 +145,7 @@
   <span class='no'>species</span>,
   <span class='no'>camOp</span>,
   <span class='no'>CTtable</span>,
-  <span class='no'>output</span>,
+  <span class='kw'>output</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"binary"</span>, <span class='st'>"count"</span>),
   <span class='kw'>stationCol</span> <span class='kw'>=</span> <span class='st'>"Station"</span>,
   <span class='kw'>speciesCol</span> <span class='kw'>=</span> <span class='st'>"Species"</span>,
   <span class='no'>sessionCol</span>,
@@ -155,13 +158,13 @@
   <span class='kw'>recordDateTimeFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
   <span class='no'>occasionLength</span>,
   <span class='no'>minActiveDaysPerOccasion</span>,
-  <span class='kw'>occasionStartTime</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>occasionStartTime</span> <span class='kw'>=</span> <span class='st'>"deprecated"</span>,
   <span class='no'>maxNumberDays</span>,
   <span class='no'>day1</span>,
   <span class='no'>buffer</span>,
   <span class='kw'>includeEffort</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>scaleEffort</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>binaryEffort</span>,
+  <span class='kw'>binaryEffort</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>timeZone</span>,
   <span class='no'>makeRMarkInput</span>
 )</pre>
@@ -239,7 +242,7 @@
     </tr>
     <tr>
       <th>occasionStartTime</th>
-      <td><p>integer. time of day (the full hour) at which to begin occasions.</p></td>
+      <td><p>(DEPRECATED) integer. time of day (the full hour) at which to begin occasions. Please use argument <code>occasionStartTime</code> in <code><a href='cameraOperation.html'>cameraOperation</a></code> instead.</p></td>
     </tr>
     <tr>
       <th>maxNumberDays</th>
@@ -280,8 +283,8 @@
     <p>The function creates a <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object by combining three different objects: 1) a record table of identified individuals of a species, 2) a camera trap station table with station coordinates and 3) a camera operation matrix computed with <code><a href='cameraOperation.html'>cameraOperation</a></code>. The record table must contain a column with individual IDs and optionally individual covariates. The camera trap station table must contain station coordinates and optionally station-level covariates. The camera operation matrix provides the dates stations were active or not and the number of active stations.</p>
 <p><code>day1</code> defines if each stations detection history will begin on that station's setup day (<code>day1 = "station"</code>) or if all station's detection histories have a common origin (the day the first station was set up if <code>day1 = "survey"</code> or a fixed date if, e.g. <code>day1 = "2015-12-31"</code>).</p>
 <p><code>includeEffort</code> controls whether an effort matrix is computed or not. If TRUE, effort will be used for object <code><a href='https://rdrr.io/pkg/secr/man/usage.html'>usage</a></code> information in a <code><a href='https://rdrr.io/pkg/secr/man/traps.html'>traps</a></code>. <code>binaryEffort</code> makes the effort information binary. <code>scaleEffort</code> is currently not used and must be set to FALSE. The reason is that <code><a href='https://rdrr.io/pkg/secr/man/usage.html'>usage</a></code> can only be either binary, or nonnegative real values, whereas scaling effort would return negative values.</p>
-<p>The number of days that are aggregated is controlled by <code>occasionLength</code>. <code>occasionStartTime</code> can be used to make occasions begin another hour than midnight (the default). This may be relevant for nocturnal animals, in which 1 whole night would be considered an occasion.
-Output can be returned as individual counts per occasion (<code>output = "count"</code>) or as binary observation (<code>output = "binary"</code>).</p>
+<p>The number of days that are aggregated is controlled by <code>occasionLength</code>. <code>occasionStartTime</code> will be removed from the function. It has moved to <code><a href='cameraOperation.html'>cameraOperation</a></code>, to ensure daily effort is computed correctly and takes the occasion start time into account.<!-- %\code{occasionStartTime} can be used to make occasions begin another hour than midnight (the default). This may be relevant for nocturnal animals, in which 1 whole night would be considered an occasion. --></p>
+<p>Output can be returned as individual counts per occasion (<code>output = "count"</code>) or as binary observation (<code>output = "binary"</code>).</p>
 <p>Argument <code>sessionCol</code> can be used to a create multi-session <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object. There are two different ways in which the argument is interpreted. It depends on whether a column with the name you specify in argument <code>sessionCol</code> exists in <code>recordTableIndividual</code> or in <code>CTtable</code>. If <code>sessionCol</code> is found in <code>recordTableIndividual</code>, the records will be assigned to the specified sessions, and it will be assumed that all camera trap station were used in all sessions. Alternatively, if <code>sessionCol</code> is found in<code>CTtable</code>, it will be assumed that only a subset of stations was used in each session, and the records will be assigned automatically (using the station IDs to identify which session they belong into). In both cases, session information must be provided as a sequence of integer numbers beginnign with 1, i.e., you provide the session number directly in <code>sessionCol</code>. See <code><a href='https://rdrr.io/pkg/secr/man/session.html'>session</a></code> for more information about sessions in <span class="pkg">secr</span>.</p>
 <p><code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> objects (as created by <code>spatialDetectionHistory</code> for spatial capture-recapture analyses) expect the units of coordinates (<code>Xcol</code> and <code>col</code> in <code>CTtable</code>) to be meters. Therefore, please use a suitable coordinate system (e.g. UTM).</p>
 <p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in <span class="pkg">lubridate</span> via <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument "orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in <code>recordDateTimeFormat</code>.</p>
@@ -346,9 +349,9 @@ Output can be returned as individual counts per occasion (<code>output = "count"
 #&gt; y-range            604000 607050 m 
 #&gt; 
 #&gt;  Usage range by occasion
-#&gt;      1  2  3  4 5
-#&gt; min  8 10 10 10 0
-#&gt; max 10 10 10 10 5
+#&gt;       1  2  3  4   5
+#&gt; min 7.5 10 10 10 0.0
+#&gt; max 9.5 10 10 10 4.5
 #&gt; 
 #&gt; Counts by occasion 
 #&gt;                   1 2 3 4 5 Total
@@ -359,7 +362,7 @@ Output can be returned as individual counts per occasion (<code>output = "count"
 #&gt; losses            0 0 0 0 0     0
 #&gt; detections        3 4 4 3 1    15
 #&gt; detectors visited 2 3 3 2 1    11
-#&gt; detectors used    3 3 3 3 2    14</div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='no'>sdh</span>, <span class='kw'>tracks</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-1.png' alt='' width='700' height='433' /></div><div class='input'>
+#&gt; detectors used    3 3 3 3 2    14</div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>sdh</span>, <span class='kw'>tracks</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-1.png' alt='' width='700' height='433' /></div><div class='input'>
   <span class='co'>## multi-season capthist object</span>
   <span class='co'># see vignette "3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input"</span>
 
@@ -409,9 +412,9 @@ Output can be returned as individual counts per occasion (<code>output = "count"
 #&gt; y-range            604000 607050 m 
 #&gt; 
 #&gt;  Usage range by occasion
-#&gt;      1  2  3  4 5
-#&gt; min  8 10 10 10 0
-#&gt; max 10 10 10 10 5
+#&gt;       1  2  3  4   5
+#&gt; min 7.5 10 10 10 0.0
+#&gt; max 9.5 10 10 10 4.5
 #&gt; 
 #&gt; Counts by occasion 
 #&gt;                   1 2 3 4 5 Total
@@ -440,9 +443,9 @@ Output can be returned as individual counts per occasion (<code>output = "count"
 #&gt; y-range            604000 607050 m 
 #&gt; 
 #&gt;  Usage range by occasion
-#&gt;     1  2  3  4  5 6 7  8 9
-#&gt; min 3 10 10 10  5 0 0  0 0
-#&gt; max 5 10 10 10 10 3 6 10 2
+#&gt;       1  2  3  4  5 6 7  8   9
+#&gt; min 2.5 10 10 10  5 0 0  0 0.0
+#&gt; max 4.5 10 10 10 10 3 6 10 1.5
 #&gt; 
 #&gt; Counts by occasion 
 #&gt;                   1 2 3 4 5 6 7 8 9 Total
@@ -460,23 +463,14 @@ Output can be returned as individual counts per occasion (<code>output = "count"
 #&gt;  1:1       
 #&gt;  2:1       
 #&gt; 
-#&gt; </div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='no'>sdh_multi</span>, <span class='kw'>tracks</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: screen layout does not allow for all sessions and some plots may be lost; set par mfrow</span></div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='spatialDetectionHistory-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;  1  2 
+#&gt; </div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>sdh_multi</span>, <span class='kw'>tracks</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: screen layout does not allow for all sessions and some plots may be lost; set par mfrow</span></div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='spatialDetectionHistory-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;  1  2 
 #&gt; 15  6 </div><div class='input'>
 </div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#warning-">Warning </a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    <p>Juergen Niedballa</p>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -487,7 +481,7 @@ Output can be returned as individual counts per occasion (<code>output = "count"
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

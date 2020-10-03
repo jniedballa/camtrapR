@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Create a camera trap station operability matrix — cameraOperation" />
 <meta property="og:description" content="Construct a matrix of daily camera trap station operability for use in detectionHistory and spatialDetectionHistory, where it is needed for calculating trapping effort per occasion. If several cameras were deployed per station, the matrix can contain camera- or station-specific trap operation information." />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.01</span>
       </span>
     </div>
 
@@ -95,13 +98,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -111,7 +114,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jniedballa/camtrapR">
+  <a href="https://github.com/jniedballa/camtrapR/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -149,6 +152,7 @@
   <span class='no'>allCamsOn</span>,
   <span class='no'>camerasIndependent</span>,
   <span class='kw'>dateFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d"</span>,
+  <span class='kw'>occasionStartTime</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>writecsv</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>outDir</span>
 )</pre>
@@ -199,6 +203,10 @@
     <tr>
       <th>dateFormat</th>
       <td><p>character. The format of columns <code>setupCol</code> and <code>retrievalCol</code> (and potential problem columns) in <code>CTtable</code>. Must be interpretable by either <code>as.Date</code> or the "orders" argument <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> in <span class="pkg">lubridate</span>.</p></td>
+    </tr>
+    <tr>
+      <th>occasionStartTime</th>
+      <td><p>integer. time of day (the full hour) at which to begin occasions. Replaces <code>occasionStartTime</code> from <code><a href='detectionHistory.html'>detectionHistory</a></code> and  <code><a href='spatialDetectionHistory.html'>spatialDetectionHistory</a></code>.</p></td>
     </tr>
     <tr>
       <th>writecsv</th>
@@ -277,9 +285,9 @@ Legend: NA: camera(s) not set up, 0: camera(s) not operational, 1 (or higher): n
 )
 
 <span class='no'>camop_no_problem</span></div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB         NA          1          1          1          1          1
-#&gt; StationC         NA         NA          1          1          1          1
+#&gt; StationA        0.5        1.0        1.0          1          1          1
+#&gt; StationB         NA        0.5        1.0          1          1          1
+#&gt; StationC         NA         NA        0.5          1          1          1
 #&gt;          2009-04-08 2009-04-09 2009-04-10 2009-04-11 2009-04-12 2009-04-13
 #&gt; StationA          1          1          1          1          1          1
 #&gt; StationB          1          1          1          1          1          1
@@ -305,43 +313,12 @@ Legend: NA: camera(s) not set up, 0: camera(s) not operational, 1 (or higher): n
 #&gt; StationB          1          1          1          1          1          1
 #&gt; StationC          1          1          1          1          1          1
 #&gt;          2009-05-14 2009-05-15 2009-05-16 2009-05-17
-#&gt; StationA          1         NA         NA         NA
-#&gt; StationB          1          1          1         NA
-#&gt; StationC          1          1          1          1</div><div class='input'><span class='no'>camop_problem</span></div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB         NA          1          1          1          1          1
-#&gt; StationC         NA         NA          1          1          1          1
-#&gt;          2009-04-08 2009-04-09 2009-04-10 2009-04-11 2009-04-12 2009-04-13
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-04-14 2009-04-15 2009-04-16 2009-04-17 2009-04-18 2009-04-19
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-04-20 2009-04-21 2009-04-22 2009-04-23 2009-04-24 2009-04-25
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-04-26 2009-04-27 2009-04-28 2009-04-29 2009-04-30 2009-05-01
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-05-02 2009-05-03 2009-05-04 2009-05-05 2009-05-06 2009-05-07
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-05-08 2009-05-09 2009-05-10 2009-05-11 2009-05-12 2009-05-13
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          0          0
-#&gt;          2009-05-14 2009-05-15 2009-05-16 2009-05-17
-#&gt; StationA          1         NA         NA         NA
-#&gt; StationB          1          1          1         NA
-#&gt; StationC          0          0          0          0</div><div class='input'><span class='no'>camop_problem_lubridate</span></div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB         NA          1          1          1          1          1
-#&gt; StationC         NA         NA          1          1          1          1
+#&gt; StationA        0.5         NA         NA         NA
+#&gt; StationB        1.0          1        0.5         NA
+#&gt; StationC        1.0          1        1.0        0.5</div><div class='input'><span class='no'>camop_problem</span></div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
+#&gt; StationA        0.5        1.0        1.0          1          1          1
+#&gt; StationB         NA        0.5        1.0          1          1          1
+#&gt; StationC         NA         NA        0.5          1          1          1
 #&gt;          2009-04-08 2009-04-09 2009-04-10 2009-04-11 2009-04-12 2009-04-13
 #&gt; StationA          1          1          1          1          1          1
 #&gt; StationB          1          1          1          1          1          1
@@ -367,22 +344,45 @@ Legend: NA: camera(s) not set up, 0: camera(s) not operational, 1 (or higher): n
 #&gt; StationB          1          1          1          1          1          1
 #&gt; StationC          1          1          1          1          0          0
 #&gt;          2009-05-14 2009-05-15 2009-05-16 2009-05-17
-#&gt; StationA          1         NA         NA         NA
-#&gt; StationB          1          1          1         NA
-#&gt; StationC          0          0          0          0</div></pre>
+#&gt; StationA        0.5         NA         NA         NA
+#&gt; StationB        1.0          1        0.5         NA
+#&gt; StationC        0.0          0        0.0          0</div><div class='input'><span class='no'>camop_problem_lubridate</span></div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
+#&gt; StationA        0.5        1.0        1.0          1          1          1
+#&gt; StationB         NA        0.5        1.0          1          1          1
+#&gt; StationC         NA         NA        0.5          1          1          1
+#&gt;          2009-04-08 2009-04-09 2009-04-10 2009-04-11 2009-04-12 2009-04-13
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-04-14 2009-04-15 2009-04-16 2009-04-17 2009-04-18 2009-04-19
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-04-20 2009-04-21 2009-04-22 2009-04-23 2009-04-24 2009-04-25
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-04-26 2009-04-27 2009-04-28 2009-04-29 2009-04-30 2009-05-01
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-05-02 2009-05-03 2009-05-04 2009-05-05 2009-05-06 2009-05-07
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-05-08 2009-05-09 2009-05-10 2009-05-11 2009-05-12 2009-05-13
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          0          0
+#&gt;          2009-05-14 2009-05-15 2009-05-16 2009-05-17
+#&gt; StationA        0.5         NA         NA         NA
+#&gt; StationB        1.0          1        0.5         NA
+#&gt; StationC        0.0          0        0.0          0</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#note">Note</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    <p>Juergen Niedballa</p>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -393,7 +393,7 @@ Legend: NA: camera(s) not set up, 0: camera(s) not operational, 1 (or higher): n
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
