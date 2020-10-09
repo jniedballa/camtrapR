@@ -1471,7 +1471,8 @@ dataFrameTibbleCheck <- function(df,
 parseDateObject <- function(inputColumn,     
                             dateFormat,   
                             checkNA,      # throw error if there are NAs in input (only setup / retrieval, not problems)
-                            checkEmpty    # throw error if there are blank values in input  (only setup / retrieval, not problems)
+                            checkEmpty,    # throw error if there are blank values in input  (only setup / retrieval, not problems)
+                            returndatetime = FALSE
 ){
   
   #if(!class(inputColumn) %in% c("factor", "character")) stop(paste("date column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
@@ -1498,7 +1499,9 @@ parseDateObject <- function(inputColumn,
   
   if(checkNA & any(is.na(out))) stop(paste("At least one entry in", deparse(substitute(inputColumn)), "cannot be interpreted using dateFormat:", dateFormat, "\n",
                                            "rows", paste(which(is.na(out)), collapse = ", ")), call. = FALSE)
-  return(out)
+  if(isTRUE(returndatetime))  return(as_datetime(out, tz = "UTC"))
+  if(isFALSE(returndatetime)) return(out)
+  #return(out)
 }
 
 
