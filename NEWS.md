@@ -5,11 +5,10 @@
 * function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument "lattice", which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)
 
 ## bugfixes
-* cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character
-* recordTable: supports extraction of metadata tags from video files in camera subdirectories
-* recordTable: supports duplicate video file names in different camera subdirectories when extracting metadata
-* recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata)
-# imageRename: fixed error when hasCameraFolders is TRUE, but a stations has only 1 camera
+* cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character (reported by David Nicholls)
+* recordTable: supports extraction of metadata tags from video files in camera subdirectories, and allows duplicate video file names in different camera subdirectories (reported by Sian Green)
+* recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata, reported by Sian Green)
+# imageRename: fixed error when hasCameraFolders is TRUE, but a station has only 1 camera (reported by Camille Coudrat and Ezekiel Gading)
 
 
 ## other changes
