@@ -208,10 +208,10 @@ cameraOperation <- function(CTtable,
       }
     } else {
       for(problemFromColumn in cols.prob.from){
-        CTtable[, problemFromColumn] <- parseDateObject(inputColumn = CTtable[, problemFromColumn], dateFormat, checkNA = FALSE, checkEmpty = FALSE)
+        CTtable[, problemFromColumn] <- parseDateObject(inputColumn = CTtable[, problemFromColumn], dateFormat, checkNA = FALSE, checkEmpty = FALSE, returndatetime = TRUE)
       }
       for(problemToColumn in cols.prob.to){
-        CTtable[, problemToColumn] <- parseDateObject(inputColumn = CTtable[, problemToColumn], dateFormat, checkNA = FALSE, checkEmpty = FALSE)
+        CTtable[, problemToColumn] <- parseDateObject(inputColumn = CTtable[, problemToColumn], dateFormat, checkNA = FALSE, checkEmpty = FALSE, returndatetime = TRUE)
       }
     }
     
@@ -219,12 +219,32 @@ cameraOperation <- function(CTtable,
     if(all(is.na(CTtable[, problemFromColumn]))) stop("in problemFromColumn column(s), all values are NA", call. = FALSE)
     if(all(is.na(CTtable[, problemToColumn])))   stop("in Problem_to column(s), all values are NA", call. = FALSE)
     
+    # if problems begin on setup day, make sure it's the same time as setup (if only dates are specified)
+     if(isFALSE(effortAsFraction)){
+       problem_begin_on_setup_day <- which(as.Date(CTtable[, setupCol]) == as.Date(CTtable[, cols.prob.from[1]]))
+       if(length(problem_begin_on_setup_day) >= 1) {
+         CTtable[problem_begin_on_setup_day, cols.prob.from[1]] <- CTtable[problem_begin_on_setup_day, setupCol]
+       }
+       problem_ends_on_retrieval_day <- which(as.Date(CTtable[, retrievalCol]) == as.Date(CTtable[, cols.prob.to[length(cols.prob.to)]]))
+       if(length(problem_ends_on_retrieval_day) >= 1) {
+         CTtable[problem_ends_on_retrieval_day, cols.prob.to[length(cols.prob.to)]] <- CTtable[problem_ends_on_retrieval_day, retrievalCol]
+       }
+     }
+    
     # check that problems begin after setup
     for(cols.prob.from.index in cols.prob.from){
-      if(any(CTtable[,setupCol] > CTtable[,cols.prob.from.index], na.rm = TRUE)){
-        stop(paste(paste(CTtable[which(CTtable[,setupCol] > CTtable[,cols.prob.from.index]), stationCol], collapse = ", "), ": Problem begins before Setup"), call. = FALSE)
+      if(isTRUE(effortAsFraction)){
+        if(any(CTtable[,setupCol] > CTtable[,cols.prob.from.index], na.rm = TRUE)) {
+          stop(paste(paste(CTtable[which(CTtable[,setupCol] > CTtable[,cols.prob.from.index]), stationCol], collapse = ", "), ": Problem begins before Setup"), call. = FALSE)
+        }
+      }
+      if(isFALSE(effortAsFraction)){
+        if(any(as.Date(CTtable[,setupCol]) > CTtable[,cols.prob.from.index], na.rm = TRUE)){
+          stop(paste(paste(CTtable[which(CTtable[,setupCol] > CTtable[,cols.prob.from.index]), stationCol], collapse = ", "), ": Problem begins before Setup"), call. = FALSE)
+        } 
       }
     }
+    
     # check that problems end before (or on) retrieval
     for(cols.prob.to.index in cols.prob.to){
       if(any(CTtable[,retrievalCol] < CTtable[,cols.prob.to.index], na.rm = TRUE)){
@@ -248,7 +268,7 @@ cameraOperation <- function(CTtable,
     # loop over cameras, make and concatenate the problem intervals by station
     problem_intervals_by_row <- list()
     for(row_index in 1:nrow(CTtable)){
-       
+      
       # make data frame of problem start / end times
       tmp <- lapply(problem_colnames_index_list, FUN = function(x) {
         
@@ -306,7 +326,7 @@ cameraOperation <- function(CTtable,
   
   
   
-
+  
   
   
   #  trapping intervals for all cameras (setup to retrieval)
@@ -326,7 +346,7 @@ cameraOperation <- function(CTtable,
   # int_end_total   <- as_date(int_end(start_to_end))
   int_start_total <- int_start(start_to_end)
   int_end_total   <- int_end(start_to_end)
-
+  
   
   
   # identify overlapping intervals with data.table
@@ -341,7 +361,7 @@ cameraOperation <- function(CTtable,
                           end = sapply(int_end_daily, as.POSIXct))
   
   setDT(int.total)[, `:=`(start = start,
-                        end = end)]
+                          end = end)]
   setkey(setDT(int.daily)[, `:=`(start =start,
                                  end = end)], start, end)
   intervals_matched <- foverlaps(int.total, int.daily, type = "any", which = TRUE)
@@ -370,7 +390,7 @@ cameraOperation <- function(CTtable,
     # if problems are defined, subtract those from the camera operation values
     if(hasProblems) {
       if(any(!is.na(problem_intervals_by_row[[i]]))){
-        if(!all(problem_intervals_by_row[[i]] %within% start_to_end[i], na.rm = TRUE)) stop(paste(CTtable[,stationCol], ": problem intervals are not within interval from setup to retrieval"))
+        if(!all(problem_intervals_by_row[[i]] %within% start_to_end[i], na.rm = TRUE)) stop(paste(CTtable[i,stationCol], ": problem intervals are not within interval from setup to retrieval"))
         
         interval.tmp.prob <- sapply(camop_daily_intervals[run_these], intersect.Interval.fast, problem_intervals_by_row[[i]])   # intersection of day and total trapping period
         # total Problem value per day
