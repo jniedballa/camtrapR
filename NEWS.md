@@ -4,6 +4,7 @@
 * cameraOperation: setup/ retrieval / problem columns can be interpreted as date-time format, then computes effort as fraction of day. (Thank you to Zoé Siegel for the suggestion, Fridolin Zimmermann and the Department of Ecology & Evolution from the University of Lausanne for funding the development of the feature)
 * cameraOperation: gained argument occasionStartTime (deprecated in detectionHistory / spatialDetectionHistory)
 * function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument "lattice", which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)
+* timeShiftImages / addCopyrightTag: added argument "ignoreMinorErrors", set it to TRUE if functions fail due to bad MakerNotes (reported by An The Truong Nguyen)
 
 ## bugfixes
 * cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character (reported by David Nicholls)
