@@ -199,11 +199,11 @@ cameraOperation <- function(CTtable,
     
     if(effortAsFraction) {
       for(problemFromColumn in cols.prob.from){
-        CTtable[, problemFromColumn] <- parseDateTimeObject(inputColumn = CTtable[, problemFromColumn], dateFormat,
+        CTtable[, problemFromColumn] <- parseDateTimeObject(inputColumn = CTtable[, problemFromColumn], dateFormat, quiet = TRUE,
                                                             checkNA = FALSE, checkEmpty = FALSE, checkNA_out = FALSE, timeZone = "UTC")
       }
       for(problemToColumn in cols.prob.to){
-        CTtable[, problemToColumn]   <- parseDateTimeObject(inputColumn = CTtable[, problemToColumn],   dateFormat, 
+        CTtable[, problemToColumn]   <- parseDateTimeObject(inputColumn = CTtable[, problemToColumn],   dateFormat, quiet = TRUE,
                                                             checkNA = FALSE, checkEmpty = FALSE, checkNA_out = FALSE, timeZone = "UTC")
       }
     } else {

@@ -1507,12 +1507,13 @@ parseDateObject <- function(inputColumn,
 
 # check and convert date - time (character) to datetime objects (POSIXlt), either with base functions or lubridate    ####
 
-parseDateTimeObject <- function(inputColumn,     
+parseDateTimeObject <- function(inputColumn,   
                                 dateTimeFormat,
                                 timeZone,
                                 checkNA = TRUE,      # throw error if there are NAs in input (only setup / retrieval, not problems)
                                 checkEmpty = TRUE,    # throw error if there are blank values in input  (only setup / retrieval, not problems)
-                                checkNA_out = TRUE  # throw error when there is NAs in output (FALSE so reporting is done by detectionHistory, which returns correct row numbers)
+                                checkNA_out = TRUE,  # throw error when there is NAs in output (FALSE so reporting is done by detectionHistory, which returns correct row numbers)
+                                quiet = FALSE
 ){
   
   
@@ -1530,7 +1531,7 @@ parseDateTimeObject <- function(inputColumn,
     # option 2: lubridate functions (identified by absence of "%")
     if(!requireNamespace("lubridate", quietly = TRUE)) stop(paste("package 'lubridate' is required for the specified dateTimeFormat", dateTimeFormat))
     
-    out <- lubridate::parse_date_time(inputColumn.char, orders = dateTimeFormat, tz = timeZone)
+    out <- lubridate::parse_date_time(inputColumn.char, orders = dateTimeFormat, tz = timeZone, quiet = quiet)
   }
   
   if(all(is.na(out))) stop(paste0("Cannot read datetime format in ", deparse(substitute(inputColumn)), ". Output is all NA.\n",
