@@ -30,7 +30,7 @@ addCopyrightTag(inDir,
      logical. Keep original JPG files as .JPG_original files (TRUE) or overwrite JPGs (FALSE)?
 }
  \item{ignoreMinorErrors}{
-  logical. Ignore minor errors that would cause the function to fail (set TRUE for images with bad MakerNotes, observed in Panthera cameras)
+  logical. Ignore minor errors that would cause the function to fail (set TRUE for images with bad MakerNotes, observed in Panthera V4 cameras)
 }
 
 }
@@ -39,7 +39,7 @@ If askFirst = TRUE, the function will show a menu and asks the user to confirm t
 
 By default Exiftool creates a copy of each JPG image and preserves the original images (without the copyright tag) as .JPG_original files. Note that this behaviour will instantly double the number of images in inDir and the disk space required. If this is not desired, set keepJPG_original = FALSE.
 
-\code{ignoreMinorErrors} is useful if copyright tags can't be updated correctly. This can be caused by bad MakerNotes and so far was only observed in Panthera cameras. In that case, set \code{ignoreMinorErrors} to \code{TRUE}. This will add the "-m" option to the Exiftool call, thereby ignoring minor errors and warnings and assigning the copyright tag regardless.
+\code{ignoreMinorErrors} is useful if copyright tags can't be updated correctly. This can be caused by bad MakerNotes and so far was only observed in Panthera V4 cameras. In that case, set \code{ignoreMinorErrors} to \code{TRUE}. This will add the "-m" option to the Exiftool call, thereby ignoring minor errors and warnings and assigning the copyright tag regardless.
 }
 \value{
   An invisible list of Exiftool output.
