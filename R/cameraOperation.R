@@ -154,7 +154,7 @@ cameraOperation <- function(CTtable,
     CTtable[,retrievalCol] <- CTtable[,retrievalCol] + dhours(12)
   }
   
-  if(any(CTtable[,setupCol] == CTtable[,retrievalCol])) stop("row ", which(CTtable[,setupCol] == CTtable[,retrievalCol]), ": setup is identical to retrieval")
+  if(any(CTtable[,setupCol] == CTtable[,retrievalCol])) stop(paste0("row ", paste(which(CTtable[,setupCol] == CTtable[,retrievalCol]), collapse = ", "), ": setup is identical to retrieval"), call. = FALSE)
   
   # check if dates make sense
   if(any(CTtable[,setupCol]     < as.Date("1970-01-01"))) warning("setup dates begin before 1970. If this is not intended please check dateFormat", call. = FALSE)
@@ -220,16 +220,16 @@ cameraOperation <- function(CTtable,
     if(all(is.na(CTtable[, problemToColumn])))   stop("in Problem_to column(s), all values are NA", call. = FALSE)
     
     # if problems begin on setup day, make sure it's the same time as setup (if only dates are specified)
-     if(isFALSE(effortAsFraction)){
-       problem_begin_on_setup_day <- which(as.Date(CTtable[, setupCol]) == as.Date(CTtable[, cols.prob.from[1]]))
-       if(length(problem_begin_on_setup_day) >= 1) {
-         CTtable[problem_begin_on_setup_day, cols.prob.from[1]] <- CTtable[problem_begin_on_setup_day, setupCol]
-       }
-       problem_ends_on_retrieval_day <- which(as.Date(CTtable[, retrievalCol]) == as.Date(CTtable[, cols.prob.to[length(cols.prob.to)]]))
-       if(length(problem_ends_on_retrieval_day) >= 1) {
-         CTtable[problem_ends_on_retrieval_day, cols.prob.to[length(cols.prob.to)]] <- CTtable[problem_ends_on_retrieval_day, retrievalCol]
-       }
-     }
+    if(isFALSE(effortAsFraction)){
+      problem_begin_on_setup_day <- which(as.Date(CTtable[, setupCol]) == as.Date(CTtable[, cols.prob.from[1]]))
+      if(length(problem_begin_on_setup_day) >= 1) {
+        CTtable[problem_begin_on_setup_day, cols.prob.from[1]] <- CTtable[problem_begin_on_setup_day, setupCol]
+      }
+      problem_ends_on_retrieval_day <- which(as.Date(CTtable[, retrievalCol]) == as.Date(CTtable[, cols.prob.to[length(cols.prob.to)]]))
+      if(length(problem_ends_on_retrieval_day) >= 1) {
+        CTtable[problem_ends_on_retrieval_day, cols.prob.to[length(cols.prob.to)]] <- CTtable[problem_ends_on_retrieval_day, retrievalCol]
+      }
+    }
     
     # check that problems begin after setup
     for(cols.prob.from.index in cols.prob.from){
