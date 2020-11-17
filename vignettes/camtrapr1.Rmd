@@ -61,7 +61,7 @@ The latest vignettes, function reference and changelog can be found on the [camt
 
 ## Workflow
 
-The workflow in camptrapR is made up of a number of function that build upon one another in a logical sequence. Here is a list of function grouped by work steps in the order in which they should be run. Details on all functions are provided below, in the other vignettes and the function help files.
+The workflow in camptrapR is made up of a number of function that build upon one another in a logical sequence. Here is a list of functions grouped by work steps in the order in which they should be run. Details on all functions are provided below, in the other vignettes, and the function help files.
 
 * Organising raw images
 1. `createStationFolders`
@@ -144,7 +144,7 @@ camtrapR relies on the free and open-source software **ExifTool** written by Phi
 
 ### ExifTool for Windows
 
-On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found [here](https://exiftool.org/install.html). Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained "exiftool(-k).exe" file to "exiftool.exe" and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in Windows PATH variable (e.g. C:/Windows). 
+On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found [here](https://exiftool.org/install.html). Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained "exiftool(-k).exe" file to "exiftool.exe" and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in the Windows PATH variable (e.g. C:/Windows). 
 
 
 ```{r eval = FALSE}
@@ -249,13 +249,13 @@ If there was more than 1 camera per station, the station directories must contai
 
 If you have more than 1 camera per station but don't separate the images from different cameras at this stage, you will not be able to do so at a later point. Later in the workflow, you can decide whether you would like to keep them separate or merge them (in the function `imageRename`).
 
-Generally, you should not work on your raw data and instead keep them as a backup. If you rename you images with `imageRename`, whole camtrapR workflow will take place in a copy of the images to prevent data loss.
+Generally, you should not work on your raw data and instead keep them as a backup. If you rename you images with `imageRename`, the whole camtrapR workflow will take place in a copy of the images to prevent data loss.
 
 Another important point is not to save any other data besides images in image directories. It may interfere with the operation of the package and ExifTool.
 
 ## Saving raw images on your hard disk
 
-The directories for the raw images can be created automatically using the function `createStationFolders` and the camera trap station table. As mentioned above, images can either be stored in station directories (if there was 1 camera per station) or in station/camera directories (if there was >1 camera per station).  The behaviour is controlled by the function argument `cameras`. It specifies the camera ID column in the camera trap information table. if it is defined, camera subdirectories will be created within the station directories.
+The directories for the raw images can be created automatically using the function `createStationFolders` and the camera trap station table. As mentioned above, images can either be stored in station directories (if there was 1 camera per station) or in station/camera directories (if there was >1 camera per station).  The behaviour is controlled by the function argument `cameras`. It specifies the camera ID column in the camera trap information table. If it is defined, camera subdirectories will be created within the station directories.
 
 Here is an example in which station directories without camera subdirectories are created. 
 
@@ -449,4 +449,4 @@ exifTagNames(wd_images_ID_copy)
 The copyright tag will henceforth be visible in digiKam and other image management software.
 
 
-Now that the raw images are organised, the next step is species identification covered in the next vignette.
+Now that the raw images are organised, the next step is species identification, covered in the next vignette.
