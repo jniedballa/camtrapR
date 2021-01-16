@@ -1517,7 +1517,12 @@ parseDateTimeObject <- function(inputColumn,
 ){
   
   
-  if(!class(inputColumn) %in% c("factor", "character")) stop(paste("datetime column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
+  if("POSIXct" %in% class(inputColumn)){
+    message(paste("datetime column is in POSIXct format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
+    inputColumn <- as.character(inputColumn)
+  } else {
+    if(!class(inputColumn) %in% c("factor", "character")) stop(paste("datetime column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
+  }
   
   if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
   if(checkEmpty & any(inputColumn == "")) stop(paste("there are blank values in", deparse(substitute(inputColumn))), call. = FALSE)
