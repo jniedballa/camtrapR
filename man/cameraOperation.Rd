@@ -5,7 +5,7 @@
 Create a camera trap station operability matrix
 }
 \description{
-Construct a matrix of daily camera trap station operability for use in \code{\link{detectionHistory}} and \code{\link{spatialDetectionHistory}}, where it is needed for calculating trapping effort per occasion. If several cameras were deployed per station, the matrix can contain camera- or station-specific trap operation information.
+Construct a matrix of daily camera trap station operability for use in \code{\link{detectionHistory}} and \code{\link{spatialDetectionHistory}}, where it is needed for calculating trapping effort per occasion. It is also used in \code{\link{surveyReport}} to calculate the number of trap nights durig a survey. If several cameras were deployed per station, the matrix can contain camera- or station-specific trap operation information, or information about sessions during repeated surveys.
 }
 \usage{
 cameraOperation(CTtable, 
@@ -35,8 +35,8 @@ cameraOperation(CTtable,
   \item{cameraCol}{
   character. name of the column specifying Camera ID in \code{CTtable} (optional). If empty, 1 camera per station is assumed.
 }
-\item{sessionCol}{
-  character. name of the column specifying session ID in \code{CTtable} (optional). Use it for creating multi-session / multi-season detection histories (unmarked: \code{\link[unmarked]{unmarkedMultFrame}}; secr: \code{\link[secr]{capthist}} )
+  \item{sessionCol}{
+  character. name of the column specifying session ID in \code{CTtable} (optional). Use it for creating multi-session / multi-season detection   histories (unmarked: \code{\link[unmarked]{unmarkedMultFrame}}; secr: \code{\link[secr]{capthist}} )
 }
   \item{setupCol}{
   character. name of the column containing camera setup dates in \code{CTtable}
@@ -57,7 +57,7 @@ cameraOperation(CTtable,
   logical. Return number of active camera traps by station? Only if \code{byCamera} is FALSE and \code{allCamsOn} is FALSE. If \code{camerasIndependent} is TRUE, output values will be the number of operational cameras at a station. If \code{camerasIndependent} is FALSE, the value is 1 if at least 1 camera was operational, otherwise 0. In both cases, values are NA if no camera was set up.
   }
   \item{dateFormat}{
-  character. The format of columns \code{setupCol} and \code{retrievalCol} (and potential problem columns) in \code{CTtable}. Must be interpretable by either \code{as.Date} or the "orders" argument \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}.
+  character. The format of columns \code{setupCol} and \code{retrievalCol} (and potential problem columns) in \code{CTtable}. Must be interpretable by either \code{as.Date} or the "orders" argument \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}. Can be a date or (since version 2.1) a date-time.
 }
 \item{occasionStartTime}{
   integer. time of day (the full hour) at which to begin occasions. Replaces \code{occasionStartTime} from \code{\link{detectionHistory}} and  \code{\link{spatialDetectionHistory}}.
@@ -70,12 +70,19 @@ cameraOperation(CTtable,
 }
 }
 \details{
-\code{cameraCol} is NULL by default. The function then assumes there was 1 camera per station \code{CTtable}. In more than 1 camera was deployed per station, \code{cameraCol} needs to be specified to identify individual cameras within a station.
-\code{dateFormat} defaults to "YYYY-MM-DD", e.g. "2014-10-31". It can be specified either in the format required by \code{\link[base]{strptime}} or the 'orders' argument in \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}. In the example above, "YYYY-MM-DD" would be specified as "\%Y-\%m-\%d" or "ymd". 
+\code{cameraCol} is NULL by default, meaning the function assumes there was 1 camera per station in \code{CTtable}. If more than 1 camera was deployed per station, \code{cameraCol} needs to be specified to identify individual cameras within a station. Likewise, \code{sessionCol} can be used to if camera trap stations were operated during multiple sessions / trapping seasons.
+
+\code{dateFormat} defaults to "YYYY-MM-DD", e.g. "2014-10-31", but can be any other date format or date-time  also. It can be specified either in the format required by \code{\link[base]{strptime}} or the 'orders' argument in \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}. In the example above, "YYYY-MM-DD" would be specified as "\%Y-\%m-\%d" in base R or "ymd" in \pkg{lubridate}.
+
+Since version 2.1, dateFormat can be a date-time. That makes it possible to specify the exact time cameras were set up / retrieved / malfunctioned / worked again. This information is used to calculate the daily trapping effort more precisely on days with incomplete effort. 
+
+Previously, setup and retrival day were counted as 1, indicating a whole day of effort on those days. Since version 2.1, setup and retrieval are assumed to have happened at 12 noon (resulting in daily effort of 0.5 instead of 1). Users can also specify the exact time cameras were set up (by providing a date-time in the setup / retrieval / problem columns). See vignette 3 for more details. 
 
 If \code{hasProblems} is TRUE, the function tries to find columns \code{ProblemX_from} and \code{ProblemX_to} in \code{CTtable}. \code{X} is a consecutive number from 1 to n, specifying periods in which a camera or station was not operational. If \code{hasProblems} is FALSE, cameras are assumed to have been operational uninterruptedly from setup to retrieval (see \code{\link{camtraps}} for details).
+
 \code{allCamsOn} only has an effect if there was more than 1 camera at a station. If TRUE, for the station to be considered operational, all cameras at a station need to be operational. If FALSE, at least 1 active camera renders the station operational.
 Argument \code{camerasIndependent} defines if cameras record animals independently (it thus only has an effect if there was more than 1 camera at a station). This is the case if an observation at one camera does not increase the probability for detection at another camera (cameras face different trails at a distance of one another). Non-independence occurs if an animal is likely to trigger both camers (as would be the case with 2 cameras facing each other).
+
 If \code{camerasIndependent} is TRUE, 2 active cameras at a station will result in a station operation value of 2 in the resulting matrix, i.e., 2 independent trap days at 1 station and day. If \code{camerasIndependent} is FALSE, 2 active cameras will return value 1, i.e., 1 trap night at 1 station per day.
 
 Row names depend on the input arguments and contain the station name and potentially session and camera names (if \code{sessionCol} and/or \code{cameraCol} are defined).
