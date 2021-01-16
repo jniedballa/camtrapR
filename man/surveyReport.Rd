@@ -10,13 +10,14 @@ This function creates a report about a camera trapping survey and species record
 \usage{
 surveyReport (recordTable,
   CTtable,
+  camOp,
   speciesCol = "Species",
   stationCol = "Station",
   cameraCol, 
   setupCol,
   retrievalCol,
   CTDateFormat = "\%Y-\%m-\%d", 
-  CTHasProblems = FALSE,
+  CTHasProblems = "deprecated",
   recordDateTimeCol = "DateTimeOriginal",
   recordDateTimeFormat = "\%Y-\%m-\%d \%H:\%M:\%S",
   Xcol,
@@ -32,6 +33,9 @@ surveyReport (recordTable,
 }
   \item{CTtable}{
    data.frame containing information about location and trapping period of camera trap stations (equivalent to \code{\link{camtraps}}
+}
+  \item{camOp}{
+   camera operation matrix created with \code{\link{cameraOperation}}
 }
   \item{speciesCol}{
   character. name of the column specifying Species ID in \code{recordTable}
@@ -52,7 +56,7 @@ surveyReport (recordTable,
   character. The format of columns \code{setupCol} and \code{retrievalCol} (and potential problem columns) in \code{CTtable}. Must be interpretable by either \code{as.Date} or the "orders" argument \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}.
 }
 \item{CTHasProblems}{
-  logical. Are there periods of camera malfunction specified in \code{CTtable}?
+  deprecated (since version 2.1)
 }
   \item{recordDateTimeCol}{
   character. The name of the column containing date and time of records in \code{recordTable}
@@ -76,17 +80,18 @@ surveyReport (recordTable,
 \details{
 
 \code{dateFormat} defaults to "YYYY-MM-DD", e.g. "2014-10-31". It can be specified either in the format required by \code{\link[base]{strptime}} or the 'orders' argument in \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}. In the example above, "YYYY-MM-DD" would be specified as "\%Y-\%m-\%d" or "ymd". 
-If \code{CTHasProblems} is set to TRUE, the function tries to find columns \code{ProblemX_from} and \code{ProblemX_to} in \code{CTtable} (\code{X} designates numbers from 1 to n in which a camera or station was not operational). If there are no such columns all stations are assumed to have been operational uninterruptedly from setup to retrieval.
 
 \code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be interpreted either by base-R via \code{\link[base]{strptime}} or in \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument "orders"). \pkg{lubridate} will be used if there are no "\%" characters in \code{recordDateTimeFormat}. 
 
 For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date and time formats in R see \code{\link[base]{strptime}} or \code{\link[lubridate]{parse_date_time}}.
+
+Note: as of version 2.1, argument \code{CTHasProblems} is deprecated and defunct. Please use \code{camOp} instead to provide information about periods of camera activity and malfunction. 
  
 }
 \value{
  An invisible list containing 5 \code{data.frames}. 
 
-  \item{survey_dates}{station and image date ranges, number of total and active trap nights, number of cameras per station}
+  \item{survey_dates}{station and image date ranges, number of total and active trap days (calendar days and taking into account independent effort of multiple cameras, if applicable), number of cameras per station}
   \item{species_by_station}{species numbers by station}
   \item{events_by_species}{number of events and stations by species}
   \item{events_by_station}{number of events for every species by station (only species that were recorded)}
@@ -114,8 +119,20 @@ Juergen Niedballa
 data(camtraps)
 data(recordTableSample)
 
+# since version 2.1, camera operation matrix is required as input
+
+camop_no_problem <- cameraOperation(CTtable      = camtraps,
+                                    stationCol   = "Station",
+                                    setupCol     = "Setup_date",
+                                    retrievalCol = "Retrieval_date",
+                                    writecsv     = FALSE,
+                                    hasProblems  = FALSE,
+                                    dateFormat   = "\%d/\%m/\%Y"
+)
+
 reportTest <- surveyReport (recordTable          = recordTableSample,
                             CTtable              = camtraps,
+                            camOp                = camop_no_problem,
                             speciesCol           = "Species",
                             stationCol           = "Station",
                             setupCol             = "Setup_date",
@@ -135,16 +152,25 @@ reportTest[[5]]    # number of species events by station including 0s (non-obser
 
 # with camera problems
 
+camop_problem <- cameraOperation(CTtable      = camtraps,
+                                 stationCol   = "Station",
+                                 setupCol     = "Setup_date",
+                                 retrievalCol = "Retrieval_date",
+                                 writecsv     = FALSE,
+                                 hasProblems  = TRUE,
+                                 dateFormat   = "\%d/\%m/\%Y"
+)
+
 reportTest_problem <- surveyReport (recordTable          = recordTableSample,
                                     CTtable              = camtraps,
+                                    camOp                = camop_problem,
                                     speciesCol           = "Species",
                                     stationCol           = "Station",
                                     setupCol             = "Setup_date",
                                     retrievalCol         = "Retrieval_date",
                                     CTDateFormat         = "\%d/\%m/\%Y", 
                                     recordDateTimeCol    = "DateTimeOriginal",
-                                    recordDateTimeFormat = "\%Y-\%m-\%d \%H:\%M:\%S",
-                                    CTHasProblems        = TRUE)
+                                    recordDateTimeFormat = "\%Y-\%m-\%d \%H:\%M:\%S")
 
 reportTest_problem$survey_dates
 
@@ -152,6 +178,7 @@ reportTest_problem$survey_dates
 # run again with sinkpath defined
 reportTest <- surveyReport (recordTable          = recordTableSample,
                             CTtable              = camtraps,
+                            camOp                = camop_no_problem,
                             speciesCol           = "Species",
                             stationCol           = "Station",
                             setupCol             = "Setup_date",
