@@ -161,6 +161,8 @@ detectionHistory <- function(recordTable,
   # get information about station / session / camera IDs
   if("session" %in% colnames(camop.info.df)){
     
+    if("camera" %in% colnames(camop.info.df)) stop("currently detectionHistory does not support camera-specific camera operation matrices when session/seasons are defined. Please run cameraOperation with byCamera = FALSE.", call. = FALSE)
+    
     if(!is.logical(unmarkedMultFrameInput)) stop("unmarkedMultFrameInput must be logical (TRUE / FALSE)", call. = FALSE)
     
     # assign session IDs to record table (this will also change station ID to station__session)
