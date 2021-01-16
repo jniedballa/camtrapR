@@ -175,7 +175,7 @@ Mapstest2 <- detectionMaps(CTtable           = camtraps,
 }
 
 \references{
-A great resource for \code{\link[sp:CRS-class]{CRS}} arguments is \url{http://spatialreference.org/}. Use the Proj4 string as \code{shapefileProjection} argument.
+A great resource for \code{\link[sp:CRS-class]{CRS}} arguments is \url{https://spatialreference.org/}. Use the Proj4 string as \code{shapefileProjection} argument.
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

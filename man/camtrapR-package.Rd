@@ -127,7 +127,7 @@ Maintainer:Juergen Niedballa <camtrapr@gmail.com>
 
 \references{
 
-Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016): camtrapR: an R package for efficient camera trap data management. Methods in Ecology and Evolution, 7(12). \url{http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12600/full} \cr
+Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016): camtrapR: an R package for efficient camera trap data management. Methods in Ecology and Evolution, 7(12). \url{https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12600/full} \cr
 
 camtrapR Google Group \url{https://groups.google.com/forum/#!forum/camtrapr} \cr
 

@@ -93,7 +93,7 @@ Juergen Niedballa
 
 \seealso{
 \code{\link{activityHistogram}}, \code{\link{activityRadial}}, \code{\link{activityOverlap}}
-\url{http://www.kent.ac.uk/smsas/personal/msr/overlap.html}
+\url{https://www.kent.ac.uk/smsas/personal/msr/overlap.html}
 }
 \examples{
 # load record table
