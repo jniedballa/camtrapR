@@ -304,6 +304,7 @@ activityOverlap (recordTable = recordTableSample,
 * number of stations (total and operational)
 * number of active trap days (total and by station)
 * number of days with cameras set up (operational or not; total and by station)
+* number of active trap days (taking into account multiple cameras accumulating effort independently at the same station)
 * total trapping period
 * camera trap and record date ranges
 * number of species by station
@@ -311,18 +312,31 @@ activityOverlap (recordTable = recordTableSample,
 * number of stations at which species were recorded
 * number of independent events by station and species
 
+It requires a record table, the camera trap table, and (since version 2.1) a camera operation matrix.
+
+The camera operation matrix is required to provide more precise and flexible calculation of the number of active trap days. So we first create the camera operation matrix, here taking into account periods in which the cameras malfunctioned (hasProblems = TRUE). 
+```{r}
+camop_problem <- cameraOperation(CTtable      = camtraps,
+                                 stationCol   = "Station",
+                                 setupCol     = "Setup_date",
+                                 retrievalCol = "Retrieval_date",
+                                 hasProblems  = TRUE,
+                                 dateFormat   = "dmy")
+```
+
 
 ```{r}
 reportTest <- surveyReport (recordTable          = recordTableSample,
                             CTtable              = camtraps,
+                            camOp                = camop_problem,   # new argument since v2.1
                             speciesCol           = "Species",
                             stationCol           = "Station",
                             setupCol             = "Setup_date",
                             retrievalCol         = "Retrieval_date",
                             CTDateFormat         = "%d/%m/%Y", 
                             recordDateTimeCol    = "DateTimeOriginal",
-                            recordDateTimeFormat = "%Y-%m-%d %H:%M:%S",
-                            CTHasProblems        = TRUE)
+                            recordDateTimeFormat = "%Y-%m-%d %H:%M:%S") #,
+                            #CTHasProblems        = TRUE)    # deprecated in v2.1
 ```
 
 Some basic information is shown in the console. The function output is a list with `r length(reportTest)` elements.
@@ -333,7 +347,9 @@ str(reportTest)
 
 The list elements can be accessed individually like this: `reportTest[[1]]` or like this: `reportTest$survey_dates`.
 
-Some of the arguments need further explanations. `CTHasProblems` is used to tell camtrapR whether to look for columns specifying periods of malfunctioning in `CTtable` (e.g. 'Problem1_from' and 'Problem1_to'). If there was more than one camera per station `cameraCol` specifies the columns containing camera IDs . Not setting it will cause camtrapR to assume there was 1 camera per station, biasing the trap day calculation. `sinkpath` can optionally be a directory in which the function will save the output as a txt file. 
+Some of the arguments need further explanations. 
+<!-- `CTHasProblems` is used to tell camtrapR whether to look for columns specifying periods of malfunctioning in `CTtable` (e.g. 'Problem1_from' and 'Problem1_to').  -->
+If there was more than one camera per station `cameraCol` specifies the columns containing camera IDs . Not setting it will cause camtrapR to assume there was 1 camera per station, biasing the trap day calculation. `sinkpath` can optionally be a directory in which the function will save the output as a txt file. 
 
 ```{r}
 # here's the output of surveyReport

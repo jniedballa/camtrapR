@@ -304,6 +304,30 @@ camop_hours[, (ncol(camop_hours)-6):ncol(camop_hours)]
 ```
 
 
+## Differences between version 2.1 and previous versions
+
+Version 2.1 introduced support of cameraOperation() for date-times in the setup / retrieval / problem columns. By giving the setup / retrieval / problem columns as date-times (and adjusting argument dateFormat accordingly), one can calculate precise daily effort.
+
+
+If the times are unknown and users provide dates only to argument dateFormat, camtrapR will assume that setup and retrieval were at 12 noon. Malfunction periods (indicated by the problem columns) will be interpreted as the cameras having malfunctioned the whole day. 
+
+
+This is how the handling of setup/retrieval days differs between dates and date-times in dateFormat:
+
+| version  | dateFormat is date  | dateFormat is date-time |
+|-|-|-|
+| prior to 2.1  | 1   | not implemented |
+| 2.1 and later | 0.5 | calculated precisely |
+
+
+This is how the handling of problems / malfunction periods differs between dates and date-times in dateFormat:
+
+| version  | dateFormat is date  | dateFormat is date-time |
+|-|-|-|
+| prior to 2.1  | 0 | not implemented |
+| 2.1 and later | 0 | calculated precisely |
+  
+
 
 ## Camera days vs. camera nights
 
