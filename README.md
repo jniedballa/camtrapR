@@ -30,6 +30,14 @@ library(remotes)
 install_github("jniedballa/camtrapR")
 ```
 
+You can also install a previous version (e.g. if a recent update broke
+the code you need to run urgently) via:
+
+``` r
+library(remotes)
+install_version(package = "camtrapR", version = "1.2.3")
+```
+
 ## Exiftool
 
 Numerous important camtrapR functions read EXIF metadata from JPG images

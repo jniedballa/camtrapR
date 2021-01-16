@@ -38,6 +38,13 @@ library(remotes)
 install_github("jniedballa/camtrapR")
 ```
 
+You can also install a previous version (e.g. if a recent update broke the code you need to run urgently) via:
+
+```{r, eval = FALSE}
+library(remotes)
+install_version(package = "camtrapR", version = "1.2.3")
+```
+
 ## Exiftool
 
 Numerous important camtrapR functions read EXIF metadata from JPG images (and videos). This is done via Exiftool, a free and open-source sofware tool developed by Phil Harvey and available for Windows, MacOS and Linux.
