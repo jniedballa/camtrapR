@@ -86,7 +86,7 @@ recordTableIndividual(inDir,
   character. The function by which to summarise \code{eventSummaryColumn} of  non-independent records, e.g. "sum", "max" (optional)
 }
 \item{video}{
-  list. Contains information on how to handle video data (otional). See details.
+  list. Contains information on how to handle video data (optional). See details.
 }
 }
 
