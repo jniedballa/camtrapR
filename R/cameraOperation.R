@@ -141,11 +141,11 @@ cameraOperation <- function(CTtable,
   
   # if dateFormat contains H (hour), use parseDateTimeObject, otherwise parseDateObject
   if(effortAsFraction) {
-    CTtable[,setupCol]     <- parseDateTimeObject(inputColumn = CTtable[,setupCol],     dateFormat, checkNA = TRUE, checkEmpty = TRUE, timeZone = "UTC")
-    CTtable[,retrievalCol] <- parseDateTimeObject(inputColumn = CTtable[,retrievalCol], dateFormat, checkNA = TRUE, checkEmpty = TRUE, timeZone = "UTC")
+    CTtable[,setupCol]     <- parseDateTimeObject(inputColumn = CTtable[,setupCol],     dateTimeFormat = dateFormat, checkNA = TRUE, checkEmpty = TRUE, timeZone = "UTC")
+    CTtable[,retrievalCol] <- parseDateTimeObject(inputColumn = CTtable[,retrievalCol], dateTimeFormat = dateFormat, checkNA = TRUE, checkEmpty = TRUE, timeZone = "UTC")
   } else {
-    CTtable[,setupCol]     <- parseDateObject(inputColumn = CTtable[,setupCol],     dateFormat, checkNA = TRUE, checkEmpty = TRUE)
-    CTtable[,retrievalCol] <- parseDateObject(inputColumn = CTtable[,retrievalCol], dateFormat, checkNA = TRUE, checkEmpty = TRUE)
+    CTtable[,setupCol]     <- parseDateObject(inputColumn = CTtable[,setupCol],     dateFormat = dateFormat, checkNA = TRUE, checkEmpty = TRUE)
+    CTtable[,retrievalCol] <- parseDateObject(inputColumn = CTtable[,retrievalCol], dateFormat = dateFormat, checkNA = TRUE, checkEmpty = TRUE)
   }
   
   # if setup time was not defined, assume 12 noon (so effort on setup/retrieval day = 0.5)
@@ -164,13 +164,20 @@ cameraOperation <- function(CTtable,
   if(any(CTtable[,retrievalCol] > Sys.Date())) warning("retrieval date is in the future. If this is not intended please check dateFormat", call. = FALSE)
   
   
-  # ensure setup is before retrieval
-  if(any(CTtable[,setupCol] > CTtable[,retrievalCol])){
-    stop(paste("Setup Date after Retrieval Date:   "),
-         paste(CTtable[which(CTtable[,setupCol] > CTtable[,retrievalCol]), stationCol],
-               collapse = ", "))
-  }
   
+  # ensure setup is before retrieval (treating sessions independently)
+  CTtable_split <- split(CTtable, f = CTtable[, sessionCol])
+  
+  lapply(CTtable_split, FUN = function(x) {
+    if(any(x[,setupCol] > x[,retrievalCol])){
+      stop(paste("Setup Date after Retrieval Date:   "),
+           paste(x[which(x[,setupCol] > x[,retrievalCol]), stationCol],
+                 collapse = ", "), 
+           ifelse(sessionColInArgs, paste0(" (Session ", unique(x[, sessionCol]), ")"), ""), call. = FALSE)
+    }
+  }
+  )
+
   # get start / retrieval dates of all cameras
   date0 <- sapply(CTtable[, setupCol],     FUN =  function(x) as.character(min(x)))
   date1 <- sapply(CTtable[, retrievalCol], FUN =  function(x) as.character(max(x) - dseconds(1)))  # if not removing 1 second, last day with end on midnight when the day begins, leading to retrieval day being 0
