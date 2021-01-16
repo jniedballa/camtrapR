@@ -32,6 +32,8 @@ print("WARNING: THIS VIGNETTE WAS CREATED WITHOUT EXIFTOOL. OUTPUT IS INCOMPLETE
 
 The four vignettes demonstrate the camtrapR workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
 
+camtrapR is compatible with other software for camera trap data management. So if you prefer to manage images and identify species in other software, you usually can. For example, Camelot and TRAPPER export csv files that can be used as input for camtrapR. camtrapR uses a simple data structure and standard data types (data frames and matrices) to store information about the camera trap survey and the detected species and individuals in separate data frames to maximise compatibility. 
+
 ## Installation
 
 You can install the newest stable version from CRAN via:
