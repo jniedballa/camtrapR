@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.04</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -114,7 +114,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jniedballa/camtrapR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -144,17 +144,20 @@
 <a href="#new-features" class="anchor"></a>new features</h2>
 <ul>
 <li>cameraOperation: setup/ retrieval / problem columns can be interpreted as date-time format, then computes effort as fraction of day. (Thank you to Zoé Siegel for the suggestion, Fridolin Zimmermann and the Department of Ecology &amp; Evolution from the University of Lausanne for funding the development of the feature)</li>
+<li>cameraOperation: gained argument occasionStartTime (deprecated in detectionHistory / spatialDetectionHistory)</li>
 <li>function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument “lattice”, which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)</li>
+<li>surveyReport: new argument camOp (for a camera operation matrix), argument CTHasProblems is deprecated. Improved calculation of survey effort.</li>
+<li>timeShiftImages / addCopyrightTag: added argument “ignoreMinorErrors”, set it to TRUE if functions fails due to bad MakerNotes (reported by An The Truong Nguyen)</li>
 </ul>
 </div>
 <div id="bugfixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bugfixes" class="anchor"></a>bugfixes</h2>
 <ul>
-<li>cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character</li>
-<li>recordTable: supports extraction of metadata tags from video files in camera subdirectories</li>
-<li>recordTable: supports duplicate video file names in different camera subdirectories when extracting metadata</li>
-<li>recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata)</li>
+<li>cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character (reported by David Nicholls)</li>
+<li>recordTable: supports extraction of metadata tags from video files in camera subdirectories, and allows duplicate video file names in different camera subdirectories (reported by Sian Green)</li>
+<li>recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata, reported by Sian Green)</li>
+<li>imageRename: fixed error when hasCameraFolders is TRUE, but a station has only 1 camera (reported by Camille Coudrat and Ezekiel Gading)</li>
 </ul>
 </div>
 <div id="other-changes" class="section level2">

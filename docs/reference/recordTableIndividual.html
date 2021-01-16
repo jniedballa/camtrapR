@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -98,13 +98,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -115,7 +115,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jniedballa/camtrapR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -141,26 +141,26 @@
     <p>The function generates a single-species record table containing individual IDs, e.g. for (spatial) capture-recapture analyses. It prepares input for the function <code><a href='spatialDetectionHistory.html'>spatialDetectionHistory</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>recordTableIndividual</span>(<span class='no'>inDir</span>,
-  <span class='no'>hasStationFolders</span>,
-  <span class='no'>IDfrom</span>,
-  <span class='no'>cameraID</span>,
-  <span class='no'>camerasIndependent</span>,
-  <span class='kw'>minDeltaTime</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='no'>deltaTimeComparedTo</span>,
-  <span class='no'>timeZone</span>,
-  <span class='no'>stationCol</span>,
-  <span class='kw'>writecsv</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>outDir</span>,
-  <span class='kw'>metadataHierarchyDelimitor</span> <span class='kw'>=</span> <span class='st'>"|"</span>,
-  <span class='no'>metadataIDTag</span>,
-  <span class='no'>additionalMetadataTags</span>,
-  <span class='kw'>removeDuplicateRecords</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>returnFileNamesMissingTags</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>eventSummaryColumn</span>,
-  <span class='no'>eventSummaryFunction</span>,
-  <span class='no'>video</span>
-)</pre>
+    <pre class="usage"><span class='fu'>recordTableIndividual</span><span class='op'>(</span><span class='va'>inDir</span>,
+  <span class='va'>hasStationFolders</span>,
+  <span class='va'>IDfrom</span>,
+  <span class='va'>cameraID</span>,
+  <span class='va'>camerasIndependent</span>,
+  minDeltaTime <span class='op'>=</span> <span class='fl'>0</span>,
+  <span class='va'>deltaTimeComparedTo</span>,
+  <span class='va'>timeZone</span>,
+  <span class='va'>stationCol</span>,
+  writecsv <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>outDir</span>,
+  metadataHierarchyDelimitor <span class='op'>=</span> <span class='st'>"|"</span>,
+  <span class='va'>metadataIDTag</span>,
+  <span class='va'>additionalMetadataTags</span>,
+  removeDuplicateRecords <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  returnFileNamesMissingTags <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>eventSummaryColumn</span>,
+  <span class='va'>eventSummaryFunction</span>,
+  <span class='va'>video</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -239,7 +239,7 @@
     </tr>
     <tr>
       <th>video</th>
-      <td><p>list. Contains information on how to handle video data (otional). See details.</p></td>
+      <td><p>list. Contains information on how to handle video data (optional). See details.</p></td>
     </tr>
     </table>
 
@@ -278,67 +278,71 @@ To return digiKam tags, two additional items are required (<code>db_directory</c
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Phil Harvey's ExifTool <a href='https://exiftool.org/'>https://exiftool.org/</a></p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>)    <span class='co'># the examples run too long to pass CRAN tests</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span>    <span class='co'># the examples run too long to pass CRAN tests</span>
 
- <span class='no'>wd_images_ID_individual</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_indiv_tag/LeopardCat"</span>,
-                                        <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+ <span class='va'>wd_images_ID_individual</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"pictures/sample_images_indiv_tag/LeopardCat"</span>, 
+                                        package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span>
  <span class='co'># missing space in species = "LeopardCat" is because of CRAN package policies</span>
  <span class='co'># note argument additionalMetadataTags: contains tag names as returned by function exifTagNames</span>
 
- <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span>(<span class='st'>"exiftool"</span>) <span class='kw'>!=</span> <span class='st'>""</span>){        <span class='co'># only run these examples if ExifTool is available</span>
+ <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"exiftool"</span><span class='op'>)</span> <span class='op'>!=</span> <span class='st'>""</span><span class='op'>)</span><span class='op'>{</span>        <span class='co'># only run these examples if ExifTool is available</span>
 
- <span class='no'>rec_table_pbe</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTableIndividual</span>(<span class='kw'>inDir</span>                  <span class='kw'>=</span> <span class='no'>wd_images_ID_individual</span>,
-                                        <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>60</span>,
-                                        <span class='kw'>deltaTimeComparedTo</span>    <span class='kw'>=</span> <span class='st'>"lastRecord"</span>,
-                                        <span class='kw'>hasStationFolders</span>      <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                        <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"metadata"</span>,
-                                        <span class='kw'>camerasIndependent</span>     <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                        <span class='kw'>writecsv</span>               <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                        <span class='kw'>metadataIDTag</span>          <span class='kw'>=</span> <span class='st'>"individual"</span>,
-                                        <span class='kw'>additionalMetadataTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"EXIF:Model"</span>, <span class='st'>"EXIF:Make"</span>),
-                                        <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
- )
-
-
+ <span class='va'>rec_table_pbe</span> <span class='op'>&lt;-</span> <span class='fu'>recordTableIndividual</span><span class='op'>(</span>inDir                  <span class='op'>=</span> <span class='va'>wd_images_ID_individual</span>,
+                                        minDeltaTime           <span class='op'>=</span> <span class='fl'>60</span>,
+                                        deltaTimeComparedTo    <span class='op'>=</span> <span class='st'>"lastRecord"</span>,
+                                        hasStationFolders      <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                        IDfrom                 <span class='op'>=</span> <span class='st'>"metadata"</span>,
+                                        camerasIndependent     <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                        writecsv               <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                        metadataIDTag          <span class='op'>=</span> <span class='st'>"individual"</span>,
+                                        additionalMetadataTags <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"EXIF:Model"</span>, <span class='st'>"EXIF:Make"</span><span class='op'>)</span>,
+                                        timeZone               <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
+ <span class='op'>)</span>
+ 
+ 
  <span class='co'># extracting some example summary stats too </span>
  <span class='co'># a nonsensical example, get all unique cameras with which the event was photographed</span>
-
-  <span class='no'>rec_table_pbe2</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTableIndividual</span>(<span class='kw'>inDir</span>                <span class='kw'>=</span> <span class='no'>wd_images_ID_individual</span>,
-                                        <span class='kw'>minDeltaTime</span>           <span class='kw'>=</span> <span class='fl'>60</span>,
-                                        <span class='kw'>deltaTimeComparedTo</span>    <span class='kw'>=</span> <span class='st'>"lastRecord"</span>,
-                                        <span class='kw'>hasStationFolders</span>      <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                        <span class='kw'>IDfrom</span>                 <span class='kw'>=</span> <span class='st'>"metadata"</span>,
-                                        <span class='kw'>camerasIndependent</span>     <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                        <span class='kw'>writecsv</span>               <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                        <span class='kw'>metadataIDTag</span>          <span class='kw'>=</span> <span class='st'>"individual"</span>,
-                                        <span class='kw'>additionalMetadataTags</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"EXIF:Model"</span>, <span class='st'>"EXIF:Make"</span>),
-                                        <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
-                                        <span class='kw'>eventSummaryColumn</span>     <span class='kw'>=</span> <span class='st'>"EXIF:Make"</span>,
-                                        <span class='kw'>eventSummaryFunction</span>   <span class='kw'>=</span> <span class='st'>"unique"</span>
- )
-
+ 
+  <span class='va'>rec_table_pbe2</span> <span class='op'>&lt;-</span> <span class='fu'>recordTableIndividual</span><span class='op'>(</span>inDir                <span class='op'>=</span> <span class='va'>wd_images_ID_individual</span>,
+                                        minDeltaTime           <span class='op'>=</span> <span class='fl'>60</span>,
+                                        deltaTimeComparedTo    <span class='op'>=</span> <span class='st'>"lastRecord"</span>,
+                                        hasStationFolders      <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                        IDfrom                 <span class='op'>=</span> <span class='st'>"metadata"</span>,
+                                        camerasIndependent     <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                        writecsv               <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                        metadataIDTag          <span class='op'>=</span> <span class='st'>"individual"</span>,
+                                        additionalMetadataTags <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"EXIF:Model"</span>, <span class='st'>"EXIF:Make"</span><span class='op'>)</span>,
+                                        timeZone               <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
+                                        eventSummaryColumn     <span class='op'>=</span> <span class='st'>"EXIF:Make"</span>,
+                                        eventSummaryFunction   <span class='op'>=</span> <span class='st'>"unique"</span>
+ <span class='op'>)</span>
+ 
  <span class='co'>### Video example (the sample data don't contain a video, this is hypothetical)</span>
  <span class='co'># with JPG, video mp4, avi, mov, ID = metadata</span>
+ 
+<span class='va'>rec_table_ind_video</span> <span class='op'>&lt;-</span> <span class='fu'>recordTableIndividual</span><span class='op'>(</span>inDir <span class='op'>=</span> <span class='va'>wd_images_ID_individual</span>,
+                          hasStationFolder  <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                          IDfrom            <span class='op'>=</span> <span class='st'>"metadata"</span>, 
+                          metadataIDTag     <span class='op'>=</span> <span class='st'>"individual"</span>,
+                          video <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>file_formats <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"jpg"</span>, <span class='st'>"mp4"</span>, <span class='st'>"avi"</span>, <span class='st'>"mov"</span><span class='op'>)</span>,
+                                       dateTimeTag <span class='op'>=</span> <span class='st'>"QuickTime:CreateDate"</span>,
+                                       db_directory <span class='op'>=</span> <span class='st'>"C:/Users/YourName/Pictures"</span>,
+                                       db_filename <span class='op'>=</span> <span class='st'>"digikam4.db"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='no'>rec_table_ind_video</span> <span class='kw'>&lt;-</span> <span class='fu'>recordTableIndividual</span>(<span class='kw'>inDir</span> <span class='kw'>=</span> <span class='no'>wd_images_ID_individual</span>,
-                          <span class='kw'>hasStationFolder</span>  <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                          <span class='kw'>IDfrom</span>            <span class='kw'>=</span> <span class='st'>"metadata"</span>,
-                          <span class='kw'>metadataIDTag</span>     <span class='kw'>=</span> <span class='st'>"individual"</span>,
-                          <span class='kw'>video</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>file_formats</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"jpg"</span>, <span class='st'>"mp4"</span>, <span class='st'>"avi"</span>, <span class='st'>"mov"</span>),
-                                       <span class='kw'>dateTimeTag</span> <span class='kw'>=</span> <span class='st'>"QuickTime:CreateDate"</span>,
-                                       <span class='kw'>db_directory</span> <span class='kw'>=</span> <span class='st'>"C:/Users/YourName/Pictures"</span>,
-                                       <span class='kw'>db_filename</span> <span class='kw'>=</span> <span class='st'>"digikam4.db"</span>)
-)
-
-
-} <span class='kw'>else</span> {
+  
+<span class='op'>}</span> <span class='kw'>else</span> <span class='op'>{</span>  
 <span class='co'># show function output if ExifTool is not available</span>
-<span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span>(<span class='st'>"ExifTool is not available. Cannot test function. Loading recordTableSample instead"</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableSample</span>)
-}</div><div class='output co'>#&gt; <span class='error'>Error in recordTableIndividual(inDir = wd_images_ID_individual, minDeltaTime = 60,     deltaTimeComparedTo = "lastRecord", hasStationFolders = FALSE,     IDfrom = "metadata", camerasIndependent = FALSE, writecsv = FALSE,     metadataIDTag = "individual", additionalMetadataTags = c("EXIF:Model",         "EXIF:Make"), timeZone = "Asia/Kuala_Lumpur"): object 'wd_images_ID_individual' not found</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span><span class='op'>(</span><span class='st'>"ExifTool is not available. Cannot test function. Loading recordTableSample instead"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in recordTableIndividual(inDir = wd_images_ID_individual, minDeltaTime = 60,     deltaTimeComparedTo = "lastRecord", hasStationFolders = FALSE,     IDfrom = "metadata", camerasIndependent = FALSE, writecsv = FALSE,     metadataIDTag = "individual", additionalMetadataTags = c("EXIF:Model",         "EXIF:Make"), timeZone = "Asia/Kuala_Lumpur"): object 'wd_images_ID_individual' not found</span></div><div class='input'>
 
 </div></pre>
   </div>
@@ -356,7 +360,7 @@ To return digiKam tags, two additional items are required (<code>db_directory</c
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
