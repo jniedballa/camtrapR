@@ -134,10 +134,6 @@ addMetadataAsColumns <- function(intable,
   
   which_cols_to_rename <- which(colnames(intable) %in% cols2add)
   
-  # remove spaces and punctuation in column names
-  #colnames(intable) <- gsub(pattern = "[[:blank:]]", replacement = "", x = colnames(intable))
-  #colnames(intable) <- gsub(pattern = "[[:punct:]]", replacement = "", x = colnames(intable))
-  
   # rename metadata columns with prefix "metadata_"
   colnames(intable)[which_cols_to_rename] <- paste("metadata_", colnames(intable)[which_cols_to_rename], sep = "")
   
@@ -498,10 +494,7 @@ assessTemporalIndependence <- function(intable,
     summary_column_name <- paste(eventSummaryColumn, eventSummaryFunction, sep = "_")
     intable[, summary_column_name[eventSummaryColumn %in% colnames(intable)]] <- NA
     
-    
-    # summary_column_name <- paste(eventSummaryColumn, eventSummaryFunction, sep = "_")[which(eventSummaryColumn %in% colnames(intable))]
-    # intable[, summary_column_name] <- NA
-  }    # end    if(hasArg(eventSummaryColumn)){
+    }    # end    if(hasArg(eventSummaryColumn)){
   
   
   for(xy in 1:length(which_independent)){     # for every independent record (the ones that end up in record table)
@@ -1029,17 +1022,14 @@ makeSurveyZip <- function(output,
   unlink(dir.zip, recursive = TRUE)
   dir.create(dir.zip, showWarnings = FALSE, recursive = TRUE)
   
-  
   # create directories
   invisible(sapply(file.path(dir.zip, c("surveyReport", "activity", "scripts", "detectionMaps")), dir.create, showWarnings = FALSE))
-  
   
   ######
   # save input tables
   
   write.csv(recordTable, file = file.path(dir.zip, "recordTable.csv"), row.names = FALSE)
   write.csv(CTtable, file = file.path(dir.zip, "CTtable.csv"), row.names = FALSE)
-  
   
   ######
   # save surveyReport tables
@@ -1053,11 +1043,8 @@ makeSurveyZip <- function(output,
   }
   rm(xyz)
   
-  
-  
   ######
   # make activity plots
-  
   
   activityDensity(recordTable          = recordTable,
                   allSpecies           = TRUE,
@@ -1067,8 +1054,6 @@ makeSurveyZip <- function(output,
                   plotR                = FALSE,
                   writePNG             = TRUE,
                   plotDirectory        = file.path(dir.zip, "activity"))
-  
-  
   
   ######
   # make detection maps
@@ -1183,7 +1168,6 @@ makeSurveyZip <- function(output,
             #buffer                                  = 0,
             includeEffort                            = TRUE,
             scaleEffort                              = FALSE,
-            occasionStartTime                        = 0,
             datesAsOccasionNames                     = FALSE,
             timeZone                                 = timeZone,
             writecsv                                 = FALSE #,
@@ -1270,9 +1254,6 @@ makeSurveyZip <- function(output,
   } else {
     message("zip file creation failed")
   }
-  
-  # remove temporary directory
-  #unlink(dir.zip, recursive = TRUE)
 }
 
 
@@ -1492,8 +1473,6 @@ parseDateObject <- function(inputColumn,
     out <- lubridate::date(lubridate::parse_date_time(inputColumn.char, orders = dateFormat))
   }
   
- # if(all(is.na(out))) stop(paste0("Cannot read date format in", deparse(substitute(inputColumn)), ". Output is all NA."), call. = FALSE)
-  
   if(all(is.na(out))) stop(paste0("Cannot read date format in ", deparse(substitute(inputColumn)), ". Output is all NA.\n",
                                   "expected:  ", dateFormat, "\nactual:    ", inputColumn[1]), call. = FALSE)
   
@@ -1501,7 +1480,6 @@ parseDateObject <- function(inputColumn,
                                            "rows", paste(which(is.na(out)), collapse = ", ")), call. = FALSE)
   if(isTRUE(returndatetime))  return(as_datetime(out, tz = "UTC"))
   if(isFALSE(returndatetime)) return(out)
-  #return(out)
 }
 
 
@@ -1557,8 +1535,7 @@ stationSessionCamMatrix <- function(CTtable,
                                     cameraCol, 
                                     sessionCol, 
                                     setupCol,
-                                    retrievalCol#,
-                                    #separator
+                                    retrievalCol
 ){
   
   separatorCam     <- "__CAM_"
@@ -1619,13 +1596,7 @@ stationSessionCamMatrix <- function(CTtable,
     colnames(m) <- as.character(as.Date(min(CTtable[,setupCol]):max(CTtable[,retrievalCol]), origin = "1970-01-01"))
     rownames(m) <- CTtable[, stationCol]
   }
-  
-  # # assign attributes to rownames
-  # attr(rownames(m), "station") <- CTtable[,stationCol]
-  # 
-  # if(hasArg(sessionCol)) attr(rownames(m), "session") <- CTtable[, sessionCol]
-  # if(hasArg(cameraCol))  attr(rownames(m), "camera")  <- CTtable[, cameraCol]
-  
+
   return(m)
 }
 
@@ -1775,8 +1746,6 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   Tags             <- digiKamTablesList$Tags
   ImageTags        <- digiKamTablesList$ImageTags
 
-  # guess which AlbumRoot is correct, based on string distance (choose the smallest one)
-  # adist(x = stationDir, y = AlbumRoots$specificPath)
   
   # add platform file separator to stationDir
   stationDir0 <- stationDir
@@ -1813,7 +1782,6 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   }
   
   # keep only images in the current album
-  #image_subset <- Images[Images$album == album_of_interest$id,]   # only returns matches for 1 directory, not many (only station dir, not camera subdirs). Also, may return NAs
   image_subset <- Images[Images$album %in% album_of_interest$id,]  # returns matches for all directories. Also, no NAs apparently
   
   # add stationDirectory 
@@ -1849,8 +1817,6 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
    
    # get proper labels for image tags (and their parent labels = tag group names)
    ImageTags$cleartext_child  <- Tags$name [match(ImageTags$tagid, Tags$id)]
-   #ImageTags$cleartext_parent <- Tags$name [Tags$pid[match(ImageTags$tagid, Tags$id)]]        # this is wrong!
-   # issue here: Tags$pid can be 0 if tag has no parent! Then indexing fails and functions errors
    
    Tags$parent_name <- Tags$name[match(Tags$pid, Tags$id)]
    ImageTags$cleartext_parent <- Tags$parent_name[match(ImageTags$tagid, Tags$id)]    #alternative to above, seems to work (and above seems wrong suddenly)
@@ -1877,12 +1843,6 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
    
    ImageTags <- ImageTags[!ImageTags$tagid %in% c(remove1, remove2, remove3),]
 
-   # # if parent ID = NA (the tag has no parent), then save it without the NA|  (below works but will lead to problems parsing HierarchicalSubject). Requires some more testing
-   # ImageTags$cleartext_full[is.na(ImageTags$cleartext_parent)] <- gsub(pattern = "NA|",
-   #                                                                     replacement = "",
-   #                                                                     ImageTags$cleartext_full[is.na(ImageTags$cleartext_parent)],
-   #                                                                     fixed = TRUE)
-   
    # combine multiple tags for images into single field "HierarchicalSubject"
    ImageTags_aggregate <- aggregate(ImageTags$cleartext_full,
                                     by = list(ImageTags$imageid),
@@ -1893,11 +1853,8 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
    
    # assign HierarchicalSubject to matching images
    image_subset2$HierarchicalSubject <- ImageTags_aggregate$HierarchicalSubject[match(image_subset2$id, ImageTags_aggregate$imageid)]
-   
-   #data.frame(rbindlist(list(image_subset2, image_subset_others), fill = TRUE))
-
-
-  return(image_subset2) 
+  
+   return(image_subset2) 
 }
 
 # process the "video" argument of recordTable
@@ -1963,9 +1920,7 @@ addVideoHierarchicalSubject <- function(metadata.tmp,
   
   if(nrow(digiKamVideoMetadata) == 0) return(metadata.tmp)
   # add HierarchialSubject for video files (match by filename, must be unique)
-  # Old Version, this doesn't work if filenames are not unique
-  #metadata.tmp$HierarchicalSubject_video <- digiKamVideoMetadata$HierarchicalSubject [match(metadata.tmp$FileName, digiKamVideoMetadata$name)]
-  
+
   # new version, should match filenames AND paths in digiKamVideoMetadata with metadata.tmp (can deal with duplicate file names in separate folders)
   # get (partial) album path for videos in digiKamVideoMetadata (for station / camera directory)
   # NOTE: no idea how to get the drive letter from volumeid / uuid in AlbumRoots, so it is missing here
@@ -1995,7 +1950,6 @@ addVideoHierarchicalSubject <- function(metadata.tmp,
   
   metadata.tmp.video <- metadata.tmp.video[order(metadata.tmp.video$fullPath),]
   digiKamVideoMetadata <- digiKamVideoMetadata[order(digiKamVideoMetadata$almostFullPath),]
-  #match(metadata.tmp.video.fullPath, digiKamVideoMetadata$almostFullPath)
   
   
   # in metadata.tmp.video, strip drive letter (everything left of first forward slash)
@@ -2097,22 +2051,11 @@ camopPlot <- function(camOp,
 # intersect intervals, fast (adapted from lubridate)
 #https://github.com/tidyverse/lubridate/blob/master/R/intervals.r
 intersect.Interval.fast <- function(int1, int2, ...) {  # (x, y, ...) {
-  #int1 <- int_standardize(x)
-  #int2 <- int_standardize(y)
-  
+
   starts <- pmax(int1@start, int2@start)
   ends <- pmin(int1@start + int1@.Data, int2@start + int2@.Data)
   spans <- as.numeric(ends) - as.numeric(starts)
   
   spans[spans < 0] <- NA
   spans
-  # no.int <- ends < starts
-  # no.int <- is.na(no.int) | no.int
-  # spans[no.int] <- NA
-  # starts[no.int] <- NA
-  # 
-  # new.int <- new("Interval", spans, start = starts, tzone = x@tzone)
-  # negix <- !is.na(x@.Data) & (sign(x@.Data) == -1)
-  # new.int[negix] <- int_flip(new.int[negix])
-  # new.int
 }
