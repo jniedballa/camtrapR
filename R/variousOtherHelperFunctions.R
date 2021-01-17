@@ -1465,6 +1465,7 @@ parseDateObject <- function(inputColumn,
   
   # option 1: base functions for dates as per strptime (identified by "%")
   if(grepl(pattern = "%", x = dateFormat, fixed = TRUE)){
+    if(any(grepl(pattern = " ", inputColumn.char))) warning(paste0("There are spaces in ", deparse(substitute(inputColumn)), ", but not in dateFormat"), call. = FALSE)
     out <- as.Date(inputColumn.char,     format = dateFormat)
   } else {
   # option 2: lubridate functions (identified by absence of "%")
