@@ -335,8 +335,9 @@ reportTest <- surveyReport (recordTable          = recordTableSample,
                             retrievalCol         = "Retrieval_date",
                             CTDateFormat         = "%d/%m/%Y", 
                             recordDateTimeCol    = "DateTimeOriginal",
-                            recordDateTimeFormat = "%Y-%m-%d %H:%M:%S") #,
-                            #CTHasProblems        = TRUE)    # deprecated in v2.1
+                            recordDateTimeFormat = "%Y-%m-%d %H:%M:%S" #,
+                            #CTHasProblems        = TRUE    # deprecated in v2.1
+                            )
 ```
 
 Some basic information is shown in the console. The function output is a list with `r length(reportTest)` elements.
