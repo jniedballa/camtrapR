@@ -360,6 +360,56 @@ test_that("Error when camOp is not a matrix", {
 )
 
 
+test_that("Error when NAs/blanks in DateTimeOriginal", {
+  recordTableSample_withNA <- recordTableSample_with_blank <- recordTableSample
+  recordTableSample_withNA$DateTimeOriginal[1] <- NA
+  recordTableSample_with_blank$DateTimeOriginal[1] <- ""
+  
+  expect_error(detectionHistory(recordTable          = recordTableSample_withNA,
+                                camOp                = camop_no_problem,
+                                stationCol           = "Station",
+                                speciesCol           = "Species",
+                                recordDateTimeCol    = "DateTimeOriginal",
+                                species              = "PBE",
+                                occasionLength       = 7,
+                                day1                 = "station",
+                                datesAsOccasionNames = FALSE,
+                                includeEffort        = FALSE,
+                                timeZone             = "Asia/Kuala_Lumpur"
+  ),
+               "there are NAs in subset_species[, recordDateTimeCol]", fixed = TRUE)
+  
+  expect_error(detectionHistory(recordTable          = recordTableSample_with_blank,
+                                camOp                = camop_no_problem,
+                                stationCol           = "Station",
+                                speciesCol           = "Species",
+                                recordDateTimeCol    = "DateTimeOriginal",
+                                species              = "PBE",
+                                occasionLength       = 7,
+                                day1                 = "station", 
+                                includeEffort        = FALSE,
+                                timeZone             = "Asia/Kuala_Lumpur"),
+               "there are blank values in subset_species[, recordDateTimeCol]", fixed = TRUE)
+}                             
+)
+
+test_that("Error when DateTimeOriginal can't be interpreted (format wrong)", {
+  # suppressWarnings is because parse_date_time() gives a warning too:  All formats failed to parse. No formats found. 
+  expect_error(suppressWarnings(detectionHistory(recordTable  = recordTableSample,
+                                                 camOp                = camop_no_problem,
+                                                 stationCol           = "Station",
+                                                 speciesCol           = "Species",
+                                                 recordDateTimeCol    = "DateTimeOriginal",
+                                                 recordDateTimeFormat = "mdy HMS",  # wrong format
+                                                 species              = "PBE",
+                                                 occasionLength       = 7,
+                                                 day1                 = "station", 
+                                                 includeEffort        = FALSE,
+                                                 timeZone             = "Asia/Kuala_Lumpur")),
+               "Cannot read datetime format in subset_species[, recordDateTimeCol]. Output is all NA.\nexpected:  mdy HMS\nactual:    2009-04-21 00:40:00", fixed = TRUE)
+}                             
+)
+
 
 
 
