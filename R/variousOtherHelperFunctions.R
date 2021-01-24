@@ -1345,6 +1345,8 @@ assignSessionIDtoRecordTable <- function(recordTable_tmp,
   recordTable_tmp[, sessionCol] <- NA
   
   record_dates_tmp <- as.Date(recordTable_tmp[, dateTimeCol])
+  if(all(is.na(record_dates_tmp))) stop("Could not interpret record date/time. Output is all NA.")
+  
   record_dates_backup <- record_dates_tmp
   camOp_dates_tmp  <- as.Date(colnames(camOp))
   
@@ -1353,7 +1355,7 @@ assignSessionIDtoRecordTable <- function(recordTable_tmp,
   
   if(length(records_too_early) > 0) {
     recordTable_tmp <- recordTable_tmp[-records_too_early, ]
-    warning(paste(length(records_too_late), "records were removed because they were before the first day in the camera operation matrix"), call. = FALSE)
+    warning(paste(length(records_too_early), "records were removed because they were before the first day in the camera operation matrix"), call. = FALSE)
     record_dates_tmp <- as.Date(recordTable_tmp[, dateTimeCol])
   }
   
