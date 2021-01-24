@@ -99,6 +99,22 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
   if(!all(recordTableIndividual$Station %in% CTtable$Station)) stop ("there are entries in stationCol of recordTableIndividual that are not found in stationCol of CTtable")
 
+  #####################################################################################################################
+  # bring date, time, station ids into shape
+  
+  recordTableIndividual$DateTime2 <- parseDateTimeObject(inputColumn = recordTableIndividual[,recordDateTimeCol],
+                                                  dateTimeFormat = recordDateTimeFormat,
+                                                  timeZone = timeZone,
+                                                  checkNA_out = FALSE)
+  
+  if(any(is.na(recordTableIndividual$DateTime2))) stop(paste(sum(is.na(recordTableIndividual$DateTime2)), "out of",
+                                                      nrow(recordTableIndividual),
+                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
+                                                      paste(rownames(recordTableIndividual)[which(is.na(recordTableIndividual$DateTime2))], collapse = ", ")))
+  
+  
+  
+  
   # check sessionCol argument
   if(hasArg(sessionCol)) {
     checkForSpacesInColumnNames(sessionCol = sessionCol)
@@ -130,7 +146,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
       
       recordTableIndividual <- assignSessionIDtoRecordTable (recordTable_tmp = recordTableIndividual,
                                                camOp = camOp,
-                                               dateTimeCol = recordDateTimeCol,
+                                               dateTimeCol = "DateTime2", # recordDateTimeCol,
                                                stationCol = stationCol,
                                                sessionCol = sessionCol
       )
@@ -231,22 +247,8 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   
 
-  #####################################################################################################################
-  # bring date, time, station ids into shape
-
+ # subset to species of interest
   subset_species           <- recordTableIndividual[recordTableIndividual[,speciesCol] == species,]
-  subset_species$DateTime2 <- parseDateTimeObject(inputColumn = subset_species[,recordDateTimeCol],
-                                                  dateTimeFormat = recordDateTimeFormat,
-                                                  timeZone = timeZone,
-                                                  checkNA_out = FALSE)
-  
-  if(any(is.na(subset_species$DateTime2))) stop(paste(sum(is.na(subset_species$DateTime2)), "out of",
-                                                      nrow(subset_species),
-                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
-                                                      paste(rownames(subset_species)[which(is.na(subset_species$DateTime2))], collapse = ", ")))
-  
-  
-  
   
   # if sessionCol is defined and present in CTtable, check if all records are within correct session. remove if not
   if(hasArg(sessionCol)){
