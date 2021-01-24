@@ -158,6 +158,95 @@ surveyReport <- function(recordTable,
   # per station, number of active cameras * number of active days
   n_trap_nights_active <- rowSums(camOp, na.rm =TRUE) 
   
+  
+  
+  #######################
+  # # Legacy calculation of active days - for the sake of continuity
+  # # doesn't return same results as old version
+  # # when there's 2 cameras per station and 1 malfunctioned at the end, difference is 0.5 days
+  # n_days_inactive_rowsum <- vector(mode = "numeric")
+  # #sum up days with problems
+  # for(i in 1:nrow(camop_matrix)){
+  #   rows_of_interest <- seq(match(as.character(station_dates$setup)[i], colnames(camop_matrix)) + 1,
+  #                           match(as.character(station_dates$retrieval)[i], colnames(camop_matrix)) - 1)
+  #   # n_cameras - actual effort -> number of inactive days
+  #   n_days_inactive_rowsum[i] <- sum(station_dates$n_cameras[i] - camop_matrix[i, rows_of_interest], na.rm = TRUE)
+  # } 
+  # #n_days_inactive_rowsum <- apply(, MARGIN = 1, FUN = function(x) sum(x < max(x, na.rm = TRUE), na.rm = TRUE))
+  # 
+  # n_nights_total_legacy      <- as.integer(CTtable[,retrievalCol] - CTtable[,setupCol])
+  #  n_nights_total_agg_legacy  <- aggregate(n_nights_total,
+  #                                   by  = list(CTtable[,stationCol]),
+  #                                   FUN = sum)
+  # # n_cameras_total_agg <- aggregate(CTtable[,stationCol],
+  # #                                  by  = list(CTtable[,stationCol]),
+  # #                                  FUN = length)
+  # n_nights_active_legacy     <- n_nights_total_agg_legacy$x - n_days_inactive_rowsum
+  
+  
+  
+  
+  # Legacy calculation - full old code
+  
+  # infer CTHasProblems
+  
+  CTHasProblems <- TRUE
+  # check that problems are arranged in order 1,2,3,...
+  cols.prob.from <- grep(colnames(CTtable), pattern = "Problem\\d\\Sfrom")
+  cols.prob.to   <- grep(colnames(CTtable), pattern = "Problem\\d\\Sto")
+  
+  if(length(cols.prob.from) == 0 | length(cols.prob.to) == 0) CTHasProblems <- FALSE 
+  if(!all(order(colnames(CTtable)[cols.prob.from]) == seq(1:length(cols.prob.from)))) CTHasProblems <- FALSE 
+  if(!all(order(colnames(CTtable)[cols.prob.to])   == seq(1:length(cols.prob.to)))) CTHasProblems <- FALSE 
+  if(length(cols.prob.from) != length(cols.prob.to)) CTHasProblems <- FALSE 
+  
+  if(isTRUE(CTHasProblems)){    # camera problem columns
+    
+    n_days_inactive_legacy <- data.frame(matrix(NA,
+                                         ncol = length(cols.prob.from),
+                                         nrow = nrow(CTtable)))
+    
+    for(xy in 1:length(cols.prob.from)){
+      
+      # if(isTRUE(unlist(strsplit(colnames(CTtable)[cols.prob.from[xy]], split = "_"))[1] !=
+      #           unlist(strsplit(colnames(CTtable)[cols.prob.to[xy]], split = "_"))[1])) stop (
+      #             paste("problem columns are arranged incorrectly (",
+      #                   colnames(CTtable)[cols.prob.from[xy]], ", ",
+      #                   colnames(CTtable)[cols.prob.to  [xy]], ")",
+      #                   sep = "")
+      #           )
+      
+      CTtable[, cols.prob.from[xy]] <- parseDateObject(inputColumn = CTtable[, cols.prob.from[xy]], CTDateFormat, checkNA = FALSE, checkEmpty = FALSE)
+      CTtable[, cols.prob.to[xy]]   <- parseDateObject(inputColumn = CTtable[, cols.prob.to[xy]],   CTDateFormat, checkNA = FALSE, checkEmpty = FALSE)
+      
+      n_days_inactive_legacy[,xy] <- CTtable[cols.prob.to[xy]] - CTtable[cols.prob.from[xy]]       # compute number of inactive trap nights
+      # EDIT 2021-01-17: the line above computes time difference between start and end of problem. So yesterday and end today = 1 day, not 2 days as in the new version
+      # basically, that's assuming problems began / ended at noon (for the sake of computing the effort)
+      # hence, the number of inactive days was 1 less in the old version compared to the new version. 
+      # if problem_to = retrieval, difference will only be 0.5 per camera (because in new version, retrieval is assumed to be 12 noon)
+      
+      n_days_inactive_legacy[,xy] <- as.integer(n_days_inactive_legacy[,xy])
+    }
+
+    n_days_inactive_rowsum_legacy <- rowSums(n_days_inactive_legacy, na.rm = TRUE)
+  } else {
+    n_days_inactive_rowsum_legacy <- rep(0, times = nrow(CTtable))
+  }
+  stopifnot(nrow(n_days_inactive_rowsum_legacy) == nrow(CTtable))
+  
+  n_days_inactive_rowsum_legacy <- aggregate(n_days_inactive_rowsum_legacy,
+                                      by    = list(CTtable[,stationCol]),
+                                      FUN   = sum,
+                                      na.rm = TRUE)
+
+  n_nights_total_legacy      <- as.integer(CTtable[,retrievalCol] - CTtable[,setupCol])
+  n_nights_total_agg_legacy  <- aggregate(n_nights_total_legacy,
+                                   by  = list(CTtable[,stationCol]),
+                                   FUN = sum)
+  n_nights_active_legacy     <- n_nights_total_agg_legacy[,2] - n_days_inactive_rowsum_legacy[,2]
+
+  
+  ############################
   # make data frame with the number of active / inactive days
   if(!all(station_dates$station == camop.info.df$station)) stop("Mismatch between station column in CTtable and camOp")
   
@@ -165,7 +254,10 @@ surveyReport <- function(recordTable,
                                n_calendar_days_total    = n_calendar_days_total,    # this is 1 for setup/retrieval on consecutive days
                                n_calendar_days_active   = n_calendar_days_active,   # this is 2 for setup/retrieval on consecutive days
                                n_calendar_days_inactive = n_calendar_days_inactive, # number of days stations was inactive
-                               n_trap_nights_active       = n_trap_nights_active)       # this is precisely how long the cameras were active ( 1 for setup/retrieval on consecutive days - for each camera).
+                               n_trap_nights_active     = n_trap_nights_active,   # this is precisely how long the cameras were active ( 1 for setup/retrieval on consecutive days - for each camera).
+                               n_nights_active_legacy   = n_nights_active_legacy,
+                               n_nights_total_legacy    = n_nights_total_agg_legacy$x
+                               )       
   
   
   
@@ -198,6 +290,16 @@ surveyReport <- function(recordTable,
   cat("\n-------------------------------------------------------\n")
   print(paste("Trap nights (number of active 24 hour cycles completed by independent cameras): ",
               sum(station.info.combined$n_trap_nights_active)
+  ))
+  
+  cat("\n-------------------------------------------------------\n")
+  print(paste("n nights with cameras set up and active (trap nights - LECAGY CALCULATION - WHOLE DAYS): ",
+              sum(station.info.combined$n_nights_active_legacy)
+  ))
+  
+  cat("\n-------------------------------------------------------\n")
+  print(paste("n nights with cameras set up (LECAGY CALCULATION - WHOLE DAYS): ",
+              sum(station.info.combined$n_nights_total_legacy)
   ))
   
   cat("\n-------------------------------------------------------\n")
