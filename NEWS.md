@@ -1,5 +1,8 @@
 # camtrapR 2.1.0
 
+## new function
+* OCRdataFields: allows automatic reading of text from data fields in images via optical character recognition (OCR), requires magick and tesseract packages. 
+
 ## new features
 * cameraOperation: setup/ retrieval / problem columns can be interpreted as date-time format, then computes effort as fraction of day. (Thank you to Zoé Siegel for the suggestion, Fridolin Zimmermann and the Department of Ecology & Evolution from the University of Lausanne for funding the development of the feature)
 * cameraOperation: gained argument occasionStartTime (deprecated in detectionHistory / spatialDetectionHistory)
@@ -16,7 +19,7 @@
 
 ## other changes
 * lubdidate is a dependency now (for cameraOperation)
-* lattice in Suggests (for camopPlot)
+* additional Suggests: magick and tesseract (for OCRdataFields), lattice (for camopPlot)
 
 # camtrapR 2.0.3
 
