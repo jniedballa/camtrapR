@@ -15,4 +15,4 @@ importFrom("data.table", rbindlist, setDF, setDT, setkey, foverlaps, ":=")
 importFrom("lubridate", as_date, as_datetime, ddays, dhours, dseconds, interval, int_start, int_end, time_length, "%within%")
 
 
-export(activityDensity, activityHistogram, activityOverlap, activityRadial, addCopyrightTag,  appendSpeciesNames, cameraOperation, checkSpeciesIdentification, checkSpeciesNames, createSpeciesFolders, createStationFolders, detectionHistory, detectionMaps, exifTagNames, exiftoolPath, fixDateTimeOriginal, getSpeciesImages, imageRename, recordTable, recordTableIndividual, spatialDetectionHistory, surveyReport, timeShiftImages)
+export(activityDensity, activityHistogram, activityOverlap, activityRadial, addCopyrightTag,  appendSpeciesNames, cameraOperation, checkSpeciesIdentification, checkSpeciesNames, createSpeciesFolders, createStationFolders, detectionHistory, detectionMaps, exifTagNames, exiftoolPath, fixDateTimeOriginal, getSpeciesImages, imageRename, OCRdataFields, recordTable, recordTableIndividual, spatialDetectionHistory, surveyReport, timeShiftImages)

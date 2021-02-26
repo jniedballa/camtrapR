@@ -41,7 +41,9 @@ Suggests:
         unmarked, 
         zip,
         RSQLite,
-        lattice
+        lattice,
+        magick,
+        tesseract
 VignetteBuilder: knitr
 SystemRequirements: ExifTool (https://exiftool.org/)
 Description: Management of and data extraction from camera trap data in wildlife studies. The package provides a workflow for storing and sorting camera trap photos (and videos), tabulates records of species and individuals, and creates detection/non-detection matrices for occupancy and spatial capture-recapture analyses with great flexibility. In addition, it can visualise species activity data and provides simple mapping functions with GIS export.
