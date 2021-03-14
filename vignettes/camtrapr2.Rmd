@@ -75,7 +75,7 @@ digiKam needs to write metadata tags into image metadata, not into .xmp sidecar 
 If installing for the first time, it will ask you to make a few settings when you first start the program. When asked "Configure Metadata Storage to Files", set "Add Information to Files" instead of the default "Do Nothing".
 
 If digiKam was installed already, go to "Settings", then "Configure digiKam". There, select "Metadata" on the left and, in the tab "Behaviour", make sure that "Image tags" is checked in the box titled "Write This Information to the Metadata". 
-Below, in the box "Reading and Writing Metadata", make sure that both "Read from sidecar files" and "Write to sidecar files" are unchecked.
+Below, in the box "Reading and Writing Metadata", make sure that both "Read from sidecar files" and "Write to sidecar files" are unchecked. In more recent versions of digiKam, these two options are in a separate "Sidecars" tab, next to the "Behaviour" tab.
 
 ### Metadata tag structure
 

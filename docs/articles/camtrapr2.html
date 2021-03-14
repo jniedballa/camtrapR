@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.01</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.09</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -74,7 +74,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/jniedballa/camtrapR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -88,13 +88,13 @@
 
       
 
-      </header><script src="camtrapr2_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="camtrapr2_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>2. Species and Individual Identification</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2020-09-16</h4>
+            <h4 class="date">2021-03-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr2.Rmd"><code>vignettes/camtrapr2.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr2.Rmd</code></div>
@@ -103,8 +103,9 @@
 
     
     
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">camtrapR</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">camtraps</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jniedballa/camtrapR">camtrapR</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">camtraps</span><span class="op">)</span></code></pre></div>
 <div id="methods-for-species-and-individual-identification---general" class="section level1">
 <h1 class="hasAnchor">
 <a href="#methods-for-species-and-individual-identification---general" class="anchor"></a>Methods for species and individual identification - General</h1>
@@ -142,7 +143,7 @@
 <a href="#digikam-setup" class="anchor"></a>digiKam setup</h3>
 <p>digiKam needs to write metadata tags into image metadata, not into .xmp sidecar files. Its behaviour can be configured. Here’s how to set up digiKam:</p>
 <p>If installing for the first time, it will ask you to make a few settings when you first start the program. When asked “Configure Metadata Storage to Files”, set “Add Information to Files” instead of the default “Do Nothing”.</p>
-<p>If digiKam was installed already, go to “Settings”, then “Configure digiKam”. There, select “Metadata” on the left and, in the tab “Behaviour”, make sure that “Image tags” is checked in the box titled “Write This Information to the Metadata”. Below, in the box “Reading and Writing Metadata”, make sure that both “Read from sidecar files” and “Write to sidecar files” are unchecked.</p>
+<p>If digiKam was installed already, go to “Settings”, then “Configure digiKam”. There, select “Metadata” on the left and, in the tab “Behaviour”, make sure that “Image tags” is checked in the box titled “Write This Information to the Metadata”. Below, in the box “Reading and Writing Metadata”, make sure that both “Read from sidecar files” and “Write to sidecar files” are unchecked. In more recent versions of digiKam, these two options are in a separate “Sidecars” tab, next to the “Behaviour” tab.</p>
 </div>
 <div id="metadata-tag-structure" class="section level3">
 <h3 class="hasAnchor">
@@ -302,10 +303,11 @@
 <a href="#checking-species-names-with-the-itis-taxonomic-database" class="anchor"></a>Checking species names with the ITIS taxonomic database</h2>
 <p>Generally, you are free to use any species names you wish to - scientific names, common names, local names, abbreviations, codes, etc. But it may often be desirable to be consistent with species names, e.g. to ensure long-term usability of data or to facilitate data exchange between researchers. Therefore, users can check the species names they wish to use in species identification (common or scientific names) against the <a href="http://www.itis.gov">ITIS taxonomic database</a> using the function <code>checkSpeciesNames</code>. The function returns matching common and scientific names to the names provided by the user, taxon ranks and authors, the ITIS taxonomic serial number (TSN) and an ITIS taxon url. Internally, the function <code>checkSpeciesNames</code> makes use of the R package <code>taxize</code>.</p>
 <p>If multiple matches are found, a menu allows users to choose their species of interest (if argument <code>ask = TRUE</code>). By default, only accepted species names are returned (controlled by argument <code>accepted</code>). Invalid names will return NA.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co"># find data for 2 species with correctly spelled names</span>
-<span class="no">checkNames1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesNames.html">checkSpeciesNames</a></span> (<span class="kw">speciesNames</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Bearded Pig"</span>, <span class="st">"Malayan Civet"</span>),
-                                  <span class="kw">searchtype</span>   <span class="kw">=</span> <span class="st">"common"</span>)
-<span class="no">checkNames1</span></pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># find data for 2 species with correctly spelled names</span>
+<span class="va">checkNames1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesNames.html">checkSpeciesNames</a></span> <span class="op">(</span>speciesNames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Bearded Pig"</span>, <span class="st">"Malayan Civet"</span><span class="op">)</span>,
+                                  searchtype   <span class="op">=</span> <span class="st">"common"</span><span class="op">)</span>
+<span class="va">checkNames1</span></code></pre></div>
 <pre><code>##      tsn     user_name     scientificName              commonName   authorship
 ## 1 625012   Bearded Pig       Sus barbatus bearded pig/Bearded Pig Müller, 1838
 ## 2 622004 Malayan Civet Viverra tangalunga           Malayan Civet   Gray, 1832
@@ -318,10 +320,11 @@
 ##   taxon_status
 ## 1        valid
 ## 2        valid</code></pre>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co"># and with scientific names (note that this is for a subspecies)</span>
-<span class="no">checkNames2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesNames.html">checkSpeciesNames</a></span> (<span class="kw">speciesNames</span> <span class="kw">=</span> <span class="st">"Viverra tangalunga tangalunga"</span>,
-                                  <span class="kw">searchtype</span>   <span class="kw">=</span> <span class="st">"scientific"</span>)
-<span class="no">checkNames2</span></pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># and with scientific names (note that this is for a subspecies)</span>
+<span class="va">checkNames2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesNames.html">checkSpeciesNames</a></span> <span class="op">(</span>speciesNames <span class="op">=</span> <span class="st">"Viverra tangalunga tangalunga"</span>,
+                                  searchtype   <span class="op">=</span> <span class="st">"scientific"</span><span class="op">)</span>
+<span class="va">checkNames2</span></code></pre></div>
 <pre><code>##      tsn                     user_name                scientificName commonName
 ## 1 726578 Viverra tangalunga tangalunga Viverra tangalunga tangalunga         NA
 ##   authorship   rankname
@@ -330,22 +333,24 @@
 ## 1 https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&amp;search_value=726578
 ##   taxon_status
 ## 1        valid</code></pre>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co"># an invalid name: the accepted name of the leopard cat is Prionailurus bengalensis</span>
-<span class="no">checkNames3</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesNames.html">checkSpeciesNames</a></span> (<span class="kw">speciesNames</span> <span class="kw">=</span> <span class="st">"Felis bengalensis"</span>,
-                                  <span class="kw">searchtype</span>   <span class="kw">=</span> <span class="st">"scientific"</span>,
-                                  <span class="kw">accepted</span>     <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="no">checkNames3</span></pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># an invalid name: the accepted name of the leopard cat is Prionailurus bengalensis</span>
+<span class="va">checkNames3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesNames.html">checkSpeciesNames</a></span> <span class="op">(</span>speciesNames <span class="op">=</span> <span class="st">"Felis bengalensis"</span>,
+                                  searchtype   <span class="op">=</span> <span class="st">"scientific"</span>,
+                                  accepted     <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">checkNames3</span></code></pre></div>
 <pre><code>##      tsn         user_name    scientificName  commonName authorship rankname
 ## 1 183793 Felis bengalensis Felis bengalensis leopard cat Kerr, 1792  Species
 ##                                                                                itis_url
 ## 1 https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&amp;search_value=183793
 ##   taxonUsageRating
 ## 1          invalid</code></pre>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># an ambiguous name name: Chevrotain (Tragulus)</span>
-<span class="no">checkNames4</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesNames.html">checkSpeciesNames</a></span> (<span class="kw">speciesNames</span> <span class="kw">=</span> <span class="st">"Chevrotain"</span>,
-                                  <span class="kw">searchtype</span>   <span class="kw">=</span> <span class="st">"common"</span>)
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># an ambiguous name name: Chevrotain (Tragulus)</span>
+<span class="va">checkNames4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesNames.html">checkSpeciesNames</a></span> <span class="op">(</span>speciesNames <span class="op">=</span> <span class="st">"Chevrotain"</span>,
+                                  searchtype   <span class="op">=</span> <span class="st">"common"</span><span class="op">)</span>
 <span class="fl">1</span>              <span class="co"># making a choice from the menu</span>
-<span class="no">checkNames4</span></pre></body></html></div>
+<span class="va">checkNames4</span></code></pre></div>
 <pre><code>##      tsn  user_name scientificName  commonName          authorship rankname
 ## 1 624919 Chevrotain     Tragulidae chevrotains Milne-Edwards, 1864   Family
 ##                                                                                itis_url
@@ -363,46 +368,50 @@
 <p>The function <code>createSpeciesFolders</code> assists with species identification by drag &amp; drop by creating species directories automatically in all station directories. Alternatively, directories can be created manually. <code>createSpeciesFolders</code> can also remove empty species directories after identification (by setting <code>removeFolders = FALSE</code>). In doing so, it will not touch directories that contain any files.</p>
 <p>It makes sense to create directories for all species one expects to find in the study area, and possibly also for images one wants to exclude later on, e.g. unidentifiable images, blank images or team photos.</p>
 <p>Here is an example in which we first create station directories and the then species directories within these. Note that creating station directories in the example is for demonstration purposes only. Normally, at this point you would already have a directory structure with station directories (possibly with camera subdirectories), each containing renamed, unsorted images. Running <code>createStationFolders</code> here therefore is for demonstration only.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># this dummy directory will be used as inDir (containing station directories with species subdirectories)</span>
-<span class="no">wd_createSpeciesFoldersTest</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>), <span class="st">"createSpeciesFoldersTest"</span>)
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># this dummy directory will be used as inDir (containing station directories with species subdirectories)</span>
+<span class="va">wd_createSpeciesFoldersTest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, <span class="st">"createSpeciesFoldersTest"</span><span class="op">)</span>
 
 <span class="co"># now first create the station directories</span>
 <span class="co"># (normally, you'd create species directories in the station directories that </span>
 <span class="co"># already contain renamed, unsorted images). Again, this is for demonstation only.</span>
-<span class="no">StationFolderCreate1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createStationFolders.html">createStationFolders</a></span> (<span class="kw">inDir</span>       <span class="kw">=</span> <span class="no">wd_createSpeciesFoldersTest</span>,
-                                              <span class="kw">stations</span>    <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">camtraps</span>$<span class="no">Station</span>),
-                                              <span class="kw">createinDir</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<span class="va">StationFolderCreate1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createStationFolders.html">createStationFolders</a></span> <span class="op">(</span>inDir       <span class="op">=</span> <span class="va">wd_createSpeciesFoldersTest</span>,
+                                              stations    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">camtraps</span><span class="op">$</span><span class="va">Station</span><span class="op">)</span>, 
+                                              createinDir <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## created 3 directories</code></pre>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">StationFolderCreate1</span></pre></body></html></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">StationFolderCreate1</span></code></pre></div>
 <pre><code>##    station
 ## 1 StationA
 ## 2 StationB
 ## 3 StationC
 ##                                                                          directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationA
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationB
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationC
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationB
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationC
 ##   created exists
 ## 1    TRUE   TRUE
 ## 2    TRUE   TRUE
 ## 3    TRUE   TRUE</code></pre>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="co"># species names for which we want to create subdirectories</span>
-<span class="no">species</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Sambar Deer"</span>, <span class="st">"Bay Cat"</span>)
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># species names for which we want to create subdirectories</span>
+<span class="va">species</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Sambar Deer"</span>, <span class="st">"Bay Cat"</span><span class="op">)</span>
 
 <span class="co"># create species subdirectories</span>
-<span class="no">SpeciesFolderCreate1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createSpeciesFolders.html">createSpeciesFolders</a></span> (<span class="kw">inDir</span>               <span class="kw">=</span> <span class="no">wd_createSpeciesFoldersTest</span>,
-                                              <span class="kw">species</span>             <span class="kw">=</span> <span class="no">species</span>,
-                                              <span class="kw">hasCameraFolders</span>    <span class="kw">=</span> <span class="fl">FALSE</span>,
-                                              <span class="kw">removeFolders</span>       <span class="kw">=</span> <span class="fl">FALSE</span>)</pre></body></html></div>
+<span class="va">SpeciesFolderCreate1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createSpeciesFolders.html">createSpeciesFolders</a></span> <span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_createSpeciesFoldersTest</span>,
+                                              species             <span class="op">=</span> <span class="va">species</span>,
+                                              hasCameraFolders    <span class="op">=</span> <span class="cn">FALSE</span>,
+                                              removeFolders       <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>## created 6 directories</code></pre>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="no">SpeciesFolderCreate1</span></pre></body></html></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">SpeciesFolderCreate1</span></code></pre></div>
 <pre><code>##                                                                                      directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationA/Sambar Deer
-## 2     C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationA/Bay Cat
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationB/Sambar Deer
-## 4     C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationB/Bay Cat
-## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationC/Sambar Deer
-## 6     C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationC/Bay Cat
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationA/Sambar Deer
+## 2     C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationA/Bay Cat
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationB/Sambar Deer
+## 4     C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationB/Bay Cat
+## 5 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationC/Sambar Deer
+## 6     C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationC/Bay Cat
 ##   created exists
 ## 1    TRUE   TRUE
 ## 2    TRUE   TRUE
@@ -410,20 +419,22 @@
 ## 4    TRUE   TRUE
 ## 5    TRUE   TRUE
 ## 6    TRUE   TRUE</code></pre>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="co"># delete empty species directories</span>
-<span class="no">SpecFolderCreate2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createSpeciesFolders.html">createSpeciesFolders</a></span> (<span class="kw">inDir</span>               <span class="kw">=</span> <span class="no">wd_createSpeciesFoldersTest</span>,
-                                           <span class="kw">species</span>             <span class="kw">=</span> <span class="no">species</span>,
-                                           <span class="kw">hasCameraFolders</span>    <span class="kw">=</span> <span class="fl">FALSE</span>,
-                                           <span class="kw">removeFolders</span>       <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># delete empty species directories</span>
+<span class="va">SpecFolderCreate2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createSpeciesFolders.html">createSpeciesFolders</a></span> <span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_createSpeciesFoldersTest</span>,
+                                           species             <span class="op">=</span> <span class="va">species</span>,
+                                           hasCameraFolders    <span class="op">=</span> <span class="cn">FALSE</span>,
+                                           removeFolders       <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## deleted 6 empty directories</code></pre>
-<div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="no">SpecFolderCreate2</span></pre></body></html></div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">SpecFolderCreate2</span></code></pre></div>
 <pre><code>##                                                                                      directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationA/Sambar Deer
-## 2     C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationA/Bay Cat
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationB/Sambar Deer
-## 4     C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationB/Bay Cat
-## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationC/Sambar Deer
-## 6     C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/createSpeciesFoldersTest/StationC/Bay Cat
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationA/Sambar Deer
+## 2     C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationA/Bay Cat
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationB/Sambar Deer
+## 4     C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationB/Bay Cat
+## 5 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationC/Sambar Deer
+## 6     C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/createSpeciesFoldersTest/StationC/Bay Cat
 ##   still.exists
 ## 1        FALSE
 ## 2        FALSE
@@ -467,17 +478,19 @@ inDir/Station/Camera/Species</p>
 inDir/Station/Camera</p>
 </blockquote>
 <p>Here is an example using images identified with the drag &amp; drop method.</p>
-<div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="no">wd_images_ID</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_species_dir"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"camtrapR"</span>)
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">wd_images_ID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"pictures/sample_images_species_dir"</span>, package <span class="op">=</span> <span class="st">"camtrapR"</span><span class="op">)</span>
 
 <span class="co"># run check with 120 seconds (2 minutes) maximum time differnce</span>
-<span class="no">check.folders</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span>(<span class="kw">inDir</span>               <span class="kw">=</span> <span class="no">wd_images_ID</span>,
-                                            <span class="kw">IDfrom</span>              <span class="kw">=</span> <span class="st">"directory"</span>,
-                                            <span class="kw">hasCameraFolders</span>    <span class="kw">=</span> <span class="fl">FALSE</span>,
-                                            <span class="kw">maxDeltaTime</span>        <span class="kw">=</span> <span class="fl">120</span>)</pre></body></html></div>
+<span class="va">check.folders</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span><span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_images_ID</span>,
+                                            IDfrom              <span class="op">=</span> <span class="st">"directory"</span>,
+                                            hasCameraFolders    <span class="op">=</span> <span class="cn">FALSE</span>,
+                                            maxDeltaTime        <span class="op">=</span> <span class="fl">120</span><span class="op">)</span></code></pre></div>
 <pre><code>## StationA : checking 8 images in 2 directories</code></pre>
 <pre><code>## StationB : checking 23 images in 4 directories</code></pre>
 <pre><code>## StationC : checking 37 images in 4 directories</code></pre>
-<div class="sourceCode" id="cb26"><html><body><pre class="r"><span class="no">check.folders</span></pre></body></html></div>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">check.folders</span></code></pre></div>
 <pre><code>## $temporalIndependenceCheck
 ##     station
 ## 7  StationC
@@ -492,12 +505,13 @@ inDir/Station/Camera</p>
 ## $IDconflictCheck
 ## data frame with 0 columns and 0 rows</code></pre>
 <p>The function returns a list with 2 elements. The first element (<code>temporalIndependenceCheck</code>) is the check on temporal proximity of different species (the second element <code>IDconflictCheck</code> is describes in the next paragraph). In our example, two images of different species were taken within 2 minutes of one another at StationC (a chevrotain and a moon rat in our example). Now one should check the species identity of these 2 images to make sure they were identified correctly. If not, the species ID in the incorrectly identified image is corrected. The function <code>checkSpeciesIdentification</code> can be re-run as often as desired. The behaviour of the function can be further specified by arguments <code>excludeSpecies</code> and <code>stationsToCheck</code>. The first causes camtrapR to ignore certain species and the latter can be used to check only certain stations.</p>
-<div class="sourceCode" id="cb28"><html><body><pre class="r"><span class="co"># check only station A and B (will give no results)</span>
-<span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span>(<span class="kw">inDir</span>               <span class="kw">=</span> <span class="no">wd_images_ID</span>,
-                           <span class="kw">IDfrom</span>              <span class="kw">=</span> <span class="st">"directory"</span>,
-                           <span class="kw">hasCameraFolders</span>    <span class="kw">=</span> <span class="fl">FALSE</span>,
-                           <span class="kw">maxDeltaTime</span>        <span class="kw">=</span> <span class="fl">120</span>,
-                           <span class="kw">stationsToCheck</span>     <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"StationA"</span>, <span class="st">"StationB"</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># check only station A and B (will give no results)</span>
+<span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span><span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_images_ID</span>,
+                           IDfrom              <span class="op">=</span> <span class="st">"directory"</span>,
+                           hasCameraFolders    <span class="op">=</span> <span class="cn">FALSE</span>,
+                           maxDeltaTime        <span class="op">=</span> <span class="fl">120</span>,
+                           stationsToCheck     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"StationA"</span>, <span class="st">"StationB"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## StationA : checking 8 images in 2 directories</code></pre>
 <pre><code>## StationB : checking 23 images in 4 directories</code></pre>
 <pre><code>## $temporalIndependenceCheck
@@ -505,12 +519,13 @@ inDir/Station/Camera</p>
 ## 
 ## $IDconflictCheck
 ## data frame with 0 columns and 0 rows</code></pre>
-<div class="sourceCode" id="cb32"><html><body><pre class="r"><span class="co"># Exclude chevrotains (Tragulus spp).  will give no results</span>
-<span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span>(<span class="kw">inDir</span>               <span class="kw">=</span> <span class="no">wd_images_ID</span>,
-                           <span class="kw">IDfrom</span>              <span class="kw">=</span> <span class="st">"directory"</span>,
-                           <span class="kw">hasCameraFolders</span>    <span class="kw">=</span> <span class="fl">FALSE</span>,
-                           <span class="kw">maxDeltaTime</span>        <span class="kw">=</span> <span class="fl">120</span>,
-                           <span class="kw">excludeSpecies</span>      <span class="kw">=</span> <span class="st">"TRA"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Exclude chevrotains (Tragulus spp).  will give no results</span>
+<span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span><span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_images_ID</span>,
+                           IDfrom              <span class="op">=</span> <span class="st">"directory"</span>,
+                           hasCameraFolders    <span class="op">=</span> <span class="cn">FALSE</span>,
+                           maxDeltaTime        <span class="op">=</span> <span class="fl">120</span>,
+                           excludeSpecies      <span class="op">=</span> <span class="st">"TRA"</span><span class="op">)</span></code></pre></div>
 <pre><code>## StationA : checking 8 images in 2 directories
 ## StationB : checking 23 images in 4 directories</code></pre>
 <pre><code>## StationC : checking 20 images in 3 directories</code></pre>
@@ -529,26 +544,29 @@ inDir/Station/Camera</p>
 <h2 class="hasAnchor">
 <a href="#appending-species-names-to-image-files" class="anchor"></a>Appending species names to image files</h2>
 <p>Once species are identified correctly, species names can be appended to image file names using <code>appendSpeciesNames</code>. The species names are taken from the directory names (of the drag and drop method was used) or from metadata tags and will be appended to the image file names. Set argument <code>IDfrom = "directory"</code> or <code>IDfrom = "metadata"</code>, respectively. A data frame will show directories, old and new file names.</p>
-<div class="sourceCode" id="cb36"><html><body><pre class="r"><span class="co"># copy sample images to another location (so we don't mess around in the package directory)</span>
-<span class="no">wd_images_ID</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"pictures/sample_images_species_dir"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"camtrapR"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span>(<span class="kw">from</span> <span class="kw">=</span> <span class="no">wd_images_ID</span>, <span class="kw">to</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>) , <span class="kw">recursive</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># copy sample images to another location (so we don't mess around in the package directory)</span>
+<span class="va">wd_images_ID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"pictures/sample_images_species_dir"</span>, package <span class="op">=</span> <span class="st">"camtrapR"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">wd_images_ID</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span> , recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb38"><html><body><pre class="r"><span class="no">wd_images_species_copy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>), <span class="st">"sample_images_species_dir"</span>)
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">wd_images_species_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, <span class="st">"sample_images_species_dir"</span><span class="op">)</span>
 
 
-<span class="no">species_names_append</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/appendSpeciesNames.html">appendSpeciesNames</a></span>(<span class="kw">inDir</span>               <span class="kw">=</span> <span class="no">wd_images_species_copy</span>,
-                                           <span class="kw">IDfrom</span>              <span class="kw">=</span> <span class="st">"directory"</span>,
-                                           <span class="kw">hasCameraFolders</span>    <span class="kw">=</span> <span class="fl">FALSE</span>
-)</pre></body></html></div>
-<pre><code>## renamed 68 out of 68 images in C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir</code></pre>
-<div class="sourceCode" id="cb40"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">species_names_append</span>)</pre></body></html></div>
+<span class="va">species_names_append</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/appendSpeciesNames.html">appendSpeciesNames</a></span><span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_images_species_copy</span>,
+                                           IDfrom              <span class="op">=</span> <span class="st">"directory"</span>,
+                                           hasCameraFolders    <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span></code></pre></div>
+<pre><code>## renamed 68 out of 68 images in C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir</code></pre>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">species_names_append</span><span class="op">)</span></code></pre></div>
 <pre><code>##                                                                               directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 6 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 4 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 5 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 6 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
 ##                            filename_old species
 ## 1 StationA__2009-04-21__00-40-00(1).JPG     PBE
 ## 2 StationA__2009-04-22__20-19-00(1).JPG     PBE
@@ -563,20 +581,22 @@ inDir/Station/Camera</p>
 ## 4 StationA__2009-04-23__00-07-00(1)__PBE.JPG    TRUE
 ## 5 StationA__2009-04-23__00-09-00(1)__PBE.JPG    TRUE
 ## 6 StationA__2009-05-07__17-11-00(1)__PBE.JPG    TRUE</code></pre>
-<div class="sourceCode" id="cb42"><html><body><pre class="r"><span class="no">species_names_remove</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/appendSpeciesNames.html">appendSpeciesNames</a></span>(<span class="kw">inDir</span>               <span class="kw">=</span> <span class="no">wd_images_species_copy</span>,
-                                           <span class="kw">IDfrom</span>              <span class="kw">=</span> <span class="st">"directory"</span>,
-                                           <span class="kw">hasCameraFolders</span>    <span class="kw">=</span> <span class="fl">FALSE</span>,
-                                           <span class="kw">removeNames</span>         <span class="kw">=</span> <span class="fl">TRUE</span>
-)</pre></body></html></div>
-<pre><code>## renamed 68 out of 68 images in C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir</code></pre>
-<div class="sourceCode" id="cb44"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">species_names_remove</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">species_names_remove</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/appendSpeciesNames.html">appendSpeciesNames</a></span><span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_images_species_copy</span>,
+                                           IDfrom              <span class="op">=</span> <span class="st">"directory"</span>,
+                                           hasCameraFolders    <span class="op">=</span> <span class="cn">FALSE</span>,
+                                           removeNames         <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
+<pre><code>## renamed 68 out of 68 images in C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir</code></pre>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">species_names_remove</span><span class="op">)</span></code></pre></div>
 <pre><code>##                                                                               directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
-## 6 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sample_images_species_dir/StationA/PBE
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 4 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 5 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
+## 6 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sample_images_species_dir/StationA/PBE
 ##                                 filename_old species
 ## 1 StationA__2009-04-21__00-40-00(1)__PBE.JPG     PBE
 ## 2 StationA__2009-04-22__20-19-00(1)__PBE.JPG     PBE
@@ -601,19 +621,21 @@ inDir/Station/Camera</p>
 <li>it is a prerequisite for individual identification.</li>
 </ol>
 <p>The images that are to be copied can be specified an a record table (as returned by function <code>recordTable</code>) or, alternatively, the function can scan for all images of your target species that were identified using either the drag and drop method or metadata tagging for species identification. Please see the function help file for more detail.</p>
-<div class="sourceCode" id="cb46"><html><body><pre class="r"><span class="co"># again, we use a temporary directory for demonstration. Change this in your own code!</span>
-<span class="no">wd_images_species_copy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="kw">winslash</span> <span class="kw">=</span> <span class="st">"/"</span>), <span class="st">"sampleSpeciesImages"</span>)
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># again, we use a temporary directory for demonstration. Change this in your own code!</span>
+<span class="va">wd_images_species_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, <span class="st">"sampleSpeciesImages"</span><span class="op">)</span>
 
-<span class="no">species_to_copy</span> <span class="kw">&lt;-</span> <span class="st">"VTA"</span>    <span class="co"># = Viverra tangalunga, Malay Civet</span>
+<span class="va">species_to_copy</span> <span class="op">&lt;-</span> <span class="st">"VTA"</span>    <span class="co"># = Viverra tangalunga, Malay Civet</span>
 
-<span class="no">specImagecopy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/getSpeciesImages.html">getSpeciesImages</a></span>(<span class="kw">species</span>                 <span class="kw">=</span> <span class="no">species_to_copy</span>,
-                                  <span class="kw">IDfrom</span>                  <span class="kw">=</span> <span class="st">"directory"</span>,
-                                  <span class="kw">inDir</span>                   <span class="kw">=</span> <span class="no">wd_images_ID</span>,
-                                  <span class="kw">outDir</span>                  <span class="kw">=</span> <span class="no">wd_images_species_copy</span>,
-                                  <span class="kw">createStationSubfolders</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-  )</pre></body></html></div>
-<pre><code>## VTA  - copied 5 out of 5 images in C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/sample_images_species_dir   to   C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sampleSpeciesImages/VTA</code></pre>
-<div class="sourceCode" id="cb48"><html><body><pre class="r"><span class="no">specImagecopy</span></pre></body></html></div>
+<span class="va">specImagecopy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getSpeciesImages.html">getSpeciesImages</a></span><span class="op">(</span>species                 <span class="op">=</span> <span class="va">species_to_copy</span>,
+                                  IDfrom                  <span class="op">=</span> <span class="st">"directory"</span>,
+                                  inDir                   <span class="op">=</span> <span class="va">wd_images_ID</span>,
+                                  outDir                  <span class="op">=</span> <span class="va">wd_images_species_copy</span>,
+                                  createStationSubfolders <span class="op">=</span> <span class="cn">FALSE</span>
+  <span class="op">)</span></code></pre></div>
+<pre><code>## VTA  - copied 5 out of 5 images in C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/sample_images_species_dir   to   C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sampleSpeciesImages/VTA</code></pre>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">specImagecopy</span></code></pre></div>
 <pre><code>##   species
 ## 1     VTA
 ## 2     VTA
@@ -633,11 +655,11 @@ inDir/Station/Camera</p>
 ## 4 StationB__2009-04-27__05-07-00(1).JPG
 ## 5 StationC__2009-04-24__02-57-00(1).JPG
 ##                                                            DirectoryCopy
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sampleSpeciesImages/VTA
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sampleSpeciesImages/VTA
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sampleSpeciesImages/VTA
-## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sampleSpeciesImages/VTA
-## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmpw3s28U/sampleSpeciesImages/VTA
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sampleSpeciesImages/VTA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sampleSpeciesImages/VTA
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sampleSpeciesImages/VTA
+## 4 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sampleSpeciesImages/VTA
+## 5 C:/Users/Juergen/AppData/Local/Temp/RtmpKgPdTD/sampleSpeciesImages/VTA
 ##                            FilenameCopy copy_ok
 ## 1 StationA__2009-04-10__05-07-00(1).JPG    TRUE
 ## 2 StationA__2009-05-06__19-06-00(1).JPG    TRUE
@@ -685,27 +707,28 @@ inDir/Station/Camera</p>
 <a href="#double-observer-identification-of-individuals" class="anchor"></a>Double observer identification of individuals</h3>
 <p>Despite its name, the function <code>checkSpeciesIdentification</code>can also be used to compare individual IDs assigned via metadata by multiple observers (with some limitations still). The idea is the same as with comparing double-observer species identifcation. In other words, the function treats individual IDs as if they were species IDs. Images of a species need to be stored in a species directory containing only images of that species (see function <code>getSpeciesImages</code>), preferably in station subdirectories. If images were not stored in station directories, the function will not be able to tell you which station the images were taken at (but you still have unique file names), do be careful when interpreting the first part of the output (the check for temporal independence).</p>
 <p>For lack of an example dataset in the package, here’s two theoretical code examples which assumes tagged images of only one species in this directory “C:/Users/Peter/individualID/SpeciesA”", either with or without station subdirectories</p>
-<div class="sourceCode" id="cb50"><html><body><pre class="r"><span class="co"># all images in one directory, no station subdirectories</span>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># all images in one directory, no station subdirectories</span>
 <span class="co"># column "station" in outtable will be uninformative</span>
-<span class="no">ID_check1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span>(<span class="kw">inDir</span>    <span class="kw">=</span> <span class="st">"C:/Users/Peter/individualID"</span>,
-                                        <span class="kw">stationsToCheck</span>   <span class="kw">=</span> <span class="st">"SpeciesA"</span>,         <span class="co"># no station subdirectories</span>
-                                        <span class="kw">IDfrom</span>            <span class="kw">=</span> <span class="st">"metadata"</span>,
-                                        <span class="kw">hasCameraFolders</span>  <span class="kw">=</span> <span class="fl">FALSE</span>,
-                                        <span class="kw">metadataSpeciesTag</span>          <span class="kw">=</span> <span class="st">"Example_Species_ID_Paul"</span>,
-                                        <span class="kw">metadataSpeciesTagToCompare</span> <span class="kw">=</span> <span class="st">"Example_Species_ID_Peter"</span>,
-                                        <span class="kw">maxDeltaTime</span>        <span class="kw">=</span> <span class="fl">60</span>)
+<span class="va">ID_check1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span><span class="op">(</span>inDir    <span class="op">=</span> <span class="st">"C:/Users/Peter/individualID"</span>,
+                                        stationsToCheck   <span class="op">=</span> <span class="st">"SpeciesA"</span>,         <span class="co"># no station subdirectories</span>
+                                        IDfrom            <span class="op">=</span> <span class="st">"metadata"</span>,
+                                        hasCameraFolders  <span class="op">=</span> <span class="cn">FALSE</span>,
+                                        metadataSpeciesTag          <span class="op">=</span> <span class="st">"Example_Species_ID_Paul"</span>,
+                                        metadataSpeciesTagToCompare <span class="op">=</span> <span class="st">"Example_Species_ID_Peter"</span>,
+                                        maxDeltaTime        <span class="op">=</span> <span class="fl">60</span><span class="op">)</span>
 
 <span class="co"># check results with either of the following two:</span>
 <span class="co"># ID_check1[[2]]   </span>
 <span class="co"># ID_check1$IDconflictCheck   </span>
 
 <span class="co"># all images in station subdirectories</span>
-<span class="no">ID_check2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span>(<span class="kw">inDir</span>    <span class="kw">=</span> <span class="st">"C:/Users/Peter/individualID/SpeciesA"</span>,  <span class="co"># with station subdirectories</span>
-                                        <span class="kw">IDfrom</span>   <span class="kw">=</span> <span class="st">"metadata"</span>,
-                                        <span class="kw">hasCameraFolders</span>    <span class="kw">=</span> <span class="fl">FALSE</span>,
-                                        <span class="kw">metadataSpeciesTag</span>  <span class="kw">=</span> <span class="st">"Example_Species_ID_Paul"</span>,
-                                        <span class="kw">metadataSpeciesTagToCompare</span> <span class="kw">=</span> <span class="st">"Example_Species_ID_Peter"</span>,
-                                        <span class="kw">maxDeltaTime</span>        <span class="kw">=</span> <span class="fl">60</span>)</pre></body></html></div>
+<span class="va">ID_check2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/checkSpeciesIdentification.html">checkSpeciesIdentification</a></span><span class="op">(</span>inDir    <span class="op">=</span> <span class="st">"C:/Users/Peter/individualID/SpeciesA"</span>,  <span class="co"># with station subdirectories</span>
+                                        IDfrom   <span class="op">=</span> <span class="st">"metadata"</span>,
+                                        hasCameraFolders    <span class="op">=</span> <span class="cn">FALSE</span>,
+                                        metadataSpeciesTag  <span class="op">=</span> <span class="st">"Example_Species_ID_Paul"</span>,
+                                        metadataSpeciesTagToCompare <span class="op">=</span> <span class="st">"Example_Species_ID_Peter"</span>,
+                                        maxDeltaTime        <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -726,7 +749,7 @@ inDir/Station/Camera</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
