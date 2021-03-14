@@ -176,12 +176,12 @@ assignSpeciesID <- function(intable,
           
           # give warnings
           if(isTRUE(returnFileNamesMissingTags)){
-            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "records out of", nrow(intable),
+            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "images out of", nrow(intable),
                                  "because of missing species metadata tag:\n"),
                           paste(head(paste(intable$Directory[species_records_to_remove], intable$FileName[species_records_to_remove], sep = file.sep)), collapse = "\n")),
                     call. = FALSE, immediate. = TRUE)
           } else {
-            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "records out of", nrow(intable),
+            warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "images out of", nrow(intable),
                                  "because of missing species metadata tag")),
                     call. = FALSE, immediate. = TRUE)
           }
