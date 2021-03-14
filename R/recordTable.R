@@ -43,7 +43,7 @@ recordTable <- function(inDir,
 
   # check input
   if(!hasArg(timeZone)) {
-    warning("timeZone is not specified. Assuming UTC", call. = FALSE,  immediate. = TRUE)
+    message("timeZone is not specified. Assuming UTC")
     timeZone <- "UTC"
   }
   if(!is.element(timeZone , OlsonNames())){
