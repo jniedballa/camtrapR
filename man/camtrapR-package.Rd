@@ -28,6 +28,8 @@ The functions in this section set up a directory structure for storing camera tr
 \tabular{ll}{
 \code{\link{createStationFolders}} \tab Create camera trap station directories for raw images \cr
 \code{\link{fixDateTimeOriginal}}  \tab Fix DateTimeOriginal Exif metadata tag in Reconyx Hyperfire cameras \cr
+\code{\link{OCRdataFields}}        \tab Optical character recognition (OCR) from data fields in images \cr
+\code{\link{writeDateTimeOriginal}} \tab Write values to DateTimeOriginal tag in image metadata \cr
 \code{\link{timeShiftImages}}      \tab Apply time shifts to JPEG images \cr
 \code{\link{imageRename}}          \tab Copy and rename images based on station ID and image creation date \cr
 \code{\link{addCopyrightTag}}      \tab Write a copyright tag into JPEG image metadata \cr
@@ -143,6 +145,7 @@ Phil Harvey's ExifTool \url{https://exiftool.org/} \cr
 \seealso{
 \pkg{overlap}
 \pkg{unmarked}
+\pkg{ubms}
 \pkg{secr}
 \pkg{plotrix}
 \pkg{taxize}
