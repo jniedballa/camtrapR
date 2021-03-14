@@ -92,7 +92,7 @@ df_image_data$DateTimeOriginal <- paste(df_image_data$date, df_image_data$time)
 df_image_data$DateTimeOriginal <- as.character(ymd_hms(df_image_data$DateTimeOriginal))
 
 # create cluster (3 cores)
-cl <- makeCluster(3))
+cl <- makeCluster(3)
 
 # assign new DateTimeOriginal
 writeDateTimeOriginal(DateTimeOriginal = df_image_data$DateTimeOriginal,

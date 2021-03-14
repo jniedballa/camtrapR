@@ -74,7 +74,7 @@ The only manual input needed is species (and individual) identification, which i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.09</span>
       </span>
     </div>
 
@@ -161,6 +161,8 @@ Information about the camera-specific trapping periods (and periods of malfuncti
 <p>The functions in this section set up a directory structure for storing camera trap images and identifying species and individuals from images. They build on one another and can be run in sequential order as needed.</p><table class='table'>
 <tr><td><code><a href='createStationFolders.html'>createStationFolders</a></code></td><td>Create camera trap station directories for raw images</td></tr>
 <tr><td><code><a href='fixDateTimeOriginal.html'>fixDateTimeOriginal</a></code></td><td>Fix DateTimeOriginal Exif metadata tag in Reconyx Hyperfire cameras</td></tr>
+<tr><td><code><a href='OCRdataFields.html'>OCRdataFields</a></code></td><td>Optical character recognition (OCR) from data fields in images</td></tr>
+<tr><td><code><a href='writeDateTimeOriginal.html'>writeDateTimeOriginal</a></code></td><td>Write values to DateTimeOriginal tag in image metadata</td></tr>
 <tr><td><code><a href='timeShiftImages.html'>timeShiftImages</a></code></td><td>Apply time shifts to JPEG images</td></tr>
 <tr><td><code><a href='imageRename.html'>imageRename</a></code></td><td>Copy and rename images based on station ID and image creation date</td></tr>
 <tr><td><code><a href='addCopyrightTag.html'>addCopyrightTag</a></code></td><td>Write a copyright tag into JPEG image metadata</td></tr>
@@ -265,6 +267,7 @@ Information about the camera-specific trapping periods (and periods of malfuncti
 
     <div class='dont-index'><p><span class="pkg">overlap</span>
 <span class="pkg">unmarked</span>
+<span class="pkg">ubms</span>
 <span class="pkg">secr</span>
 <span class="pkg">plotrix</span>
 <span class="pkg">taxize</span>

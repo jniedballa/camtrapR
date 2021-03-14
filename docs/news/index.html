@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.09</span>
       </span>
     </div>
 
@@ -139,6 +139,14 @@
 <h1 class="page-header" data-toc-text="2.1.0">
 <a href="#camtrapr-210" class="anchor"></a>camtrapR 2.1.0<small> Unreleased </small>
 </h1>
+<div id="new-functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-functions" class="anchor"></a>new functions</h2>
+<ul>
+<li>OCRdataFields: allows automatic reading of text from data fields in images via optical character recognition (OCR), requires magick and tesseract packages.</li>
+<li>writeDateTimeOriginal: Write values to DateTimeOriginal tag to image metadata</li>
+</ul>
+</div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>new features</h2>
@@ -165,7 +173,7 @@
 <a href="#other-changes" class="anchor"></a>other changes</h2>
 <ul>
 <li>lubdidate is a dependency now (for cameraOperation)</li>
-<li>lattice in Suggests (for camopPlot)</li>
+<li>additional Suggests: magick and tesseract (for OCRdataFields), lattice (for camopPlot)</li>
 </ul>
 </div>
 </div>
@@ -504,9 +512,9 @@
 <li>fixed crash in cameraOperation function caused by underscores in station / camera IDs (reported by Wyatt Petersen)</li>
 </ul>
 </div>
-<div id="new-functions" class="section level2">
+<div id="new-functions-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions" class="anchor"></a>new functions</h2>
+<a href="#new-functions-1" class="anchor"></a>new functions</h2>
 <ul>
 <li>fixDateTimeOriginal: Makes DateTimeOriginal Exif metadata tag in Reconyx Hyperfire cameras readable</li>
 </ul>
@@ -589,9 +597,9 @@
 <h1 class="page-header" data-toc-text="0.99.3">
 <a href="#camtrapr-0993" class="anchor"></a>camtrapR 0.99.3<small> 2016-08-01 </small>
 </h1>
-<div id="new-functions-1" class="section level2">
+<div id="new-functions-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-1" class="anchor"></a>new functions</h2>
+<a href="#new-functions-2" class="anchor"></a>new functions</h2>
 <ul>
 <li>addCopyrightTag: Write a copyright tag into image Exif metadata</li>
 </ul>
@@ -659,9 +667,9 @@
 <h1 class="page-header" data-toc-text="0.99.0">
 <a href="#camtrapr-0990" class="anchor"></a>camtrapR 0.99.0<small> 2016-04-12 </small>
 </h1>
-<div id="new-functions-2" class="section level2">
+<div id="new-functions-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-2" class="anchor"></a>new functions</h2>
+<a href="#new-functions-3" class="anchor"></a>new functions</h2>
 <ul>
 <li>checkSpeciesNames: checks a vector of species names (common or scientific) against the ITIS taxonomic database via package ‘taxize’</li>
 <li>checkSpeciesIdentification: expanded from former function checkSpeciesFolders (now defunct). Can check identification if metadata tags were used for species identification.</li>
@@ -732,9 +740,9 @@
 <h1 class="page-header" data-toc-text="0.98.0">
 <a href="#camtrapr-0980" class="anchor"></a>camtrapR 0.98.0<small> 2015-11-16 </small>
 </h1>
-<div id="new-functions-3" class="section level2">
+<div id="new-functions-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-functions-3" class="anchor"></a>new functions</h2>
+<a href="#new-functions-4" class="anchor"></a>new functions</h2>
 <ul>
 <li>createStationFolders: Create camera trap station directories, possibly with camera subdirectories, for storing raw images</li>
 <li>recordDatabaseIndividual: Single-species record databases from camera trap images with custom metadata tags</li>
