@@ -102,7 +102,7 @@ geometries <- list(date = geometry1,
                    time = geometry2, 
                    sequence_id = geometry3,
                    temperature = geometry4,
-                   camera_model = geometry5
+                   camera_model = geometry5)
 
 df_image_data  <- OCRdataFields(inDir = wd_images_OCR,
                                 geometries = geometries, 
