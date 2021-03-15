@@ -335,7 +335,7 @@ timeshift_undo
 
 Some Reconyx Hyperfire cameras (e.g. Hyperfire HC500) don't store date and time in the standard Exif format. Consequently, camtrapR cannot read the DateTimeOriginal tag from these images. This can be fixed easily by using the camtrapR function `fixDateTimeOriginal` or by following the instructions given by Mathias Tobler in the CameraBase documentation (page 7):
 
-https://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf
+http://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf
 
 <!-- ### Date/Time problems with Maginon cameras -->
 
