@@ -27,7 +27,7 @@ or you can install the latest development version from GitHub via:
 
 ``` r
 library(remotes)
-install_github("jniedballa/camtrapR")
+install_github("jniedballa/camtrapR", ref = "dev")
 ```
 
 You can also install a previous version (e.g. if a recent update broke
