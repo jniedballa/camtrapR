@@ -174,7 +174,7 @@ Normally all these information should be in the image metadata. This function is
     
 
 <p>This function reads all images in inDir (including subdirectories), crops them to the geometries in the "geometries" list, and performs optical character recognition (OCR) on each of these fields (leveraging the magick and tesseract packages).</p>
-<p>See the magick manual or <code><a href='https://docs.ropensci.org/magick/reference/geometry.html'>geometry</a></code> for details on how to specify geometries. It is easiest to create geometries with <code><a href='https://docs.ropensci.org/magick/reference/geometry.html'>geometry_area</a></code>. The format is: "widthxheight+x_off+y_off", where:</p>
+<p>Geometries are defined with <code>geometry_area</code> from <span class="pkg">magick</span>. See <code><a href='https://docs.ropensci.org/magick/reference/geometry.html'>geometry</a></code> for details on how to specify geometries with <code>geometry_area</code>. The format is: "widthxheight+x_off+y_off", where:</p>
 
 <p></p><dl>
     <dt>width</dt><dd><p>width of the area of interest</p></dd>

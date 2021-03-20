@@ -36,7 +36,7 @@ OCRdataFields(inDir,
 
 This function reads all images in inDir (including subdirectories), crops them to the geometries in the "geometries" list, and performs optical character recognition (OCR) on each of these fields (leveraging the magick and tesseract packages).
 
-See the magick manual or \code{\link[magick]{geometry}} for details on how to specify geometries. It is easiest to create geometries with \code{\link[magick]{geometry_area}}. The format is: "widthxheight+x_off+y_off", where:
+Geometries are defined with \code{geometry_area} from \pkg{magick}. See \code{\link[magick]{geometry}} for details on how to specify geometries with \code{geometry_area}. The format is: "widthxheight+x_off+y_off", where:
 
 
  \describe{
