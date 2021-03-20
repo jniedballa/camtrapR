@@ -16,10 +16,9 @@ camtrapR is a package for camera trap data management in R.
 
 ## Installation
 
-You can install the stable version of camtrapR from CRAN:
+You can install the release version of camtrapR from CRAN:
 
 ``` r
-# Install release version from CRAN
 install.packages("camtrapR")
 ```
 
@@ -28,6 +27,14 @@ or you can install the latest development version from GitHub via:
 ``` r
 library(remotes)
 install_github("jniedballa/camtrapR", ref = "dev")
+```
+
+If no development branch exists at the time on GitHub, you can install
+from the master branch via:
+
+``` r
+library(remotes)
+install_github("jniedballa/camtrapR")
 ```
 
 You can also install a previous version (e.g. if a recent update broke
