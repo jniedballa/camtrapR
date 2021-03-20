@@ -103,7 +103,7 @@ Please be aware that the function (like the other activity... function of this p
 
 \seealso{
 \code{\link{activityDensity}} \cr
-\url{http://www.kent.ac.uk/smsas/personal/msr/overlap.html}
+\url{https://www.kent.ac.uk/smsas/personal/msr/overlap.html}
 }
 \examples{
 # load record table

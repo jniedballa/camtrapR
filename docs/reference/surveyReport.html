@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Create a report about a camera trapping survey and species detections — surveyReport" />
 <meta property="og:description" content="This function creates a report about a camera trapping survey and species records. It uses a camera trap station information table and a record table (generated with recordTable) as input. Output tables can be saved and a zip file for simple data sharing can be created easily." />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
       </span>
     </div>
 
@@ -77,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -95,13 +98,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -111,8 +114,8 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jniedballa/camtrapR">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/jniedballa/camtrapR/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -138,22 +141,23 @@
     <p>This function creates a report about a camera trapping survey and species records. It uses a camera trap station information table and a record table (generated with <code><a href='recordTable.html'>recordTable</a></code>) as input. Output tables can be saved and a zip file for simple data sharing can be created easily.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>surveyReport</span> (<span class='no'>recordTable</span>,
-  <span class='no'>CTtable</span>,
-  <span class='kw'>speciesCol</span> <span class='kw'>=</span> <span class='st'>"Species"</span>,
-  <span class='kw'>stationCol</span> <span class='kw'>=</span> <span class='st'>"Station"</span>,
-  <span class='no'>cameraCol</span>,
-  <span class='no'>setupCol</span>,
-  <span class='no'>retrievalCol</span>,
-  <span class='kw'>CTDateFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d"</span>,
-  <span class='kw'>CTHasProblems</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>recordDateTimeCol</span> <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-  <span class='kw'>recordDateTimeFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
-  <span class='no'>Xcol</span>,
-  <span class='no'>Ycol</span>,
-  <span class='no'>sinkpath</span>,
-  <span class='no'>makezip</span>
-)</pre>
+    <pre class="usage"><span class='fu'>surveyReport</span> <span class='op'>(</span><span class='va'>recordTable</span>,
+  <span class='va'>CTtable</span>,
+  <span class='va'>camOp</span>,
+  speciesCol <span class='op'>=</span> <span class='st'>"Species"</span>,
+  stationCol <span class='op'>=</span> <span class='st'>"Station"</span>,
+  <span class='va'>cameraCol</span>, 
+  <span class='va'>setupCol</span>,
+  <span class='va'>retrievalCol</span>,
+  CTDateFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d"</span>, 
+  CTHasProblems <span class='op'>=</span> <span class='st'>"deprecated"</span>,
+  recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
+  <span class='va'>Xcol</span>,
+  <span class='va'>Ycol</span>,
+  <span class='va'>sinkpath</span>,
+  <span class='va'>makezip</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -165,6 +169,10 @@
     <tr>
       <th>CTtable</th>
       <td><p>data.frame containing information about location and trapping period of camera trap stations (equivalent to <code><a href='camtraps.html'>camtraps</a></code></p></td>
+    </tr>
+    <tr>
+      <th>camOp</th>
+      <td><p>camera operation matrix created with <code><a href='cameraOperation.html'>cameraOperation</a></code></p></td>
     </tr>
     <tr>
       <th>speciesCol</th>
@@ -192,7 +200,7 @@
     </tr>
     <tr>
       <th>CTHasProblems</th>
-      <td><p>logical. Are there periods of camera malfunction specified in <code>CTtable</code>?</p></td>
+      <td><p>deprecated (since version 2.1)</p></td>
     </tr>
     <tr>
       <th>recordDateTimeCol</th>
@@ -224,15 +232,15 @@
 
     
 
-<p><code>dateFormat</code> defaults to "YYYY-MM-DD", e.g. "2014-10-31". It can be specified either in the format required by <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or the 'orders' argument in <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> in <span class="pkg">lubridate</span>. In the example above, "YYYY-MM-DD" would be specified as "%Y-%m-%d" or "ymd". 
-If <code>CTHasProblems</code> is set to TRUE, the function tries to find columns <code>ProblemX_from</code> and <code>ProblemX_to</code> in <code>CTtable</code> (<code>X</code> designates numbers from 1 to n in which a camera or station was not operational). If there are no such columns all stations are assumed to have been operational uninterruptedly from setup to retrieval.</p>
+<p><code>dateFormat</code> defaults to "YYYY-MM-DD", e.g. "2014-10-31". It can be specified either in the format required by <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or the 'orders' argument in <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> in <span class="pkg">lubridate</span>. In the example above, "YYYY-MM-DD" would be specified as "%Y-%m-%d" or "ymd".</p>
 <p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in <span class="pkg">lubridate</span> via <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument "orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in <code>recordDateTimeFormat</code>.</p>
 <p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either "%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
+<p>Note: as of version 2.1, argument <code>CTHasProblems</code> is deprecated and defunct. Please use <code>camOp</code> instead to provide information about periods of camera activity and malfunction.</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An invisible list containing 5 <code>data.frames</code>.</p>
 <p></p>
-<dt>survey_dates</dt><dd><p>station and image date ranges, number of total and active trap nights, number of cameras per station</p></dd>
+<dt>survey_dates</dt><dd><p>station and image date ranges, number of total and active trap days (calendar days and taking into account independent effort of multiple cameras, if applicable), number of cameras per station</p></dd>
   <dt>species_by_station</dt><dd><p>species numbers by station</p></dd>
   <dt>events_by_species</dt><dd><p>number of events and stations by species</p></dd>
   <dt>events_by_station</dt><dd><p>number of events for every species by station (only species that were recorded)</p></dd>
@@ -243,23 +251,39 @@ The output will be saved to a .txt file if sinkpath is defined.
 
 If makezip is TRUE, a zip file will be created in sinkpath. It contains single-species activity plots, detection maps (if Xcol and Ycol are defined), the survey report tables, the record table and the camera trap station table, and an example R script.
 
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='recordTable.html'>recordTable</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>camtraps</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableSample</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>camtraps</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>)</span>
 
-<span class='no'>reportTest</span> <span class='kw'>&lt;-</span> <span class='fu'>surveyReport</span> (<span class='kw'>recordTable</span>          <span class='kw'>=</span> <span class='no'>recordTableSample</span>,
-                            <span class='kw'>CTtable</span>              <span class='kw'>=</span> <span class='no'>camtraps</span>,
-                            <span class='kw'>speciesCol</span>           <span class='kw'>=</span> <span class='st'>"Species"</span>,
-                            <span class='kw'>stationCol</span>           <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                            <span class='kw'>setupCol</span>             <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                            <span class='kw'>retrievalCol</span>         <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                            <span class='kw'>CTDateFormat</span>         <span class='kw'>=</span> <span class='st'>"%d/%m/%Y"</span>,
-                            <span class='kw'>recordDateTimeCol</span>    <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                            <span class='kw'>recordDateTimeFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>)</div><div class='output co'>#&gt; 
+<span class='co'># since version 2.1, camera operation matrix is required as input</span>
+
+<span class='va'>camop_no_problem</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span><span class='op'>(</span>CTtable      <span class='op'>=</span> <span class='va'>camtraps</span>,
+                                    stationCol   <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                    setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                    retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                    writecsv     <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                    hasProblems  <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                    dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+<span class='op'>)</span>
+
+<span class='va'>reportTest</span> <span class='op'>&lt;-</span> <span class='fu'>surveyReport</span> <span class='op'>(</span>recordTable          <span class='op'>=</span> <span class='va'>recordTableSample</span>,
+                            CTtable              <span class='op'>=</span> <span class='va'>camtraps</span>,
+                            camOp                <span class='op'>=</span> <span class='va'>camop_no_problem</span>,
+                            speciesCol           <span class='op'>=</span> <span class='st'>"Species"</span>,
+                            stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
+                            setupCol             <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                            retrievalCol         <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                            CTDateFormat         <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>, 
+                            recordDateTimeCol    <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                            recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
 #&gt; -------------------------------------------------------
 #&gt; [1] "Total number of stations:  3"
 #&gt; 
@@ -267,30 +291,46 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 #&gt; [1] "Number of operational stations:  3"
 #&gt; 
 #&gt; -------------------------------------------------------
-#&gt; [1] "n nights with cameras set up (operational or not. NOTE: only correct if 1 camera per station): 128"
+#&gt; [1] "Trap nights (number of active 24 hour cycles completed by independent cameras):  128"
 #&gt; 
 #&gt; -------------------------------------------------------
-#&gt; [1] "n nights with cameras set up and active (trap nights. NOTE: only correct if 1 camera per station): 128"
+#&gt; [1] "Calendar days with cameras set up (operational or not):  131"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "Calendar days with cameras set up and active:  131"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "Calendar days with cameras set up but inactive:  0"
 #&gt; 
 #&gt; -------------------------------------------------------
 #&gt; [1] "total trapping period:  2009-04-02 - 2009-05-17"</div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span>(<span class='no'>reportTest</span>)  <span class='co'># a list with</span></div><div class='output co'>#&gt; [1] "list"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>reportTest</span>) <span class='co'># 5 elements</span></div><div class='output co'>#&gt; [1] 5</div><div class='input'>
-<span class='no'>reportTest</span><span class='kw'>[[</span><span class='fl'>1</span>]]    <span class='co'># camera trap operation times and image date ranges</span></div><div class='output co'>#&gt;    Station setup_date first_image_date last_image_date retrieval_date
-#&gt; 1 StationA 2009-04-02       2009-04-10      2009-05-07     2009-05-14
-#&gt; 2 StationB 2009-04-03       2009-04-05      2009-05-14     2009-05-16
-#&gt; 3 StationC 2009-04-04       2009-04-06      2009-05-12     2009-05-17
-#&gt;   n_nights_total n_nights_active n_cameras
-#&gt; 1             42              42         1
-#&gt; 2             43              43         1
-#&gt; 3             43              43         1</div><div class='input'><span class='no'>reportTest</span><span class='kw'>[[</span><span class='fl'>2</span>]]    <span class='co'># number of species by station</span></div><div class='output co'>#&gt;    Station n_species
+<span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='va'>reportTest</span><span class='op'>)</span>  <span class='co'># a list with</span>
+</div><div class='output co'>#&gt; [1] "list"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>reportTest</span><span class='op'>)</span> <span class='co'># 5 elements</span>
+</div><div class='output co'>#&gt; [1] 5</div><div class='input'>
+<span class='va'>reportTest</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span>    <span class='co'># camera trap operation times and image date ranges</span>
+</div><div class='output co'>#&gt;    station      setup image_first image_last  retrieval n_cameras
+#&gt; 1 StationA 2009-04-02  2009-04-10 2009-05-07 2009-05-14         1
+#&gt; 2 StationB 2009-04-03  2009-04-05 2009-05-14 2009-05-16         1
+#&gt; 3 StationC 2009-04-04  2009-04-06 2009-05-12 2009-05-17         1
+#&gt;   n_calendar_days_total n_calendar_days_active n_calendar_days_inactive
+#&gt; 1                    43                     43                        0
+#&gt; 2                    44                     44                        0
+#&gt; 3                    44                     44                        0
+#&gt;   n_trap_nights_active
+#&gt; 1                   42
+#&gt; 2                   43
+#&gt; 3                   43</div><div class='input'><span class='va'>reportTest</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span>    <span class='co'># number of species by station</span>
+</div><div class='output co'>#&gt;    Station n_species
 #&gt; 1 StationA         2
 #&gt; 2 StationB         3
-#&gt; 3 StationC         4</div><div class='input'><span class='no'>reportTest</span><span class='kw'>[[</span><span class='fl'>3</span>]]    <span class='co'># number of events and number of stations by species</span></div><div class='output co'>#&gt;   species n_events n_stations
+#&gt; 3 StationC         4</div><div class='input'><span class='va'>reportTest</span><span class='op'>[[</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>]</span>    <span class='co'># number of events and number of stations by species</span>
+</div><div class='output co'>#&gt;   species n_events n_stations
 #&gt; 1     EGY        6          1
 #&gt; 2     MNE        2          1
 #&gt; 3     PBE       18          3
 #&gt; 4     TRA        8          1
-#&gt; 5     VTA        5          3</div><div class='input'><span class='no'>reportTest</span><span class='kw'>[[</span><span class='fl'>4</span>]]    <span class='co'># number of species events by station</span></div><div class='output co'>#&gt;    Station Species n_events
+#&gt; 5     VTA        5          3</div><div class='input'><span class='va'>reportTest</span><span class='op'>[[</span><span class='fl'>4</span><span class='op'>]</span><span class='op'>]</span>    <span class='co'># number of species events by station</span>
+</div><div class='output co'>#&gt;    Station Species n_events
 #&gt; 1 StationA     PBE        4
 #&gt; 2 StationA     VTA        2
 #&gt; 3 StationB     MNE        2
@@ -299,7 +339,8 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 #&gt; 6 StationC     EGY        6
 #&gt; 7 StationC     PBE        6
 #&gt; 8 StationC     TRA        8
-#&gt; 9 StationC     VTA        1</div><div class='input'><span class='no'>reportTest</span><span class='kw'>[[</span><span class='fl'>5</span>]]    <span class='co'># number of species events by station including 0s (non-observed species)</span></div><div class='output co'>#&gt;     Station Species n_events
+#&gt; 9 StationC     VTA        1</div><div class='input'><span class='va'>reportTest</span><span class='op'>[[</span><span class='fl'>5</span><span class='op'>]</span><span class='op'>]</span>    <span class='co'># number of species events by station including 0s (non-observed species)</span>
+</div><div class='output co'>#&gt;     Station Species n_events
 #&gt; 1  StationA     EGY        0
 #&gt; 2  StationA     MNE        0
 #&gt; 3  StationA     PBE        4
@@ -317,16 +358,26 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 #&gt; 15 StationC     VTA        1</div><div class='input'>
 <span class='co'># with camera problems</span>
 
-<span class='no'>reportTest_problem</span> <span class='kw'>&lt;-</span> <span class='fu'>surveyReport</span> (<span class='kw'>recordTable</span>          <span class='kw'>=</span> <span class='no'>recordTableSample</span>,
-                                    <span class='kw'>CTtable</span>              <span class='kw'>=</span> <span class='no'>camtraps</span>,
-                                    <span class='kw'>speciesCol</span>           <span class='kw'>=</span> <span class='st'>"Species"</span>,
-                                    <span class='kw'>stationCol</span>           <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                    <span class='kw'>setupCol</span>             <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                                    <span class='kw'>retrievalCol</span>         <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                                    <span class='kw'>CTDateFormat</span>         <span class='kw'>=</span> <span class='st'>"%d/%m/%Y"</span>,
-                                    <span class='kw'>recordDateTimeCol</span>    <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                                    <span class='kw'>recordDateTimeFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
-                                    <span class='kw'>CTHasProblems</span>        <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; 
+<span class='va'>camop_problem</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span><span class='op'>(</span>CTtable      <span class='op'>=</span> <span class='va'>camtraps</span>,
+                                 stationCol   <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                 setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                 retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                 writecsv     <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                 hasProblems  <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                                 dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+<span class='op'>)</span>
+
+<span class='va'>reportTest_problem</span> <span class='op'>&lt;-</span> <span class='fu'>surveyReport</span> <span class='op'>(</span>recordTable          <span class='op'>=</span> <span class='va'>recordTableSample</span>,
+                                    CTtable              <span class='op'>=</span> <span class='va'>camtraps</span>,
+                                    camOp                <span class='op'>=</span> <span class='va'>camop_problem</span>,
+                                    speciesCol           <span class='op'>=</span> <span class='st'>"Species"</span>,
+                                    stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                    setupCol             <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                    retrievalCol         <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                    CTDateFormat         <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>, 
+                                    recordDateTimeCol    <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                                    recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
 #&gt; -------------------------------------------------------
 #&gt; [1] "Total number of stations:  3"
 #&gt; 
@@ -334,51 +385,56 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 #&gt; [1] "Number of operational stations:  3"
 #&gt; 
 #&gt; -------------------------------------------------------
-#&gt; [1] "n nights with cameras set up (operational or not. NOTE: only correct if 1 camera per station): 128"
+#&gt; [1] "Trap nights (number of active 24 hour cycles completed by independent cameras):  122.5"
 #&gt; 
 #&gt; -------------------------------------------------------
-#&gt; [1] "n nights with cameras set up and active (trap nights. NOTE: only correct if 1 camera per station): 123"
+#&gt; [1] "Calendar days with cameras set up (operational or not):  131"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "Calendar days with cameras set up and active:  125"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "Calendar days with cameras set up but inactive:  6"
 #&gt; 
 #&gt; -------------------------------------------------------
 #&gt; [1] "total trapping period:  2009-04-02 - 2009-05-17"</div><div class='input'>
-<span class='no'>reportTest_problem</span>$<span class='no'>survey_dates</span></div><div class='output co'>#&gt;    Station setup_date first_image_date last_image_date retrieval_date
-#&gt; 1 StationA 2009-04-02       2009-04-10      2009-05-07     2009-05-14
-#&gt; 2 StationB 2009-04-03       2009-04-05      2009-05-14     2009-05-16
-#&gt; 3 StationC 2009-04-04       2009-04-06      2009-05-12     2009-05-17
-#&gt;   n_nights_total n_nights_active n_cameras
-#&gt; 1             42              42         1
-#&gt; 2             43              43         1
-#&gt; 3             43              38         1</div><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='va'>reportTest_problem</span><span class='op'>$</span><span class='va'>survey_dates</span>
+</div><div class='output co'>#&gt;    station      setup image_first image_last  retrieval n_cameras
+#&gt; 1 StationA 2009-04-02  2009-04-10 2009-05-07 2009-05-14         1
+#&gt; 2 StationB 2009-04-03  2009-04-05 2009-05-14 2009-05-16         1
+#&gt; 3 StationC 2009-04-04  2009-04-06 2009-05-12 2009-05-17         1
+#&gt;   n_calendar_days_total n_calendar_days_active n_calendar_days_inactive
+#&gt; 1                    43                     43                        0
+#&gt; 2                    44                     44                        0
+#&gt; 3                    44                     38                        6
+#&gt;   n_trap_nights_active
+#&gt; 1                 42.0
+#&gt; 2                 43.0
+#&gt; 3                 37.5</div><div class='input'>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># run again with sinkpath defined</span>
-<span class='no'>reportTest</span> <span class='kw'>&lt;-</span> <span class='fu'>surveyReport</span> (<span class='kw'>recordTable</span>          <span class='kw'>=</span> <span class='no'>recordTableSample</span>,
-                            <span class='kw'>CTtable</span>              <span class='kw'>=</span> <span class='no'>camtraps</span>,
-                            <span class='kw'>speciesCol</span>           <span class='kw'>=</span> <span class='st'>"Species"</span>,
-                            <span class='kw'>stationCol</span>           <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                            <span class='kw'>setupCol</span>             <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                            <span class='kw'>retrievalCol</span>         <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                            <span class='kw'>CTDateFormat</span>         <span class='kw'>=</span> <span class='st'>"%d/%m/%Y"</span>,
-                            <span class='kw'>recordDateTimeCol</span>    <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                            <span class='kw'>recordDateTimeFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
-                            <span class='kw'>sinkpath</span>             <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span>())
+<span class='va'>reportTest</span> <span class='op'>&lt;-</span> <span class='fu'>surveyReport</span> <span class='op'>(</span>recordTable          <span class='op'>=</span> <span class='va'>recordTableSample</span>,
+                            CTtable              <span class='op'>=</span> <span class='va'>camtraps</span>,
+                            camOp                <span class='op'>=</span> <span class='va'>camop_no_problem</span>,
+                            speciesCol           <span class='op'>=</span> <span class='st'>"Species"</span>,
+                            stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
+                            setupCol             <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                            retrievalCol         <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                            CTDateFormat         <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>, 
+                            recordDateTimeCol    <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                            recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
+                            sinkpath             <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># have a look at the text file</span>
-<span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span>(), <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span>(<span class='st'>"survey_report_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span>(), <span class='st'>".txt"</span>, <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>""</span>),
-                                         <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
-}</div></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span><span class='op'>(</span><span class='op'>)</span>, pattern <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"survey_report_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>".txt"</span>, sep <span class='op'>=</span> <span class='st'>""</span><span class='op'>)</span>, 
+           full.names <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    <p>Juergen Niedballa</p>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -389,7 +445,7 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

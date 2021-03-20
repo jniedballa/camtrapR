@@ -89,8 +89,9 @@ DetHist1day <- detectionHistory(recordTable          = recordTableSample,
                                 species              = "VTA",
                                 occasionLength       = 1,
                                 day1                 = "station",
-                                datesAsOccasionNames = FALSE,
-                                includeEffort        = FALSE,
+                                datesAsOccasionNames = F,
+                                includeEffort        = T,
+                                scaleEffort          = FALSE,
                                 timeZone             = "Asia/Kuala_Lumpur"
 )
 
@@ -357,3 +358,104 @@ test_that("Error when camOp is not a matrix", {
                "camOp must be a matrix", fixed = TRUE)
 }                             
 )
+
+
+test_that("Error when NAs/blanks in DateTimeOriginal", {
+  recordTableSample_withNA <- recordTableSample_with_blank <- recordTableSample
+  recordTableSample_withNA$DateTimeOriginal[1] <- NA
+  recordTableSample_with_blank$DateTimeOriginal[1] <- ""
+  
+  expect_error(detectionHistory(recordTable          = recordTableSample_withNA,
+                                camOp                = camop_no_problem,
+                                stationCol           = "Station",
+                                speciesCol           = "Species",
+                                recordDateTimeCol    = "DateTimeOriginal",
+                                species              = "PBE",
+                                occasionLength       = 7,
+                                day1                 = "station",
+                                datesAsOccasionNames = FALSE,
+                                includeEffort        = FALSE,
+                                timeZone             = "Asia/Kuala_Lumpur"
+  ),
+               "there are NAs in subset_species[, recordDateTimeCol]", fixed = TRUE)
+  
+  expect_error(detectionHistory(recordTable          = recordTableSample_with_blank,
+                                camOp                = camop_no_problem,
+                                stationCol           = "Station",
+                                speciesCol           = "Species",
+                                recordDateTimeCol    = "DateTimeOriginal",
+                                species              = "PBE",
+                                occasionLength       = 7,
+                                day1                 = "station", 
+                                includeEffort        = FALSE,
+                                timeZone             = "Asia/Kuala_Lumpur"),
+               "there are blank values in subset_species[, recordDateTimeCol]", fixed = TRUE)
+}                             
+)
+
+test_that("Error when DateTimeOriginal can't be interpreted (format wrong)", {
+  # suppressWarnings is because parse_date_time() gives a warning too:  All formats failed to parse. No formats found. 
+  expect_error(suppressWarnings(detectionHistory(recordTable  = recordTableSample,
+                                                 camOp                = camop_no_problem,
+                                                 stationCol           = "Station",
+                                                 speciesCol           = "Species",
+                                                 recordDateTimeCol    = "DateTimeOriginal",
+                                                 recordDateTimeFormat = "mdy HMS",  # wrong format
+                                                 species              = "PBE",
+                                                 occasionLength       = 7,
+                                                 day1                 = "station", 
+                                                 includeEffort        = FALSE,
+                                                 timeZone             = "Asia/Kuala_Lumpur")),
+               "Cannot read datetime format in subset_species[, recordDateTimeCol]. Output is all NA.\nexpected:  mdy HMS\nactual:    2009-04-21 00:40:00", fixed = TRUE)
+}                             
+)
+
+
+
+
+
+# PART 2: camera operation matrix with fraction days!
+
+camtraps_hrs <- camtraps
+
+camtraps_hrs$Setup_date <- paste(camtraps_hrs$Setup_date, "12")
+camtraps_hrs$Retrieval_date <- paste(camtraps_hrs$Retrieval_date, "18")
+camtraps_hrs$Problem1_from  <- paste(camtraps_hrs$Problem1_from, "12")
+camtraps_hrs$Problem1_to  <- paste(camtraps_hrs$Problem1_to, "18")
+
+
+# create camera operation matrix
+camop_no_problem_frac <- cameraOperation(CTtable      = camtraps_hrs,
+                                         stationCol   = "Station",
+                                         setupCol     = "Setup_date",
+                                         retrievalCol = "Retrieval_date",
+                                         hasProblems  = FALSE,
+                                         dateFormat   = "dmy H"
+)
+
+# add some records on incomplete days
+recordTableSample_extra <- recordTableSample_extra2 <- recordTableSample[5,]
+recordTableSample_extra$DateTimeOriginal  <- "2009-04-02 05:07:00"  # on first day / StationA
+recordTableSample_extra2$DateTimeOriginal <- "2009-05-14 05:07:00"  # on last day / StationA
+
+
+recordTableSample2 <- rbind(recordTableSample_extra, recordTableSample, recordTableSample_extra2)
+
+test_that("it works when camera operation matrix uses fraction of days & there's records on those days", {
+
+DetHist2_lub_frac <- detectionHistory(recordTable          = recordTableSample2,
+                                      camOp                = camop_no_problem_frac,
+                                      stationCol           = "Station",
+                                      speciesCol           = "Species",
+                                      recordDateTimeCol    = "DateTimeOriginal",
+                                      recordDateTimeFormat = "ymd HMS",
+                                      species              = "VTA",
+                                      occasionLength       = 7,
+                                      day1                 = "station",
+                                      datesAsOccasionNames = FALSE,
+                                      includeEffort        = TRUE,
+                                      scaleEffort          = FALSE,
+                                      timeZone             = "Asia/Kuala_Lumpur"
+)
+expect_type(DetHist2_lub_frac, type = "list")                                      
+})

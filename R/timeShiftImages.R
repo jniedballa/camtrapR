@@ -5,7 +5,8 @@ timeShiftImages <- function(inDir,
                             cameraCol,
                             timeShiftColumn,
                             timeShiftSignColumn,
-                            undo = FALSE
+                            undo = FALSE,
+                            ignoreMinorErrors = FALSE
 )
 {
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool")
@@ -20,8 +21,8 @@ timeShiftImages <- function(inDir,
   
   # check column names
   checkForSpacesInColumnNames(stationCol = stationCol, timeShiftColumn = timeShiftColumn, timeShiftSignColumn = timeShiftSignColumn)
-  if(!stationCol %in% colnames(timeShiftTable))         stop(paste('stationCol = "',   stationCol,     '" is not a column name in timeShiftTable', sep = ''), call. = FALSE)
-  if(!timeShiftColumn %in% colnames(timeShiftTable))  stop(paste('timeShiftColumn = "',   timeShiftColumn,     '" is not a column name in timeShiftTable', sep = ''), call. = FALSE)
+  if(!stationCol %in% colnames(timeShiftTable))           stop(paste('stationCol = "',   stationCol,     '" is not a column name in timeShiftTable', sep = ''), call. = FALSE)
+  if(!timeShiftColumn %in% colnames(timeShiftTable))      stop(paste('timeShiftColumn = "',   timeShiftColumn,     '" is not a column name in timeShiftTable', sep = ''), call. = FALSE)
   if(!timeShiftSignColumn %in% colnames(timeShiftTable))  stop(paste('timeShiftSignColumn = "', timeShiftSignColumn,       '" is not a column name in timeShiftTable', sep = ''), call. = FALSE)
 
   
@@ -93,9 +94,8 @@ timeShiftImages <- function(inDir,
 
     for(i in 1:nrow(timeShiftTable)){
       message(shift.dirs[i])
-      list.files(shift.dirs)
-      command.tmp2b <- paste('exiftool -r "-DateTimeOriginal', timeShiftTable[i,timeShiftSignColumn], '=',
-                             timeShiftTable[i,timeShiftColumn], '" "', shift.dirs[i], '"', sep = "")
+      command.tmp2b <- paste0('exiftool -r ', ifelse(ignoreMinorErrors, "-m ", ""), '"-DateTimeOriginal', timeShiftTable[i,timeShiftSignColumn], '=',
+                             timeShiftTable[i,timeShiftColumn], '" "', shift.dirs[i], '"')
       results.tmp[[i]] <- system(command.tmp2b, intern=TRUE)
       rm(command.tmp2b)
     }
@@ -104,6 +104,12 @@ timeShiftImages <- function(inDir,
     
     output <- data.frame(shift.dirs, matrix(unlist(results.tmp2),ncol = 2, byrow = 2))
     colnames(output) <- c("directory", "n_directories", "n_images")
+    if(any(grepl("files weren't updated due to errors", output$n_images))){
+      warning("There were problems changing the time stamps in:\n", 
+              paste(output$directory[grepl("files weren't updated due to errors", output$n_images)], collapse = "\n"),
+              "\n\nTry setting ignoreMinorErrors = TRUE", call. = FALSE)
+    }
+    
     return(output)
   }
 }

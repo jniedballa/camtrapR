@@ -26,7 +26,10 @@ exifTagNames <- function(inDir,
     if(!dir.exists(inDir)) stop("Could not find inDir:\n", inDir, call. = FALSE)
     
     if(is.numeric(whichSubDir)){
-      dir.tmp <- list.dirs(inDir, recursive = FALSE, full.names = TRUE)[whichSubDir]
+      dir.tmp0 <- list.dirs(inDir, recursive = FALSE, full.names = TRUE)
+      if(length(dir.tmp0) == 0) stop("inDir has no subdirectories")
+      dir.tmp <- dir.tmp0[whichSubDir]
+      if(is.na(dir.tmp)) stop(paste0("Cound not find subdirectory ", whichSubDir, " in inDir: ", inDir))
     }
     if(is.character(whichSubDir)){
       dir.tmp <- file.path(inDir, whichSubDir)

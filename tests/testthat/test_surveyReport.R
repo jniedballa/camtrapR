@@ -1,4 +1,4 @@
-context("recordTable")
+context("surveyReport")
 library(camtrapR)
 
 data(camtraps)
@@ -20,11 +20,44 @@ camtraps_setup_NA$Setup_date[1] <- NA
 camtraps_retrieval_NA$Retrieval_date[1] <- NA
 recordTableSample_datetime_NA$DateTimeOriginal[1] <- NA
 
+# camera operation matrices
+camop_no_problem <- cameraOperation(CTtable      = camtraps,
+                                    stationCol   = "Station",
+                                    setupCol     = "Setup_date",
+                                    retrievalCol = "Retrieval_date",
+                                    writecsv     = FALSE,
+                                    hasProblems  = FALSE,
+                                    dateFormat   = "%d/%m/%Y"
+)
+
+# with problems/malfunction
+camop_problem <- cameraOperation(CTtable      = camtraps,
+                                 stationCol   = "Station",
+                                 setupCol     = "Setup_date",
+                                 retrievalCol = "Retrieval_date",
+                                 writecsv     = FALSE,
+                                 hasProblems  = TRUE,
+                                 dateFormat   = "%d/%m/%Y"
+)
+
 # Test section
+
+test_that("errors when camOp missing", {
+  expect_error(surveyReport (recordTable          = recordTableSample,
+                             CTtable              = camtraps_setup_blank,
+                             speciesCol           = "Species",
+                             stationCol           = "Station",
+                             setupCol             = "Setup_date",
+                             retrievalCol         = "Retrieval_date",
+                             CTDateFormat         = "%d/%m/%Y"), 
+               "'camOp' is not defined", fixed = TRUE)
+})
+
 
 test_that("errors about blank values in Date/Time are correct", {
   expect_error(surveyReport (recordTable          = recordTableSample,
                              CTtable              = camtraps_setup_blank,
+                             camOp                = camop_no_problem,
                              speciesCol           = "Species",
                              stationCol           = "Station",
                              setupCol             = "Setup_date",
@@ -33,6 +66,7 @@ test_that("errors about blank values in Date/Time are correct", {
                "there are blank values in CTtable[, setupCol]", fixed = TRUE)
   expect_error(surveyReport (recordTable          = recordTableSample,
                              CTtable              = camtraps_retrieval_blank,
+                             camOp                = camop_no_problem,
                              speciesCol           = "Species",
                              stationCol           = "Station",
                              setupCol             = "Setup_date",
@@ -41,6 +75,7 @@ test_that("errors about blank values in Date/Time are correct", {
                "there are blank values in CTtable[, retrievalCol]", fixed = TRUE)
   expect_error(surveyReport (recordTable          = recordTableSample_datetime_blank,
                              CTtable              = camtraps,
+                             camOp                = camop_no_problem,
                              speciesCol           = "Species",
                              stationCol           = "Station",
                              setupCol             = "Setup_date",
@@ -54,6 +89,7 @@ test_that("errors about blank values in Date/Time are correct", {
 test_that("errors about NAs in Date/Time are correct", {
   expect_error(surveyReport (recordTable          = recordTableSample,
                              CTtable              = camtraps_setup_NA,
+                             camOp                = camop_no_problem,
                              speciesCol           = "Species",
                              stationCol           = "Station",
                              setupCol             = "Setup_date",
@@ -62,6 +98,7 @@ test_that("errors about NAs in Date/Time are correct", {
                "there are NAs in CTtable[, setupCol]", fixed = TRUE)
   expect_error(surveyReport (recordTable          = recordTableSample,
                              CTtable              = camtraps_retrieval_NA,
+                             camOp                = camop_no_problem,
                              speciesCol           = "Species",
                              stationCol           = "Station",
                              setupCol             = "Setup_date",
@@ -70,6 +107,7 @@ test_that("errors about NAs in Date/Time are correct", {
                "there are NAs in CTtable[, retrievalCol]", fixed = TRUE)
   expect_error(surveyReport (recordTable          = recordTableSample_datetime_NA,
                              CTtable              = camtraps,
+                             camOp                = camop_no_problem,
                              speciesCol           = "Species",
                              stationCol           = "Station",
                              setupCol             = "Setup_date",
@@ -83,6 +121,7 @@ test_that("errors about NAs in Date/Time are correct", {
 test_that("errors about all NAs in Date/Time are correct", {
   expect_error(surveyReport (recordTable          = recordTableSample,
                              CTtable              = camtraps,
+                             camOp                = camop_no_problem,
                              speciesCol           = "Species",
                              stationCol           = "Station",
                              setupCol             = "Setup_date",
@@ -94,6 +133,7 @@ actual:    02/04/2009", fixed = TRUE)
   
   expect_error(surveyReport (recordTable          = recordTableSample,
                              CTtable              = camtraps,
+                             camOp                = camop_no_problem,
                              speciesCol           = "Species",
                              stationCol           = "Station",
                              setupCol             = "Setup_date",

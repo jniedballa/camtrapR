@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="Write a copyright tag into JPEG image metadata — addCopyrightTag" />
 <meta property="og:description" content="This function writes a copyright tag into the copyright field of JPEG image Exif metadata. It does so recursively, so it works both for images that are sorted into subdirectories and unsorted images. Note that all images in subdirectories of inDir will be tagged. It is not required to run this function in the camtrapR workflow, but may be desired for data sharing or publishing." />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
       </span>
     </div>
 
@@ -77,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -95,13 +98,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -111,8 +114,8 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jniedballa/camtrapR">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/jniedballa/camtrapR/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -138,11 +141,12 @@
     <p>This function writes a copyright tag into the copyright field of JPEG image Exif metadata. It does so recursively, so it works both for images that are sorted into subdirectories and unsorted images. Note that all images in subdirectories of inDir will be tagged. It is not required to run this function in the camtrapR workflow, but may be desired for data sharing or publishing.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>addCopyrightTag</span>(<span class='no'>inDir</span>,
-  <span class='no'>copyrightTag</span>,
-  <span class='kw'>askFirst</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>keepJPG_original</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>addCopyrightTag</span><span class='op'>(</span><span class='va'>inDir</span>, 
+  <span class='va'>copyrightTag</span>,
+  askFirst <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  keepJPG_original <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  ignoreMinorErrors <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -163,57 +167,59 @@
       <th>keepJPG_original</th>
       <td><p>logical. Keep original JPG files as .JPG_original files (TRUE) or overwrite JPGs (FALSE)?</p></td>
     </tr>
+    <tr>
+      <th>ignoreMinorErrors</th>
+      <td><p>logical. Ignore minor errors that would cause the function to fail (set TRUE for images with bad MakerNotes, observed in Panthera V4 cameras)</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>If askFirst = TRUE, the function will show a menu and asks the user to confirm the action before execution. Type "1" to write copyright tags and "2" to abort.</p>
 <p>By default Exiftool creates a copy of each JPG image and preserves the original images (without the copyright tag) as .JPG_original files. Note that this behaviour will instantly double the number of images in inDir and the disk space required. If this is not desired, set keepJPG_original = FALSE.</p>
+<p><code>ignoreMinorErrors</code> is useful if copyright tags can't be updated correctly. This can be caused by bad MakerNotes and so far was only observed in Panthera V4 cameras. In that case, set <code>ignoreMinorErrors</code> to <code>TRUE</code>. This will add the "-m" option to the Exiftool call, thereby ignoring minor errors and warnings and assigning the copyright tag regardless.</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An invisible list of Exiftool output.</p>  
 <p>More importantly, the specified copyright tag is written into the Copyright field of the Exif metadata of all images in inDir.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 
-<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span>(<span class='st'>"exiftool"</span>) <span class='kw'>!=</span> <span class='st'>""</span>){        <span class='co'># only run this example if ExifTool is available</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"exiftool"</span><span class='op'>)</span> <span class='op'>!=</span> <span class='st'>""</span><span class='op'>)</span><span class='op'>{</span>        <span class='co'># only run this example if ExifTool is available</span>
 
 <span class='co'># copy sample images to temporary directory (so we don't mess around in the package directory)</span>
-<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"pictures"</span>, <span class='st'>"sample_images_species_dir"</span>),
-                            <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.copy</a></span>(<span class='kw'>from</span> <span class='kw'>=</span> <span class='no'>wd_images_ID</span>, <span class='kw'>to</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>wd_images_ID_copy</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"sample_images_species_dir"</span>)
+<span class='va'>wd_images_ID</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"pictures"</span>, <span class='st'>"sample_images_species_dir"</span><span class='op'>)</span>, 
+                            package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.copy</a></span><span class='op'>(</span>from <span class='op'>=</span> <span class='va'>wd_images_ID</span>, to <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, recursive <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='va'>wd_images_ID_copy</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"sample_images_species_dir"</span><span class='op'>)</span>
 
 <span class='co'># define a sample tag</span>
-<span class='no'>copyrightTagToAdd</span> <span class='kw'>&lt;-</span> <span class='st'>"Your Name (Your Organisation)"</span>
+<span class='va'>copyrightTagToAdd</span> <span class='op'>&lt;-</span> <span class='st'>"Your Name (Your Organisation)"</span>
 
 <span class='co'># add the tag to the images</span>
-<span class='fu'>addCopyrightTag</span>(<span class='kw'>inDir</span>        <span class='kw'>=</span> <span class='no'>wd_images_ID_copy</span>,
-                <span class='kw'>copyrightTag</span> <span class='kw'>=</span> <span class='no'>copyrightTagToAdd</span>)
+<span class='fu'>addCopyrightTag</span><span class='op'>(</span>inDir        <span class='op'>=</span> <span class='va'>wd_images_ID_copy</span>, 
+                copyrightTag <span class='op'>=</span> <span class='va'>copyrightTagToAdd</span><span class='op'>)</span>
 <span class='fl'>1</span>     <span class='co'># we choose "YES", i.e., we want to add a copyright tag</span>
-
+                
 <span class='co'># you can check the outcome with function exifTagNames</span>
 
-<span class='no'>metadat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='exifTagNames.html'>exifTagNames</a></span>(<span class='no'>wd_images_ID_copy</span>)
-<span class='no'>metadat</span> [<span class='no'>metadat</span>$<span class='no'>tag_name</span> <span class='kw'>==</span> <span class='st'>"Copyright"</span>,]
-}
+<span class='va'>metadat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='exifTagNames.html'>exifTagNames</a></span><span class='op'>(</span><span class='va'>wd_images_ID_copy</span><span class='op'>)</span>
+<span class='va'>metadat</span> <span class='op'>[</span><span class='va'>metadat</span><span class='op'>$</span><span class='va'>tag_name</span> <span class='op'>==</span> <span class='st'>"Copyright"</span>,<span class='op'>]</span>
+<span class='op'>}</span>
 
 
-}</div></pre>
+<span class='op'>}</span>
+</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    <p>Juergen Niedballa</p>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -224,7 +230,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

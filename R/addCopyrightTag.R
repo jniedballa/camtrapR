@@ -1,7 +1,8 @@
 addCopyrightTag <- function(inDir,
                             copyrightTag,
                             askFirst = TRUE,
-                            keepJPG_original = TRUE){
+                            keepJPG_original = TRUE,
+                            ignoreMinorErrors = FALSE){
 
   stopifnot(is.character(inDir))
   stopifnot(file.exists(inDir))
@@ -28,11 +29,14 @@ addCopyrightTag <- function(inDir,
 
   if(isTRUE(doit)){
 
-    command.tmp  <- paste('exiftool -r', overwrite_command  ,'-Copyright="', copyrightTag, '" "', inDir, '"', sep = "")
+    command.tmp  <- paste0('exiftool -r ', ifelse(ignoreMinorErrors, "-m", ""), overwrite_command  ,'-Copyright="', copyrightTag, '" "', inDir, '"')
 
     output <- system(command.tmp, show.output.on.console = FALSE, intern = TRUE)
     message(paste(output[length(output) - 1],
                   output[length(output)]))
+    if(grepl("files weren't updated due to errors",  output[length(output)])) {
+      warning("There were problems adding the copyright tag. Try setting ignoreMinorErrors = TRUE", call. = FALSE)
+    }
     return(invisible(output))
   } else {
     message("Did not write copyright tag")

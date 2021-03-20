@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -98,13 +98,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -115,7 +115,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jniedballa/camtrapR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -141,15 +141,16 @@
     <p>Change the values of digital timestamps in image metadata using ExifTool. If date/time of images were set incorrectly, they can be corrected easily in batch mode for further analyses. Please, always make a backup of your data before using this function to avoid data loss or damage. This is because ExifTool will make a copy of your images and applies the time shifts to the copies. The file extentsion of the original images (.JPG) will be renamed to ".JPG_original".</p>
     </div>
 
-    <pre class="usage"><span class='fu'>timeShiftImages</span> (<span class='no'>inDir</span>,
-  <span class='no'>hasCameraFolders</span>,
-  <span class='no'>timeShiftTable</span>,
-  <span class='no'>stationCol</span>,
-  <span class='no'>cameraCol</span>,
-  <span class='no'>timeShiftColumn</span>,
-  <span class='no'>timeShiftSignColumn</span>,
-  <span class='kw'>undo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>timeShiftImages</span> <span class='op'>(</span><span class='va'>inDir</span>,
+  <span class='va'>hasCameraFolders</span>,
+  <span class='va'>timeShiftTable</span>,
+  <span class='va'>stationCol</span>,
+  <span class='va'>cameraCol</span>,
+  <span class='va'>timeShiftColumn</span>,
+  <span class='va'>timeShiftSignColumn</span>,
+  undo <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  ignoreMinorErrors <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -186,6 +187,10 @@
       <th>undo</th>
       <td><p>logical. Undo changes and restore the original images? Please be careful, this deletes any edited images if <code>TRUE</code></p></td>
     </tr>
+    <tr>
+      <th>ignoreMinorErrors</th>
+      <td><p>logical. Ignore minor errors that would cause the function to fail (set TRUE for images with bad MakerNotes, observed in Panthera V4 cameras)</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -199,44 +204,49 @@ Images in <code>inDir</code> must be sorted into station directories. If <code>h
 <p>ExifTool stores the original images as <code>.JPG_original</code> files in the original file location. By setting <code>undo = TRUE</code>, any JPG files in the directories specified by <code>timeShiftTable</code> will be deleted and the original JPEGs will be restored from the JPG_original files. Please make a backup before using <code>undo</code>.</p>
 <p>Years can have 365 or 366 days, and months 28 to 31 days. Here is how the function handles these (from the exiftool help page):
 "The ability to shift dates by Y years, M months, etc, conflicts with the design goal of maintaining a constant shift for all time values when applying a batch shift. This is because shifting by 1 month can be equivalent to anything from 28 to 31 days, and 1 year can be 365 or 366 days, depending on the starting date. The inconsistency is handled by shifting the first tag found with the actual specified shift, then calculating the equivalent time difference in seconds for this shift and applying this difference to subsequent tags in a batch conversion."</p>
+<p><code>ignoreMinorErrors</code> is useful if image timestamps are not updated correctly (entries in column "n_images" of the output are "... files weren't updated due to errors"). This can be caused by bad MakerNotes and so far was only observed in Panthera V4 cameras. In that case, set <code>ignoreMinorErrors</code> to <code>TRUE</code>. This will add the "-m" option to the Exiftool call, thereby ignoring minor errors and warnings and applying the time shift nevertheless.</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A <code>data.frame</code> containing the information about the processed directories and the number of images.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p><a href='https://exiftool.org/#shift'>https://exiftool.org/#shift</a></p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 
 <span class='co'># copy sample images to temporary directory (so we don't mess around in the package directory)</span>
-<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_species_dir"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.copy</a></span>(<span class='kw'>from</span> <span class='kw'>=</span> <span class='no'>wd_images_ID</span>, <span class='kw'>to</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>wd_images_ID_copy</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"sample_images_species_dir"</span>)
+<span class='va'>wd_images_ID</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"pictures/sample_images_species_dir"</span>, package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.copy</a></span><span class='op'>(</span>from <span class='op'>=</span> <span class='va'>wd_images_ID</span>, to <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, recursive <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='va'>wd_images_ID_copy</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"sample_images_species_dir"</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>timeShiftTable</span>)
-
-
-<span class='no'>timeshift_run</span> <span class='kw'>&lt;-</span> <span class='fu'>timeShiftImages</span>(<span class='kw'>inDir</span>                <span class='kw'>=</span> <span class='no'>wd_images_ID_copy</span>,
-                                 <span class='kw'>timeShiftTable</span>       <span class='kw'>=</span> <span class='no'>timeShiftTable</span>,
-                                 <span class='kw'>stationCol</span>           <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                 <span class='kw'>hasCameraFolders</span>     <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                 <span class='kw'>timeShiftColumn</span>      <span class='kw'>=</span> <span class='st'>"timeshift"</span>,
-                                 <span class='kw'>timeShiftSignColumn</span>  <span class='kw'>=</span> <span class='st'>"sign"</span>,
-                                 <span class='kw'>undo</span>                 <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>timeShiftTable</span><span class='op'>)</span>
 
 
-<span class='no'>timeshift_undo</span> <span class='kw'>&lt;-</span> <span class='fu'>timeShiftImages</span>(<span class='kw'>inDir</span>               <span class='kw'>=</span> <span class='no'>wd_images_ID_copy</span>,
-                                  <span class='kw'>timeShiftTable</span>      <span class='kw'>=</span> <span class='no'>timeShiftTable</span>,
-                                  <span class='kw'>stationCol</span>          <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                  <span class='kw'>hasCameraFolders</span>    <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                  <span class='kw'>timeShiftColumn</span>     <span class='kw'>=</span> <span class='st'>"timeshift"</span>,
-                                  <span class='kw'>timeShiftSignColumn</span> <span class='kw'>=</span> <span class='st'>"sign"</span>,
-                                  <span class='kw'>undo</span>                <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
-}</div></pre>
+<span class='va'>timeshift_run</span> <span class='op'>&lt;-</span> <span class='fu'>timeShiftImages</span><span class='op'>(</span>inDir                <span class='op'>=</span> <span class='va'>wd_images_ID_copy</span>,
+                                 timeShiftTable       <span class='op'>=</span> <span class='va'>timeShiftTable</span>,
+                                 stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                 hasCameraFolders     <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                 timeShiftColumn      <span class='op'>=</span> <span class='st'>"timeshift"</span>,
+                                 timeShiftSignColumn  <span class='op'>=</span> <span class='st'>"sign"</span>,
+                                 undo                 <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
+
+
+<span class='va'>timeshift_undo</span> <span class='op'>&lt;-</span> <span class='fu'>timeShiftImages</span><span class='op'>(</span>inDir               <span class='op'>=</span> <span class='va'>wd_images_ID_copy</span>,
+                                  timeShiftTable      <span class='op'>=</span> <span class='va'>timeShiftTable</span>,
+                                  stationCol          <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                  hasCameraFolders    <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                  timeShiftColumn     <span class='op'>=</span> <span class='st'>"timeshift"</span>,
+                                  timeShiftSignColumn <span class='op'>=</span> <span class='st'>"sign"</span>,
+                                  undo                <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -252,7 +262,7 @@ Images in <code>inDir</code> must be sorted into station directories. If <code>h
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -54,6 +54,8 @@ imageRename <- function(inDir,
       dirs_short  <- dirs_short[-stations2remove]
     }
   }
+  # for pretty console messages
+  max_nchar_station <- max(nchar(dirs_short))
   
   
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
@@ -66,8 +68,8 @@ imageRename <- function(inDir,
   if(isTRUE(writecsv) & isFALSE(hasArg(outDir))) stop("writecsv is TRUE. Please specify outDir", call. = FALSE)
   
   if(isTRUE(hasCameraFolders)){
-    stopifnot(hasArg(keepCameraSubfolders))
-    stopifnot(is.logical(keepCameraSubfolders))
+    if(!hasArg(keepCameraSubfolders)) stop("If hasCameraFolders is TRUE, keepCameraSubfolders must be defined")
+    if(!is.logical(keepCameraSubfolders)) stop("atgument keepCameraSubfolders must be logical (TRUE or FALSE)")
   } else {
     keepCameraSubfolders <- FALSE
   }
@@ -99,14 +101,14 @@ imageRename <- function(inDir,
       warning(paste(dirs_short[i], "seems to contain no images;", " found", length.tmp, "jpgs"), call. = FALSE, immediate. = TRUE)    # give message if station directory contains no jpgs
     } else {
       
-      message(paste(dirs_short[i], ": ", formatC(nrow(metadata.tmp), width = 4), " images", 
+      message(paste(formatC(dirs_short[i], width = max_nchar_station, flag = "-"), ": ", formatC(nrow(metadata.tmp), width = 4), " images", 
                     makeProgressbar(current = i, total = length(dirs_short)), sep = ""))
       
       if(isTRUE(hasCameraFolders)){
         # sort by camera, then image name (in case cameras are not sorted alphabetically)
         metadata.tmp <- metadata.tmp[order(metadata.tmp$Directory, metadata.tmp$FileName),]
         
-        filenames_by_subfolder <- sapply(list.dirs(dirs[i], full.names =TRUE, recursive = FALSE),
+        filenames_by_subfolder <- lapply(list.dirs(dirs[i], full.names =TRUE, recursive = FALSE),
                                          FUN = list.files, pattern = ".jpg$|.JPG$", recursive = TRUE, ignore.case = TRUE)
         metadata.tmp$CameraID <- rep(list.dirs(dirs[i], full.names = FALSE, recursive = FALSE),
                                      times = sapply(filenames_by_subfolder, length))

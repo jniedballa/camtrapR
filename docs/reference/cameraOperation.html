@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -36,8 +40,7 @@
 
 
 <meta property="og:title" content="Create a camera trap station operability matrix — cameraOperation" />
-<meta property="og:description" content="Construct a matrix of daily camera trap station operability for use in detectionHistory and spatialDetectionHistory, where it is needed for calculating trapping effort per occasion. If several cameras were deployed per station, the matrix can contain camera- or station-specific trap operation information." />
-<meta name="twitter:card" content="summary" />
+<meta property="og:description" content="Construct a matrix of daily camera trap station operability for use in detectionHistory and spatialDetectionHistory, where it is needed for calculating trapping effort per occasion. It is also used in surveyReport to calculate the number of trap nights durig a survey. If several cameras were deployed per station, the matrix can contain camera- or station-specific trap operation information, or information about sessions during repeated surveys." />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
       </span>
     </div>
 
@@ -77,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -95,13 +98,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -111,8 +114,8 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jniedballa/camtrapR">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/jniedballa/camtrapR/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -135,23 +138,24 @@
     </div>
 
     <div class="ref-description">
-    <p>Construct a matrix of daily camera trap station operability for use in <code><a href='detectionHistory.html'>detectionHistory</a></code> and <code><a href='spatialDetectionHistory.html'>spatialDetectionHistory</a></code>, where it is needed for calculating trapping effort per occasion. If several cameras were deployed per station, the matrix can contain camera- or station-specific trap operation information.</p>
+    <p>Construct a matrix of daily camera trap station operability for use in <code><a href='detectionHistory.html'>detectionHistory</a></code> and <code><a href='spatialDetectionHistory.html'>spatialDetectionHistory</a></code>, where it is needed for calculating trapping effort per occasion. It is also used in <code><a href='surveyReport.html'>surveyReport</a></code> to calculate the number of trap nights durig a survey. If several cameras were deployed per station, the matrix can contain camera- or station-specific trap operation information, or information about sessions during repeated surveys.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cameraOperation</span>(<span class='no'>CTtable</span>,
-  <span class='kw'>stationCol</span> <span class='kw'>=</span> <span class='st'>"Station"</span>,
-  <span class='no'>cameraCol</span>,
-  <span class='no'>sessionCol</span>,
-  <span class='no'>setupCol</span>,
-  <span class='no'>retrievalCol</span>,
-  <span class='kw'>hasProblems</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>byCamera</span>,
-  <span class='no'>allCamsOn</span>,
-  <span class='no'>camerasIndependent</span>,
-  <span class='kw'>dateFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d"</span>,
-  <span class='kw'>writecsv</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>outDir</span>
-)</pre>
+    <pre class="usage"><span class='fu'>cameraOperation</span><span class='op'>(</span><span class='va'>CTtable</span>, 
+  stationCol <span class='op'>=</span> <span class='st'>"Station"</span>, 
+  <span class='va'>cameraCol</span>, 
+  <span class='va'>sessionCol</span>,
+  <span class='va'>setupCol</span>, 
+  <span class='va'>retrievalCol</span>, 
+  hasProblems <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>byCamera</span>, 
+  <span class='va'>allCamsOn</span>, 
+  <span class='va'>camerasIndependent</span>,
+  dateFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d"</span>, 
+  occasionStartTime <span class='op'>=</span> <span class='fl'>0</span>,
+  writecsv <span class='op'>=</span> <span class='cn'>FALSE</span>, 
+  <span class='va'>outDir</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -170,7 +174,7 @@
     </tr>
     <tr>
       <th>sessionCol</th>
-      <td><p>character. name of the column specifying session ID in <code>CTtable</code> (optional). Use it for creating multi-session / multi-season detection histories (unmarked: <code><a href='https://rdrr.io/pkg/unmarked/man/unmarkedMultFrame.html'>unmarkedMultFrame</a></code>; secr: <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> )</p></td>
+      <td><p>character. name of the column specifying session ID in <code>CTtable</code> (optional). Use it for creating multi-session / multi-season detection   histories (unmarked: <code><a href='https://rdrr.io/pkg/unmarked/man/unmarkedMultFrame.html'>unmarkedMultFrame</a></code>; secr: <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> )</p></td>
     </tr>
     <tr>
       <th>setupCol</th>
@@ -198,7 +202,11 @@
     </tr>
     <tr>
       <th>dateFormat</th>
-      <td><p>character. The format of columns <code>setupCol</code> and <code>retrievalCol</code> (and potential problem columns) in <code>CTtable</code>. Must be interpretable by either <code>as.Date</code> or the "orders" argument <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> in <span class="pkg">lubridate</span>.</p></td>
+      <td><p>character. The format of columns <code>setupCol</code> and <code>retrievalCol</code> (and potential problem columns) in <code>CTtable</code>. Must be interpretable by either <code>as.Date</code> or the "orders" argument <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> in <span class="pkg">lubridate</span>. Can be a date or (since version 2.1) a date-time.</p></td>
+    </tr>
+    <tr>
+      <th>occasionStartTime</th>
+      <td><p>integer. time of day (the full hour) at which to begin occasions. Replaces <code>occasionStartTime</code> from <code><a href='detectionHistory.html'>detectionHistory</a></code> and  <code><a href='spatialDetectionHistory.html'>spatialDetectionHistory</a></code>.</p></td>
     </tr>
     <tr>
       <th>writecsv</th>
@@ -212,12 +220,14 @@
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>cameraCol</code> is NULL by default. The function then assumes there was 1 camera per station <code>CTtable</code>. In more than 1 camera was deployed per station, <code>cameraCol</code> needs to be specified to identify individual cameras within a station.
-<code>dateFormat</code> defaults to "YYYY-MM-DD", e.g. "2014-10-31". It can be specified either in the format required by <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or the 'orders' argument in <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> in <span class="pkg">lubridate</span>. In the example above, "YYYY-MM-DD" would be specified as "%Y-%m-%d" or "ymd".</p>
-<p>If <code>hasProblems</code> is TRUE, the function tries to find columns <code>ProblemX_from</code> and <code>ProblemX_to</code> in <code>CTtable</code>. <code>X</code> is a consecutive number from 1 to n, specifying periods in which a camera or station was not operational. If <code>hasProblems</code> is FALSE, cameras are assumed to have been operational uninterruptedly from setup to retrieval (see <code><a href='camtraps.html'>camtraps</a></code> for details).
-<code>allCamsOn</code> only has an effect if there was more than 1 camera at a station. If TRUE, for the station to be considered operational, all cameras at a station need to be operational. If FALSE, at least 1 active camera renders the station operational.
-Argument <code>camerasIndependent</code> defines if cameras record animals independently (it thus only has an effect if there was more than 1 camera at a station). This is the case if an observation at one camera does not increase the probability for detection at another camera (cameras face different trails at a distance of one another). Non-independence occurs if an animal is likely to trigger both camers (as would be the case with 2 cameras facing each other).
-If <code>camerasIndependent</code> is TRUE, 2 active cameras at a station will result in a station operation value of 2 in the resulting matrix, i.e., 2 independent trap days at 1 station and day. If <code>camerasIndependent</code> is FALSE, 2 active cameras will return value 1, i.e., 1 trap night at 1 station per day.</p>
+    <p><code>cameraCol</code> is NULL by default, meaning the function assumes there was 1 camera per station in <code>CTtable</code>. If more than 1 camera was deployed per station, <code>cameraCol</code> needs to be specified to identify individual cameras within a station. Likewise, <code>sessionCol</code> can be used to if camera trap stations were operated during multiple sessions / trapping seasons.</p>
+<p><code>dateFormat</code> defaults to "YYYY-MM-DD", e.g. "2014-10-31", but can be any other date format or date-time  also. It can be specified either in the format required by <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or the 'orders' argument in <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> in <span class="pkg">lubridate</span>. In the example above, "YYYY-MM-DD" would be specified as "%Y-%m-%d" in base R or "ymd" in <span class="pkg">lubridate</span>.</p>
+<p>Since version 2.1, dateFormat can be a date-time. That makes it possible to specify the exact time cameras were set up / retrieved / malfunctioned / worked again. This information is used to calculate the daily trapping effort more precisely on days with incomplete effort.</p>
+<p>Previously, setup and retrival day were counted as 1, indicating a whole day of effort on those days. Since version 2.1, setup and retrieval are assumed to have happened at 12 noon (resulting in daily effort of 0.5 instead of 1). Users can also specify the exact time cameras were set up (by providing a date-time in the setup / retrieval / problem columns). See vignette 3 for more details.</p>
+<p>If <code>hasProblems</code> is TRUE, the function tries to find columns <code>ProblemX_from</code> and <code>ProblemX_to</code> in <code>CTtable</code>. <code>X</code> is a consecutive number from 1 to n, specifying periods in which a camera or station was not operational. If <code>hasProblems</code> is FALSE, cameras are assumed to have been operational uninterruptedly from setup to retrieval (see <code><a href='camtraps.html'>camtraps</a></code> for details).</p>
+<p><code>allCamsOn</code> only has an effect if there was more than 1 camera at a station. If TRUE, for the station to be considered operational, all cameras at a station need to be operational. If FALSE, at least 1 active camera renders the station operational.
+Argument <code>camerasIndependent</code> defines if cameras record animals independently (it thus only has an effect if there was more than 1 camera at a station). This is the case if an observation at one camera does not increase the probability for detection at another camera (cameras face different trails at a distance of one another). Non-independence occurs if an animal is likely to trigger both camers (as would be the case with 2 cameras facing each other).</p>
+<p>If <code>camerasIndependent</code> is TRUE, 2 active cameras at a station will result in a station operation value of 2 in the resulting matrix, i.e., 2 independent trap days at 1 station and day. If <code>camerasIndependent</code> is FALSE, 2 active cameras will return value 1, i.e., 1 trap night at 1 station per day.</p>
 <p>Row names depend on the input arguments and contain the station name and potentially session and camera names (if <code>sessionCol</code> and/or <code>cameraCol</code> are defined).</p>
 <p>Naming convention is (since version 1.2) <b>Bold</b> information are from the columns <code>stationCol</code>, <code>sessionCol</code> and <code>cameraCol</code> in <code>CTtable</code>:</p>
 <p><b>Station</b> <br />
@@ -238,48 +248,52 @@ Legend: NA: camera(s) not set up, 0: camera(s) not operational, 1 (or higher): n
 
 
 
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>Setting <code>camerasIndependent</code> according to the sampling situation is important for the functions <code><a href='detectionHistory.html'>detectionHistory</a></code> and <code><a href='spatialDetectionHistory.html'>spatialDetectionHistory</a></code>, if sampling effort (the number of active trap nights in a occasion) is to be computed and returned.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>camtraps</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>camtraps</span><span class='op'>)</span>
 
 <span class='co'># no problems/malfunction</span>
-<span class='no'>camop_no_problem</span> <span class='kw'>&lt;-</span> <span class='fu'>cameraOperation</span>(<span class='kw'>CTtable</span>      <span class='kw'>=</span> <span class='no'>camtraps</span>,
-                                    <span class='kw'>stationCol</span>   <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                    <span class='kw'>setupCol</span>     <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                                    <span class='kw'>retrievalCol</span> <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                                    <span class='kw'>writecsv</span>     <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                    <span class='kw'>hasProblems</span>  <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                    <span class='kw'>dateFormat</span>   <span class='kw'>=</span> <span class='st'>"%d/%m/%Y"</span>
-)
+<span class='va'>camop_no_problem</span> <span class='op'>&lt;-</span> <span class='fu'>cameraOperation</span><span class='op'>(</span>CTtable      <span class='op'>=</span> <span class='va'>camtraps</span>,
+                                    stationCol   <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                    setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                    retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                    writecsv     <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                    hasProblems  <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                    dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+<span class='op'>)</span>
 
 <span class='co'># with problems/malfunction</span>
-<span class='no'>camop_problem</span> <span class='kw'>&lt;-</span> <span class='fu'>cameraOperation</span>(<span class='kw'>CTtable</span>      <span class='kw'>=</span> <span class='no'>camtraps</span>,
-                                 <span class='kw'>stationCol</span>   <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                 <span class='kw'>setupCol</span>     <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                                 <span class='kw'>retrievalCol</span> <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                                 <span class='kw'>writecsv</span>     <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                 <span class='kw'>hasProblems</span>  <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                                 <span class='kw'>dateFormat</span>   <span class='kw'>=</span> <span class='st'>"%d/%m/%Y"</span>
-)
+<span class='va'>camop_problem</span> <span class='op'>&lt;-</span> <span class='fu'>cameraOperation</span><span class='op'>(</span>CTtable      <span class='op'>=</span> <span class='va'>camtraps</span>,
+                                 stationCol   <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                 setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                 retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                 writecsv     <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                 hasProblems  <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                                 dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+<span class='op'>)</span>
 
 <span class='co'># with problems/malfunction / dateFormat in lubridate format</span>
-<span class='no'>camop_problem_lubridate</span> <span class='kw'>&lt;-</span> <span class='fu'>cameraOperation</span>(<span class='kw'>CTtable</span>      <span class='kw'>=</span> <span class='no'>camtraps</span>,
-                                           <span class='kw'>stationCol</span>   <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                           <span class='kw'>setupCol</span>     <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                                           <span class='kw'>retrievalCol</span> <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                                           <span class='kw'>writecsv</span>     <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                           <span class='kw'>hasProblems</span>  <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                                           <span class='kw'>dateFormat</span>   <span class='kw'>=</span> <span class='st'>"dmy"</span>
-)
+<span class='va'>camop_problem_lubridate</span> <span class='op'>&lt;-</span> <span class='fu'>cameraOperation</span><span class='op'>(</span>CTtable      <span class='op'>=</span> <span class='va'>camtraps</span>,
+                                           stationCol   <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                           setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                           retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                           writecsv     <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                           hasProblems  <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                                           dateFormat   <span class='op'>=</span> <span class='st'>"dmy"</span>
+<span class='op'>)</span>
 
-<span class='no'>camop_no_problem</span></div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB         NA          1          1          1          1          1
-#&gt; StationC         NA         NA          1          1          1          1
+<span class='va'>camop_no_problem</span>
+</div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
+#&gt; StationA        0.5        1.0        1.0          1          1          1
+#&gt; StationB         NA        0.5        1.0          1          1          1
+#&gt; StationC         NA         NA        0.5          1          1          1
 #&gt;          2009-04-08 2009-04-09 2009-04-10 2009-04-11 2009-04-12 2009-04-13
 #&gt; StationA          1          1          1          1          1          1
 #&gt; StationB          1          1          1          1          1          1
@@ -305,43 +319,13 @@ Legend: NA: camera(s) not set up, 0: camera(s) not operational, 1 (or higher): n
 #&gt; StationB          1          1          1          1          1          1
 #&gt; StationC          1          1          1          1          1          1
 #&gt;          2009-05-14 2009-05-15 2009-05-16 2009-05-17
-#&gt; StationA          1         NA         NA         NA
-#&gt; StationB          1          1          1         NA
-#&gt; StationC          1          1          1          1</div><div class='input'><span class='no'>camop_problem</span></div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB         NA          1          1          1          1          1
-#&gt; StationC         NA         NA          1          1          1          1
-#&gt;          2009-04-08 2009-04-09 2009-04-10 2009-04-11 2009-04-12 2009-04-13
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-04-14 2009-04-15 2009-04-16 2009-04-17 2009-04-18 2009-04-19
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-04-20 2009-04-21 2009-04-22 2009-04-23 2009-04-24 2009-04-25
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-04-26 2009-04-27 2009-04-28 2009-04-29 2009-04-30 2009-05-01
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-05-02 2009-05-03 2009-05-04 2009-05-05 2009-05-06 2009-05-07
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          1          1
-#&gt;          2009-05-08 2009-05-09 2009-05-10 2009-05-11 2009-05-12 2009-05-13
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB          1          1          1          1          1          1
-#&gt; StationC          1          1          1          1          0          0
-#&gt;          2009-05-14 2009-05-15 2009-05-16 2009-05-17
-#&gt; StationA          1         NA         NA         NA
-#&gt; StationB          1          1          1         NA
-#&gt; StationC          0          0          0          0</div><div class='input'><span class='no'>camop_problem_lubridate</span></div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
-#&gt; StationA          1          1          1          1          1          1
-#&gt; StationB         NA          1          1          1          1          1
-#&gt; StationC         NA         NA          1          1          1          1
+#&gt; StationA        0.5         NA         NA         NA
+#&gt; StationB        1.0          1        0.5         NA
+#&gt; StationC        1.0          1        1.0        0.5</div><div class='input'><span class='va'>camop_problem</span>
+</div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
+#&gt; StationA        0.5        1.0        1.0          1          1          1
+#&gt; StationB         NA        0.5        1.0          1          1          1
+#&gt; StationC         NA         NA        0.5          1          1          1
 #&gt;          2009-04-08 2009-04-09 2009-04-10 2009-04-11 2009-04-12 2009-04-13
 #&gt; StationA          1          1          1          1          1          1
 #&gt; StationB          1          1          1          1          1          1
@@ -367,22 +351,46 @@ Legend: NA: camera(s) not set up, 0: camera(s) not operational, 1 (or higher): n
 #&gt; StationB          1          1          1          1          1          1
 #&gt; StationC          1          1          1          1          0          0
 #&gt;          2009-05-14 2009-05-15 2009-05-16 2009-05-17
-#&gt; StationA          1         NA         NA         NA
-#&gt; StationB          1          1          1         NA
-#&gt; StationC          0          0          0          0</div></pre>
+#&gt; StationA        0.5         NA         NA         NA
+#&gt; StationB        1.0          1        0.5         NA
+#&gt; StationC        0.0          0        0.0          0</div><div class='input'><span class='va'>camop_problem_lubridate</span>
+</div><div class='output co'>#&gt;          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06 2009-04-07
+#&gt; StationA        0.5        1.0        1.0          1          1          1
+#&gt; StationB         NA        0.5        1.0          1          1          1
+#&gt; StationC         NA         NA        0.5          1          1          1
+#&gt;          2009-04-08 2009-04-09 2009-04-10 2009-04-11 2009-04-12 2009-04-13
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-04-14 2009-04-15 2009-04-16 2009-04-17 2009-04-18 2009-04-19
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-04-20 2009-04-21 2009-04-22 2009-04-23 2009-04-24 2009-04-25
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-04-26 2009-04-27 2009-04-28 2009-04-29 2009-04-30 2009-05-01
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-05-02 2009-05-03 2009-05-04 2009-05-05 2009-05-06 2009-05-07
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          1          1
+#&gt;          2009-05-08 2009-05-09 2009-05-10 2009-05-11 2009-05-12 2009-05-13
+#&gt; StationA          1          1          1          1          1          1
+#&gt; StationB          1          1          1          1          1          1
+#&gt; StationC          1          1          1          1          0          0
+#&gt;          2009-05-14 2009-05-15 2009-05-16 2009-05-17
+#&gt; StationA        0.5         NA         NA         NA
+#&gt; StationB        1.0          1        0.5         NA
+#&gt; StationC        0.0          0        0.0          0</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#note">Note</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    <p>Juergen Niedballa</p>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -393,7 +401,7 @@ Legend: NA: camera(s) not set up, 0: camera(s) not operational, 1 (or higher): n
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

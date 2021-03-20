@@ -1,16 +1,18 @@
 importFrom("overlap", overlapEst, getBandWidth, densityFit, overlapPlot, densityPlot)
-importFrom("grDevices", col2rgb, dev.off, extendrange, png,
+importFrom("grDevices", col2rgb, dev.off, extendrange, heat.colors, png,
            rgb)
 importFrom("graphics", abline, axis, box, grconvertX, grconvertY,
-           hist, legend, lines, mtext, par, plot, plot.default, 
+           hist, image, legend, lines, mtext, par, plot, plot.default, 
            points, polygon, rect, segments, strheight, strwidth,
            text)
-importFrom("stats", aggregate, na.omit)
-importFrom("utils", modifyList, write.csv, zip)
+importFrom("stats", aggregate, na.omit, start, end)
+importFrom("utils", capture.output, modifyList, write.csv, zip)
 importFrom("methods", hasArg, is)
 importFrom("utils", head, menu, read.table)
 importFrom("sp", CRS, SpatialPointsDataFrame, SpatialPolygonsDataFrame, coordinates)
 importFrom("secr", read.traps, make.capthist, traps, RMarkInput, usage, covariates)
-importFrom("data.table", rbindlist, setDF)
+importFrom("data.table", rbindlist, setDF, setDT, setkey, foverlaps, ":=")
+importFrom("lubridate", as_date, as_datetime, ddays, dhours, dseconds, interval, int_start, int_end, time_length, "%within%")
 
-export(activityDensity, activityHistogram, activityOverlap, activityRadial, addCopyrightTag,  appendSpeciesNames, cameraOperation, checkSpeciesIdentification, checkSpeciesNames, createSpeciesFolders, createStationFolders, detectionHistory, detectionMaps, exifTagNames, exiftoolPath, fixDateTimeOriginal, getSpeciesImages, imageRename, recordTable, recordTableIndividual, spatialDetectionHistory, surveyReport, timeShiftImages)
+
+export(activityDensity, activityHistogram, activityOverlap, activityRadial, addCopyrightTag,  appendSpeciesNames, cameraOperation, checkSpeciesIdentification, checkSpeciesNames, createSpeciesFolders, createStationFolders, detectionHistory, detectionMaps, exifTagNames, exiftoolPath, fixDateTimeOriginal, getSpeciesImages, imageRename, OCRdataFields, recordTable, recordTableIndividual, spatialDetectionHistory, surveyReport, timeShiftImages, writeDateTimeOriginal)

@@ -23,7 +23,7 @@ detectionHistory(recordTable,
  buffer,
  includeEffort = TRUE,
  scaleEffort = FALSE,
- occasionStartTime = 0,
+ occasionStartTime = "deprecated",
  datesAsOccasionNames = FALSE,
  timeZone,
  writecsv = FALSE,
@@ -79,7 +79,7 @@ detectionHistory(recordTable,
   logical. scale and center effort matrix to mean = 0 and sd = 1?
 }
   \item{occasionStartTime}{
-  integer. time of day (the full hour) at which to begin occasions.
+  (DEPRECATED) integer. time of day (the full hour) at which to begin occasions. Please use argument \code{occasionStartTime} in \code{\link{cameraOperation}} instead.
 }
   \item{datesAsOccasionNames}{
   If \code{day1 = "survey"}, occasion names in the detection history will be composed of first and last day of that occasion.
@@ -105,7 +105,8 @@ The function computes a species detection matrix, either as a detection-by-date 
 
 \code{includeEffort} controls whether an additional effort matrix is computed or not. This also affects the detection matrices. If \code{includeEffort = FALSE}, all occasions in which a station was not set up or malfunctioning (NA or 0 in \code{camOp}) will result in NAs in the detection history. If \code{includeEffort = TRUE}, the record history will only contain 0 and 1, and no NAs. The effort matrix can then be included in occupancy models as a (continuous) observation covariate to estimate the effect of effort on detection probability.
 
-The number of days that are aggregated is controlled by \code{occasionLength}. \code{occasionStartTime} can be used to make occasions begin another hour than midnight (the default). This may be relevant for nocturnal animals, in which 1 whole night would be considered an occasion.
+The number of days that are aggregated is controlled by \code{occasionLength}. \code{occasionStartTime} will be removed from the function. It has moved to \code{\link{cameraOperation}}, to ensure daily effort is computed correctly and takes the occasion start time into account. %can be used to make occasions begin another hour than midnight (the default). This may be relevant for nocturnal animals, in which 1 whole night would be considered an occasion.
+
 The values of \code{stationCol} in \code{recordTable} must be matched by the row names of \code{camOp} (case-insensitive), otherwise an error is raised.
 
 \code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be interpreted either by base-R via \code{\link[base]{strptime}} or in \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument "orders"). \pkg{lubridate} will be used if there are no "\%" characters in \code{recordDateTimeFormat}. 

@@ -28,6 +28,8 @@ The functions in this section set up a directory structure for storing camera tr
 \tabular{ll}{
 \code{\link{createStationFolders}} \tab Create camera trap station directories for raw images \cr
 \code{\link{fixDateTimeOriginal}}  \tab Fix DateTimeOriginal Exif metadata tag in Reconyx Hyperfire cameras \cr
+\code{\link{OCRdataFields}}        \tab Optical character recognition (OCR) from data fields in images \cr
+\code{\link{writeDateTimeOriginal}} \tab Write values to DateTimeOriginal tag in image metadata \cr
 \code{\link{timeShiftImages}}      \tab Apply time shifts to JPEG images \cr
 \code{\link{imageRename}}          \tab Copy and rename images based on station ID and image creation date \cr
 \code{\link{addCopyrightTag}}      \tab Write a copyright tag into JPEG image metadata \cr
@@ -127,7 +129,7 @@ Maintainer:Juergen Niedballa <camtrapr@gmail.com>
 
 \references{
 
-Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016): camtrapR: an R package for efficient camera trap data management. Methods in Ecology and Evolution, 7(12). \url{http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12600/full} \cr
+Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016): camtrapR: an R package for efficient camera trap data management. Methods in Ecology and Evolution, 7(12). \url{https://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12600/full} \cr
 
 camtrapR Google Group \url{https://groups.google.com/forum/#!forum/camtrapr} \cr
 
@@ -143,6 +145,7 @@ Phil Harvey's ExifTool \url{https://exiftool.org/} \cr
 \seealso{
 \pkg{overlap}
 \pkg{unmarked}
+\pkg{ubms}
 \pkg{secr}
 \pkg{plotrix}
 \pkg{taxize}

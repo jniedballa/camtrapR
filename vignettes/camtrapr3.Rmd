@@ -1,16 +1,17 @@
 ---
-title: "3. Extracting Data from Camera Trapping Images and videos, creating occupancy & secr input"
+title: "3. Data Extraction from Images and videos, creating occupancy & secr input"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output:
-  html_document:
+    html_document:
     toc: true
     toc_float:
       collapsed: false
       smooth_scroll: false
     toc_depth: 2
+    df_print: kable
 vignette: >
-  %\VignetteIndexEntry{3. Extracting data from camera trap images, creating occupancy & secr input}
+  %\VignetteIndexEntry{3. Data Extraction from Images and videos, creating occupancy & secr input}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -231,14 +232,22 @@ head(rec.db.pbe)
 # Camera Operation 
 
 The camera operation matrix is a day-by-station matrix that states how many cameras were active at a station on a given day. Rows represent stations and columns days, beginning with the day the first camera was set up and ending the day the last camera was retrieved.
+It is calculated from the camera trap table mention in vignette 1 (see ?camtraps for an example). Users can give the setup / retrieval / problem columns in the input table as dates or date-times (since version 2.1.0). 
 
+*Important:* Prior to version 2.1.0, the values were integer numbers, with 1 indicating the camera was active on a day (or possibly higher values if multiple cameras at a station are combined).
+
+From version 2.1.0, the values are the fraction of the day a camera was active. If only dates are provided in the camera trap table, the function will assume 12 noon as setup/retrieval time Problem periods will be assumed to last the entire day.
+
+If imput is provided as date-times, output will be the exact fraction of day a station or camera was active (taking into account setup / retrieval time as well as time of Problem periods). 
+
+## Dates as input
+ 
 ```{r}
  # first load the camera trap station table
-
 data(camtraps)
 
-dateFormat <- "%d/%m/%Y"
-# alternatively, use "dmy" (requires package "lubridate")
+dateFormat <- "dmy"    # requires lubridate package
+# alternatively, use "%d/%m/%Y" (from base R)
  
 camop_problem <- cameraOperation(CTtable      = camtraps,
                                  stationCol   = "Station",
@@ -257,47 +266,219 @@ camop_problem[, 1:5]
 camop_problem[, (ncol(camop_problem)-6):ncol(camop_problem)]
 ```
 
-If stations were not set up, values are NA. If they were set up but malfunctioning, it is 0. Operational stations get value 1.
+If stations were not set up, values are NA. Operational stations get value 1. If cameras were set up but malfunctioning, it is 0 (if hasProblems = TRUE). 
 
+## Date-times as input
 
-Here is a little function for plotting the camera operation matrix. Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.
 
 ```{r}
-camopPlot <- function(camOp, 
-                      palette = "Heat"){
-  
-  which.tmp <- grep(as.Date(colnames(camOp)), pattern = "01$")
-  label.tmp <- format(as.Date(colnames(camOp))[which.tmp], "%Y-%m")
-  at.tmp <- which.tmp / ncol(camOp)
-  
-  values_tmp <- sort(na.omit(unique(c(camOp))))
+camtraps_hrs <- camtraps
 
-  # hcl.colors only exists in R >3.6.0, use heat.colors for earlier versions
-  if(getRversion() >= "3.6.0") {
-    image_colors <- grDevices::hcl.colors(n = length(values_tmp), palette = palette, rev = TRUE)
-  } else {
-    image_colors <- heat.colors(n = length(values_tmp), rev = TRUE)
-  }
-  
-  image(t(as.matrix(camOp)), xaxt = "n", yaxt = "n", col = image_colors)
-  axis(1, at = at.tmp, labels = label.tmp)
-  axis(2, at = seq(from = 0, to = 1, length.out = nrow(camOp)), labels = rownames(camOp), las = 1)
-  abline(v = at.tmp, col = rgb(0,0,0, 0.2))
-  box()
-}
+# assign hours for setup and retrieval
+camtraps_hrs$Setup_date     <- paste(camtraps_hrs$Setup_date, c("12", "15", "18"))
+camtraps_hrs$Retrieval_date <- paste(camtraps_hrs$Retrieval_date, c("18", "15", "12"))
+
+# assign a random hours for begin of Problem at station 3
+camtraps_hrs$Problem1_from[3]  <- paste(camtraps_hrs$Problem1_from[3], "20")
+# Problem ends with retrieval (i.e., malfunction until camera retrieved)
+camtraps_hrs$Problem1_to[3]  <- camtraps_hrs$Retrieval_date[3]
+
+
+
+
+# create camera operation matrix
+camop_hours <- cameraOperation(CTtable = camtraps_hrs,
+                                         stationCol   = "Station",
+                                         setupCol     = "Setup_date",
+                                         retrievalCol = "Retrieval_date",
+                                         hasProblems  = TRUE,
+                                         dateFormat   = "dmy H"
+)
+
+# as a reminder, these are the date-times in our station information table
+camtraps_hrs
+# now let's have a look at the first few columns of the camera operation matrix
+camop_hours[, 1:5]
+# and the last few
+camop_hours[, (ncol(camop_hours)-6):ncol(camop_hours)]
 ```
 
-And this is what we get (in two different color palettes, on R 3.6.0 or higher).
+
+## Differences between version 2.1 and previous versions
+
+Version 2.1 introduced support of cameraOperation() for date-times in the setup / retrieval / problem columns. By giving the setup / retrieval / problem columns as date-times (and adjusting argument dateFormat accordingly), one can calculate precise daily effort.
+
+
+If the times are unknown and users provide dates only to argument dateFormat, camtrapR will assume that setup and retrieval were at 12 noon. Malfunction periods (indicated by the problem columns) will be interpreted as the cameras having malfunctioned the whole day. 
+
+
+This is how the handling of setup/retrieval days differs between dates and date-times in dateFormat:
+
+| version  | dateFormat is date  | dateFormat is date-time |
+|-|-|-|
+| prior to 2.1  | 1   | not implemented |
+| 2.1 and later | 0.5 | calculated precisely |
+
+
+This is how the handling of problems / malfunction periods differs between dates and date-times in dateFormat:
+
+| version  | dateFormat is date  | dateFormat is date-time |
+|-|-|-|
+| prior to 2.1  | 0 | not implemented |
+| 2.1 and later | 0 | calculated precisely |
+  
+
+
+## Camera days vs. camera nights
+
+By default, the camera operation matrix refers to days, centered on noon and lasting from midnight to midnight the next day. In some situations it can make sense to shift the time frame for analyses, so the camera operation matrix describes trap nights (centered on midnight, lasting from noon to noon the next day). 
+
+To that end, the argument occasionStartTime can be set. Prior to version 2.1.0, it was an argument of detectionHistory and spatialDetectionHistory, but was moved to cameraOperation in v2.1.0. It can be set to an hour between 0 and 23, describing the hour the occasions begin. 
+
+```{r}
+# create camera operation matrix with occasions / trap days starting on noon (until noon the next day)
+camop_hours_12 <- cameraOperation(CTtable = camtraps_hrs,
+                                  stationCol   = "Station",
+                                  setupCol     = "Setup_date",
+                                  retrievalCol = "Retrieval_date",
+                                  hasProblems  = TRUE,
+                                  dateFormat   = "dmy H",
+                                  occasionStartTime = 12
+)
+
+# now let's have a look at the first few columns of the camera operation matrix
+camop_hours_12[, 1:5]
+# and the last few
+camop_hours_12[, (ncol(camop_hours_12)-6):ncol(camop_hours_12)]
+
+```
+
+The column names now indicate the shift, "+12h" in the example above. That means that the first column shows the effort from 12 noon on 2009-04-02 until 12 noon 2009-04-03.
+
+When using this camera operation matrix in detectionHistory or spatialDetectionHistory, the shift will be extracted and trapping effort will be calculated accordingly. Therefore, the argument occasionStartTime in these two functions is deprecated from version 2.1.0.
+
+
+## Combining multiple cameras per station
+
+Often multiple cameras are set at a station, but data are to be analysed on a station-level, not at the level of individual cameras. cameraOperation can combine these effort of individual cameras according to how they were set up.
+
+First, let's create a simple artifial data set. Note how the columns contain an hour (e.g. 12 noon in this case: "2020-01-01 12"). Other formats for date-time are possible and can be specified with argument dateFormat in cameraOperation.
+```{r}
+camtraps_by_camera <- data.frame(Station = c("A", "A"),
+                        camera = c("cam1", "cam2"),
+                        setup = c("2020-01-01 12"),
+                        retrieval = c("2020-01-08 18", "2020-01-07 18"),
+                        Problem1_from = c("2020-01-03 12", NA),
+                        Problem1_to = c("2020-01-05 18", NA),
+                        Problem2_from = c("2020-01-06 12", NA),
+                        Problem2_to = c("2020-01-07 12", NA))
+
+camtraps_by_camera
+```
+
+ To aggregate data from cameras to station, you need a camera column ("camera" in the example above). Furthermore, set argument byCamera = FALSE. Then, the combinations of the arguments camerasIndependent and allCamsOn define how effort from individual cameras is combined. allCamsOn means all cameras need to be active for a station to be considered active. camerasIndepndent specifies whether the cameras accumulate effort independently or now. See ?cameraoperation for details.
+ 
+ Below we'll run cameraOperation of the little sample table camtraps_by_camera, for all possible combinations of allCamsOn, cameraOperation and hasProblems.
+  
+  
+```{r}
+# list of common arguments for the different function runs
+ args.common <- list(CTtable = camtraps_by_camera,
+  stationCol = "Station",
+  cameraCol  = "camera",
+  setupCol   = "setup",
+  retrievalCol = "retrieval",
+  dateFormat = "ymd H",
+  byCamera = FALSE,
+  writecsv = FALSE
+  )
+ 
+# combinations of the arguments of interest
+ fun.args0 <- expand.grid(allCamsOn = c(T,F),
+                                 camerasIndependent = c(T,F),
+                                 hasProblems = c(T,F))
+ 
+ # create a list of function arguments with the varying arguments
+   fun.args1 <- apply(fun.args0, MARGIN = 1, FUN = function(x) modifyList(args.common, as.list(x)))
+   
+   # run cameraOperation on each combination of arguments, and combine into an output table with the function arguments
+   camOp_station_aggregation <- cbind(fun.args0, do.call(rbind, lapply(fun.args1, FUN = function(x)
+     do.call(cameraOperation, x))), row.names = NULL)
+   
+```
+
+Now let's see how the daily effort was combined for the different combinations of allCamsOn and camerasIndependent when hasProblems is FALSE.
+
+```{r}
+   camOp_station_aggregation [camOp_station_aggregation$hasProblems == FALSE, -3]
+```
+
+sS you can see, allCamsOn has no effect if all cameras were active (due to hasProblems = FALSE). The differences on the setup/retrieval day are due to camerasIndependent.
+
+Now with hasProblems = TRUE:
+
+```{r}
+   camOp_station_aggregation [camOp_station_aggregation$hasProblems == TRUE, -3]
+```
+
+
+Here's how the daily aggregates are calculate for the different combinations of allCamsOn and camerasIndependent, and depending on whether input columns are date or date-time (from v2.1.0). In the table below, x is a vector of values at individual cameras for one day (e.g. c(1,0.5) when one camera was active the whole day, the other cameras half a day).
+
+| camerasIndependent | allCamsOn | input columns  | aggregate with | example c(1, 0.5) |  example c(1, 1) |
+|---|---|---|---|---|---|
+| TRUE | TRUE | date-time | ifelse(all(x == 1), sum(x), min(x) * length(x)) | 1  | 2  |
+| TRUE | TRUE | date |  ifelse(all(x == 1), sum(x), 0) | 0  | 2 |
+| TRUE | FALSE | date-time | sum  | 1.5 | 2 |
+| TRUE | FALSE | date| sum | 1.5 | 2 |
+| FALSE |TRUE | date-time | min | 0.5 | 1 |
+| FALSE| TRUE | date | ifelse(all(x == 1), 1, 0) | 0 | 1 |
+| FALSE| FALSE | date-time | mean | 0.75 | 2 |
+| FALSE |FALSE | date| ifelse(sum(x, na.rm = TRUE) >= 1, 1, sum(x, na.rm = TRUE))  | 1 | 1 |
+
+
+
+## Plotting camera operation matrices
+
+There is a little function for plotting the camera operation matrix included in the package, but not exported in the Namespace. It is accessible with camtrapR:::camopPlot(). Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.
+
+
+Here is the camera operation matrix calculated above  (in two different color palettes, the default being the viridis palette - requires R 3.6.0 or higher).
 
 ```{r}
 par(mfrow = c(1,2))
-camopPlot(camOp = camop_problem)
-camopPlot(camOp = camop_problem, palette = "Viridis")
+camtrapR:::camopPlot(camOp = camop_problem)
+camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat")
 ```
 
-```{r include = FALSE}
-par(mfrow = c(1,2))
+<!--  ```{r include = FALSE} -->
+<!--   par(mfrow = c(1,2)) -->
+<!--  ``` -->
+
+One can also plot with the levelplot function from the lattice package:
+```{r}
+camtrapR:::camopPlot(camOp = camop_problem, lattice = TRUE)
+camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat", lattice = TRUE)
 ```
+
+
+
+Here is what it would look like if the year is wrong for one station.
+```{r}
+camtraps_typo <- camtraps
+# replace 2009 with 2008 in setup date of station A
+camtraps_typo$Setup_date[1] <- gsub("2009", "2008", camtraps_typo$Setup_date[1])
+
+camop_typo <- cameraOperation(CTtable      = camtraps_typo,
+                                 stationCol   = "Station",
+                                 setupCol     = "Setup_date",
+                                 retrievalCol = "Retrieval_date",
+                                 writecsv     = FALSE,
+                                 hasProblems  = TRUE,
+                                 dateFormat   = dateFormat
+)
+camtrapR:::camopPlot(camop_typo)
+```
+
 
 Note that the colors are stretched between the lowest and highest value. There is no dedicated color for 0, designating non-operational cameras. 
 
@@ -405,6 +586,7 @@ DetHist3 <- detectionHistory(recordTable          = recordTableSample,
                              scaleEffort          = TRUE
 )
 
+DetHist3[[1]]  # detection history (same as above)
 DetHist3[[2]]  # effort (scaled)
 DetHist3[[3]]  # scaling parameters for back-transformation
 
@@ -514,7 +696,7 @@ camop_season <- cameraOperation(CTtable         = camtrapsMultiSeason,
 
 # plot camera operation matrix
 par(oma = c(0,7,0,0))
-camopPlot(camop_season)
+camtrapR:::camopPlot(camop_season)
 
 
 # make multi-season detection history

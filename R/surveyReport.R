@@ -1,12 +1,13 @@
 surveyReport <- function(recordTable,
                          CTtable,
+                         camOp,
                          speciesCol = "Species",
                          stationCol = "Station",
                          cameraCol,
                          setupCol,
                          retrievalCol,
                          CTDateFormat = "%Y-%m-%d",
-                         CTHasProblems = FALSE,
+                         CTHasProblems = "deprecated",
                          recordDateTimeCol = "DateTimeOriginal",
                          recordDateTimeFormat = "%Y-%m-%d %H:%M:%S",
                          Xcol,
@@ -15,9 +16,32 @@ surveyReport <- function(recordTable,
                          makezip
 ){
   
+  # To do: 
+  # - setup/retrieval with hour (seems to work, when using base R date-time string is converted to date.)
+  # - sessionCol? As long as camOp and CTtable match it should be fine. But all aggregate commands need a session column (dummy if only one session).
+  # - explanation in vignette / help file
+  
+  
   # check column names
-  checkForSpacesInColumnNames(stationCol = stationCol, setupCol = setupCol, retrievalCol = retrievalCol,
-                              recordDateTimeCol = recordDateTimeCol, speciesCol = speciesCol)
+  checkForSpacesInColumnNames(stationCol = stationCol, 
+                              setupCol = setupCol, 
+                              retrievalCol = retrievalCol,
+                              recordDateTimeCol = recordDateTimeCol, 
+                              speciesCol = speciesCol)
+  
+  # check input
+  if(!hasArg(recordTable))         stop("'recordTable' is not defined", call. = FALSE)
+  if(!is.data.frame(recordTable))  stop("'recordTable' must be a data.frame", call. = FALSE)
+  if(hasArg(CTHasProblems))        message("Since version 2.1, argument CTHasProblems is deprecated. It was replaced with the new argument camOp. Periods when cameras malfunctioned are now assinged via camOp.")
+  if(!hasArg(camOp))               stop("'camOp' is not defined", call. = FALSE)
+  if(!inherits(camOp, "matrix"))   stop("camOp must be a matrix", call. = FALSE)
+  if(any(camOp < 0, na.rm = TRUE)) stop("camOp may only contain positive values (set scaleEffort = FALSE in cameraOperation().")
+  
+  camop.info.df <- deparseCamOpRownames(camOp)   # only works if camOp is station-specific
+  if("camera" %in% colnames(camop.info.df))  stop("camera operation matrix is camera-specific. Please provide a camera operation matrix that is by station (byCamera = FALSE).\nThis is necessary for correctly calculating the number of active days (taking into account whether cameras were independent or not).", call. = FALSE)
+  if("session" %in% colnames(camop.info.df)) stop("camera operation matrix contains sessions. This is currently not supported. Please run the survey report separately for the different sessions.", call. = FALSE)
+  
+  
   
   CTtable     <- dataFrameTibbleCheck(df = CTtable)
   recordTable <- dataFrameTibbleCheck(df = recordTable)
@@ -87,85 +111,15 @@ surveyReport <- function(recordTable,
   recordTable$Date2 <- as.Date(recordTable$DateTime2, tz = "UTC")
   
   
-  # if("POSIXlt" %in% class(recordTable$DateTime2) == FALSE) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat")
-  # if(any(is.na(recordTable$DateTime2))) stop(paste("at least 1 entry in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat. row",
-  #                                                  paste(which(is.na(recordTable$DateTime2)), collapse = ", ")))
-  
   if(all(as.character(unique(recordTable[,stationCol])) %in% CTtable[,stationCol]) == FALSE){
     (stop("Not all values of stationCol in recordTable are matched by values of stationCol in CTtable"))
   }
   
-  # check date columns and format
   
+  # check date columns and format
   CTtable[,setupCol]     <- parseDateObject(inputColumn = CTtable[,setupCol],     CTDateFormat, checkNA = TRUE, checkEmpty = TRUE)
   CTtable[,retrievalCol] <- parseDateObject(inputColumn = CTtable[,retrievalCol], CTDateFormat, checkNA = TRUE, checkEmpty = TRUE)
   
-  
-  if(isTRUE(CTHasProblems)){    # camera problem columns
-    
-    # check that problems are arranged in order 1,2,3,...
-    cols.prob.from <- grep(colnames(CTtable), pattern = "Problem\\d\\Sfrom")
-    cols.prob.to   <- grep(colnames(CTtable), pattern = "Problem\\d\\Sto")
-    
-    if(length(cols.prob.from) == 0) stop("could not find column ProblemX_from")
-    if(length(cols.prob.to) == 0)   stop("could not find column ProblemX_to")
-    
-    if(all(order(colnames(CTtable)[cols.prob.from]) == seq(1:length(cols.prob.from))) == FALSE){"problem columns are not arranged correctly"}
-    if(all(order(colnames(CTtable)[cols.prob.to])   == seq(1:length(cols.prob.to)))   == FALSE){"problem columns are not arranged correctly"}
-    
-    if(length(cols.prob.from) != length(cols.prob.to)){
-      stop("number of 'Problem..._from' and 'Problem..._to' columns differs. Check column names Sample: 'Problem1_from', 'Problem1_to'")
-    }
-    
-    n_days_inactive <- data.frame(matrix(NA,
-                                         ncol = length(cols.prob.from),
-                                         nrow = nrow(CTtable)))
-    
-    for(xy in 1:length(cols.prob.from)){
-      
-      if(isTRUE(unlist(strsplit(colnames(CTtable)[cols.prob.from[xy]], split = "_"))[1] !=
-                unlist(strsplit(colnames(CTtable)[cols.prob.to[xy]], split = "_"))[1])) stop (
-                  paste("problem columns are arranged incorrectly (",
-                        colnames(CTtable)[cols.prob.from[xy]], ", ",
-                        colnames(CTtable)[cols.prob.to  [xy]], ")",
-                        sep = "")
-                )
-      
-      CTtable[, cols.prob.from[xy]] <- parseDateObject(inputColumn = CTtable[, cols.prob.from[xy]], CTDateFormat, checkNA = FALSE, checkEmpty = FALSE)
-      CTtable[, cols.prob.to[xy]]   <- parseDateObject(inputColumn = CTtable[, cols.prob.to[xy]],   CTDateFormat, checkNA = FALSE, checkEmpty = FALSE)
-      
-      n_days_inactive[,xy] <- CTtable[cols.prob.to[xy]] - CTtable[cols.prob.from[xy]]       # compute number of inactive trap nights
-      n_days_inactive[,xy] <- as.integer(n_days_inactive[,xy])
-    }
-    for(xyz in cols.prob.from){
-      if(any(CTtable[,setupCol] > CTtable[,xyz], na.rm = TRUE)){
-        stop(paste(paste(CTtable[which(CTtable[,setupCol] > CTtable[,xyz]), stationCol], collapse = ", "), ": Problem begins before Setup"))
-      }
-    }
-    for(xyz2 in cols.prob.to){
-      if(any(CTtable[,retrievalCol] < CTtable[,xyz2], na.rm = TRUE)){
-        stop(paste(paste(CTtable[which(CTtable[,retrievalCol] < CTtable[,xyz2]), stationCol], collapse = ", "), ": Problem ends after retrieval"))
-      }
-    }
-    rm(xy, xyz, xyz2)
-    
-    n_days_inactive_rowsum <- rowSums(n_days_inactive, na.rm = TRUE)
-  } else {
-    n_days_inactive_rowsum <- rep(0, times = nrow(CTtable))
-  }
-  stopifnot(nrow(n_days_inactive_rowsum) == nrow(CTtable))
-  
-  n_days_inactive_rowsum <- aggregate(n_days_inactive_rowsum,
-                                      by    = list(CTtable[,stationCol]),
-                                      FUN   = sum,
-                                      na.rm = TRUE)
-  
-  
-  # adjust options for printing results
-  options.tmp <- options()
-  on.exit(options(options.tmp))
-  options(max.print=1e6)
-  options(width = 1000)
   
   # station and image date ranges
   station.tmp1 <- aggregate(CTtable[,setupCol],
@@ -180,32 +134,143 @@ surveyReport <- function(recordTable,
   image.tmp2   <- aggregate(recordTable$Date2,
                             list(recordTable[,stationCol]),
                             FUN = max)
+  n_cameras.tmp   <- aggregate(CTtable[,stationCol],
+                               list(CTtable[,stationCol]),
+                               FUN = length)
   
   
-  n_nights_total      <- as.integer(CTtable[,retrievalCol] - CTtable[,setupCol])
-  n_nights_total_agg  <- aggregate(n_nights_total,
+  station_dates <- data.frame(station     = station.tmp1[,1], 
+                              setup       = station.tmp1[,2],
+                              image_first = image.tmp1[,2],
+                              image_last  = image.tmp2[,2],
+                              retrieval   = station.tmp2[,2],
+                              n_cameras   = n_cameras.tmp[,2])
+  
+  n_calendar_days_total <- rowSums(camOp >= 0, na.rm =TRUE)
+  
+  # Calendar days on which cameras were active, by row.
+  n_calendar_days_active <- rowSums(camOp > 0, na.rm =TRUE)
+  
+  # sum of inactive calendar days (by row)
+  n_calendar_days_inactive <- rowSums(camOp == 0, na.rm =TRUE)
+  
+  # trap-nights (counting independent cameras separately)
+  # per station, number of active cameras * number of active days
+  n_trap_nights_active <- rowSums(camOp, na.rm =TRUE) 
+  
+  
+  
+  #######################
+  # # Legacy calculation of active days - for the sake of continuity
+  # # doesn't return same results as old version
+  # # when there's 2 cameras per station and 1 malfunctioned at the end, difference is 0.5 days
+  # n_days_inactive_rowsum <- vector(mode = "numeric")
+  # #sum up days with problems
+  # for(i in 1:nrow(camop_matrix)){
+  #   rows_of_interest <- seq(match(as.character(station_dates$setup)[i], colnames(camop_matrix)) + 1,
+  #                           match(as.character(station_dates$retrieval)[i], colnames(camop_matrix)) - 1)
+  #   # n_cameras - actual effort -> number of inactive days
+  #   n_days_inactive_rowsum[i] <- sum(station_dates$n_cameras[i] - camop_matrix[i, rows_of_interest], na.rm = TRUE)
+  # } 
+  # #n_days_inactive_rowsum <- apply(, MARGIN = 1, FUN = function(x) sum(x < max(x, na.rm = TRUE), na.rm = TRUE))
+  # 
+  # n_nights_total_legacy      <- as.integer(CTtable[,retrievalCol] - CTtable[,setupCol])
+  #  n_nights_total_agg_legacy  <- aggregate(n_nights_total,
+  #                                   by  = list(CTtable[,stationCol]),
+  #                                   FUN = sum)
+  # # n_cameras_total_agg <- aggregate(CTtable[,stationCol],
+  # #                                  by  = list(CTtable[,stationCol]),
+  # #                                  FUN = length)
+  # n_nights_active_legacy     <- n_nights_total_agg_legacy$x - n_days_inactive_rowsum
+  
+  
+  
+  
+  # Legacy calculation - full old code
+  
+  # infer CTHasProblems
+  
+  CTHasProblems <- TRUE
+  # check that problems are arranged in order 1,2,3,...
+  cols.prob.from <- grep(colnames(CTtable), pattern = "Problem\\d\\Sfrom")
+  cols.prob.to   <- grep(colnames(CTtable), pattern = "Problem\\d\\Sto")
+  
+  if(length(cols.prob.from) == 0 | length(cols.prob.to) == 0) CTHasProblems <- FALSE 
+  if(!all(order(colnames(CTtable)[cols.prob.from]) == seq(1:length(cols.prob.from)))) CTHasProblems <- FALSE 
+  if(!all(order(colnames(CTtable)[cols.prob.to])   == seq(1:length(cols.prob.to)))) CTHasProblems <- FALSE 
+  if(length(cols.prob.from) != length(cols.prob.to)) CTHasProblems <- FALSE 
+  
+  if(isTRUE(CTHasProblems)){    # camera problem columns
+    
+    n_days_inactive_legacy <- data.frame(matrix(NA,
+                                         ncol = length(cols.prob.from),
+                                         nrow = nrow(CTtable)))
+    
+    for(xy in 1:length(cols.prob.from)){
+      
+      # if(isTRUE(unlist(strsplit(colnames(CTtable)[cols.prob.from[xy]], split = "_"))[1] !=
+      #           unlist(strsplit(colnames(CTtable)[cols.prob.to[xy]], split = "_"))[1])) stop (
+      #             paste("problem columns are arranged incorrectly (",
+      #                   colnames(CTtable)[cols.prob.from[xy]], ", ",
+      #                   colnames(CTtable)[cols.prob.to  [xy]], ")",
+      #                   sep = "")
+      #           )
+      
+      CTtable[, cols.prob.from[xy]] <- parseDateObject(inputColumn = CTtable[, cols.prob.from[xy]], CTDateFormat, checkNA = FALSE, checkEmpty = FALSE)
+      CTtable[, cols.prob.to[xy]]   <- parseDateObject(inputColumn = CTtable[, cols.prob.to[xy]],   CTDateFormat, checkNA = FALSE, checkEmpty = FALSE)
+      
+      n_days_inactive_legacy[,xy] <- CTtable[cols.prob.to[xy]] - CTtable[cols.prob.from[xy]]       # compute number of inactive trap nights
+      # EDIT 2021-01-17: the line above computes time difference between start and end of problem. So yesterday and end today = 1 day, not 2 days as in the new version
+      # basically, that's assuming problems began / ended at noon (for the sake of computing the effort)
+      # hence, the number of inactive days was 1 less in the old version compared to the new version. 
+      # if problem_to = retrieval, difference will only be 0.5 per camera (because in new version, retrieval is assumed to be 12 noon)
+      
+      n_days_inactive_legacy[,xy] <- as.integer(n_days_inactive_legacy[,xy])
+    }
+
+    n_days_inactive_rowsum_legacy <- rowSums(n_days_inactive_legacy, na.rm = TRUE)
+  } else {
+    n_days_inactive_rowsum_legacy <- rep(0, times = nrow(CTtable))
+  }
+  stopifnot(nrow(n_days_inactive_rowsum_legacy) == nrow(CTtable))
+  
+  n_days_inactive_rowsum_legacy <- aggregate(n_days_inactive_rowsum_legacy,
+                                      by    = list(CTtable[,stationCol]),
+                                      FUN   = sum,
+                                      na.rm = TRUE)
+
+  n_nights_total_legacy      <- as.integer(CTtable[,retrievalCol] - CTtable[,setupCol])
+  n_nights_total_agg_legacy  <- aggregate(n_nights_total_legacy,
                                    by  = list(CTtable[,stationCol]),
                                    FUN = sum)
-  n_cameras_total_agg <- aggregate(CTtable[,stationCol],
-                                   by  = list(CTtable[,stationCol]),
-                                   FUN = length)
-  n_nights_active     <- n_nights_total_agg[,2] - n_days_inactive_rowsum[,2]
+  n_nights_active_legacy     <- n_nights_total_agg_legacy[,2] - n_days_inactive_rowsum_legacy[,2]
+
   
-  date_range_combined <- data.frame(station.tmp1[,1], station.tmp1[,2],
-                                    image.tmp1[match(station.tmp1[,1], image.tmp1[,1]),2],
-                                    image.tmp2[match(station.tmp1[,1], image.tmp2[,1]),2],
-                                    station.tmp2[,2],
-                                    n_nights_total_agg[,2],
-                                    n_nights_active,
-                                    n_cameras_total_agg[,2])
-  colnames(date_range_combined) <- c(stationCol, "setup_date",  "first_image_date", "last_image_date", "retrieval_date",
-                                     "n_nights_total", "n_nights_active", "n_cameras")
-  rownames(date_range_combined) <- NULL
+  ############################
+  # make data frame with the number of active / inactive days
+  if(!all(station_dates$station == camop.info.df$station)) stop("Mismatch between station column in CTtable and camOp")
+  
+  camop.info.df2 <- data.frame(camop.info.df,
+                               n_calendar_days_total    = n_calendar_days_total,    # this is 1 for setup/retrieval on consecutive days
+                               n_calendar_days_active   = n_calendar_days_active,   # this is 2 for setup/retrieval on consecutive days
+                               n_calendar_days_inactive = n_calendar_days_inactive, # number of days stations was inactive
+                               n_trap_nights_active     = n_trap_nights_active,   # this is precisely how long the cameras were active ( 1 for setup/retrieval on consecutive days - for each camera).
+                               n_nights_active_legacy   = n_nights_active_legacy,
+                               n_nights_total_legacy    = n_nights_total_agg_legacy$x
+                               )       
+  
+  
+  
+  station.info.combined <- merge(station_dates, camop.info.df2, by = "station")
+  
+  # adjust options for printing results
+  options.tmp <- options()
+  on.exit(options(options.tmp))
+  options(max.print=1e6)
+  options(width = 1000)
   
   
   # sink/print output
-  
-  
   if(hasArg(sinkpath)){
     sinkfile <- file.path(sinkpath, paste("survey_report_", Sys.Date(), ".txt", sep = ""))
     sink(file = sinkfile)
@@ -213,28 +278,47 @@ surveyReport <- function(recordTable,
   }
   cat("\n-------------------------------------------------------\n")
   print(paste("Total number of stations: ", length(unique(CTtable[,stationCol]))))
+  
   cat("\n-------------------------------------------------------\n")
-  print(paste("Number of operational stations: ", length(which(n_nights_active >= 1))))
-  cat("\n-------------------------------------------------------\n")
+  print(paste("Number of operational stations: ", sum(station.info.combined$n_trap_nights_active > 0)))
   
   if(hasArg(cameraCol)){
+    cat("\n-------------------------------------------------------\n")
     print(paste("Total number of cameras: ", length(unique(paste(CTtable[,stationCol], CTtable[,cameraCol], sep = "_")))))
-    cat("\n-------------------------------------------------------\n")
-    
-    print(paste("n nights with cameras set up (operational or not): ",
-                sum(n_nights_total, na.rm = TRUE)))
-    cat("\n-------------------------------------------------------\n")
-    print(paste("n nights with cameras set up and active (trap nights): ",
-                sum(n_nights_active, na.rm = TRUE)))
-  } else {
-    print(paste("n nights with cameras set up (operational or not. NOTE: only correct if 1 camera per station):",
-                sum(n_nights_total, na.rm = TRUE)))
-    cat("\n-------------------------------------------------------\n")
-    print(paste("n nights with cameras set up and active (trap nights. NOTE: only correct if 1 camera per station):",
-                sum(n_nights_active, na.rm = TRUE)))
   }
+  
   cat("\n-------------------------------------------------------\n")
-  print(paste("total trapping period: ", paste(min(station.tmp1[,2]), max(station.tmp2[,2]), sep = " - ")))
+  print(paste("Trap nights (number of active 24 hour cycles completed by independent cameras): ",
+              sum(station.info.combined$n_trap_nights_active)
+  ))
+  
+  cat("\n-------------------------------------------------------\n")
+  print(paste("n nights with cameras set up and active (trap nights - LECAGY CALCULATION - WHOLE DAYS): ",
+              sum(station.info.combined$n_nights_active_legacy)
+  ))
+  
+  cat("\n-------------------------------------------------------\n")
+  print(paste("n nights with cameras set up (LECAGY CALCULATION - WHOLE DAYS): ",
+              sum(station.info.combined$n_nights_total_legacy)
+  ))
+  
+  cat("\n-------------------------------------------------------\n")
+  print(paste("Calendar days with cameras set up (operational or not): ",
+              sum(station.info.combined$n_calendar_days_total)
+  ))
+  
+  cat("\n-------------------------------------------------------\n")
+  print(paste("Calendar days with cameras set up and active: ",
+              sum(station.info.combined$n_calendar_days_active)
+  ))
+  
+  cat("\n-------------------------------------------------------\n")
+  print(paste("Calendar days with cameras set up but inactive: ",
+              sum(station.info.combined$n_calendar_days_inactive)
+  ))
+  
+  cat("\n-------------------------------------------------------\n")
+  print(paste("total trapping period: ", paste(min(station.info.combined$setup), max(station.info.combined$retrieval), sep = " - ")))
   
   
   
@@ -289,7 +373,7 @@ surveyReport <- function(recordTable,
   if(hasArg(sinkpath)){
     cat("\n\n-------------------------------------------------------\n\n")
     print(" survey station and image date ranges")
-    print(date_range_combined)
+    print(station.info.combined) #print(date_range_combined)
     cat("\n\n-------------------------------------------------------\n\n")
     print(" number of species by station")
     print(n_spec_by_station)
@@ -307,7 +391,8 @@ surveyReport <- function(recordTable,
             paste(sinkfile, "\n\n"))
   }
   
-  output <- list(date_range_combined, n_spec_by_station, species_record_table2, station_record_table1, station_record_table2)
+  output <- list(station.info.combined, #date_range_combined, 
+                 n_spec_by_station, species_record_table2, station_record_table1, station_record_table2)
   names(output) <- c("survey_dates", "species_by_station", "events_by_species",
                      "events_by_station", "events_by_station2")
   
@@ -317,17 +402,18 @@ surveyReport <- function(recordTable,
     arglist_zip <-  list(output               = output,
                          recordTable          = recordTable,
                          CTtable              = CTtable,
+                         camOp                = camOp,
                          speciesCol           = speciesCol,
                          stationCol           = stationCol,
                          setupCol             = setupCol,
                          retrievalCol         = retrievalCol,
                          CTDateFormat         = CTDateFormat,
-                         CTHasProblems        = CTHasProblems,
                          recordDateTimeCol    = recordDateTimeCol,
                          recordDateTimeFormat = recordDateTimeFormat,
                          sinkpath             = sinkpath,
                          usePackageZip        = usePackageZip)
     
+    if(hasArg(cameraCol)) arglist_zip <- c(arglist_zip,  cameraCol = cameraCol)
     if(hasArg(Xcol) & hasArg(Ycol)) arglist_zip <- c(arglist_zip,  Xcol = Xcol, Ycol = Ycol)
     
     do.call(makeSurveyZip, arglist_zip)

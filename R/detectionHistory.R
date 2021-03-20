@@ -13,7 +13,7 @@ detectionHistory <- function(recordTable,
                              buffer,
                              includeEffort = TRUE,
                              scaleEffort = FALSE,
-                             occasionStartTime = 0,
+                             occasionStartTime = "deprecated",
                              datesAsOccasionNames = FALSE,
                              timeZone,
                              writecsv = FALSE,
@@ -69,10 +69,11 @@ detectionHistory <- function(recordTable,
   }
   if(!is.logical(writecsv)) stop("writecsv must be logical (TRUE / FALSE)", call. = FALSE)
   
-  if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
-  occasionStartTime <- as.integer(round(occasionStartTime))
-  if(occasionStartTime != 0 & !is.integer(occasionStartTime)) {stop ("occasionStartTime must be between 0 and 23", call. = FALSE)}
-  if(occasionStartTime < 0 | occasionStartTime >= 24){         stop ("occasionStartTime must be between 0 and 23", call. = FALSE)}
+  if(hasArg(occasionStartTime)) warning("'occasionStartTime' is deprecated and will be removed in the next release. It is now found in cameraOperation()")
+  # if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
+  # occasionStartTime <- as.integer(round(occasionStartTime))
+  # if(occasionStartTime != 0 & !is.integer(occasionStartTime)) {stop ("occasionStartTime must be between 0 and 23", call. = FALSE)}
+  # if(occasionStartTime < 0 | occasionStartTime >= 24){         stop ("occasionStartTime must be between 0 and 23", call. = FALSE)}
   
   occasionLength <- as.integer(round(occasionLength))
   if(length(occasionLength) != 1)  stop("occasionLength may only contain one value", call. = FALSE)
@@ -144,13 +145,23 @@ detectionHistory <- function(recordTable,
     }
   }
   
+  # check that column names can be interpreted as day, as save
+  camOp <- checkCamOpColumnNames (cameraOperationMatrix = camOp)
+  # check if there's conflict in occasionStartTime. Error if so. 
+  if(hasArg(occasionStartTime)){
+    if(occasionStartTime != attributes(camOp)$occasionStartTime){
+     stop(paste("occasionStartTime", occasionStartTime, "differs from occasionStartTime in camOp", attributes(camOp)$occasionStartTime)) 
+    }
+  }
+  occasionStartTime <- attributes(camOp)$occasionStartTime
   
-  checkCamOpColumnNames (cameraOperationMatrix = camOp)
-  
+  # extract station / camera / session information from row names of camera operation matrix
   camop.info.df <- deparseCamOpRownames(camOp)
   
   # get information about station / session / camera IDs
   if("session" %in% colnames(camop.info.df)){
+    
+    if("camera" %in% colnames(camop.info.df)) stop("currently detectionHistory does not support camera-specific camera operation matrices when session/seasons are defined. Please run cameraOperation with byCamera = FALSE.", call. = FALSE)
     
     if(!is.logical(unmarkedMultFrameInput)) stop("unmarkedMultFrameInput must be logical (TRUE / FALSE)", call. = FALSE)
     
@@ -205,7 +216,8 @@ detectionHistory <- function(recordTable,
   arg.list0 <- list(cam.op          = cam.op.worked, 
                     occasionLength2 = occasionLength, 
                     scaleEffort2    = scaleEffort, 
-                    includeEffort2  = includeEffort)
+                    includeEffort2  = includeEffort,
+                    occasionStartTime2 = occasionStartTime)
   
   if(hasArg(minActiveDaysPerOccasion))  arg.list0 <- c(arg.list0, minActiveDaysPerOccasion2 = minActiveDaysPerOccasion)
   
@@ -263,15 +275,27 @@ detectionHistory <- function(recordTable,
   ############
   # make detection history
   
-  if(occasionLength == 1){                    # occasion length = 1
-    record.hist <- cam.op.worked
-    record.hist <- ifelse(record.hist == 0, NA, record.hist)    # if cameras not operational, set NA
-    record.hist <- ifelse(record.hist >= 1, 0,  record.hist)    # if cameras operational, set to 0
-    
-    # identify occasions during which there were records (and how many)
-    if(output == "binary")  occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = unique, simplify = FALSE)
-    if(output == "count")   occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = table, simplify = FALSE)
-    
+  record.hist <- effort                     # start with effort (including NAs)
+  record.hist <- ifelse(!is.na(record.hist), 0, record.hist)     # set all cells 0 (unless they are NA)
+  rownames(record.hist) <- rownames(cam.op.worked)
+  
+  # identify occasions during which there were records (and how many)
+  # binary: values = occasion
+  # count: values = number of records, names = occasion
+  if(output == "binary")  occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = unique, simplify = FALSE)
+  if(output == "count")   occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = table, simplify = FALSE)
+  
+  
+  
+ # if(occasionLength == 1){                    # occasion length = 1
+    # record.hist <- cam.op.worked
+    # record.hist <- ifelse(record.hist == 0, NA, record.hist)    # if cameras not operational, set NA
+    # record.hist <- ifelse(record.hist >= 1, 0,  record.hist)    # if cameras operational, set to 0
+    # 
+    # # identify occasions during which there were records (and how many)
+    # if(output == "binary")  occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = unique, simplify = FALSE)
+    # if(output == "count")   occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = table, simplify = FALSE)
+    # 
     # fill detection matrix with 1 (or count) in appropriate cells
     for(xyz in which(sapply(occasions.by.station, FUN = function(x){!is.null(x)}))){
       
@@ -288,31 +312,36 @@ detectionHistory <- function(recordTable,
                     as.numeric(names(occasions.by.station[[xyz]]))] <- occasions.by.station[[xyz]]
       } 
     }
+    
+  if(occasionLength == 1){
     record.hist[is.na(cam.op.worked)] <- NA   # remove the records that were taken when cams were NA (redundant with above:   # remove records taken after day1 + maxNumberDays)
-    
-    rm(occasions.by.station, xyz)
-    
-  } else {                                    # occasion length > 1
-    record.hist <- effort                     # start with effort (including NAs)
-    record.hist <- ifelse(!is.na(record.hist), 0, record.hist)     # set all cells 0 (unless they are NA)
-    rownames(record.hist) <- rownames(cam.op.worked)
-    
-    # identify occasions during which there were records (and how many)
-    # binary: values = occasion
-    # count: values = number of records, names = occasion
-    if(output == "binary")  occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = unique, simplify = FALSE)
-    if(output == "count")   occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = table, simplify = FALSE)
-    
-    # fill detection matrix with "1" (or count) in appropriate cells
-    for(xyz in which(sapply(occasions.by.station, FUN = function(x){!is.null(x)}))){
-      if(output == "binary")  record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
-                                          occasions.by.station[[xyz]]] <- 1
-      if(output == "count")   record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
-                                          as.numeric(names(occasions.by.station[[xyz]]))] <- occasions.by.station[[xyz]]
-      
-    }
+  } else {
     record.hist[is.na(effort)] <- NA     # just to make sure NA stays NA
   }
+    
+   # rm(occasions.by.station, xyz)
+    
+#  } else {                                    # occasion length > 1
+    # record.hist <- effort                     # start with effort (including NAs)
+    # record.hist <- ifelse(!is.na(record.hist), 0, record.hist)     # set all cells 0 (unless they are NA)
+    # rownames(record.hist) <- rownames(cam.op.worked)
+    # 
+    # # identify occasions during which there were records (and how many)
+    # # binary: values = occasion
+    # # count: values = number of records, names = occasion
+    # if(output == "binary")  occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = unique, simplify = FALSE)
+    # if(output == "count")   occasions.by.station <- tapply(X = subset_species$occasion, INDEX = subset_species[,stationCol], FUN = table, simplify = FALSE)
+    # 
+    
+    # fill detection matrix with "1" (or count) in appropriate cells
+    # for(xyz in which(sapply(occasions.by.station, FUN = function(x){!is.null(x)}))){
+    #   if(output == "binary")  record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
+    #                                       occasions.by.station[[xyz]]] <- 1
+    #   if(output == "count")   record.hist[match(names(occasions.by.station)[xyz], rownames(record.hist)), 
+    #                                       as.numeric(names(occasions.by.station[[xyz]]))] <- occasions.by.station[[xyz]]
+    # }
+    # record.hist[is.na(effort)] <- NA     # just to make sure NA stays NA
+ # }
   
   # assign row names to output
   row.names(record.hist) <- row.names(effort) <- rownames(cam.op.worked)

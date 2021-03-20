@@ -112,12 +112,17 @@ test_that("errors are correct", {
                "'arg' should be one of")
 })
 
+test_that("time zone message works", {
+  expect_message(recordTable(inDir     = wd_images_ID_species,
+                             IDfrom    = "directory"),
+                 "Warning: timeZone is not specified. Assuming UTC
+StationA:      8 images    0 duplicates removed      |=======             |   33%
+StationB:     23 images    6 duplicates removed      |=============       |   67%
+StationC:     37 images    6 duplicates removed      |====================|  100%")
+})
+
 
 test_that("warnings are correct", {
-  
-  expect_warning(recordTable(inDir               = wd_images_ID_species,
-                             IDfrom                 = "directory"),
-                 "timeZone is not specified. Assuming UTC")
   
   expect_warning(recordTable(inDir               = wd_images_ID_species,
                              IDfrom                 = "directory",

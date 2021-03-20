@@ -15,7 +15,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
                                     recordDateTimeFormat = "%Y-%m-%d %H:%M:%S",
                                     occasionLength,
                                     minActiveDaysPerOccasion,
-                                    occasionStartTime = 0,
+                                    occasionStartTime = "deprecated",
                                     maxNumberDays,
                                     day1,
                                     buffer,
@@ -99,6 +99,22 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
   if(!all(recordTableIndividual$Station %in% CTtable$Station)) stop ("there are entries in stationCol of recordTableIndividual that are not found in stationCol of CTtable")
 
+  #####################################################################################################################
+  # bring date, time, station ids into shape
+  
+  recordTableIndividual$DateTime2 <- parseDateTimeObject(inputColumn = recordTableIndividual[,recordDateTimeCol],
+                                                  dateTimeFormat = recordDateTimeFormat,
+                                                  timeZone = timeZone,
+                                                  checkNA_out = FALSE)
+  
+  if(any(is.na(recordTableIndividual$DateTime2))) stop(paste(sum(is.na(recordTableIndividual$DateTime2)), "out of",
+                                                      nrow(recordTableIndividual),
+                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
+                                                      paste(rownames(recordTableIndividual)[which(is.na(recordTableIndividual$DateTime2))], collapse = ", ")))
+  
+  
+  
+  
   # check sessionCol argument
   if(hasArg(sessionCol)) {
     checkForSpacesInColumnNames(sessionCol = sessionCol)
@@ -130,10 +146,11 @@ spatialDetectionHistory <- function(recordTableIndividual,
       
       recordTableIndividual <- assignSessionIDtoRecordTable (recordTable_tmp = recordTableIndividual,
                                                camOp = camOp,
-                                               dateTimeCol = recordDateTimeCol,
+                                               dateTimeCol = "DateTime2", # recordDateTimeCol,
                                                stationCol = stationCol,
                                                sessionCol = sessionCol
       )
+
       
       # see if there are duplicate station#session IDs in CTtable (meaning multiple cameras per station/session)
       
@@ -182,10 +199,11 @@ spatialDetectionHistory <- function(recordTableIndividual,
     if(!minActiveDaysPerOccasion <= occasionLength) stop("minActiveDaysPerOccasion must be smaller than or equal to occasionLength", call. = FALSE)
   }
 
-  if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
-  occasionStartTime    <- as.integer(round(occasionStartTime))
-  if(occasionStartTime != 0 & !is.integer(occasionStartTime)) stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
-  if(occasionStartTime < 0 | occasionStartTime >= 24)         stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
+  if(hasArg(occasionStartTime)) warning("'occasionStartTime' is deprecated and will be removed in the next release. It is now found in cameraOperation()")
+  # if(length(occasionStartTime) != 1) stop("occasionStartTime must have length 1")
+  # occasionStartTime    <- as.integer(round(occasionStartTime))
+  # if(occasionStartTime != 0 & !is.integer(occasionStartTime)) stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
+  # if(occasionStartTime < 0 | occasionStartTime >= 24)         stop ("occasionStartTime must be between 0 and 23", call. = FALSE)
 
   occasionLength    <- as.integer(round(occasionLength))
   if(length(occasionLength) != 1)  stop("occasionLength may only contain one value", call. = FALSE)
@@ -205,8 +223,8 @@ spatialDetectionHistory <- function(recordTableIndividual,
     if(!buffer >= 1)        stop("if buffer is defined, it must be 1 or higher", call. = FALSE)
   }
 
-
-  if(!species %in% recordTableIndividual[,speciesCol]) stop("species", species, "not found in speciesCol of recordTableIndividual")
+  # check that species is in the speciesCol
+  if(!species %in% recordTableIndividual[,speciesCol]) stop("species ", species, " not found in speciesCol of recordTableIndividual")
   # check all stations in recordTableIndividual are matched in CTtable
   if(!all(recordTableIndividual[,stationCol] %in% CTtable[,stationCol])) {
     stop(paste("items of stationCol in recordTableIndividual are not matched in stationCol of CTtable: ", paste(recordTableIndividual[-which(recordTableIndividual[,stationCol] %in% CTtable[,stationCol]),stationCol], collapse = ", ")))
@@ -229,22 +247,8 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   
 
-  #####################################################################################################################
-  # bring date, time, station ids into shape
-
+ # subset to species of interest
   subset_species           <- recordTableIndividual[recordTableIndividual[,speciesCol] == species,]
-  subset_species$DateTime2 <- parseDateTimeObject(inputColumn = subset_species[,recordDateTimeCol],
-                                                  dateTimeFormat = recordDateTimeFormat,
-                                                  timeZone = timeZone,
-                                                  checkNA_out = FALSE)
-  
-  if(any(is.na(subset_species$DateTime2))) stop(paste(sum(is.na(subset_species$DateTime2)), "out of",
-                                                      nrow(subset_species),
-                                                      "entries in recordDateTimeCol of recordTable could not be interpreted using recordDateTimeFormat (NA). row",
-                                                      paste(rownames(subset_species)[which(is.na(subset_species$DateTime2))], collapse = ", ")))
-  
-  
-  
   
   # if sessionCol is defined and present in CTtable, check if all records are within correct session. remove if not
   if(hasArg(sessionCol)){
@@ -285,8 +289,16 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
 
 
-  ####
-  checkCamOpColumnNames (cameraOperationMatrix = camOp)
+  
+  # check that column names can be interpreted as day, as extract occasionStartTime if relevant
+  camOp <- checkCamOpColumnNames (cameraOperationMatrix = camOp)
+  if(hasArg(occasionStartTime)){
+    if(occasionStartTime != attributes(camOp)$occasionStartTime){
+      stop(paste("occasionStartTime", occasionStartTime, "differs from occasionStartTime in camOp", attributes(camOp)$occasionStartTime)) 
+    }
+  }
+  occasionStartTime <- attributes(camOp)$occasionStartTime
+  
   cam.op.worked0 <- as.matrix(camOp)
   
   if(all(as.character(unique(subset_species[,stationCol])) %in% rownames(cam.op.worked0)) == FALSE){
@@ -403,7 +415,6 @@ spatialDetectionHistory <- function(recordTableIndividual,
 
   ############
   # remove records for which effort was 0 or NA
-
   rowindex_sdh_to_remove <- vector()
 
   for(rowindex_sdh in 1:nrow(sdh2)){
@@ -414,10 +425,11 @@ spatialDetectionHistory <- function(recordTableIndividual,
   }
   
   
+  
   # if there were records in occasions with effort = 0/NA, remove these records
   if(length(rowindex_sdh_to_remove) != 0){
-    warning(paste("removed ", length(rowindex_sdh_to_remove), " record(s) because of effort = 0/NA, incomplete occasions (if includeEffort = FALSE), or effort < minActiveDaysPerOccasion \n(rownames: ",
-                  paste(rownames(sdh2)[rowindex_sdh_to_remove], collapse = ", "), ")", sep = ""),
+    warning("removed ", length(rowindex_sdh_to_remove), " record(s) because of effort = 0/NA, incomplete occasions (if includeEffort = FALSE), or effort < minActiveDaysPerOccasion:\n",
+            paste(capture.output(print(sdh2[rowindex_sdh_to_remove,])), collapse = "\n"),
             call. = FALSE)
     sdh2 <- sdh2[-rowindex_sdh_to_remove,]
   }

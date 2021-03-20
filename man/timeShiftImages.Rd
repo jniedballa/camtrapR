@@ -15,7 +15,8 @@ timeShiftImages (inDir,
   cameraCol,
   timeShiftColumn,
   timeShiftSignColumn,
-  undo = FALSE
+  undo = FALSE,
+  ignoreMinorErrors = FALSE
 )
 }
 
@@ -41,9 +42,11 @@ timeShiftImages (inDir,
   \item{timeShiftSignColumn}{
   character. The name of the column with the direction of time shifts in \code{timeShiftTable}. Can only be "-" or "+".
 }
-
   \item{undo}{
   logical. Undo changes and restore the original images? Please be careful, this deletes any edited images if \code{TRUE}
+}
+\item{ignoreMinorErrors}{
+  logical. Ignore minor errors that would cause the function to fail (set TRUE for images with bad MakerNotes, observed in Panthera V4 cameras)
 }
 }
 \details{
@@ -59,6 +62,9 @@ ExifTool stores the original images as \code{.JPG_original} files in the origina
 
 Years can have 365 or 366 days, and months 28 to 31 days. Here is how the function handles these (from the exiftool help page):
 "The ability to shift dates by Y years, M months, etc, conflicts with the design goal of maintaining a constant shift for all time values when applying a batch shift. This is because shifting by 1 month can be equivalent to anything from 28 to 31 days, and 1 year can be 365 or 366 days, depending on the starting date. The inconsistency is handled by shifting the first tag found with the actual specified shift, then calculating the equivalent time difference in seconds for this shift and applying this difference to subsequent tags in a batch conversion."
+
+\code{ignoreMinorErrors} is useful if image timestamps are not updated correctly (entries in column "n_images" of the output are "... files weren't updated due to errors"). This can be caused by bad MakerNotes and so far was only observed in Panthera V4 cameras. In that case, set \code{ignoreMinorErrors} to \code{TRUE}. This will add the "-m" option to the Exiftool call, thereby ignoring minor errors and warnings and applying the time shift nevertheless.
+
 }
 
 \value{

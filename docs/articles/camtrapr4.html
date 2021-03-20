@@ -5,20 +5,20 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>4. Data exploration and visualisation in camtrapR • camtrapR</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="4. Data exploration and visualisation in camtrapR">
-<meta property="og:description" content="">
-<meta name="twitter:card" content="summary">
+<title>4. Data exploration and visualisation • camtrapR</title>
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script><meta property="og:title" content="4. Data exploration and visualisation">
+<meta property="og:description" content="camtrapR">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.09</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -57,13 +57,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -73,8 +73,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/jniedballa/camtrapR">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/jniedballa/camtrapR/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -88,13 +88,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="camtrapr4_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>4. Data exploration and visualisation in camtrapR</h1>
+      <h1 data-toc-skip>4. Data exploration and visualisation</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2020-04-22</h4>
+            <h4 class="date">2021-02-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr4.Rmd"><code>vignettes/camtrapr4.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr4.Rmd</code></div>
@@ -103,17 +103,19 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(camtrapR)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jniedballa/camtrapR">camtrapR</a></span><span class="op">)</span></code></pre></div>
 <div id="overview" class="section level1">
 <h1 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h1>
 <p>camtrapR can help with data exploration by creating maps of observed species richness and the number of independent detections by species. It can also plot single-species and two-species diel activity data. In addition, a survey report summarising camera trap station operation and species records can be created easily. The usage of these functions will be demonstrated using the sample data set included in the package.</p>
 <p>In creating the plots and the report, the species record table and the camera trap station information table are combined. Therefore, both are required as function input (more details in the vignette on “Image organisation and species/individual identification”).</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># load sample camera trap station table</span></a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(camtraps)</a>
-<a class="sourceLine" id="cb2-3" title="3"></a>
-<a class="sourceLine" id="cb2-4" title="4"><span class="co"># load sample record table</span></a>
-<a class="sourceLine" id="cb2-5" title="5"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(recordTableSample)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># load sample camera trap station table</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">camtraps</span><span class="op">)</span>
+
+<span class="co"># load sample record table</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">recordTableSample</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="species-presence-maps" class="section level1">
 <h1 class="hasAnchor">
@@ -123,38 +125,40 @@
 <h2 class="hasAnchor">
 <a href="#number-of-observed-species" class="anchor"></a>Number of observed species</h2>
 <p>We first create a map of the number of observed species.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">Mapstest1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionMaps.html">detectionMaps</a></span>(<span class="dt">CTtable     =</span> camtraps,</a>
-<a class="sourceLine" id="cb3-2" title="2">                          <span class="dt">recordTable  =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb3-3" title="3">                          <span class="dt">Xcol         =</span> <span class="st">"utm_x"</span>,</a>
-<a class="sourceLine" id="cb3-4" title="4">                          <span class="dt">Ycol         =</span> <span class="st">"utm_y"</span>,</a>
-<a class="sourceLine" id="cb3-5" title="5">                          <span class="dt">stationCol   =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb3-6" title="6">                          <span class="dt">speciesCol   =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb3-7" title="7">                          <span class="dt">printLabels  =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb3-8" title="8">                          <span class="dt">richnessPlot =</span> <span class="ot">TRUE</span>,    <span class="co"># by setting this argument TRUE</span></a>
-<a class="sourceLine" id="cb3-9" title="9">                          <span class="dt">speciesPlots =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-10" title="10">                          <span class="dt">addLegend    =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb3-11" title="11">)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">Mapstest1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/detectionMaps.html">detectionMaps</a></span><span class="op">(</span>CTtable     <span class="op">=</span> <span class="va">camtraps</span>,
+                          recordTable  <span class="op">=</span> <span class="va">recordTableSample</span>,
+                          Xcol         <span class="op">=</span> <span class="st">"utm_x"</span>,
+                          Ycol         <span class="op">=</span> <span class="st">"utm_y"</span>,
+                          stationCol   <span class="op">=</span> <span class="st">"Station"</span>,
+                          speciesCol   <span class="op">=</span> <span class="st">"Species"</span>,
+                          printLabels  <span class="op">=</span> <span class="cn">TRUE</span>,
+                          richnessPlot <span class="op">=</span> <span class="cn">TRUE</span>,    <span class="co"># by setting this argument TRUE</span>
+                          speciesPlots <span class="op">=</span> <span class="cn">FALSE</span>,
+                          addLegend    <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
 <p><img src="camtrapr4_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 </div>
 <div id="number-of-records-by-species" class="section level2">
 <h2 class="hasAnchor">
 <a href="#number-of-records-by-species" class="anchor"></a>Number of records by species</h2>
 <p>Maps of the number of independent detections of the observed species can be generated just as easily. Normally, maps for all species will be created at once. Here, to avoid cluttering the vignette, we look at one species only. This is achieved via the argument <code>speciesToShow</code>. Arguments <code>richnessPlot</code> and <code>speciesPlots</code> are changed compared to the observed species richness plot above. It is also possible to set both arguments to TRUE or FALSE.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"> <span class="co"># subset to 1 species</span></a>
-<a class="sourceLine" id="cb4-2" title="2">recordTableSample_PBE &lt;-<span class="st"> </span>recordTableSample[recordTableSample<span class="op">$</span>Species <span class="op">==</span><span class="st"> "PBE"</span>,]</a>
-<a class="sourceLine" id="cb4-3" title="3"> </a>
-<a class="sourceLine" id="cb4-4" title="4"> Mapstest2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionMaps.html">detectionMaps</a></span>(<span class="dt">CTtable      =</span> camtraps,</a>
-<a class="sourceLine" id="cb4-5" title="5">                           <span class="dt">recordTable   =</span> recordTableSample_PBE,</a>
-<a class="sourceLine" id="cb4-6" title="6">                           <span class="dt">Xcol          =</span> <span class="st">"utm_x"</span>,</a>
-<a class="sourceLine" id="cb4-7" title="7">                           <span class="dt">Ycol          =</span> <span class="st">"utm_y"</span>,</a>
-<a class="sourceLine" id="cb4-8" title="8">                           <span class="dt">stationCol    =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb4-9" title="9">                           <span class="dt">speciesCol    =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb4-10" title="10">                           <span class="dt">speciesToShow =</span> <span class="st">"PBE"</span>,     <span class="co"># added</span></a>
-<a class="sourceLine" id="cb4-11" title="11">                           <span class="dt">printLabels   =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb4-12" title="12">                           <span class="dt">richnessPlot  =</span> <span class="ot">FALSE</span>,     <span class="co"># changed</span></a>
-<a class="sourceLine" id="cb4-13" title="13">                           <span class="dt">speciesPlots  =</span> <span class="ot">TRUE</span>,      <span class="co"># changed</span></a>
-<a class="sourceLine" id="cb4-14" title="14">                           <span class="dt">addLegend     =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb4-15" title="15">)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"> <span class="co"># subset to 1 species</span>
+<span class="va">recordTableSample_PBE</span> <span class="op">&lt;-</span> <span class="va">recordTableSample</span><span class="op">[</span><span class="va">recordTableSample</span><span class="op">$</span><span class="va">Species</span> <span class="op">==</span> <span class="st">"PBE"</span>,<span class="op">]</span>
+ 
+ <span class="va">Mapstest2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/detectionMaps.html">detectionMaps</a></span><span class="op">(</span>CTtable      <span class="op">=</span> <span class="va">camtraps</span>,
+                           recordTable   <span class="op">=</span> <span class="va">recordTableSample_PBE</span>,
+                           Xcol          <span class="op">=</span> <span class="st">"utm_x"</span>,
+                           Ycol          <span class="op">=</span> <span class="st">"utm_y"</span>,
+                           stationCol    <span class="op">=</span> <span class="st">"Station"</span>,
+                           speciesCol    <span class="op">=</span> <span class="st">"Species"</span>,
+                           speciesToShow <span class="op">=</span> <span class="st">"PBE"</span>,     <span class="co"># added</span>
+                           printLabels   <span class="op">=</span> <span class="cn">TRUE</span>,
+                           richnessPlot  <span class="op">=</span> <span class="cn">FALSE</span>,     <span class="co"># changed</span>
+                           speciesPlots  <span class="op">=</span> <span class="cn">TRUE</span>,      <span class="co"># changed</span>
+                           addLegend     <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
 <p><img src="camtrapr4_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>The number of independent observations depends on the argument <code>minDeltaTime</code> in the <code>recordTable</code> function.</p>
 </div>
@@ -163,47 +167,52 @@
 <a href="#shapefile-export" class="anchor"></a>Shapefile export</h2>
 <p>Function <code>detectionMaps</code> comes with 4 arguments that allow for and control creation of ESRI shapefile for use in GIS software: <code>writeShapefile</code>, <code>shapefileName</code>, <code>shapefileDirectory</code> and <code>shapefileProjection</code>. The resulting shapefile will show stations as point features (as the map above), with coordinates, total species number and number of observations per species in the attribute table. The shapefile attribute table is identical to the resulting <code>data.frame</code> of the <code>detectionMaps</code> function.</p>
 <p>The following example demonstrates the creation of a shapefile using <code>detectionMaps</code>. Please note that for demonstration the shapefile is saved to a temporary directory, which makes no sense in real data and must be changed by the user. The argument <code>shapefileProjection</code> must be a valid argument to the function <code>CRS</code> from the package <code>sp</code>, i.e., a PROJ.4 string. These can be found under <a href="http://spatialreference.org/" class="uri">http://spatialreference.org/</a>. There, find the projection your coordinates are in, click on “Proj4” and copy the text. In this example, it is a projected coordinate system, UTM 50N with the WGS84 ellipsoid. Its PROJ.4 string is "+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs". Because it is so widespread, here’s the PROJ4 string for standard Lat/Long coordinates using the WGS84 ellipsoid (a standard used by most GPS devices): "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs".</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># writing shapefiles requires packages rgdal and sp</span></a>
-<a class="sourceLine" id="cb5-2" title="2"> <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(rgdal)</a>
-<a class="sourceLine" id="cb5-3" title="3"> <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(sp)</a></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"> <span class="co"># define shapefile name</span></a>
-<a class="sourceLine" id="cb6-2" title="2"> shapefileName       &lt;-<span class="st"> "recordShapefileTest"</span></a>
-<a class="sourceLine" id="cb6-3" title="3"> shapefileProjection &lt;-<span class="st"> "+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"</span></a>
-<a class="sourceLine" id="cb6-4" title="4"> </a>
-<a class="sourceLine" id="cb6-5" title="5"><span class="co"># run detectionMaps with shapefile creation</span></a>
-<a class="sourceLine" id="cb6-6" title="6">Mapstest3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/detectionMaps.html">detectionMaps</a></span>(<span class="dt">CTtable            =</span> camtraps,</a>
-<a class="sourceLine" id="cb6-7" title="7">                          <span class="dt">recordTable         =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb6-8" title="8">                          <span class="dt">Xcol                =</span> <span class="st">"utm_x"</span>,</a>
-<a class="sourceLine" id="cb6-9" title="9">                          <span class="dt">Ycol                =</span> <span class="st">"utm_y"</span>,</a>
-<a class="sourceLine" id="cb6-10" title="10">                          <span class="dt">stationCol          =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb6-11" title="11">                          <span class="dt">speciesCol          =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb6-12" title="12">                          <span class="dt">richnessPlot        =</span> <span class="ot">FALSE</span>,         <span class="co"># no richness plot</span></a>
-<a class="sourceLine" id="cb6-13" title="13">                          <span class="dt">speciesPlots        =</span> <span class="ot">FALSE</span>,         <span class="co"># no species plots</span></a>
-<a class="sourceLine" id="cb6-14" title="14">                          <span class="dt">writeShapefile      =</span> <span class="ot">TRUE</span>,          <span class="co"># but shaepfile creation</span></a>
-<a class="sourceLine" id="cb6-15" title="15">                          <span class="dt">shapefileName       =</span> shapefileName,</a>
-<a class="sourceLine" id="cb6-16" title="16">                          <span class="dt">shapefileDirectory  =</span> <span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(),     <span class="co"># change this in your scripts!   </span></a>
-<a class="sourceLine" id="cb6-17" title="17">                          <span class="dt">shapefileProjection =</span> shapefileProjection</a>
-<a class="sourceLine" id="cb6-18" title="18">)</a>
-<a class="sourceLine" id="cb6-19" title="19"> </a>
-<a class="sourceLine" id="cb6-20" title="20"><span class="co"># check for the files that were created</span></a>
-<a class="sourceLine" id="cb6-21" title="21"><span class="kw"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), <span class="dt">pattern =</span> shapefileName)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># writing shapefiles requires packages rgdal and sp</span>
+ <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://rgdal.r-forge.r-project.org">rgdal</a></span><span class="op">)</span>
+ <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edzer/sp/">sp</a></span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"> <span class="co"># define shapefile name</span>
+ <span class="va">shapefileName</span>       <span class="op">&lt;-</span> <span class="st">"recordShapefileTest"</span>
+ <span class="va">shapefileProjection</span> <span class="op">&lt;-</span> <span class="st">"+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"</span>
+ 
+<span class="co"># run detectionMaps with shapefile creation</span>
+<span class="va">Mapstest3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/detectionMaps.html">detectionMaps</a></span><span class="op">(</span>CTtable            <span class="op">=</span> <span class="va">camtraps</span>,
+                          recordTable         <span class="op">=</span> <span class="va">recordTableSample</span>,
+                          Xcol                <span class="op">=</span> <span class="st">"utm_x"</span>,
+                          Ycol                <span class="op">=</span> <span class="st">"utm_y"</span>,
+                          stationCol          <span class="op">=</span> <span class="st">"Station"</span>,
+                          speciesCol          <span class="op">=</span> <span class="st">"Species"</span>,
+                          richnessPlot        <span class="op">=</span> <span class="cn">FALSE</span>,         <span class="co"># no richness plot</span>
+                          speciesPlots        <span class="op">=</span> <span class="cn">FALSE</span>,         <span class="co"># no species plots</span>
+                          writeShapefile      <span class="op">=</span> <span class="cn">TRUE</span>,          <span class="co"># but shaepfile creation</span>
+                          shapefileName       <span class="op">=</span> <span class="va">shapefileName</span>,
+                          shapefileDirectory  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>,     <span class="co"># change this in your scripts!   </span>
+                          shapefileProjection <span class="op">=</span> <span class="va">shapefileProjection</span>
+<span class="op">)</span>
+ 
+<span class="co"># check for the files that were created</span>
+<span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="va">shapefileName</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "recordShapefileTest.dbf" "recordShapefileTest.prj"
 ## [3] "recordShapefileTest.shp" "recordShapefileTest.shx"</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># load it as shapefile</span></a>
-<a class="sourceLine" id="cb8-2" title="2">shapefileTest &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="dt">dsn   =</span> <span class="kw"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span>(), </a>
-<a class="sourceLine" id="cb8-3" title="3">                         <span class="dt">layer =</span> shapefileName)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># load it as shapefile</span>
+<span class="va">shapefileTest</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://rgdal.r-forge.r-project.org/reference/readOGR.html">readOGR</a></span><span class="op">(</span>dsn   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, 
+                         layer <span class="op">=</span> <span class="va">shapefileName</span><span class="op">)</span></code></pre></div>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: "C:\Users\Juergen\AppData\Local\Temp\Rtmp0s38Wd", layer: "recordShapefileTest"
+## Source: "C:\Users\Juergen\AppData\Local\Temp\RtmpGKYAqp", layer: "recordShapefileTest"
 ## with 3 features
 ## It has 9 fields</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># we have a look at the attribute table</span></a>
-<a class="sourceLine" id="cb10-2" title="2">shapefileTest<span class="op">@</span>data</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># we have a look at the attribute table</span>
+<span class="va">shapefileTest</span><span class="op">@</span><span class="va">data</span></code></pre></div>
 <pre><code>##    Station  utm_y  utm_x EGY MNE PBE TRA VTA n_species
 ## 1 StationA 604000 526000   0   0   4   0   2         2
 ## 2 StationB 606000 523000   0   2   8   0   2         3
 ## 3 StationC 607050 525000   6   0   6   8   1         4</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># the output of detectionMaps is used as shapefile attribute table. Therefore, they are identical:</span></a>
-<a class="sourceLine" id="cb12-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/all.html">all</a></span>(shapefileTest<span class="op">@</span>data <span class="op">==</span><span class="st"> </span>Mapstest3)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># the output of detectionMaps is used as shapefile attribute table. Therefore, they are identical:</span>
+<span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="va">shapefileTest</span><span class="op">@</span><span class="va">data</span> <span class="op">==</span> <span class="va">Mapstest3</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="making-and-using-a-spatialpointsdataframe" class="section level2">
@@ -211,68 +220,59 @@
 <a href="#making-and-using-a-spatialpointsdataframe" class="anchor"></a>Making and using a SpatialPointsDataFrame</h2>
 <p>The data frame that <code>detectionMaps</code> returns can be turned into a SpatialPointsDataFrame as defined in the package <code>sp</code>. SpatialPointsDataFrames can be used for spatial analyses and queries in R, e.g. for extracting data from raster layers such as elevation maps.</p>
 <p>This is how it works. We use the output of <code>detectionMaps</code> created above and make a SpatialPointsDataFrame. Afterwards, a sample raster is created, plotted together with the points and the values are extracted.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">detections_spdf &lt;-<span class="st"> </span><span class="kw">SpatialPointsDataFrame</span>(<span class="dt">coords      =</span> Mapstest3[,<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"utm_x"</span>, <span class="st">"utm_y"</span>)],</a>
-<a class="sourceLine" id="cb14-2" title="2">                                          <span class="dt">data        =</span> Mapstest3,</a>
-<a class="sourceLine" id="cb14-3" title="3">                                          <span class="dt">proj4string =</span> <span class="kw">CRS</span>(shapefileProjection))</a>
-<a class="sourceLine" id="cb14-4" title="4"></a>
-<a class="sourceLine" id="cb14-5" title="5"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(detections_spdf)</a></code></pre></div>
-<pre><code>## Formal class 'SpatialPointsDataFrame' [package "sp"] with 5 slots
-##   ..@ data       :'data.frame':  3 obs. of  9 variables:
-##   .. ..$ Station  : chr [1:3] "StationA" "StationB" "StationC"
-##   .. ..$ utm_y    : num [1:3] 604000 606000 607050
-##   .. ..$ utm_x    : num [1:3] 526000 523000 525000
-##   .. ..$ EGY      : int [1:3] 0 0 6
-##   .. ..$ MNE      : int [1:3] 0 2 0
-##   .. ..$ PBE      : int [1:3] 4 8 6
-##   .. ..$ TRA      : int [1:3] 0 0 8
-##   .. ..$ VTA      : int [1:3] 2 2 1
-##   .. ..$ n_species: int [1:3] 2 3 4
-##   ..@ coords.nrs : num(0) 
-##   ..@ coords     : num [1:3, 1:2] 526000 523000 525000 604000 606000 ...
-##   .. ..- attr(*, "dimnames")=List of 2
-##   .. .. ..$ : NULL
-##   .. .. ..$ : chr [1:2] "utm_x" "utm_y"
-##   ..@ bbox       : num [1:2, 1:2] 523000 604000 526000 607050
-##   .. ..- attr(*, "dimnames")=List of 2
-##   .. .. ..$ : chr [1:2] "utm_x" "utm_y"
-##   .. .. ..$ : chr [1:2] "min" "max"
-##   ..@ proj4string:Formal class 'CRS' [package "sp"] with 1 slot
-##   .. .. ..@ projargs: chr "+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs +towgs84=0,0,0"</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># now we create a sample raster and extract data from it (if the raster package is available)</span></a>
-<a class="sourceLine" id="cb16-2" title="2"><span class="cf">if</span>(<span class="st">"raster"</span> <span class="op">%in%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span>()){</a>
-<a class="sourceLine" id="cb16-3" title="3">  <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(raster)</a>
-<a class="sourceLine" id="cb16-4" title="4">  raster_test &lt;-<span class="st"> </span><span class="kw">raster</span>(<span class="dt">x =</span> <span class="kw">extend</span>(<span class="kw">extent</span>(detections_spdf), <span class="dt">y =</span> <span class="dv">500</span>), <span class="dt">nrows =</span> <span class="dv">10</span>, <span class="dt">ncols =</span> <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb16-5" title="5">  <span class="kw">values</span>(raster_test) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Poisson.html">rpois</a></span>(<span class="dt">n =</span> <span class="dv">100</span>, <span class="dt">lambda =</span> <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dv">1</span>, <span class="dv">100</span>))    <span class="co"># fill raster with random numbers</span></a>
-<a class="sourceLine" id="cb16-6" title="6">  </a>
-<a class="sourceLine" id="cb16-7" title="7">  <span class="co"># plot raster</span></a>
-<a class="sourceLine" id="cb16-8" title="8">  <span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(raster_test,</a>
-<a class="sourceLine" id="cb16-9" title="9">       <span class="dt">main =</span> <span class="st">"some raster with camera trap stations"</span>,</a>
-<a class="sourceLine" id="cb16-10" title="10">       <span class="dt">ylab =</span> <span class="st">"UTM N"</span>,     <span class="co"># needs to be adjusted if data are not in UTM coordinate system</span></a>
-<a class="sourceLine" id="cb16-11" title="11">       <span class="dt">xlab =</span> <span class="st">"UTM E"</span>)     <span class="co"># needs to be adjusted if data are not in UTM coordinate system</span></a>
-<a class="sourceLine" id="cb16-12" title="12">  </a>
-<a class="sourceLine" id="cb16-13" title="13">  <span class="co"># add points to plot</span></a>
-<a class="sourceLine" id="cb16-14" title="14">  <span class="kw"><a href="https://rdrr.io/r/graphics/points.html">points</a></span>(detections_spdf, <span class="dt">pch =</span> <span class="dv">16</span>)</a>
-<a class="sourceLine" id="cb16-15" title="15">     </a>
-<a class="sourceLine" id="cb16-16" title="16">  <span class="co"># add point labels</span></a>
-<a class="sourceLine" id="cb16-17" title="17">  <span class="kw"><a href="https://rdrr.io/r/graphics/text.html">text</a></span>(<span class="dt">x      =</span> <span class="kw">coordinates</span>(detections_spdf)[,<span class="dv">1</span>],</a>
-<a class="sourceLine" id="cb16-18" title="18">       <span class="dt">y      =</span> <span class="kw">coordinates</span>(detections_spdf)[,<span class="dv">2</span>],</a>
-<a class="sourceLine" id="cb16-19" title="19">       <span class="dt">labels =</span> detections_spdf<span class="op">$</span>Station,</a>
-<a class="sourceLine" id="cb16-20" title="20">       <span class="dt">pos =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb16-21" title="21">  </a>
-<a class="sourceLine" id="cb16-22" title="22">  <span class="co"># extracting raster values. See ?extract for more information</span></a>
-<a class="sourceLine" id="cb16-23" title="23">  detections_spdf<span class="op">$</span>raster_value &lt;-<span class="st"> </span><span class="kw">extract</span>(<span class="dt">x =</span> raster_test, <span class="dt">y =</span> detections_spdf)</a>
-<a class="sourceLine" id="cb16-24" title="24">  </a>
-<a class="sourceLine" id="cb16-25" title="25">  <span class="co"># checking the attribute table</span></a>
-<a class="sourceLine" id="cb16-26" title="26">  detections_spdf<span class="op">@</span>data</a>
-<a class="sourceLine" id="cb16-27" title="27"></a>
-<a class="sourceLine" id="cb16-28" title="28">}</a></code></pre></div>
-<pre><code>## Warning: package 'raster' was built under R version 3.6.3</code></pre>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">detections_spdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html">SpatialPointsDataFrame</a></span><span class="op">(</span>coords      <span class="op">=</span> <span class="va">Mapstest3</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"utm_x"</span>, <span class="st">"utm_y"</span><span class="op">)</span><span class="op">]</span>,
+                                          data        <span class="op">=</span> <span class="va">Mapstest3</span>,
+                                          proj4string <span class="op">=</span> <span class="fu"><a href="http://rgdal.r-forge.r-project.org/reference/CRS-class.html">CRS</a></span><span class="op">(</span><span class="va">shapefileProjection</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">detections_spdf</span></code></pre></div>
+<pre><code>## class       : SpatialPointsDataFrame 
+## features    : 3 
+## extent      : 523000, 526000, 604000, 607050  (xmin, xmax, ymin, ymax)
+## crs         : +proj=utm +zone=50 +datum=WGS84 +units=m +no_defs 
+## variables   : 9
+## names       :  Station,  utm_y,  utm_x, EGY, MNE, PBE, TRA, VTA, n_species 
+## min values  : StationA, 604000, 523000,   0,   0,   4,   0,   1,         2 
+## max values  : StationC, 607050, 526000,   6,   2,   8,   8,   2,         4</code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># now we create a sample raster and extract data from it (if the raster package is available)</span>
+<span class="kw">if</span><span class="op">(</span><span class="st">"raster"</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
+  <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster">raster</a></span><span class="op">)</span>
+  <span class="va">raster_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html">raster</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extend.html">extend</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html">extent</a></span><span class="op">(</span><span class="va">detections_spdf</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, nrows <span class="op">=</span> <span class="fl">10</span>, ncols <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/raster/man/getValues.html">values</a></span><span class="op">(</span><span class="va">raster_test</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html">rpois</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, lambda <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>    <span class="co"># fill raster with random numbers</span>
+  
+  <span class="co"># plot raster</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">raster_test</span>,
+       main <span class="op">=</span> <span class="st">"some raster with camera trap stations"</span>,
+       ylab <span class="op">=</span> <span class="st">"UTM N"</span>,     <span class="co"># needs to be adjusted if data are not in UTM coordinate system</span>
+       xlab <span class="op">=</span> <span class="st">"UTM E"</span><span class="op">)</span>     <span class="co"># needs to be adjusted if data are not in UTM coordinate system</span>
+  
+  <span class="co"># add points to plot</span>
+  <span class="fu"><a href="https://rdrr.io/r/graphics/points.html">points</a></span><span class="op">(</span><span class="va">detections_spdf</span>, pch <span class="op">=</span> <span class="fl">16</span><span class="op">)</span>
+     
+  <span class="co"># add point labels</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/raster/man/text.html">text</a></span><span class="op">(</span>x      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/xyFromCell.html">coordinates</a></span><span class="op">(</span><span class="va">detections_spdf</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>,
+       y      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/xyFromCell.html">coordinates</a></span><span class="op">(</span><span class="va">detections_spdf</span><span class="op">)</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,
+       labels <span class="op">=</span> <span class="va">detections_spdf</span><span class="op">$</span><span class="va">Station</span>,
+       pos <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
+  
+  <span class="co"># extracting raster values. See ?extract for more information</span>
+  <span class="va">detections_spdf</span><span class="op">$</span><span class="va">raster_value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extract.html">extract</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">raster_test</span>, y <span class="op">=</span> <span class="va">detections_spdf</span><span class="op">)</span>
+  
+  <span class="co"># checking the attribute table</span>
+  <span class="va">detections_spdf</span><span class="op">@</span><span class="va">data</span>
+
+<span class="op">}</span></code></pre></div>
 <p><img src="camtrapr4_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <pre><code>##    Station  utm_y  utm_x EGY MNE PBE TRA VTA n_species raster_value
-## 1 StationA 604000 526000   0   0   4   0   2         2           77
-## 2 StationB 606000 523000   0   2   8   0   2         3           47
-## 3 StationC 607050 525000   6   0   6   8   1         4           16</code></pre>
+## 1 StationA 604000 526000   0   0   4   0   2         2           88
+## 2 StationB 606000 523000   0   2   8   0   2         3           30
+## 3 StationC 607050 525000   6   0   6   8   1         4           21</code></pre>
 <p>The same procedure also works with the camera trap station information table instead of the <code>detectionMaps</code> output.</p>
+<p>The SpatialPointsDataFrame can easily be converted to a sf object via</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span>
+<span class="va">detections_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/coerce-methods.html">as</a></span><span class="op">(</span><span class="va">detections_spdf</span>, <span class="st">"sf"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div id="visualising-species-activity-data" class="section level1">
@@ -293,82 +293,90 @@
 <code>activityRadial</code>: radial plot of hourly activity</li>
 </ol>
 <p>In all three, users can either plot activity of one focal species (by setting argument <code>allSpecies = FALSE</code>) or of all recorded species at once (by setting argument <code>allSpecies = TRUE</code>). If desired, plots can be saved as png files in a user-defined location automatically (arguments <code>writePNG</code> and <code>plotDirectory</code>). Note that the examples are not particularly pretty because of the low number of records used in the sample data set.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co"># we first pick a species for our activity trials</span></a>
-<a class="sourceLine" id="cb19-2" title="2">species4activity &lt;-<span class="st"> "PBE"</span>    <span class="co"># = Prionailurus bengalensis, Leopard Cat</span></a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># we first pick a species for our activity trials</span>
+<span class="va">species4activity</span> <span class="op">&lt;-</span> <span class="st">"PBE"</span>    <span class="co"># = Prionailurus bengalensis, Leopard Cat</span></code></pre></div>
 <div id="kernel-density-estimation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#kernel-density-estimation" class="anchor"></a>Kernel density estimation</h3>
 <p><code>activityDensity</code> uses the function <code>densityPlot</code> from the <code>overlap</code> package.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="kw"><a href="../reference/activityDensity.html">activityDensity</a></span>(<span class="dt">recordTable =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb20-2" title="2">                <span class="dt">species     =</span> species4activity)</a></code></pre></div>
-<p><img src="camtrapr4_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/activityDensity.html">activityDensity</a></span><span class="op">(</span>recordTable <span class="op">=</span> <span class="va">recordTableSample</span>,
+                species     <span class="op">=</span> <span class="va">species4activity</span><span class="op">)</span></code></pre></div>
+<p><img src="camtrapr4_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 </div>
 <div id="histogram" class="section level3">
 <h3 class="hasAnchor">
 <a href="#histogram" class="anchor"></a>Histogram</h3>
 <p>This function creates a histogram with hourly intervals, i.e. histogram cells are 1 hour wide.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="kw"><a href="../reference/activityHistogram.html">activityHistogram</a></span> (<span class="dt">recordTable =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb21-2" title="2">                   <span class="dt">species     =</span> species4activity)</a></code></pre></div>
-<p><img src="camtrapr4_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/activityHistogram.html">activityHistogram</a></span> <span class="op">(</span>recordTable <span class="op">=</span> <span class="va">recordTableSample</span>,
+                   species     <span class="op">=</span> <span class="va">species4activity</span><span class="op">)</span></code></pre></div>
+<p><img src="camtrapr4_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 </div>
 <div id="radial-plot" class="section level3">
 <h3 class="hasAnchor">
 <a href="#radial-plot" class="anchor"></a>Radial plot</h3>
 <p>This function uses functions from the <code>plotrix</code> package to create the clock face. Records are aggregated to the full hour (as in <code>activityHistogram</code>).</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="kw"><a href="../reference/activityRadial.html">activityRadial</a></span>(<span class="dt">recordTable  =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb22-2" title="2">               <span class="dt">species      =</span> species4activity,</a>
-<a class="sourceLine" id="cb22-3" title="3">               <span class="dt">lwd          =</span> <span class="dv">3</span>       <span class="co"># adjust line with of the plot</span></a>
-<a class="sourceLine" id="cb22-4" title="4">)</a></code></pre></div>
-<p><img src="camtrapr4_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
-<p>One can also make the function show a polygon instead of the radial lines. <code>rp.type</code> is an argument to <code>radial.plot</code> and defaults to <code>"r"</code> (radial). Setting it to <code>"p"</code> gives a polygon.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="kw"><a href="../reference/activityRadial.html">activityRadial</a></span>(<span class="dt">recordTable       =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb23-2" title="2">               <span class="dt">species           =</span> species4activity,</a>
-<a class="sourceLine" id="cb23-3" title="3">               <span class="dt">allSpecies        =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb23-4" title="4">               <span class="dt">speciesCol        =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb23-5" title="5">               <span class="dt">recordDateTimeCol =</span> <span class="st">"DateTimeOriginal"</span>,</a>
-<a class="sourceLine" id="cb23-6" title="6">               <span class="dt">plotR             =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb23-7" title="7">               <span class="dt">writePNG          =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb23-8" title="8">               <span class="dt">lwd               =</span> <span class="dv">3</span>,</a>
-<a class="sourceLine" id="cb23-9" title="9">               <span class="dt">rp.type           =</span> <span class="st">"p"</span>      <span class="co"># plot type = polygon</span></a>
-<a class="sourceLine" id="cb23-10" title="10">)</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/activityRadial.html">activityRadial</a></span><span class="op">(</span>recordTable  <span class="op">=</span> <span class="va">recordTableSample</span>,
+               species      <span class="op">=</span> <span class="va">species4activity</span>,
+               lwd          <span class="op">=</span> <span class="fl">3</span>       <span class="co"># adjust line with of the plot</span>
+<span class="op">)</span></code></pre></div>
 <p><img src="camtrapr4_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p>One can also make the function show a polygon instead of the radial lines. <code>rp.type</code> is an argument to <code>radial.plot</code> and defaults to <code>"r"</code> (radial). Setting it to <code>"p"</code> gives a polygon. poly.col is optional and defines the fill color of the polygon.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/activityRadial.html">activityRadial</a></span><span class="op">(</span>recordTable       <span class="op">=</span> <span class="va">recordTableSample</span>,
+               species           <span class="op">=</span> <span class="va">species4activity</span>,
+               allSpecies        <span class="op">=</span> <span class="cn">FALSE</span>,
+               speciesCol        <span class="op">=</span> <span class="st">"Species"</span>,
+               recordDateTimeCol <span class="op">=</span> <span class="st">"DateTimeOriginal"</span>,
+               plotR             <span class="op">=</span> <span class="cn">TRUE</span>,
+               writePNG          <span class="op">=</span> <span class="cn">FALSE</span>,
+               lwd               <span class="op">=</span> <span class="fl">3</span>,
+               rp.type           <span class="op">=</span> <span class="st">"p"</span>,     <span class="co"># plot type = polygon</span>
+               poly.col          <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/gray.html">gray</a></span><span class="op">(</span><span class="fl">0.5</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>  <span class="co"># optional. remove for no fill </span>
+<span class="op">)</span></code></pre></div>
+<p><img src="camtrapr4_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
 </div>
 <div id="two-species-activity-plots" class="section level2">
 <h2 class="hasAnchor">
 <a href="#two-species-activity-plots" class="anchor"></a>Two-species activity plots</h2>
 <p>Two-species activity overlaps can be plotted in addition to single-species activity plots. It is the overlap between two single-species kernel density estimations. The functions <code>overlapPlot</code> and <code>overlapEst</code> from the <code>overlap</code> package are used for that purpose. The overlap coefficient shown in the plot is Dhat1 from <code>overlapEst</code>.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="co"># define species of interest</span></a>
-<a class="sourceLine" id="cb24-2" title="2">speciesA_for_activity &lt;-<span class="st"> "VTA"</span>    <span class="co"># = Viverra tangalunga, Malay Civet</span></a>
-<a class="sourceLine" id="cb24-3" title="3">speciesB_for_activity &lt;-<span class="st"> "PBE"</span>    <span class="co"># = Prionailurus bengalensis, Leopard Cat</span></a>
-<a class="sourceLine" id="cb24-4" title="4"></a>
-<a class="sourceLine" id="cb24-5" title="5"><span class="co"># create activity overlap plot</span></a>
-<a class="sourceLine" id="cb24-6" title="6"><span class="kw"><a href="../reference/activityOverlap.html">activityOverlap</a></span> (<span class="dt">recordTable =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb24-7" title="7">                 <span class="dt">speciesA    =</span> speciesA_for_activity,</a>
-<a class="sourceLine" id="cb24-8" title="8">                 <span class="dt">speciesB    =</span> speciesB_for_activity,</a>
-<a class="sourceLine" id="cb24-9" title="9">                 <span class="dt">writePNG    =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb24-10" title="10">                 <span class="dt">plotR       =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb24-11" title="11">                 <span class="dt">add.rug     =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb24-12" title="12">)</a></code></pre></div>
-<p><img src="camtrapr4_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
-<p>This plot an be customised by passing additional arguments to <code>overlapPlot</code>:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="kw"><a href="../reference/activityOverlap.html">activityOverlap</a></span> (<span class="dt">recordTable =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb25-2" title="2">                 <span class="dt">speciesA    =</span> speciesA_for_activity,</a>
-<a class="sourceLine" id="cb25-3" title="3">                 <span class="dt">speciesB    =</span> speciesB_for_activity,</a>
-<a class="sourceLine" id="cb25-4" title="4">                 <span class="dt">writePNG    =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb25-5" title="5">                 <span class="dt">plotR       =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb25-6" title="6">                 <span class="dt">createDir   =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb25-7" title="7">                 <span class="dt">pngMaxPix   =</span> <span class="dv">1000</span>,</a>
-<a class="sourceLine" id="cb25-8" title="8">                 <span class="dt">linecol     =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"black"</span>, <span class="st">"blue"</span>),</a>
-<a class="sourceLine" id="cb25-9" title="9">                 <span class="dt">linewidth   =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">5</span>,<span class="dv">3</span>),</a>
-<a class="sourceLine" id="cb25-10" title="10">                 <span class="dt">linetype    =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">2</span>),</a>
-<a class="sourceLine" id="cb25-11" title="11">                 <span class="dt">olapcol     =</span> <span class="st">"darkgrey"</span>,</a>
-<a class="sourceLine" id="cb25-12" title="12">                 <span class="dt">add.rug     =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb25-13" title="13">                 <span class="dt">extend      =</span> <span class="st">"lightgrey"</span>,</a>
-<a class="sourceLine" id="cb25-14" title="14">                 <span class="dt">ylim        =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="fl">0.25</span>),</a>
-<a class="sourceLine" id="cb25-15" title="15">                 <span class="dt">main        =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"Activity overlap: "</span>, speciesA_for_activity, <span class="st">"-"</span>, speciesB_for_activity)</a>
-<a class="sourceLine" id="cb25-16" title="16">)</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># define species of interest</span>
+<span class="va">speciesA_for_activity</span> <span class="op">&lt;-</span> <span class="st">"VTA"</span>    <span class="co"># = Viverra tangalunga, Malay Civet</span>
+<span class="va">speciesB_for_activity</span> <span class="op">&lt;-</span> <span class="st">"PBE"</span>    <span class="co"># = Prionailurus bengalensis, Leopard Cat</span>
+
+<span class="co"># create activity overlap plot</span>
+<span class="fu"><a href="../reference/activityOverlap.html">activityOverlap</a></span> <span class="op">(</span>recordTable <span class="op">=</span> <span class="va">recordTableSample</span>,
+                 speciesA    <span class="op">=</span> <span class="va">speciesA_for_activity</span>,
+                 speciesB    <span class="op">=</span> <span class="va">speciesB_for_activity</span>,
+                 writePNG    <span class="op">=</span> <span class="cn">FALSE</span>,
+                 plotR       <span class="op">=</span> <span class="cn">TRUE</span>,
+                 add.rug     <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
 <p><img src="camtrapr4_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<p>This plot an be customised by passing additional arguments to <code>overlapPlot</code>:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/activityOverlap.html">activityOverlap</a></span> <span class="op">(</span>recordTable <span class="op">=</span> <span class="va">recordTableSample</span>,
+                 speciesA    <span class="op">=</span> <span class="va">speciesA_for_activity</span>,
+                 speciesB    <span class="op">=</span> <span class="va">speciesB_for_activity</span>,
+                 writePNG    <span class="op">=</span> <span class="cn">FALSE</span>,
+                 plotR       <span class="op">=</span> <span class="cn">TRUE</span>,
+                 createDir   <span class="op">=</span> <span class="cn">FALSE</span>,
+                 pngMaxPix   <span class="op">=</span> <span class="fl">1000</span>,
+                 linecol     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"blue"</span><span class="op">)</span>,
+                 linewidth   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">3</span><span class="op">)</span>,
+                 linetype    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,
+                 olapcol     <span class="op">=</span> <span class="st">"darkgrey"</span>,
+                 add.rug     <span class="op">=</span> <span class="cn">TRUE</span>,
+                 extend      <span class="op">=</span> <span class="st">"lightgrey"</span>,
+                 ylim        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span><span class="op">)</span>,
+                 main        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Activity overlap: "</span>, <span class="va">speciesA_for_activity</span>, <span class="st">"-"</span>, <span class="va">speciesB_for_activity</span><span class="op">)</span>
+<span class="op">)</span></code></pre></div>
+<p><img src="camtrapr4_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 </div>
 </div>
 <div id="survey-summary-report" class="section level1">
@@ -379,6 +387,7 @@
 <li>number of stations (total and operational)</li>
 <li>number of active trap days (total and by station)</li>
 <li>number of days with cameras set up (operational or not; total and by station)</li>
+<li>number of active trap days (taking into account multiple cameras accumulating effort independently at the same station)</li>
 <li>total trapping period</li>
 <li>camera trap and record date ranges</li>
 <li>number of species by station</li>
@@ -386,16 +395,28 @@
 <li>number of stations at which species were recorded</li>
 <li>number of independent events by station and species</li>
 </ul>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">reportTest &lt;-<span class="st"> </span><span class="kw"><a href="../reference/surveyReport.html">surveyReport</a></span> (<span class="dt">recordTable          =</span> recordTableSample,</a>
-<a class="sourceLine" id="cb26-2" title="2">                            <span class="dt">CTtable              =</span> camtraps,</a>
-<a class="sourceLine" id="cb26-3" title="3">                            <span class="dt">speciesCol           =</span> <span class="st">"Species"</span>,</a>
-<a class="sourceLine" id="cb26-4" title="4">                            <span class="dt">stationCol           =</span> <span class="st">"Station"</span>,</a>
-<a class="sourceLine" id="cb26-5" title="5">                            <span class="dt">setupCol             =</span> <span class="st">"Setup_date"</span>,</a>
-<a class="sourceLine" id="cb26-6" title="6">                            <span class="dt">retrievalCol         =</span> <span class="st">"Retrieval_date"</span>,</a>
-<a class="sourceLine" id="cb26-7" title="7">                            <span class="dt">CTDateFormat         =</span> <span class="st">"%d/%m/%Y"</span>, </a>
-<a class="sourceLine" id="cb26-8" title="8">                            <span class="dt">recordDateTimeCol    =</span> <span class="st">"DateTimeOriginal"</span>,</a>
-<a class="sourceLine" id="cb26-9" title="9">                            <span class="dt">recordDateTimeFormat =</span> <span class="st">"%Y-%m-%d %H:%M:%S"</span>,</a>
-<a class="sourceLine" id="cb26-10" title="10">                            <span class="dt">CTHasProblems        =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<p>It requires a record table, the camera trap table, and (since version 2.1) a camera operation matrix.</p>
+<p>The camera operation matrix is required to provide more precise and flexible calculation of the number of active trap days. So we first create the camera operation matrix, here taking into account periods in which the cameras malfunctioned (hasProblems = TRUE).</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">camop_problem</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cameraOperation.html">cameraOperation</a></span><span class="op">(</span>CTtable      <span class="op">=</span> <span class="va">camtraps</span>,
+                                 stationCol   <span class="op">=</span> <span class="st">"Station"</span>,
+                                 setupCol     <span class="op">=</span> <span class="st">"Setup_date"</span>,
+                                 retrievalCol <span class="op">=</span> <span class="st">"Retrieval_date"</span>,
+                                 hasProblems  <span class="op">=</span> <span class="cn">TRUE</span>,
+                                 dateFormat   <span class="op">=</span> <span class="st">"dmy"</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">reportTest</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/surveyReport.html">surveyReport</a></span> <span class="op">(</span>recordTable          <span class="op">=</span> <span class="va">recordTableSample</span>,
+                            CTtable              <span class="op">=</span> <span class="va">camtraps</span>,
+                            camOp                <span class="op">=</span> <span class="va">camop_problem</span>,   <span class="co"># new argument since v2.1</span>
+                            speciesCol           <span class="op">=</span> <span class="st">"Species"</span>,
+                            stationCol           <span class="op">=</span> <span class="st">"Station"</span>,
+                            setupCol             <span class="op">=</span> <span class="st">"Setup_date"</span>,
+                            retrievalCol         <span class="op">=</span> <span class="st">"Retrieval_date"</span>,
+                            CTDateFormat         <span class="op">=</span> <span class="st">"%d/%m/%Y"</span>, 
+                            recordDateTimeCol    <span class="op">=</span> <span class="st">"DateTimeOriginal"</span>,
+                            recordDateTimeFormat <span class="op">=</span> <span class="st">"%Y-%m-%d %H:%M:%S"</span> <span class="co">#,</span>
+                            <span class="co">#CTHasProblems        = TRUE    # deprecated in v2.1</span>
+                            <span class="op">)</span></code></pre></div>
 <pre><code>## 
 ## -------------------------------------------------------
 ## [1] "Total number of stations:  3"
@@ -404,25 +425,42 @@
 ## [1] "Number of operational stations:  3"
 ## 
 ## -------------------------------------------------------
-## [1] "n nights with cameras set up (operational or not. NOTE: only correct if 1 camera per station): 128"
+## [1] "Trap nights (number of active 24 hour cycles completed by independent cameras):  122.5"
 ## 
 ## -------------------------------------------------------
-## [1] "n nights with cameras set up and active (trap nights. NOTE: only correct if 1 camera per station): 123"
+## [1] "n nights with cameras set up and active (trap nights - LECAGY CALCULATION - WHOLE DAYS):  123"
+## 
+## -------------------------------------------------------
+## [1] "n nights with cameras set up (LECAGY CALCULATION - WHOLE DAYS):  128"
+## 
+## -------------------------------------------------------
+## [1] "Calendar days with cameras set up (operational or not):  131"
+## 
+## -------------------------------------------------------
+## [1] "Calendar days with cameras set up and active:  125"
+## 
+## -------------------------------------------------------
+## [1] "Calendar days with cameras set up but inactive:  6"
 ## 
 ## -------------------------------------------------------
 ## [1] "total trapping period:  2009-04-02 - 2009-05-17"</code></pre>
 <p>Some basic information is shown in the console. The function output is a list with 5 elements.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(reportTest)</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">reportTest</span><span class="op">)</span></code></pre></div>
 <pre><code>## List of 5
-##  $ survey_dates      :'data.frame':  3 obs. of  8 variables:
-##   ..$ Station         : Factor w/ 3 levels "StationA","StationB",..: 1 2 3
-##   ..$ setup_date      : Date[1:3], format: "2009-04-02" "2009-04-03" ...
-##   ..$ first_image_date: Date[1:3], format: "2009-04-10" "2009-04-05" ...
-##   ..$ last_image_date : Date[1:3], format: "2009-05-07" "2009-05-14" ...
-##   ..$ retrieval_date  : Date[1:3], format: "2009-05-14" "2009-05-16" ...
-##   ..$ n_nights_total  : int [1:3] 42 43 43
-##   ..$ n_nights_active : num [1:3] 42 43 38
-##   ..$ n_cameras       : int [1:3] 1 1 1
+##  $ survey_dates      :'data.frame':  3 obs. of  12 variables:
+##   ..$ station                 : chr [1:3] "StationA" "StationB" "StationC"
+##   ..$ setup                   : Date[1:3], format: "2009-04-02" "2009-04-03" ...
+##   ..$ image_first             : Date[1:3], format: "2009-04-10" "2009-04-05" ...
+##   ..$ image_last              : Date[1:3], format: "2009-05-07" "2009-05-14" ...
+##   ..$ retrieval               : Date[1:3], format: "2009-05-14" "2009-05-16" ...
+##   ..$ n_cameras               : int [1:3] 1 1 1
+##   ..$ n_calendar_days_total   : num [1:3] 43 44 44
+##   ..$ n_calendar_days_active  : num [1:3] 43 44 38
+##   ..$ n_calendar_days_inactive: num [1:3] 0 0 6
+##   ..$ n_trap_nights_active    : num [1:3] 42 43 37.5
+##   ..$ n_nights_active_legacy  : num [1:3] 42 43 38
+##   ..$ n_nights_total_legacy   : int [1:3] 42 43 43
 ##  $ species_by_station:'data.frame':  3 obs. of  2 variables:
 ##   ..$ Station  : chr [1:3] "StationA" "StationB" "StationC"
 ##   ..$ n_species: int [1:3] 2 3 4
@@ -439,31 +477,39 @@
 ##   ..$ Species : Factor w/ 5 levels "EGY","MNE","PBE",..: 1 2 3 4 5 1 2 3 4 5 ...
 ##   ..$ n_events: num [1:15] 0 0 4 0 2 0 2 8 0 2 ...</code></pre>
 <p>The list elements can be accessed individually like this: <code>reportTest[[1]]</code> or like this: <code>reportTest$survey_dates</code>.</p>
-<p>Some of the arguments need further explanations. <code>CTHasProblems</code> is used to tell camtrapR whether to look for columns specifying periods of malfunctioning in <code>CTtable</code> (e.g. ‘Problem1_from’ and ‘Problem1_to’). If there was more than one camera per station <code>cameraCol</code> specifies the columns containing camera IDs . Not setting it will cause camtrapR to assume there was 1 camera per station, biasing the trap day calculation. <code>sinkpath</code> can optionally be a directory in which the function will save the output as a txt file.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1"><span class="co"># here's the output of surveyReport</span></a>
-<a class="sourceLine" id="cb30-2" title="2"></a>
-<a class="sourceLine" id="cb30-3" title="3">reportTest[[<span class="dv">1</span>]]    <span class="co"># camera trap operation times and image date ranges</span></a></code></pre></div>
-<pre><code>##    Station setup_date first_image_date last_image_date retrieval_date
-## 1 StationA 2009-04-02       2009-04-10      2009-05-07     2009-05-14
-## 2 StationB 2009-04-03       2009-04-05      2009-05-14     2009-05-16
-## 3 StationC 2009-04-04       2009-04-06      2009-05-12     2009-05-17
-##   n_nights_total n_nights_active n_cameras
-## 1             42              42         1
-## 2             43              43         1
-## 3             43              38         1</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1">reportTest[[<span class="dv">2</span>]]    <span class="co"># number of species by station</span></a></code></pre></div>
+<p>Some of the arguments need further explanations. <!-- `CTHasProblems` is used to tell camtrapR whether to look for columns specifying periods of malfunctioning in `CTtable` (e.g. 'Problem1_from' and 'Problem1_to').  --> If there was more than one camera per station <code>cameraCol</code> specifies the columns containing camera IDs . Not setting it will cause camtrapR to assume there was 1 camera per station, biasing the trap day calculation. <code>sinkpath</code> can optionally be a directory in which the function will save the output as a txt file.</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># here's the output of surveyReport</span>
+
+<span class="va">reportTest</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>    <span class="co"># camera trap operation times and image date ranges</span></code></pre></div>
+<pre><code>##    station      setup image_first image_last  retrieval n_cameras
+## 1 StationA 2009-04-02  2009-04-10 2009-05-07 2009-05-14         1
+## 2 StationB 2009-04-03  2009-04-05 2009-05-14 2009-05-16         1
+## 3 StationC 2009-04-04  2009-04-06 2009-05-12 2009-05-17         1
+##   n_calendar_days_total n_calendar_days_active n_calendar_days_inactive
+## 1                    43                     43                        0
+## 2                    44                     44                        0
+## 3                    44                     38                        6
+##   n_trap_nights_active n_nights_active_legacy n_nights_total_legacy
+## 1                 42.0                     42                    42
+## 2                 43.0                     43                    43
+## 3                 37.5                     38                    43</code></pre>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">reportTest</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>    <span class="co"># number of species by station</span></code></pre></div>
 <pre><code>##    Station n_species
 ## 1 StationA         2
 ## 2 StationB         3
 ## 3 StationC         4</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1">reportTest[[<span class="dv">3</span>]]    <span class="co"># number of events and number of stations by species</span></a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">reportTest</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span>    <span class="co"># number of events and number of stations by species</span></code></pre></div>
 <pre><code>##   species n_events n_stations
 ## 1     EGY        6          1
 ## 2     MNE        2          1
 ## 3     PBE       18          3
 ## 4     TRA        8          1
 ## 5     VTA        5          3</code></pre>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1">reportTest[[<span class="dv">4</span>]]    <span class="co"># number of species events by station</span></a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">reportTest</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span>    <span class="co"># number of species events by station</span></code></pre></div>
 <pre><code>##    Station Species n_events
 ## 1 StationA     PBE        4
 ## 2 StationA     VTA        2
@@ -474,7 +520,8 @@
 ## 7 StationC     PBE        6
 ## 8 StationC     TRA        8
 ## 9 StationC     VTA        1</code></pre>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1"><span class="co"># reportTest[[5]] is identical to reportTest[[4]] except for the fact that it contains unobserved species with n_events = 0</span></a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># reportTest[[5]] is identical to reportTest[[4]] except for the fact that it contains unobserved species with n_events = 0</span></code></pre></div>
 <div id="survey-summary-report-zip-file" class="section level2">
 <h2 class="hasAnchor">
 <a href="#survey-summary-report-zip-file" class="anchor"></a>Survey summary report zip file</h2>
@@ -488,36 +535,11 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <div id="tocnav">
-      <h2 class="hasAnchor">
-<a href="#tocnav" class="anchor"></a>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-<li><a href="#overview">Overview</a></li>
-      <li>
-<a href="#species-presence-maps">Species presence maps</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#number-of-observed-species">Number of observed species</a></li>
-      <li><a href="#number-of-records-by-species">Number of records by species</a></li>
-      <li><a href="#shapefile-export">Shapefile export</a></li>
-      <li><a href="#making-and-using-a-spatialpointsdataframe">Making and using a SpatialPointsDataFrame</a></li>
-      </ul>
-</li>
-      <li>
-<a href="#visualising-species-activity-data">Visualising species activity data</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#single-species-activity-plots">Single-species activity plots</a></li>
-      <li><a href="#two-species-activity-plots">Two-species activity plots</a></li>
-      </ul>
-</li>
-      <li>
-<a href="#survey-summary-report">Survey summary report</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#survey-summary-report-zip-file">Survey summary report zip file</a></li>
-      <li><a href="#data-archiving">Data archiving</a></li>
-      </ul>
-</li>
-      </ul>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
 </div>
-      </div>
 
 </div>
 
@@ -528,7 +550,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

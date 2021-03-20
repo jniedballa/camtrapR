@@ -2,15 +2,16 @@
 title: "1. Organising raw camera trap images in camtrapR"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
-output: 
-  html_document:
-    toc: true
-    toc_float:
-      collapsed: false
-      smooth_scroll: false
-    toc_depth: 2
+output:
+   html_document:
+     toc: true
+     toc_float:
+       collapsed: false
+       smooth_scroll: false
+     toc_depth: 2
+     df_print: kable
 vignette: >
-  %\VignetteIndexEntry{1. Raw camera trap data organisation}
+  %\VignetteIndexEntry{1. Organising raw camera trap images in camtrapR}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -30,6 +31,8 @@ print("WARNING: THIS VIGNETTE WAS CREATED WITHOUT EXIFTOOL. OUTPUT IS INCOMPLETE
 **camtrapR** provides functions for organising and managing camera trap images and for the preparation of occupancy and (spatial) capture-recapture analyses. The package handles JPG images and since camtrapR 2.0.0, provides limited support for video files.
 
 The four vignettes demonstrate the camtrapR workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
+
+camtrapR is compatible with other software for camera trap data management. So if you prefer to manage images and identify species in other software, you usually can. For example, Camelot and TRAPPER export csv files that can be used as input for camtrapR. camtrapR uses a simple data structure and standard data types (data frames and matrices) to store information about the camera trap survey and the detected species and individuals in separate data frames to maximise compatibility. 
 
 ## Installation
 
@@ -204,7 +207,7 @@ If these arguments contain the character "\%" (characteristic of the format argu
 
 Details on how to set it correctly can be found in the Details section of the help files of functions `as.Date` and `strptime` or `parse_date_time`.
 
-[Here is some information about date format in base R]( http://www.r-bloggers.com/date-formats-in-r/). 
+[Here is some information about date format in base R](https://www.r-bloggers.com/date-formats-in-r/). 
 
 [Here is some information about date format in lubridate](https://lubridate.tidyverse.org/).
 
@@ -262,7 +265,7 @@ Here is an example in which station directories without camera subdirectories ar
 ```{r}
 # create a temporary dummy directory for tests
 # (normally, you'd set up an empty directory in a proper place, e.g. .../myStudy/rawImages)
-wd_createStationDir <- file.path(tempdir(), "createStationFoldersTest")
+wd_createStationDir <- file.path(normalizePath(tempdir(), winslash = "/"), "createStationFoldersTest")
 
 # create station directories in  wd_createStationDir
 StationFolderCreate1 <- createStationFolders (inDir       = wd_createStationDir,
@@ -295,8 +298,8 @@ The function `timeShiftImages` should be run directly after saving the raw image
 ```{r eval = exiftool_present}
 # copy sample images to another location (so we don't mess around in the package directory)
 wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")
-file.copy(from = wd_images_raw, to = tempdir() , recursive = TRUE)
-wd_images_raw_copy <- file.path(tempdir(), "raw_images")
+file.copy(from = wd_images_raw, to = normalizePath(tempdir(), winslash = "/") , recursive = TRUE)
+wd_images_raw_copy <- file.path(normalizePath(tempdir(), winslash = "/"), "raw_images")
 
 timeshift_run <- timeShiftImages(inDir                = wd_images_raw_copy,
                                  timeShiftTable       = timeShiftTable,
@@ -388,7 +391,7 @@ In addition, images are not actually copied (argument `copyImages = FALSE`), but
  # raw image location
 wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")   
  # destination for renamed images to be copied to
-wd_images_raw_renamed <- file.path(tempdir(), "raw_images_renamed")       
+wd_images_raw_renamed <- file.path(normalizePath(tempdir(), winslash = "/"), "raw_images_renamed")       
 
 renaming.table2 <- imageRename(inDir               = wd_images_raw,
                                outDir              = wd_images_raw_renamed,       
@@ -428,8 +431,8 @@ In doing so, Exiftool normally keeps the original images as .JPG_original files.
 ```{r eval = exiftool_present}
 # copy sample images to temporary directory (so we don't mess around in the package directory)
 wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
-file.copy(from = wd_images_ID, to = tempdir(), recursive = TRUE)
-wd_images_ID_copy <- file.path(tempdir(), "sample_images_species_dir")
+file.copy(from = wd_images_ID, to = normalizePath(tempdir(), winslash = "/"), recursive = TRUE)
+wd_images_ID_copy <- file.path(normalizePath(tempdir(), winslash = "/"), "sample_images_species_dir")
 
 # define an example copyright tag
 copyrightTagToAdd <- "Your Name (Your Organisation)"
@@ -442,7 +445,8 @@ addCopyrightTag(inDir        = wd_images_ID_copy,
 
 When we check the outcome with function exifTagNames, we find field "Copyright" in line 27.
 ```{r eval = exiftool_present}
-exifTagNames(wd_images_ID_copy)
+exiftagnames_extracted <- exifTagNames(wd_images_ID_copy)
+knitr::kable(exiftagnames_extracted, row.names = TRUE)
 ```
 
 

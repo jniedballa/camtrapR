@@ -43,7 +43,7 @@ recordTable <- function(inDir,
 
   # check input
   if(!hasArg(timeZone)) {
-    warning("timeZone is not specified. Assuming UTC", call. = FALSE,  immediate. = TRUE)
+    message("timeZone is not specified. Assuming UTC")
     timeZone <- "UTC"
   }
   if(!is.element(timeZone , OlsonNames())){
@@ -143,7 +143,9 @@ recordTable <- function(inDir,
   
   # create command line calls
   command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal', 
-                        ifelse(hasArg(video), paste(" -", video$dateTimeTag, sep = ""), ""),    # if video requested, video date time tag
+                        ifelse(hasArg(video), 
+                               paste(" -", video$dateTimeTag, sep = ""), 
+                               ""),    # if video requested, video date time tag
                         ' -HierarchicalSubject',
                         ifelse(hasArg(additionalMetadataTags), paste(" -",additionalMetadataTags,  collapse = "", sep = ""), ""),
                         paste(" -ext", file_formats, collapse = " ", sep = " "),    # requested file extensions
@@ -180,10 +182,12 @@ recordTable <- function(inDir,
           digiKamVideoMetadata <- digiKamVideoHierarchicalSubject(stationDir = dirs[i],
                                                                     digiKamTablesList = digiKam_data,    # output of accessDigiKamDatabase
                                                                     videoFormat = file_formats[!grepl(file_formats, pattern = "jpg")])
-          # add HierarchialSubject for video files (match by filename, must be unique)
+          # add HierarchialSubject for video files (match by filename and path)
           metadata.tmp <- addVideoHierarchicalSubject (metadata.tmp = metadata.tmp,
                                                        video = video,
-                                                       digiKamVideoMetadata = digiKamVideoMetadata)
+                                                       digiKamVideoMetadata = digiKamVideoMetadata,
+                                                       digiKamTablesList = digiKam_data,
+                                                       videoFormat = file_formats[!grepl(file_formats, pattern = "jpg")])
         }
       }
       
@@ -294,7 +298,7 @@ recordTable <- function(inDir,
   record.table <- as.data.frame(data.table::rbindlist(record.table.list, fill = TRUE, use.names = TRUE))
   
   if(nrow(record.table) == 0){
-    stop(paste("something went wrong. I looked through all those", length(dirs)  ,"folders and now your table is empty. Did you exclude too many species? Or were date/time information not readable?"), call. = FALSE)
+    stop(paste("something went wrong. I looked through all those", length(dirs)  ,"folders and now your table is empty. Were date/time information unreadable? Could species tags not be extracted (if IDfrom = 'metadata')? Or did you exclude too many species?"), call. = FALSE)
   }
 
   # rearrange table, add date and time as separate columns. add additional column names as needed.
