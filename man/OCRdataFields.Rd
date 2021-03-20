@@ -10,6 +10,8 @@ Extracts information from the data fields in camera trap images (not the metadat
 
 Normally all these information should be in the image metadata. This function is meant as a last resort if image metadata are unreadable or were removed from images. OCR is not perfect and may misidentify characters, so check the output carefully. 
 
+The output of this function can be used in \code{\link{writeDateTimeOriginal}} to write date/time into the DateTimeOriginal tag in image metadata, making these images available for automatic processing with  \code{\link{recordTable}} and other functions that extract image metadata.
+
 }
 \usage{
 OCRdataFields(inDir,
@@ -74,11 +76,15 @@ Even then, output will not be perfect. Error rates in OCR depend on multiple fac
 
 }
 \value{
-A \code{data.frame} with original directory and file names, and additional columns for the OCR data of each extracted geometry.
+A \code{data.frame} with original directory and file names, and additional columns for the OCR data of each extracted geometry. 
 }
 
 \author{
 Juergen Niedballa
+}
+
+\seealso{
+\code{\link{writeDateTimeOriginal}}
 }
 
 \examples{

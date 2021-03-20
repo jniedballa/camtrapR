@@ -43,7 +43,8 @@
 <meta property="og:description" content="
 
 Extracts information from the data fields in camera trap images (not the metadata). Many camera traps include data fields in camera trap images, often including date and time of images, and sometimes other information. This function extracts the information from these fields using optical character recognition provided by the package tesseract after reading images using the package magick.
-Normally all these information should be in the image metadata. This function is meant as a last resort if image metadata are unreadable or were removed from images. OCR is not perfect and may misidentify characters, so check the output carefully." />
+Normally all these information should be in the image metadata. This function is meant as a last resort if image metadata are unreadable or were removed from images. OCR is not perfect and may misidentify characters, so check the output carefully.
+The output of this function can be used in writeDateTimeOriginal to write date/time into the DateTimeOriginal tag in image metadata, making these images available for automatic processing with  recordTable and other functions that extract image metadata." />
 
 
 
@@ -145,6 +146,7 @@ Normally all these information should be in the image metadata. This function is
 
 <p>Extracts information from the data fields in camera trap images (not the metadata). Many camera traps include data fields in camera trap images, often including date and time of images, and sometimes other information. This function extracts the information from these fields using optical character recognition provided by the package <span class="pkg">tesseract</span> after reading images using the package <span class="pkg">magick</span>.</p>
 <p>Normally all these information should be in the image metadata. This function is meant as a last resort if image metadata are unreadable or were removed from images. OCR is not perfect and may misidentify characters, so check the output carefully.</p>
+<p>The output of this function can be used in <code><a href='writeDateTimeOriginal.html'>writeDateTimeOriginal</a></code> to write date/time into the DateTimeOriginal tag in image metadata, making these images available for automatic processing with  <code><a href='recordTable.html'>recordTable</a></code> and other functions that extract image metadata.</p>
     </div>
 
     <pre class="usage"><span class='fu'>OCRdataFields</span><span class='op'>(</span><span class='va'>inDir</span>,
@@ -205,6 +207,9 @@ Normally all these information should be in the image metadata. This function is
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Juergen Niedballa</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='writeDateTimeOriginal.html'>writeDateTimeOriginal</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>

@@ -54,6 +54,10 @@ Invisible NULL. The actual output is the JPG images which now have a DateTimeOri
 Juergen Niedballa
 }
 
+\seealso{
+\code{\link{OCRdataFields}}
+}
+
 \examples{
 
 \dontrun{
