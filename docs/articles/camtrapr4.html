@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.09</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -94,7 +94,7 @@
       <h1 data-toc-skip>4. Data exploration and visualisation</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2021-02-26</h4>
+            <h4 class="date">2021-03-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr4.Rmd"><code>vignettes/camtrapr4.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr4.Rmd</code></div>
@@ -200,7 +200,7 @@
 <span class="va">shapefileTest</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://rgdal.r-forge.r-project.org/reference/readOGR.html">readOGR</a></span><span class="op">(</span>dsn   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, 
                          layer <span class="op">=</span> <span class="va">shapefileName</span><span class="op">)</span></code></pre></div>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: "C:\Users\Juergen\AppData\Local\Temp\RtmpGKYAqp", layer: "recordShapefileTest"
+## Source: "C:\Users\Juergen\AppData\Local\Temp\Rtmpm2HCHe", layer: "recordShapefileTest"
 ## with 3 features
 ## It has 9 fields</code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -265,9 +265,9 @@
 <span class="op">}</span></code></pre></div>
 <p><img src="camtrapr4_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <pre><code>##    Station  utm_y  utm_x EGY MNE PBE TRA VTA n_species raster_value
-## 1 StationA 604000 526000   0   0   4   0   2         2           88
-## 2 StationB 606000 523000   0   2   8   0   2         3           30
-## 3 StationC 607050 525000   6   0   6   8   1         4           21</code></pre>
+## 1 StationA 604000 526000   0   0   4   0   2         2          101
+## 2 StationB 606000 523000   0   2   8   0   2         3           28
+## 3 StationC 607050 525000   6   0   6   8   1         4           20</code></pre>
 <p>The same procedure also works with the camera trap station information table instead of the <code>detectionMaps</code> output.</p>
 <p>The SpatialPointsDataFrame can easily be converted to a sf object via</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">

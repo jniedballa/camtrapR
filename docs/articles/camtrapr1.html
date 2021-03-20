@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -88,13 +88,13 @@
 
       
 
-      </header><script src="camtrapr1_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="camtrapr1_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>1. Organising raw camera trap images in camtrapR</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2021-01-16</h4>
+            <h4 class="date">2021-03-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr1.Rmd"><code>vignettes/camtrapr1.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr1.Rmd</code></div>
@@ -113,15 +113,15 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>You can install the newest stable version from CRAN via:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"camtrapR"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"camtrapR"</span><span class="op">)</span></code></pre></div>
 <p>Alternatively, you can install the development version from GitHub (requires package devtools):</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org">remotes</a></span><span class="op">)</span>
-<span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"jniedballa/camtrapR"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org">remotes</a></span><span class="op">)</span>
+<span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"jniedballa/camtrapR"</span><span class="op">)</span></code></pre></div>
 <p>Afterwards, load camtrapR via:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jniedballa/camtrapR">camtrapR</a></span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jniedballa/camtrapR">camtrapR</a></span><span class="op">)</span></code></pre></div>
 </div>
 <div id="documentation" class="section level2">
 <h2 class="hasAnchor">
@@ -131,7 +131,7 @@
 <div id="workflow" class="section level2">
 <h2 class="hasAnchor">
 <a href="#workflow" class="anchor"></a>Workflow</h2>
-<p>The workflow in camptrapR is made up of a number of function that build upon one another in a logical sequence. Here is a list of function grouped by work steps in the order in which they should be run. Details on all functions are provided below, in the other vignettes and the function help files.</p>
+<p>The workflow in camptrapR is made up of a number of function that build upon one another in a logical sequence. Here is a list of functions grouped by work steps in the order in which they should be run. Details on all functions are provided below, in the other vignettes, and the function help files.</p>
 <ul>
 <li>Organising raw images</li>
 </ul>
@@ -232,20 +232,20 @@
 <div id="exiftool-for-windows" class="section level3">
 <h3 class="hasAnchor">
 <a href="#exiftool-for-windows" class="anchor"></a>ExifTool for Windows</h3>
-<p>On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found <a href="https://exiftool.org/install.html">here</a>. Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained “exiftool(-k).exe” file to “exiftool.exe” and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in Windows PATH variable (e.g. C:/Windows).</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="co"># Check which directories are in PATH (output not shown here)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"PATH"</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="co"># Check if the system can find Exiftool (if output is empty "", system can't find Exiftool)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Sys.which.html">Sys.which</a></span><span class="op">(</span><span class="st">"exiftool"</span><span class="op">)</span></pre></div>
+<p>On Windows, ExifTool does not need installation. In order for Windows to be able to find ExifTool, follow the instructions found <a href="https://exiftool.org/install.html">here</a>. Be sure to download the stand-alone executable. The download file is a .zip which you need to unzip, rename the contained “exiftool(-k).exe” file to “exiftool.exe” and place it in, e.g., C:/Windows. Windows will be able to find ExifTool if exiftool.exe is placed in a directory that is contained in the Windows PATH variable (e.g. C:/Windows).</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Check which directories are in PATH (output not shown here)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"PATH"</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Check if the system can find Exiftool (if output is empty "", system can't find Exiftool)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Sys.which.html">Sys.which</a></span><span class="op">(</span><span class="st">"exiftool"</span><span class="op">)</span></code></pre></div>
 <pre><code>##                    exiftool 
 ## "C:\\WINDOWS\\exiftool.exe"</code></pre>
 <p>If exiftool.exe cannot be placed in a PATH directory (e.g. due to limited user privileges), users can place exiftool.exe in any directory and then add that directory to PATH temporarily for use in the running R session using the function <code>exiftoolPath</code>. This is necessary if the directory containing exiftool.exe is not in PATH by default.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="co"># this is a dummy example assuming the directory structure: C:/Path/To/Exiftool/exiftool.exe</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># this is a dummy example assuming the directory structure: C:/Path/To/Exiftool/exiftool.exe</span>
 <span class="va">exiftool_dir</span> <span class="op">&lt;-</span> <span class="st">"C:/Path/To/Exiftool"</span>        
-<span class="fu"><a href="../reference/exiftoolPath.html">exiftoolPath</a></span><span class="op">(</span>exiftoolDir <span class="op">=</span> <span class="va">exiftool_dir</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="../reference/exiftoolPath.html">exiftoolPath</a></span><span class="op">(</span>exiftoolDir <span class="op">=</span> <span class="va">exiftool_dir</span><span class="op">)</span></code></pre></div>
 <p>Afterwards, Windows (via R) should be able to find ExifTool during the active session.</p>
 </div>
 <div id="exiftool-performance" class="section level3">
@@ -259,10 +259,10 @@
 <h1 class="hasAnchor">
 <a href="#camera-trap-station-information" class="anchor"></a>Camera trap station information</h1>
 <p>Before looking at how images are handled, let’s first familiarise ourselves with how information about camera trap stations are stored. Camera trap station information are tabulated in a simple data frame with 1 row per station (if there was 1 camera per station) or 1 row per camera (if there was more than 1 camera per station). Information to be stored in this table are: station (and camera) IDs, geographic coordinates, setup and retrieval dates and possible dates when camera were not operational (because of malfunction, animal interference, empty batteries, full memory cards etc.). The table can be generated standard spreadsheet software and loaded into R.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="co"># here is a sample camera trap station table</span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># here is a sample camera trap station table</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"camtraps"</span><span class="op">)</span>
-<span class="va">camtraps</span></pre></div>
+<span class="va">camtraps</span></code></pre></div>
 <pre><code>##    Station  utm_y  utm_x Setup_date Retrieval_date Problem1_from Problem1_to
 ## 1 StationA 604000 526000 02/04/2009     14/05/2009                          
 ## 2 StationB 606000 523000 03/04/2009     16/05/2009                          
@@ -368,33 +368,33 @@
 <p>rawImages/stationA/camera2</p>
 </blockquote>
 <p>If you have more than 1 camera per station but don’t separate the images from different cameras at this stage, you will not be able to do so at a later point. Later in the workflow, you can decide whether you would like to keep them separate or merge them (in the function <code>imageRename</code>).</p>
-<p>Generally, you should not work on your raw data and instead keep them as a backup. If you rename you images with <code>imageRename</code>, whole camtrapR workflow will take place in a copy of the images to prevent data loss.</p>
+<p>Generally, you should not work on your raw data and instead keep them as a backup. If you rename you images with <code>imageRename</code>, the whole camtrapR workflow will take place in a copy of the images to prevent data loss.</p>
 <p>Another important point is not to save any other data besides images in image directories. It may interfere with the operation of the package and ExifTool.</p>
 <div id="saving-raw-images-on-your-hard-disk" class="section level2">
 <h2 class="hasAnchor">
 <a href="#saving-raw-images-on-your-hard-disk" class="anchor"></a>Saving raw images on your hard disk</h2>
-<p>The directories for the raw images can be created automatically using the function <code>createStationFolders</code> and the camera trap station table. As mentioned above, images can either be stored in station directories (if there was 1 camera per station) or in station/camera directories (if there was &gt;1 camera per station). The behaviour is controlled by the function argument <code>cameras</code>. It specifies the camera ID column in the camera trap information table. if it is defined, camera subdirectories will be created within the station directories.</p>
+<p>The directories for the raw images can be created automatically using the function <code>createStationFolders</code> and the camera trap station table. As mentioned above, images can either be stored in station directories (if there was 1 camera per station) or in station/camera directories (if there was &gt;1 camera per station). The behaviour is controlled by the function argument <code>cameras</code>. It specifies the camera ID column in the camera trap information table. If it is defined, camera subdirectories will be created within the station directories.</p>
 <p>Here is an example in which station directories without camera subdirectories are created.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="co"># create a temporary dummy directory for tests</span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># create a temporary dummy directory for tests</span>
 <span class="co"># (normally, you'd set up an empty directory in a proper place, e.g. .../myStudy/rawImages)</span>
 <span class="va">wd_createStationDir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, <span class="st">"createStationFoldersTest"</span><span class="op">)</span>
 
 <span class="co"># create station directories in  wd_createStationDir</span>
 <span class="va">StationFolderCreate1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createStationFolders.html">createStationFolders</a></span> <span class="op">(</span>inDir       <span class="op">=</span> <span class="va">wd_createStationDir</span>,
                                               stations    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">camtraps</span><span class="op">$</span><span class="va">Station</span><span class="op">)</span>, 
-                                              createinDir <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+                                              createinDir <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## created 3 directories</code></pre>
-<div class="sourceCode" id="cb12"><pre class="downlit">
-<span class="va">StationFolderCreate1</span></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">StationFolderCreate1</span></code></pre></div>
 <pre><code>##    station
 ## 1 StationA
 ## 2 StationB
 ## 3 StationC
 ##                                                                          directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/createStationFoldersTest/StationA
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/createStationFoldersTest/StationB
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/createStationFoldersTest/StationC
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/createStationFoldersTest/StationA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/createStationFoldersTest/StationB
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/createStationFoldersTest/StationC
 ##   created exists
 ## 1    TRUE   TRUE
 ## 2    TRUE   TRUE
@@ -407,21 +407,21 @@
 <a href="#shifting-date-and-time-of-images" class="anchor"></a>Shifting date and time of images</h2>
 <p>There are situations in which the date and time of your images may be incorrect. Imagine you forgot to set the system time in one of your cameras or reset the time accidentally. Or think of a bug in the camera software that causes years to be wrong as happened in the cameras of a major manufacturer at the turn of the year 2015/2016. Another situation in which images times may need a little shift is when users wish to synchronise the record times between camera pairs.</p>
 <p>In any case, systematic offsets of date and time recorded by cameras can be corrected easily. The function <code>timeShiftImages</code> does just that by utilising the date/time shift module of ExifTool. All you need is a table containing the time offset in a certain format, i.e.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">timeShiftTable</span><span class="op">)</span>
-<span class="va">timeShiftTable</span></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">timeShiftTable</span><span class="op">)</span>
+<span class="va">timeShiftTable</span></code></pre></div>
 <pre><code>##    Station camera    timeshift sign
 ## 1 StationA     NA  1:0:0 0:0:0    -
 ## 2 StationB     NA 0:0:0 12:0:0    +</code></pre>
 <p>There is a <code>station</code> column with station IDs, <code>camera</code> is NA because there was 1 camera per station only in our example, <code>timeshift</code> is the amount by which to shift the time of all images at that station, and <code>sign</code> specifies the direction in which to shift time. Setting <code>sign</code> to <code><a href="https://rdrr.io/r/base/Arithmetic.html">+</a></code> sets image time ahead by the amount specified in <code>timeshift</code>, <code><a href="https://rdrr.io/r/base/Arithmetic.html">-</a></code> sets image times back. <code>timeshift</code> format is "year:month:day hour:minute:second", i.e. "1:0:0 0:0:0" is a shift of exactly 1 year and "0:0:0 12:10:01" 12 hours and 10 minutes and 1 second. In the above table, time stampes of images taken at StationA are shifted back by 1 year, and images taken at StationB are shifted ahead by 12 hours.</p>
 <p>The function <code>timeShiftImages</code> should be run directly after saving the raw images on the hard disk.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit">
-<span class="co"># copy sample images to another location (so we don't mess around in the package directory)</span>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># copy sample images to another location (so we don't mess around in the package directory)</span>
 <span class="va">wd_images_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"pictures/raw_images"</span>, package <span class="op">=</span> <span class="st">"camtrapR"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">wd_images_raw</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span> , recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">wd_images_raw</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span> , recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit">
-<span class="va">wd_images_raw_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, <span class="st">"raw_images"</span><span class="op">)</span>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">wd_images_raw_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, <span class="st">"raw_images"</span><span class="op">)</span>
 
 <span class="va">timeshift_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/timeShiftImages.html">timeShiftImages</a></span><span class="op">(</span>inDir                <span class="op">=</span> <span class="va">wd_images_raw_copy</span>,
                                  timeShiftTable       <span class="op">=</span> <span class="va">timeShiftTable</span>,
@@ -429,20 +429,20 @@
                                  hasCameraFolders     <span class="op">=</span> <span class="cn">FALSE</span>,
                                  timeShiftColumn      <span class="op">=</span> <span class="st">"timeshift"</span>,
                                  timeShiftSignColumn  <span class="op">=</span> <span class="st">"sign"</span>
-<span class="op">)</span></pre></div>
-<pre><code>## C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images/StationA</code></pre>
-<pre><code>## C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images/StationB</code></pre>
-<div class="sourceCode" id="cb21"><pre class="downlit">
-<span class="va">timeshift_run</span></pre></div>
+<span class="op">)</span></code></pre></div>
+<pre><code>## C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images/StationA</code></pre>
+<pre><code>## C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images/StationB</code></pre>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">timeshift_run</span></code></pre></div>
 <pre><code>##                                                            directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images/StationA
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images/StationB
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images/StationA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images/StationB
 ##               n_directories                  n_images
 ## 1     1 directories scanned     3 image files updated
 ## 2     1 directories scanned     3 image files updated</code></pre>
 <p>ExifTool has now updated the time tag of all images in the directories specified in the <code>timeShiftTable</code>. The original images are preserved as XYZ.JPG_original files (XYZ being the original file name). By setting argument <code>undo = TRUE</code>, the orginals are restored and the modified images are deleted. The function will check if the number of JPG_original files and JPG files in folders is identical. If not, the function will not work. It does not check for consistency of file names.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit">
-<span class="va">timeshift_undo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/timeShiftImages.html">timeShiftImages</a></span><span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_images_raw_copy</span>,
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">timeshift_undo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/timeShiftImages.html">timeShiftImages</a></span><span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_images_raw_copy</span>,
                                  timeShiftTable       <span class="op">=</span> <span class="va">timeShiftTable</span>,
                                  stationCol           <span class="op">=</span> <span class="st">"Station"</span>,
                                  hasCameraFolders     <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -451,10 +451,10 @@
                                  undo                 <span class="op">=</span> <span class="cn">TRUE</span>
 <span class="op">)</span>
 
-<span class="va">timeshift_undo</span></pre></div>
+<span class="va">timeshift_undo</span></code></pre></div>
 <pre><code>##                                                            directory
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images/StationA
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images/StationB
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images/StationA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images/StationB
 ##   n_images_undo
 ## 1             3
 ## 2             3</code></pre>
@@ -465,7 +465,7 @@
 <a href="#datetime-problems-with-reconyx-hyperfire-cameras" class="anchor"></a>Date/Time problems with Reconyx Hyperfire cameras</h2>
 <!--  ### Date/Time problems with Reconyx Hyperfire cameras -->
 <p>Some Reconyx Hyperfire cameras (e.g. Hyperfire HC500) don’t store date and time in the standard Exif format. Consequently, camtrapR cannot read the DateTimeOriginal tag from these images. This can be fixed easily by using the camtrapR function <code>fixDateTimeOriginal</code> or by following the instructions given by Mathias Tobler in the CameraBase documentation (page 7):</p>
-<p><a href="https://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf" class="uri">https://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf</a></p>
+<p><a href="http://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf" class="uri">http://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf</a></p>
 <!-- ### Date/Time problems with Maginon cameras -->
 <!-- Camera trap model Maginon WK1 (and possibly also other models my this manufacturer) also don't store date and time in the standard Exif format, but in a different way compared to Reconyx HC500, hence the `fixDateTimeOriginal` doesn't work on these (currently).  -->
 <!-- Maginon cameras don't create the DateTimeOriginal tag of the Exif metadata that camtrapR reads out. The best alternative available is the Exif Modify Date, which corresponds to the date and time in the images + 1 second. (DateTimeOriginal seems to be the shutter time and ModifyDate is the time the image was saved). To make things worse, there also seems to be some metadata problems in JPGs created by these cameras whch prevent exiftool from simply copying the relevant information into the right tag (technical note: exiftool gives an error about "bad format for EXIFIFD entry"). For more information see here: http://owl.phy.queensu.ca/~phil/exiftool/faq.html#Q20. -->
@@ -504,8 +504,8 @@
 </blockquote>
 <p>Station ID and camera ID are derived from the raw image directory structure created earlier with <code>createStationFolders</code> Date and time are taken from image Exif metadata (read using ExifTool). (X) is a numeric identifier that is assigned to all images taken at the same station (and camera, if applicable) within one minute. This is to avoid identical image names if images were taken in the same second (or in the same minute, if cameras record time in hours and minutes only).</p>
 <p>Again, please be aware that temporary directories are used in the example. Set <code>outDir</code> to a permanent directory. In addition, images are not actually copied (argument <code>copyImages = FALSE</code>), but copying and renaming is mererly simulated in out example. So, in real world data, set <code>copyImages = TRUE</code>.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit">
- <span class="co"># raw image location</span>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"> <span class="co"># raw image location</span>
 <span class="va">wd_images_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"pictures/raw_images"</span>, package <span class="op">=</span> <span class="st">"camtrapR"</span><span class="op">)</span>   
  <span class="co"># destination for renamed images to be copied to</span>
 <span class="va">wd_images_raw_renamed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, <span class="st">"raw_images_renamed"</span><span class="op">)</span>       
@@ -514,12 +514,12 @@
                                outDir              <span class="op">=</span> <span class="va">wd_images_raw_renamed</span>,       
                                hasCameraFolders    <span class="op">=</span> <span class="cn">FALSE</span>,
                                copyImages          <span class="op">=</span> <span class="cn">FALSE</span>
-  <span class="op">)</span></pre></div>
+  <span class="op">)</span></code></pre></div>
 <pre><code>## StationA:    3 images      |==========          |   50%</code></pre>
 <pre><code>## StationB:    3 images      |====================|  100%</code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit">
-<span class="co"># here is the information for a few images </span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">renaming.table2</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># here is the information for a few images </span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">renaming.table2</span><span class="op">)</span></code></pre></div>
 <pre><code>##                                                                            Directory
 ## 1 C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/raw_images/StationA
 ## 2 C:/Users/Juergen/Documents/R/win-library/4.0/camtrapR/pictures/raw_images/StationA
@@ -535,12 +535,12 @@
 ## 5 IMG0002.JPG StationB     NA 2009-04-05 23:13:00         TRUE
 ## 6 IMG0003.JPG StationB     NA 2009-04-07 00:23:00         TRUE
 ##                                                                       outDir
-## 1 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images_renamed/StationA
-## 2 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images_renamed/StationA
-## 3 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images_renamed/StationA
-## 4 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images_renamed/StationB
-## 5 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images_renamed/StationB
-## 6 C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/raw_images_renamed/StationB
+## 1 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images_renamed/StationA
+## 2 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images_renamed/StationA
+## 3 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images_renamed/StationA
+## 4 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images_renamed/StationB
+## 5 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images_renamed/StationB
+## 6 C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/raw_images_renamed/StationB
 ##                            filename_new fileExistsAlready CopyStatus
 ## 1 StationA__2009-04-10__05-07-00(1).JPG             FALSE      FALSE
 ## 2 StationA__2009-04-21__00-40-00(1).JPG             FALSE      FALSE
@@ -604,13 +604,13 @@
 <a href="#writing-a-copyright-tag-into-image-metadata" class="anchor"></a>Writing a copyright tag into image metadata</h2>
 <p>The function <code>addCopyrightTag</code> can write a copyright tag into image Exif metadata. While this can be useful when sharing or publishing data, it is not required in the camtrapR workflow. The function will recursively find all images in <code>inDir</code> and its subdirectories and writes a user-defined text into the Copyright field of the Exif metadata.</p>
 <p>In doing so, Exiftool normally keeps the original images as .JPG_original files. Note that this behaviour will instantly double the number of images in inDir and the disk space required. If this is not desired, users can set the function argument <code>keepJPG_original = FALSE</code> (default is <code>TRUE</code>) in order to replace the original files without creating *.JPG_original files. I recommend to first try this on a copy of a subdataset and to then check the function output. If there are warnings like "Warning: [minor] Maker notes could not be parsed" image makernotes may be unreadable afterwards (they are proprietary, undocumented formats). On the other hand, you may never need these for analysing camera trapping data.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit">
-<span class="co"># copy sample images to temporary directory (so we don't mess around in the package directory)</span>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># copy sample images to temporary directory (so we don't mess around in the package directory)</span>
 <span class="va">wd_images_ID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"pictures/sample_images_species_dir"</span>, package <span class="op">=</span> <span class="st">"camtrapR"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">wd_images_ID</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">wd_images_ID</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit">
-<span class="va">wd_images_ID_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, <span class="st">"sample_images_species_dir"</span><span class="op">)</span>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">wd_images_ID_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span>, <span class="st">"sample_images_species_dir"</span><span class="op">)</span>
 
 <span class="co"># define an example copyright tag</span>
 <span class="va">copyrightTagToAdd</span> <span class="op">&lt;-</span> <span class="st">"Your Name (Your Organisation)"</span>
@@ -618,15 +618,15 @@
 <span class="co"># write the tag to images</span>
 <span class="fu"><a href="../reference/addCopyrightTag.html">addCopyrightTag</a></span><span class="op">(</span>inDir        <span class="op">=</span> <span class="va">wd_images_ID_copy</span>, 
                 copyrightTag <span class="op">=</span> <span class="va">copyrightTagToAdd</span>, 
-                askFirst     <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>                  <span class="co"># askFirst = FALSE prevents function from asking user to confirm action (which doesn't work in vignettes)</span></pre></div>
+                askFirst     <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>                  <span class="co"># askFirst = FALSE prevents function from asking user to confirm action (which doesn't work in vignettes)</span></code></pre></div>
 <pre><code>##    14 directories scanned    68 image files updated</code></pre>
 <p>When we check the outcome with function exifTagNames, we find field “Copyright” in line 27.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit">
-<span class="va">exiftagnames_extracted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exifTagNames.html">exifTagNames</a></span><span class="op">(</span><span class="va">wd_images_ID_copy</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">exiftagnames_extracted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exifTagNames.html">exifTagNames</a></span><span class="op">(</span><span class="va">wd_images_ID_copy</span><span class="op">)</span></code></pre></div>
 <pre><code>## Metadata of:
-## C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit">
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">exiftagnames_extracted</span>, row.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+## C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</code></pre>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">exiftagnames_extracted</span>, row.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <colgroup>
 <col width="2%">
@@ -663,7 +663,7 @@
 <td align="left">4</td>
 <td align="left">File</td>
 <td align="left">Directory</td>
-<td align="left">C:/Users/Juergen/AppData/Local/Temp/Rtmp2dp8mX/sample_images_species_dir/StationA/PBE</td>
+<td align="left">C:/Users/Juergen/AppData/Local/Temp/RtmpGiwBmz/sample_images_species_dir/StationA/PBE</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
@@ -675,19 +675,19 @@
 <td align="left">6</td>
 <td align="left">File</td>
 <td align="left">FileModifyDate</td>
-<td align="left">2021:01:16 18:00:48+01:00</td>
+<td align="left">2021:03:20 13:02:12+01:00</td>
 </tr>
 <tr class="odd">
 <td align="left">7</td>
 <td align="left">File</td>
 <td align="left">FileAccessDate</td>
-<td align="left">2021:01:16 18:00:51+01:00</td>
+<td align="left">2021:03:20 13:02:16+01:00</td>
 </tr>
 <tr class="even">
 <td align="left">8</td>
 <td align="left">File</td>
 <td align="left">FileCreateDate</td>
-<td align="left">2021:01:16 18:00:46+01:00</td>
+<td align="left">2021:03:20 13:02:10+01:00</td>
 </tr>
 <tr class="odd">
 <td align="left">9</td>
@@ -908,7 +908,7 @@
 </tbody>
 </table>
 <p>The copyright tag will henceforth be visible in digiKam and other image management software.</p>
-<p>Now that the raw images are organised, the next step is species identification covered in the next vignette.</p>
+<p>Now that the raw images are organised, the next step is species identification, covered in the next vignette.</p>
 </div>
 </div>
   </div>

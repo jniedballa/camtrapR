@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate a <code>capthist</code> object for spatial capture-recapture analyses from camera-trapping data — spatialDetectionHistory • camtrapR</title>
+<title>Generate a capthist object for spatial capture-recapture analyses from camera-trapping data — spatialDetectionHistory • camtrapR</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Generate a <code>capthist</code> object for spatial capture-recapture analyses from camera-trapping data — spatialDetectionHistory" />
+<meta property="og:title" content="Generate a capthist object for spatial capture-recapture analyses from camera-trapping data — spatialDetectionHistory" />
 <meta property="og:description" content="This function generates spatial detection histories of individuals of a species for spatial capture-recapture analyses with package secr. Data are stored in a capthist object. The capthist object contains detection histories, camera-trap station location and possibly individual and station-level covariates. Detection histories can have adjustable occasion length and occasion start time (as in the function detectionHistory)." />
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.01</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -115,7 +115,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jniedballa/camtrapR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -141,33 +141,33 @@
     <p>This function generates spatial detection histories of individuals of a species for spatial capture-recapture analyses with package <code><a href='https://rdrr.io/pkg/secr/man/secr-package.html'>secr</a></code>. Data are stored in a <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object. The <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object contains detection histories, camera-trap station location and possibly individual and station-level covariates. Detection histories can have adjustable occasion length and occasion start time (as in the function <code><a href='detectionHistory.html'>detectionHistory</a></code>).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>spatialDetectionHistory</span>(<span class='no'>recordTableIndividual</span>,
-  <span class='no'>species</span>,
-  <span class='no'>camOp</span>,
-  <span class='no'>CTtable</span>,
-  <span class='kw'>output</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"binary"</span>, <span class='st'>"count"</span>),
-  <span class='kw'>stationCol</span> <span class='kw'>=</span> <span class='st'>"Station"</span>,
-  <span class='kw'>speciesCol</span> <span class='kw'>=</span> <span class='st'>"Species"</span>,
-  <span class='no'>sessionCol</span>,
-  <span class='no'>Xcol</span>,
-  <span class='no'>Ycol</span>,
-  <span class='no'>stationCovariateCols</span>,
-  <span class='no'>individualCol</span>,
-  <span class='no'>individualCovariateCols</span>,
-  <span class='kw'>recordDateTimeCol</span> <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-  <span class='kw'>recordDateTimeFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
-  <span class='no'>occasionLength</span>,
-  <span class='no'>minActiveDaysPerOccasion</span>,
-  <span class='kw'>occasionStartTime</span> <span class='kw'>=</span> <span class='st'>"deprecated"</span>,
-  <span class='no'>maxNumberDays</span>,
-  <span class='no'>day1</span>,
-  <span class='no'>buffer</span>,
-  <span class='kw'>includeEffort</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>scaleEffort</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>binaryEffort</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>timeZone</span>,
-  <span class='no'>makeRMarkInput</span>
-)</pre>
+    <pre class="usage"><span class='fu'>spatialDetectionHistory</span><span class='op'>(</span><span class='va'>recordTableIndividual</span>,
+  <span class='va'>species</span>,
+  <span class='va'>camOp</span>,
+  <span class='va'>CTtable</span>,
+  output <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"binary"</span>, <span class='st'>"count"</span><span class='op'>)</span>,
+  stationCol <span class='op'>=</span> <span class='st'>"Station"</span>,
+  speciesCol <span class='op'>=</span> <span class='st'>"Species"</span>,
+  <span class='va'>sessionCol</span>,
+  <span class='va'>Xcol</span>,
+  <span class='va'>Ycol</span>,
+  <span class='va'>stationCovariateCols</span>,
+  <span class='va'>individualCol</span>,
+  <span class='va'>individualCovariateCols</span>,
+  recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
+  <span class='va'>occasionLength</span>,
+  <span class='va'>minActiveDaysPerOccasion</span>,
+  occasionStartTime <span class='op'>=</span> <span class='st'>"deprecated"</span>,
+  <span class='va'>maxNumberDays</span>,
+  <span class='va'>day1</span>,
+  <span class='va'>buffer</span>,
+  includeEffort <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  scaleEffort <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  binaryEffort <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>timeZone</span>,
+  <span class='va'>makeRMarkInput</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -299,6 +299,9 @@
 <dt><code>makeRMarkInput = TRUE</code></dt><dd><p>A data frame for use in RMark</p></dd>
 
 
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><span class="pkg">secr</span>
@@ -306,45 +309,46 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableIndividualSample</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>camtraps</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableIndividualSample</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>camtraps</span><span class='op'>)</span>
 
 <span class='co'># create camera operation matrix (with problems/malfunction)</span>
-<span class='no'>camop_problem</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span>(<span class='kw'>CTtable</span>      <span class='kw'>=</span> <span class='no'>camtraps</span>,
-                                 <span class='kw'>stationCol</span>   <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                 <span class='kw'>setupCol</span>     <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                                 <span class='kw'>retrievalCol</span> <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                                 <span class='kw'>writecsv</span>     <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                 <span class='kw'>hasProblems</span>  <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                                 <span class='kw'>dateFormat</span>   <span class='kw'>=</span> <span class='st'>"%d/%m/%Y"</span>
-)
+<span class='va'>camop_problem</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span><span class='op'>(</span>CTtable      <span class='op'>=</span> <span class='va'>camtraps</span>,
+                                 stationCol   <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                 setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                 retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                 writecsv     <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                 hasProblems  <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                                 dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+<span class='op'>)</span>
 
-<span class='no'>sdh</span> <span class='kw'>&lt;-</span> <span class='fu'>spatialDetectionHistory</span>(<span class='kw'>recordTableIndividual</span> <span class='kw'>=</span> <span class='no'>recordTableIndividualSample</span>,
-                               <span class='kw'>species</span>               <span class='kw'>=</span> <span class='st'>"LeopardCat"</span>,
-                               <span class='kw'>camOp</span>                 <span class='kw'>=</span> <span class='no'>camop_problem</span>,
-                               <span class='kw'>CTtable</span>               <span class='kw'>=</span> <span class='no'>camtraps</span>,
-                               <span class='kw'>output</span>                <span class='kw'>=</span> <span class='st'>"binary"</span>,
-                               <span class='kw'>stationCol</span>            <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                               <span class='kw'>speciesCol</span>            <span class='kw'>=</span> <span class='st'>"Species"</span>,
-                               <span class='kw'>Xcol</span>                  <span class='kw'>=</span> <span class='st'>"utm_x"</span>,
-                               <span class='kw'>Ycol</span>                  <span class='kw'>=</span> <span class='st'>"utm_y"</span>,
-                               <span class='kw'>individualCol</span>         <span class='kw'>=</span> <span class='st'>"Individual"</span>,
-                               <span class='kw'>recordDateTimeCol</span>     <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                               <span class='kw'>recordDateTimeFormat</span>  <span class='kw'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
-                               <span class='kw'>occasionLength</span>        <span class='kw'>=</span> <span class='fl'>10</span>,
-                               <span class='kw'>day1</span>                  <span class='kw'>=</span> <span class='st'>"survey"</span>,
-                               <span class='kw'>includeEffort</span>         <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                               <span class='kw'>timeZone</span>              <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
-  )
+<span class='va'>sdh</span> <span class='op'>&lt;-</span> <span class='fu'>spatialDetectionHistory</span><span class='op'>(</span>recordTableIndividual <span class='op'>=</span> <span class='va'>recordTableIndividualSample</span>,
+                               species               <span class='op'>=</span> <span class='st'>"LeopardCat"</span>,
+                               camOp                 <span class='op'>=</span> <span class='va'>camop_problem</span>,
+                               CTtable               <span class='op'>=</span> <span class='va'>camtraps</span>,
+                               output                <span class='op'>=</span> <span class='st'>"binary"</span>,
+                               stationCol            <span class='op'>=</span> <span class='st'>"Station"</span>,
+                               speciesCol            <span class='op'>=</span> <span class='st'>"Species"</span>,
+                               Xcol                  <span class='op'>=</span> <span class='st'>"utm_x"</span>,
+                               Ycol                  <span class='op'>=</span> <span class='st'>"utm_y"</span>,
+                               individualCol         <span class='op'>=</span> <span class='st'>"Individual"</span>,
+                               recordDateTimeCol     <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
+                               occasionLength        <span class='op'>=</span> <span class='fl'>10</span>,
+                               day1                  <span class='op'>=</span> <span class='st'>"survey"</span>,
+                               includeEffort         <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                               timeZone              <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
+  <span class='op'>)</span>
 
 <span class='co'># missing space in species = "LeopardCat" was introduced by recordTableIndividual</span>
 <span class='co'># (because of CRAN package policies.</span>
 <span class='co'># In your data you can have spaces in your directory names)</span>
 
-  <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>sdh</span>)</div><div class='output co'>#&gt; Object class       capthist 
+  <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>sdh</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Object class       capthist 
 #&gt; Detector type      proximity 
 #&gt; Detector number    3 
-#&gt; Average spacing    2575.831 m 
+#&gt; Average spacing    2258.871 m 
 #&gt; x-range            523000 526000 m 
 #&gt; y-range            604000 607050 m 
 #&gt; 
@@ -362,52 +366,54 @@
 #&gt; losses            0 0 0 0 0     0
 #&gt; detections        3 4 4 3 1    15
 #&gt; detectors visited 2 3 3 2 1    11
-#&gt; detectors used    3 3 3 3 2    14</div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>sdh</span>, <span class='kw'>tracks</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-1.png' alt='' width='700' height='433' /></div><div class='input'>
+#&gt; detectors used    3 3 3 3 2    14</div><div class='input'>  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sdh</span>, tracks <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-1.png' alt='' width='700' height='433' /></div><div class='input'>
   <span class='co'>## multi-season capthist object</span>
   <span class='co'># see vignette "3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input"</span>
+  
+  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>camtrapsMultiSeason</span><span class='op'>)</span>
+  <span class='va'>camtrapsMultiSeason</span><span class='op'>$</span><span class='va'>session</span><span class='op'>[</span><span class='va'>camtrapsMultiSeason</span><span class='op'>$</span><span class='va'>session</span> <span class='op'>==</span> <span class='fl'>2009</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fl'>1</span>
+  <span class='va'>camtrapsMultiSeason</span><span class='op'>$</span><span class='va'>session</span><span class='op'>[</span><span class='va'>camtrapsMultiSeason</span><span class='op'>$</span><span class='va'>session</span> <span class='op'>==</span> <span class='fl'>2010</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fl'>2</span>
 
-  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>camtrapsMultiSeason</span>)
-  <span class='no'>camtrapsMultiSeason</span>$<span class='no'>session</span>[<span class='no'>camtrapsMultiSeason</span>$<span class='no'>session</span> <span class='kw'>==</span> <span class='fl'>2009</span>] <span class='kw'>&lt;-</span> <span class='fl'>1</span>
-  <span class='no'>camtrapsMultiSeason</span>$<span class='no'>session</span>[<span class='no'>camtrapsMultiSeason</span>$<span class='no'>session</span> <span class='kw'>==</span> <span class='fl'>2010</span>] <span class='kw'>&lt;-</span> <span class='fl'>2</span>
-
-  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableIndividualSampleMultiSeason</span>)
+  <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableIndividualSampleMultiSeason</span><span class='op'>)</span>
 
   <span class='co'># create camera operation matrix (with problems/malfunction)</span>
-  <span class='no'>camop_session</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span>(<span class='kw'>CTtable</span>         <span class='kw'>=</span> <span class='no'>camtrapsMultiSeason</span>,
-                                      <span class='kw'>stationCol</span>   <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                      <span class='kw'>setupCol</span>     <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                                      <span class='kw'>sessionCol</span>   <span class='kw'>=</span> <span class='st'>"session"</span>,
-                                      <span class='kw'>retrievalCol</span> <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                                      <span class='kw'>hasProblems</span>  <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                                      <span class='kw'>dateFormat</span>   <span class='kw'>=</span> <span class='st'>"%d/%m/%Y"</span>
-  )
+  <span class='va'>camop_session</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span><span class='op'>(</span>CTtable         <span class='op'>=</span> <span class='va'>camtrapsMultiSeason</span>,
+                                      stationCol   <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                      setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                      sessionCol   <span class='op'>=</span> <span class='st'>"session"</span>,
+                                      retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                      hasProblems  <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                                      dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+  <span class='op'>)</span>
 
-<span class='no'>sdh_multi</span> <span class='kw'>&lt;-</span> <span class='fu'>spatialDetectionHistory</span>(<span class='kw'>recordTableIndividual</span> <span class='kw'>=</span> <span class='no'>recordTableIndividualSampleMultiSeason</span>,
-                               <span class='kw'>species</span>               <span class='kw'>=</span> <span class='st'>"LeopardCat"</span>,
-                               <span class='kw'>output</span>                <span class='kw'>=</span> <span class='st'>"binary"</span>,
-                               <span class='kw'>camOp</span>                 <span class='kw'>=</span> <span class='no'>camop_session</span>,
-                               <span class='kw'>CTtable</span>               <span class='kw'>=</span> <span class='no'>camtrapsMultiSeason</span>,
-                               <span class='kw'>stationCol</span>            <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                               <span class='kw'>speciesCol</span>            <span class='kw'>=</span> <span class='st'>"Species"</span>,
-                               <span class='kw'>sessionCol</span>            <span class='kw'>=</span> <span class='st'>"session"</span>,
-                               <span class='kw'>Xcol</span>                  <span class='kw'>=</span> <span class='st'>"utm_x"</span>,
-                               <span class='kw'>Ycol</span>                  <span class='kw'>=</span> <span class='st'>"utm_y"</span>,
-                               <span class='kw'>individualCol</span>         <span class='kw'>=</span> <span class='st'>"Individual"</span>,
-                               <span class='kw'>recordDateTimeCol</span>     <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                               <span class='kw'>recordDateTimeFormat</span>  <span class='kw'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
-                               <span class='kw'>occasionLength</span>        <span class='kw'>=</span> <span class='fl'>10</span>,
-                               <span class='kw'>day1</span>                  <span class='kw'>=</span> <span class='st'>"survey"</span>,
-                               <span class='kw'>includeEffort</span>         <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                               <span class='kw'>timeZone</span>              <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
-                               <span class='kw'>stationCovariateCols</span>  <span class='kw'>=</span> <span class='st'>"utm_y"</span>,         <span class='co'># example</span>
-                               <span class='kw'>individualCovariateCols</span> <span class='kw'>=</span> <span class='st'>"Individual"</span>   <span class='co'># example</span>
-  )
+<span class='va'>sdh_multi</span> <span class='op'>&lt;-</span> <span class='fu'>spatialDetectionHistory</span><span class='op'>(</span>recordTableIndividual <span class='op'>=</span> <span class='va'>recordTableIndividualSampleMultiSeason</span>,
+                               species               <span class='op'>=</span> <span class='st'>"LeopardCat"</span>,
+                               output                <span class='op'>=</span> <span class='st'>"binary"</span>,
+                               camOp                 <span class='op'>=</span> <span class='va'>camop_session</span>,
+                               CTtable               <span class='op'>=</span> <span class='va'>camtrapsMultiSeason</span>,
+                               stationCol            <span class='op'>=</span> <span class='st'>"Station"</span>,
+                               speciesCol            <span class='op'>=</span> <span class='st'>"Species"</span>,
+                               sessionCol            <span class='op'>=</span> <span class='st'>"session"</span>,
+                               Xcol                  <span class='op'>=</span> <span class='st'>"utm_x"</span>,
+                               Ycol                  <span class='op'>=</span> <span class='st'>"utm_y"</span>,
+                               individualCol         <span class='op'>=</span> <span class='st'>"Individual"</span>,
+                               recordDateTimeCol     <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
+                               occasionLength        <span class='op'>=</span> <span class='fl'>10</span>,
+                               day1                  <span class='op'>=</span> <span class='st'>"survey"</span>,
+                               includeEffort         <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                               timeZone              <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>,
+                               stationCovariateCols  <span class='op'>=</span> <span class='st'>"utm_y"</span>,         <span class='co'># example</span>
+                               individualCovariateCols <span class='op'>=</span> <span class='st'>"Individual"</span>   <span class='co'># example</span>
+  <span class='op'>)</span>
 
-  <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>sdh_multi</span>)</div><div class='output co'>#&gt; $`1`
+  <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>sdh_multi</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $`1`
 #&gt; Object class       capthist 
 #&gt; Detector type      proximity 
 #&gt; Detector number    3 
-#&gt; Average spacing    2575.831 m 
+#&gt; Average spacing    2258.871 m 
 #&gt; x-range            523000 526000 m 
 #&gt; y-range            604000 607050 m 
 #&gt; 
@@ -438,7 +444,7 @@
 #&gt; Object class       capthist 
 #&gt; Detector type      proximity 
 #&gt; Detector number    4 
-#&gt; Average spacing    2496.591 m 
+#&gt; Average spacing    2258.871 m 
 #&gt; x-range            523000 526000 m 
 #&gt; y-range            604000 607050 m 
 #&gt; 
@@ -463,7 +469,8 @@
 #&gt;  1:1       
 #&gt;  2:1       
 #&gt; 
-#&gt; </div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>sdh_multi</span>, <span class='kw'>tracks</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: screen layout does not allow for all sessions and some plots may be lost; set par mfrow</span></div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='spatialDetectionHistory-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;  1  2 
+#&gt; </div><div class='input'>  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sdh_multi</span>, tracks <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: screen layout does not allow for all sessions and some plots may be lost; set par mfrow</span></div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='spatialDetectionHistory-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;  1  2 
 #&gt; 15  6 </div><div class='input'>
 </div></pre>
   </div>
@@ -481,7 +488,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

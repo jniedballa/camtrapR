@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.08</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -294,6 +294,12 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 #&gt; [1] "Trap nights (number of active 24 hour cycles completed by independent cameras):  128"
 #&gt; 
 #&gt; -------------------------------------------------------
+#&gt; [1] "n nights with cameras set up and active (trap nights - LECAGY CALCULATION - WHOLE DAYS):  123"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "n nights with cameras set up (LECAGY CALCULATION - WHOLE DAYS):  128"
+#&gt; 
+#&gt; -------------------------------------------------------
 #&gt; [1] "Calendar days with cameras set up (operational or not):  131"
 #&gt; 
 #&gt; -------------------------------------------------------
@@ -316,10 +322,10 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 #&gt; 1                    43                     43                        0
 #&gt; 2                    44                     44                        0
 #&gt; 3                    44                     44                        0
-#&gt;   n_trap_nights_active
-#&gt; 1                   42
-#&gt; 2                   43
-#&gt; 3                   43</div><div class='input'><span class='va'>reportTest</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span>    <span class='co'># number of species by station</span>
+#&gt;   n_trap_nights_active n_nights_active_legacy n_nights_total_legacy
+#&gt; 1                   42                     42                    42
+#&gt; 2                   43                     43                    43
+#&gt; 3                   43                     38                    43</div><div class='input'><span class='va'>reportTest</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span>    <span class='co'># number of species by station</span>
 </div><div class='output co'>#&gt;    Station n_species
 #&gt; 1 StationA         2
 #&gt; 2 StationB         3
@@ -388,6 +394,12 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 #&gt; [1] "Trap nights (number of active 24 hour cycles completed by independent cameras):  122.5"
 #&gt; 
 #&gt; -------------------------------------------------------
+#&gt; [1] "n nights with cameras set up and active (trap nights - LECAGY CALCULATION - WHOLE DAYS):  123"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "n nights with cameras set up (LECAGY CALCULATION - WHOLE DAYS):  128"
+#&gt; 
+#&gt; -------------------------------------------------------
 #&gt; [1] "Calendar days with cameras set up (operational or not):  131"
 #&gt; 
 #&gt; -------------------------------------------------------
@@ -407,10 +419,10 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 #&gt; 1                    43                     43                        0
 #&gt; 2                    44                     44                        0
 #&gt; 3                    44                     38                        6
-#&gt;   n_trap_nights_active
-#&gt; 1                 42.0
-#&gt; 2                 43.0
-#&gt; 3                 37.5</div><div class='input'>
+#&gt;   n_trap_nights_active n_nights_active_legacy n_nights_total_legacy
+#&gt; 1                 42.0                     42                    42
+#&gt; 2                 43.0                     43                    43
+#&gt; 3                 37.5                     38                    43</div><div class='input'>
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># run again with sinkpath defined</span>
 <span class='va'>reportTest</span> <span class='op'>&lt;-</span> <span class='fu'>surveyReport</span> <span class='op'>(</span>recordTable          <span class='op'>=</span> <span class='va'>recordTableSample</span>,

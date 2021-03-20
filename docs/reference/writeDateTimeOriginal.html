@@ -74,7 +74,7 @@ This function assigns values to the DateTimeOriginal tag in image's EXIF metadat
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.09</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -223,7 +223,7 @@ This function assigns values to the DateTimeOriginal tag in image's EXIF metadat
 
 <span class='co'># prepare DateTimeOriginal column (ymd_hms() automatically respects the PM indicator)</span>
 <span class='va'>df_image_data</span><span class='op'>$</span><span class='va'>DateTimeOriginal</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='va'>df_image_data</span><span class='op'>$</span><span class='va'>date</span>, <span class='va'>df_image_data</span><span class='op'>$</span><span class='va'>time</span><span class='op'>)</span>
-<span class='va'>df_image_data</span><span class='op'>$</span><span class='va'>DateTimeOriginal</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='fu'><a href='http://lubridate.tidyverse.org/reference/ymd_hms.html'>ymd_hms</a></span><span class='op'>(</span><span class='va'>df_image_data</span><span class='op'>$</span><span class='va'>DateTimeOriginal</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>df_image_data</span><span class='op'>$</span><span class='va'>DateTimeOriginal</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/as.character.html'>as.character</a></span><span class='op'>(</span><span class='fu'><a href='http://lubridate.tidyverse.org/reference/ymd_hms.html'>ymd_hms</a></span><span class='op'>(</span><span class='va'>df_image_data</span><span class='op'>$</span><span class='va'>DateTimeOriginal</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># create cluster (3 cores)</span>
 <span class='va'>cl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/snow/man/snow-startstop.html'>makeCluster</a></span><span class='op'>(</span><span class='fl'>3</span><span class='op'>)</span>

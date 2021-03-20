@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3.01</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -115,7 +115,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jniedballa/camtrapR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -141,28 +141,28 @@
     <p>This function generates species detection histories that can be used in occupancy analyses, e.g. with package <a href='https://rdrr.io/pkg/unmarked/man/unmarked-package.html'>unmarked</a>. It generates detection histories in different formats, with adjustable occasion length and occasion start time.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>detectionHistory</span>(<span class='no'>recordTable</span>,
- <span class='no'>species</span>,
- <span class='no'>camOp</span>,
- <span class='kw'>output</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"binary"</span>, <span class='st'>"count"</span>),
- <span class='kw'>stationCol</span> <span class='kw'>=</span> <span class='st'>"Station"</span>,
- <span class='kw'>speciesCol</span> <span class='kw'>=</span> <span class='st'>"Species"</span>,
- <span class='kw'>recordDateTimeCol</span> <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
- <span class='kw'>recordDateTimeFormat</span> <span class='kw'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
- <span class='no'>occasionLength</span>,
- <span class='no'>minActiveDaysPerOccasion</span>,
- <span class='no'>maxNumberDays</span>,
- <span class='no'>day1</span>,
- <span class='no'>buffer</span>,
- <span class='kw'>includeEffort</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
- <span class='kw'>scaleEffort</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
- <span class='kw'>occasionStartTime</span> <span class='kw'>=</span> <span class='st'>"deprecated"</span>,
- <span class='kw'>datesAsOccasionNames</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
- <span class='no'>timeZone</span>,
- <span class='kw'>writecsv</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
- <span class='no'>outDir</span>,
- <span class='no'>unmarkedMultFrameInput</span>
-)</pre>
+    <pre class="usage"><span class='fu'>detectionHistory</span><span class='op'>(</span><span class='va'>recordTable</span>,
+ <span class='va'>species</span>,
+ <span class='va'>camOp</span>,
+ output <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"binary"</span>, <span class='st'>"count"</span><span class='op'>)</span>,
+ stationCol <span class='op'>=</span> <span class='st'>"Station"</span>,
+ speciesCol <span class='op'>=</span> <span class='st'>"Species"</span>,
+ recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+ recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
+ <span class='va'>occasionLength</span>,
+ <span class='va'>minActiveDaysPerOccasion</span>,
+ <span class='va'>maxNumberDays</span>,
+ <span class='va'>day1</span>,
+ <span class='va'>buffer</span>,
+ includeEffort <span class='op'>=</span> <span class='cn'>TRUE</span>,
+ scaleEffort <span class='op'>=</span> <span class='cn'>FALSE</span>,
+ occasionStartTime <span class='op'>=</span> <span class='st'>"deprecated"</span>,
+ datesAsOccasionNames <span class='op'>=</span> <span class='cn'>FALSE</span>,
+ <span class='va'>timeZone</span>,
+ writecsv <span class='op'>=</span> <span class='cn'>FALSE</span>,
+ <span class='va'>outDir</span>,
+ <span class='va'>unmarkedMultFrameInput</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -276,106 +276,115 @@
 
     <p>Setting <code>output = "count"</code> returns a count of detections, not individuals. We strongly advise against using it as input for models of animal abundance (such as N-Mixture models) models which use counts as input.</p>
 <p>Please note the section about defining argument <code>timeZone</code> in the vignette on data extraction (accessible via <code>vignette("DataExtraction")</code> or online (<a href='https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html'>https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html</a>)).</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># define image directory</span>
-<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_species_dir"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='va'>wd_images_ID</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"pictures/sample_images_species_dir"</span>, package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span>
 
 <span class='co'># load station information</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>camtraps</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>camtraps</span><span class='op'>)</span>
 
 <span class='co'># create camera operation matrix</span>
-<span class='no'>camop_no_problem</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span>(<span class='kw'>CTtable</span>      <span class='kw'>=</span> <span class='no'>camtraps</span>,
-                                    <span class='kw'>stationCol</span>   <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                    <span class='kw'>setupCol</span>     <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                                    <span class='kw'>retrievalCol</span> <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                                    <span class='kw'>hasProblems</span>  <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                    <span class='kw'>dateFormat</span>   <span class='kw'>=</span> <span class='st'>"%d/%m/%Y"</span>
-)
+<span class='va'>camop_no_problem</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span><span class='op'>(</span>CTtable      <span class='op'>=</span> <span class='va'>camtraps</span>,
+                                    stationCol   <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                    setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                    retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                    hasProblems  <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                    dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+<span class='op'>)</span>
 
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span>(<span class='st'>"exiftool"</span>) <span class='kw'>!=</span> <span class='st'>""</span>){        <span class='co'># only run this function if ExifTool is available</span>
-<span class='no'>recordTableSample</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='recordTable.html'>recordTable</a></span>(<span class='kw'>inDir</span>               <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
-                                 <span class='kw'>IDfrom</span>              <span class='kw'>=</span> <span class='st'>"directory"</span>,
-                                 <span class='kw'>minDeltaTime</span>        <span class='kw'>=</span> <span class='fl'>60</span>,
-                                 <span class='kw'>deltaTimeComparedTo</span> <span class='kw'>=</span> <span class='st'>"lastRecord"</span>,
-                                 <span class='kw'>exclude</span>             <span class='kw'>=</span> <span class='st'>"UNID"</span>,
-                                 <span class='kw'>timeZone</span>            <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
-)
-}
-}
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableSample</span>)    <span class='co'># load the record history, as created above</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"exiftool"</span><span class='op'>)</span> <span class='op'>!=</span> <span class='st'>""</span><span class='op'>)</span><span class='op'>{</span>        <span class='co'># only run this function if ExifTool is available</span>
+<span class='va'>recordTableSample</span> <span class='op'>&lt;-</span> <span class='fu'><a href='recordTable.html'>recordTable</a></span><span class='op'>(</span>inDir               <span class='op'>=</span> <span class='va'>wd_images_ID</span>,
+                                 IDfrom              <span class='op'>=</span> <span class='st'>"directory"</span>,
+                                 minDeltaTime        <span class='op'>=</span> <span class='fl'>60</span>,
+                                 deltaTimeComparedTo <span class='op'>=</span> <span class='st'>"lastRecord"</span>,
+                                 exclude             <span class='op'>=</span> <span class='st'>"UNID"</span>,
+                                 timeZone            <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
+<span class='op'>)</span>
+<span class='op'>}</span>
+<span class='op'>}</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>)</span>    <span class='co'># load the record history, as created above</span>
 
 
 <span class='co'># compute detection history for a species</span>
 
 <span class='co'># without trapping effort</span>
-<span class='no'>DetHist1</span> <span class='kw'>&lt;-</span> <span class='fu'>detectionHistory</span>(<span class='kw'>recordTable</span>         <span class='kw'>=</span> <span class='no'>recordTableSample</span>,
-                            <span class='kw'>camOp</span>                <span class='kw'>=</span> <span class='no'>camop_no_problem</span>,
-                            <span class='kw'>stationCol</span>           <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                            <span class='kw'>speciesCol</span>           <span class='kw'>=</span> <span class='st'>"Species"</span>,
-                            <span class='kw'>recordDateTimeCol</span>    <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                            <span class='kw'>species</span>              <span class='kw'>=</span> <span class='st'>"VTA"</span>,
-                            <span class='kw'>occasionLength</span>       <span class='kw'>=</span> <span class='fl'>7</span>,
-                            <span class='kw'>day1</span>                 <span class='kw'>=</span> <span class='st'>"station"</span>,
-                            <span class='kw'>datesAsOccasionNames</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                            <span class='kw'>includeEffort</span>        <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                            <span class='kw'>timeZone</span>             <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
-)
+<span class='va'>DetHist1</span> <span class='op'>&lt;-</span> <span class='fu'>detectionHistory</span><span class='op'>(</span>recordTable         <span class='op'>=</span> <span class='va'>recordTableSample</span>,
+                            camOp                <span class='op'>=</span> <span class='va'>camop_no_problem</span>,
+                            stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
+                            speciesCol           <span class='op'>=</span> <span class='st'>"Species"</span>,
+                            recordDateTimeCol    <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                            species              <span class='op'>=</span> <span class='st'>"VTA"</span>,
+                            occasionLength       <span class='op'>=</span> <span class='fl'>7</span>,
+                            day1                 <span class='op'>=</span> <span class='st'>"station"</span>,
+                            datesAsOccasionNames <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                            includeEffort        <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                            timeZone             <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
+<span class='op'>)</span>
 
-<span class='no'>DetHist1</span>                     <span class='co'># this is a list with 1 element</span></div><div class='output co'>#&gt; $detection_history
+<span class='va'>DetHist1</span>                     <span class='co'># this is a list with 1 element</span>
+</div><div class='output co'>#&gt; $detection_history
 #&gt;          o1 o2 o3 o4 o5 o6 o7
 #&gt; StationA  0  1  0  0  1  0 NA
 #&gt; StationB  0  1  0  1  0  0 NA
 #&gt; StationC  0  0  1  0  0  0 NA
-#&gt; </div><div class='input'><span class='no'>DetHist1</span>$<span class='no'>detection_history</span>   <span class='co'># this is the contained detection/non-detection matrix</span></div><div class='output co'>#&gt;          o1 o2 o3 o4 o5 o6 o7
+#&gt; </div><div class='input'><span class='va'>DetHist1</span><span class='op'>$</span><span class='va'>detection_history</span>   <span class='co'># this is the contained detection/non-detection matrix</span>
+</div><div class='output co'>#&gt;          o1 o2 o3 o4 o5 o6 o7
 #&gt; StationA  0  1  0  0  1  0 NA
 #&gt; StationB  0  1  0  1  0  0 NA
 #&gt; StationC  0  0  1  0  0  0 NA</div><div class='input'>
 
 <span class='co'># with effort / using base R to define recordDateTimeFormat</span>
-<span class='no'>DetHist2</span> <span class='kw'>&lt;-</span> <span class='fu'>detectionHistory</span>(<span class='kw'>recordTable</span>          <span class='kw'>=</span> <span class='no'>recordTableSample</span>,
-                             <span class='kw'>camOp</span>                <span class='kw'>=</span> <span class='no'>camop_no_problem</span>,
-                             <span class='kw'>stationCol</span>           <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                             <span class='kw'>speciesCol</span>           <span class='kw'>=</span> <span class='st'>"Species"</span>,
-                             <span class='kw'>recordDateTimeCol</span>    <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                             <span class='kw'>species</span>              <span class='kw'>=</span> <span class='st'>"VTA"</span>,
-                             <span class='kw'>occasionLength</span>       <span class='kw'>=</span> <span class='fl'>7</span>,
-                             <span class='kw'>day1</span>                 <span class='kw'>=</span> <span class='st'>"station"</span>,
-                             <span class='kw'>datesAsOccasionNames</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                             <span class='kw'>includeEffort</span>        <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                             <span class='kw'>scaleEffort</span>          <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                             <span class='kw'>timeZone</span>             <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
-)
+<span class='va'>DetHist2</span> <span class='op'>&lt;-</span> <span class='fu'>detectionHistory</span><span class='op'>(</span>recordTable          <span class='op'>=</span> <span class='va'>recordTableSample</span>,
+                             camOp                <span class='op'>=</span> <span class='va'>camop_no_problem</span>,
+                             stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
+                             speciesCol           <span class='op'>=</span> <span class='st'>"Species"</span>,
+                             recordDateTimeCol    <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                             species              <span class='op'>=</span> <span class='st'>"VTA"</span>,
+                             occasionLength       <span class='op'>=</span> <span class='fl'>7</span>,
+                             day1                 <span class='op'>=</span> <span class='st'>"station"</span>,
+                             datesAsOccasionNames <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                             includeEffort        <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                             scaleEffort          <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                             timeZone             <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
+<span class='op'>)</span>
 
-<span class='no'>DetHist2</span>$<span class='no'>detection_history</span>  <span class='co'># detection history  (alternatively, use: DetHist2[[1]])</span></div><div class='output co'>#&gt;          o1 o2 o3 o4 o5 o6 o7
+<span class='va'>DetHist2</span><span class='op'>$</span><span class='va'>detection_history</span>  <span class='co'># detection history  (alternatively, use: DetHist2[[1]])</span>
+</div><div class='output co'>#&gt;          o1 o2 o3 o4 o5 o6 o7
 #&gt; StationA  0  1  0  0  1  0  0
 #&gt; StationB  0  1  0  1  0  0  0
-#&gt; StationC  0  0  1  0  0  0  0</div><div class='input'><span class='no'>DetHist2</span>$<span class='no'>effort</span>             <span class='co'># effort (alternatively, use: DetHist2[[2]])</span></div><div class='output co'>#&gt;           o1 o2 o3 o4 o5 o6  o7
+#&gt; StationC  0  0  1  0  0  0  0</div><div class='input'><span class='va'>DetHist2</span><span class='op'>$</span><span class='va'>effort</span>             <span class='co'># effort (alternatively, use: DetHist2[[2]])</span>
+</div><div class='output co'>#&gt;           o1 o2 o3 o4 o5 o6  o7
 #&gt; StationA 6.5  7  7  7  7  7 0.5
 #&gt; StationB 6.5  7  7  7  7  7 1.5
 #&gt; StationC 6.5  7  7  7  7  7 1.5</div><div class='input'>
 <span class='co'># with effort / using lubridate package to define recordDateTimeFormat</span>
-<span class='no'>DetHist2_lub</span> <span class='kw'>&lt;-</span> <span class='fu'>detectionHistory</span>(<span class='kw'>recordTable</span>          <span class='kw'>=</span> <span class='no'>recordTableSample</span>,
-                             <span class='kw'>camOp</span>                <span class='kw'>=</span> <span class='no'>camop_no_problem</span>,
-                             <span class='kw'>stationCol</span>           <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                             <span class='kw'>speciesCol</span>           <span class='kw'>=</span> <span class='st'>"Species"</span>,
-                             <span class='kw'>recordDateTimeCol</span>    <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                             <span class='kw'>recordDateTimeFormat</span> <span class='kw'>=</span> <span class='st'>"ymd HMS"</span>,
-                             <span class='kw'>species</span>              <span class='kw'>=</span> <span class='st'>"VTA"</span>,
-                             <span class='kw'>occasionLength</span>       <span class='kw'>=</span> <span class='fl'>7</span>,
-                             <span class='kw'>day1</span>                 <span class='kw'>=</span> <span class='st'>"station"</span>,
-                             <span class='kw'>datesAsOccasionNames</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                             <span class='kw'>includeEffort</span>        <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                             <span class='kw'>scaleEffort</span>          <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                             <span class='kw'>timeZone</span>             <span class='kw'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
-)
+<span class='va'>DetHist2_lub</span> <span class='op'>&lt;-</span> <span class='fu'>detectionHistory</span><span class='op'>(</span>recordTable          <span class='op'>=</span> <span class='va'>recordTableSample</span>,
+                             camOp                <span class='op'>=</span> <span class='va'>camop_no_problem</span>,
+                             stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
+                             speciesCol           <span class='op'>=</span> <span class='st'>"Species"</span>,
+                             recordDateTimeCol    <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                             recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd HMS"</span>,
+                             species              <span class='op'>=</span> <span class='st'>"VTA"</span>,
+                             occasionLength       <span class='op'>=</span> <span class='fl'>7</span>,
+                             day1                 <span class='op'>=</span> <span class='st'>"station"</span>,
+                             datesAsOccasionNames <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                             includeEffort        <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                             scaleEffort          <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                             timeZone             <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
+<span class='op'>)</span>
 
-<span class='no'>DetHist2_lub</span>$<span class='no'>detection_history</span>  <span class='co'># detection history  (alternatively, use: DetHist2_lub[[1]])</span></div><div class='output co'>#&gt;          o1 o2 o3 o4 o5 o6 o7
+<span class='va'>DetHist2_lub</span><span class='op'>$</span><span class='va'>detection_history</span>  <span class='co'># detection history  (alternatively, use: DetHist2_lub[[1]])</span>
+</div><div class='output co'>#&gt;          o1 o2 o3 o4 o5 o6 o7
 #&gt; StationA  0  1  0  0  1  0  0
 #&gt; StationB  0  1  0  1  0  0  0
-#&gt; StationC  0  0  1  0  0  0  0</div><div class='input'><span class='no'>DetHist2_lub</span>$<span class='no'>effort</span>             <span class='co'># effort (alternatively, use: DetHist2_lub[[2]])</span></div><div class='output co'>#&gt;           o1 o2 o3 o4 o5 o6  o7
+#&gt; StationC  0  0  1  0  0  0  0</div><div class='input'><span class='va'>DetHist2_lub</span><span class='op'>$</span><span class='va'>effort</span>             <span class='co'># effort (alternatively, use: DetHist2_lub[[2]])</span>
+</div><div class='output co'>#&gt;           o1 o2 o3 o4 o5 o6  o7
 #&gt; StationA 6.5  7  7  7  7  7 0.5
 #&gt; StationB 6.5  7  7  7  7  7 1.5
 #&gt; StationC 6.5  7  7  7  7  7 1.5</div><div class='input'>
@@ -383,35 +392,36 @@
 <span class='co'># multi-season detection history</span>
 
 <span class='co'># load multi-season data</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>camtrapsMultiSeason</span>)
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>recordTableSampleMultiSeason</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>camtrapsMultiSeason</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableSampleMultiSeason</span><span class='op'>)</span>
 
 <span class='co'># multi-season camera operation matrix</span>
-<span class='no'>camop_season</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span>(<span class='kw'>CTtable</span>          <span class='kw'>=</span> <span class='no'>camtrapsMultiSeason</span>,
-                                    <span class='kw'>stationCol</span>   <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                                    <span class='kw'>setupCol</span>     <span class='kw'>=</span> <span class='st'>"Setup_date"</span>,
-                                    <span class='kw'>sessionCol</span>   <span class='kw'>=</span> <span class='st'>"session"</span>,
-                                    <span class='kw'>retrievalCol</span> <span class='kw'>=</span> <span class='st'>"Retrieval_date"</span>,
-                                    <span class='kw'>hasProblems</span>  <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                                    <span class='kw'>dateFormat</span>   <span class='kw'>=</span> <span class='st'>"%d/%m/%Y"</span>
-)
+<span class='va'>camop_season</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cameraOperation.html'>cameraOperation</a></span><span class='op'>(</span>CTtable          <span class='op'>=</span> <span class='va'>camtrapsMultiSeason</span>,
+                                    stationCol   <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                    setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                    sessionCol   <span class='op'>=</span> <span class='st'>"session"</span>,
+                                    retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                    hasProblems  <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                                    dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+<span class='op'>)</span>
 
 <span class='co'># multi-season detection history</span>
-<span class='no'>DetHist_multi</span> <span class='kw'>&lt;-</span> <span class='fu'>detectionHistory</span>(<span class='kw'>recordTable</span>      <span class='kw'>=</span> <span class='no'>recordTableSampleMultiSeason</span>,
-                            <span class='kw'>camOp</span>                  <span class='kw'>=</span> <span class='no'>camop_season</span>,
-                            <span class='kw'>stationCol</span>             <span class='kw'>=</span> <span class='st'>"Station"</span>,
-                            <span class='kw'>speciesCol</span>             <span class='kw'>=</span> <span class='st'>"Species"</span>,
-                            <span class='kw'>species</span>                <span class='kw'>=</span> <span class='st'>"VTA"</span>,
-                            <span class='kw'>occasionLength</span>         <span class='kw'>=</span> <span class='fl'>10</span>,
-                            <span class='kw'>day1</span>                   <span class='kw'>=</span> <span class='st'>"station"</span>,
-                            <span class='kw'>recordDateTimeCol</span>      <span class='kw'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                            <span class='kw'>includeEffort</span>          <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                            <span class='kw'>scaleEffort</span>            <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                            <span class='kw'>timeZone</span>               <span class='kw'>=</span> <span class='st'>"UTC"</span>,
-                            <span class='kw'>unmarkedMultFrameInput</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
+<span class='va'>DetHist_multi</span> <span class='op'>&lt;-</span> <span class='fu'>detectionHistory</span><span class='op'>(</span>recordTable      <span class='op'>=</span> <span class='va'>recordTableSampleMultiSeason</span>,
+                            camOp                  <span class='op'>=</span> <span class='va'>camop_season</span>,
+                            stationCol             <span class='op'>=</span> <span class='st'>"Station"</span>,
+                            speciesCol             <span class='op'>=</span> <span class='st'>"Species"</span>,
+                            species                <span class='op'>=</span> <span class='st'>"VTA"</span>,
+                            occasionLength         <span class='op'>=</span> <span class='fl'>10</span>,
+                            day1                   <span class='op'>=</span> <span class='st'>"station"</span>,
+                            recordDateTimeCol      <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                            includeEffort          <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                            scaleEffort            <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                            timeZone               <span class='op'>=</span> <span class='st'>"UTC"</span>,
+                            unmarkedMultFrameInput <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
-<span class='no'>DetHist_multi</span></div><div class='output co'>#&gt; $detection_history
+<span class='va'>DetHist_multi</span>
+</div><div class='output co'>#&gt; $detection_history
 #&gt;          o1 o2 o3 o4 o5 o6 o7 o8 o1 o2 o3 o4 o5 o6 o7 o8
 #&gt; StationA  1  0  0  1  0 NA NA NA  1  0  0  1  0 NA NA NA
 #&gt; StationB  0  1  1  0  0 NA NA NA  0  1  1  0  0 NA NA NA
@@ -441,7 +451,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
