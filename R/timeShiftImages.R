@@ -37,8 +37,8 @@ timeShiftImages <- function(inDir,
   for(xy in 1:nrow(timeShiftTable)){
     if(length(unlist(strsplit(timeShiftTable[xy,timeShiftColumn], split = " "))) != 2) stop(paste("there is more than 1 space in your timeShiftColumn string. Only 1 space is allowed (", timeShiftTable[xy,stationCol], ")"))
     if(nchar(timeShiftTable[xy,timeShiftColumn]) - nchar(gsub(":","",timeShiftTable[xy,timeShiftColumn])) != 4) stop("there should be 4 colons in timeShiftColumn (", timeShiftTable[xy,stationCol], ")")
-    if(timeShiftTable[xy,timeShiftSignColumn] %in% c("+", "-") == FALSE) stop("timeShiftSignColumn can only be + or - (",
-                                                                              timeShiftTable[xy,stationCol], ")")
+    if(timeShiftTable[xy,timeShiftSignColumn] %in% c("+", "-") == FALSE) stop(paste0('timeShiftSignColumn can only be "+" or "-". Found value "', timeShiftTable[xy,timeShiftSignColumn], '" at station ',
+                                                                              timeShiftTable[xy,stationCol]))
     if(length(unlist(lapply(strsplit(timeShiftTable[xy,timeShiftColumn], split = " "), FUN = strsplit, split = ":"))) != 6) stop("there must be six numbers in timeShiftColumn (",
                                                                                                                                  timeShiftTable[xy,stationCol], ")")
   }
