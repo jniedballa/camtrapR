@@ -168,7 +168,7 @@ detectionHistory <- function(recordTable,
     # assign session IDs to record table (this will also change station ID to station__session)
     subset_species <- assignSessionIDtoRecordTable(recordTable_tmp = subset_species,
                                                     camOp = camOp,
-                                                    dateTimeCol = recordDateTimeCol,
+                                                    dateTimeCol = "DateTime2",  #recordDateTimeCol,
                                                     stationCol = stationCol,
                                                     sessionCol = "session")
   } else {
