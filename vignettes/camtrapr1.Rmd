@@ -207,7 +207,7 @@ If these arguments contain the character "\%" (characteristic of the format argu
 
 Details on how to set it correctly can be found in the Details section of the help files of functions `as.Date` and `strptime` or `parse_date_time`.
 
-[Here is some information about date format in base R](https://www.r-bloggers.com/date-formats-in-r/). 
+[Here is some information about date format in base R](https://www.r-bloggers.com/2013/08/date-formats-in-r/). 
 
 [Here is some information about date format in lubridate](https://lubridate.tidyverse.org/).
 
