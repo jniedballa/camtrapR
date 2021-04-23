@@ -213,7 +213,8 @@ recordTableIndividual <- function(inDir,
                                        dirs_short             = dirs_short,
                                        i_tmp                  = i,
                                        multiple_tag_separator = multiple_tag_separator,
-                                       returnFileNamesMissingTags = returnFileNamesMissingTags
+                                       returnFileNamesMissingTags = returnFileNamesMissingTags,
+                                       parent                 = "recordTableIndividual"
       )
 
 

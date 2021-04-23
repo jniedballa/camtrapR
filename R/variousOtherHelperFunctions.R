@@ -149,8 +149,18 @@ assignSpeciesID <- function(intable,
                             dirs_short,
                             i_tmp,
                             multiple_tag_separator,
-                            returnFileNamesMissingTags)
+                            returnFileNamesMissingTags,
+                            parent = "recordTable")
 {
+  
+  if(parent == "recordTable") {
+    parent_name <- "species"
+    parent_argname <- "metadataSpeciesTag"
+  }
+  if(parent == "recordTableIndividual") {
+    parent_name <- "individual" 
+    parent_argname <- "metadataIDTag"
+  }
   
   file.sep <- .Platform$file.sep
   
@@ -177,12 +187,12 @@ assignSpeciesID <- function(intable,
           # give warnings
           if(isTRUE(returnFileNamesMissingTags)){
             warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "images out of", nrow(intable),
-                                 "because of missing species metadata tag:\n"),
+                                 "because of missing", parent_name, "metadata tag:\n"),
                           paste(head(paste(intable$Directory[species_records_to_remove], intable$FileName[species_records_to_remove], sep = file.sep)), collapse = "\n")),
                     call. = FALSE, immediate. = TRUE)
           } else {
             warning(paste(paste( dirs_short[i_tmp],":  removed", length(species_records_to_remove), "images out of", nrow(intable),
-                                 "because of missing species metadata tag")),
+                                 "because of missing", parent_name, "metadata tag")),
                     call. = FALSE, immediate. = TRUE)
           }
           #remove records without species tag
@@ -200,7 +210,7 @@ assignSpeciesID <- function(intable,
         return("found no species tag")
       }
     } else {
-      stop(paste("station", dirs_short[i_tmp], ":   cannot figure out species names. Is metadataSpeciesTag defined?"), call. = FALSE)
+      stop(paste("station", dirs_short[i_tmp], ":   cannot figure out", parent_name, "names. Is", parent_argname, "defined?"), call. = FALSE)
     }
   }
 }
