@@ -85,7 +85,7 @@ surveyReport (recordTable,
 
 For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date and time formats in R see \code{\link[base]{strptime}} or \code{\link[lubridate]{parse_date_time}}.
 
-Note: as of version 2.1, argument \code{CTHasProblems} is deprecated and defunct. Please use \code{camOp} instead to provide information about periods of camera activity and malfunction. 
+Note: as of version 2.1, argument \code{CTHasProblems} is deprecated and defunct. Please use \code{camOp} instead to provide information about periods of camera activity and malfunction. If \code{camOp} is not provided the legacy version of surveyReport (from camtrapR 2.0.3) will be run with a warning. 
  
 }
 \value{
