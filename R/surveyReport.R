@@ -22,6 +22,20 @@ surveyReport <- function(recordTable,
   # - explanation in vignette / help file
   
   
+  
+  # for users running old (<= 2.0.3) code: redirect to legacy version of surveyReport if camop not defined
+  
+  if(!hasArg(camOp)){
+    warning("Argument 'camOp' is missing (expected since camtrapR 2.1). Will run legacy version of surveyReport (from camtrapR 2.0.3). See:  news(package = 'camtrapR') and ?surveyReport. This warning may be raised to an error in the future, so please adapt your code.",
+            immediate. = TRUE)
+    args_names <- ls()
+    args <- mget(args_names)
+    args_subset <- args[!sapply(args, is.symbol)]
+    out <- do.call(surveyReport_legacy, args_subset)
+    return(out)
+  }
+  
+  
   # check column names
   checkForSpacesInColumnNames(stationCol = stationCol, 
                               setupCol = setupCol, 

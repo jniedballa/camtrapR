@@ -42,16 +42,16 @@ camop_problem <- cameraOperation(CTtable      = camtraps,
 
 # Test section
 
-test_that("errors when camOp missing", {
-  expect_error(surveyReport (recordTable          = recordTableSample,
-                             CTtable              = camtraps_setup_blank,
-                             speciesCol           = "Species",
-                             stationCol           = "Station",
-                             setupCol             = "Setup_date",
-                             retrievalCol         = "Retrieval_date",
-                             CTDateFormat         = "%d/%m/%Y"), 
-               "'camOp' is not defined", fixed = TRUE)
-})
+# test_that("errors when camOp missing", {
+#   expect_error(surveyReport (recordTable          = recordTableSample,
+#                              CTtable              = camtraps_setup_blank,
+#                              speciesCol           = "Species",
+#                              stationCol           = "Station",
+#                              setupCol             = "Setup_date",
+#                              retrievalCol         = "Retrieval_date",
+#                              CTDateFormat         = "%d/%m/%Y"), 
+#                "'camOp' is not defined", fixed = TRUE)
+# })
 
 
 test_that("errors about blank values in Date/Time are correct", {
