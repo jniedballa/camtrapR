@@ -235,7 +235,7 @@
 <p><code>dateFormat</code> defaults to "YYYY-MM-DD", e.g. "2014-10-31". It can be specified either in the format required by <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or the 'orders' argument in <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> in <span class="pkg">lubridate</span>. In the example above, "YYYY-MM-DD" would be specified as "%Y-%m-%d" or "ymd".</p>
 <p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in <span class="pkg">lubridate</span> via <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument "orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in <code>recordDateTimeFormat</code>.</p>
 <p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either "%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
-<p>Note: as of version 2.1, argument <code>CTHasProblems</code> is deprecated and defunct. Please use <code>camOp</code> instead to provide information about periods of camera activity and malfunction.</p>
+<p>Note: as of version 2.1, argument <code>CTHasProblems</code> is deprecated and defunct. Please use <code>camOp</code> instead to provide information about periods of camera activity and malfunction. If <code>camOp</code> is not provided the legacy version of surveyReport (from camtrapR 2.0.3) will be run with a warning.</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An invisible list containing 5 <code>data.frames</code>.</p>
@@ -423,6 +423,35 @@ If makezip is TRUE, a zip file will be created in sinkpath. It contains single-s
 #&gt; 1                 42.0                     42                    42
 #&gt; 2                 43.0                     43                    43
 #&gt; 3                 37.5                     38                    43</div><div class='input'>
+
+
+<span class='co'>## if camOp is missing, the legacy version (from 2.0.3) will be used:</span>
+
+<span class='va'>reportTest_problem_old</span> <span class='op'>&lt;-</span> <span class='fu'>surveyReport</span> <span class='op'>(</span>recordTable          <span class='op'>=</span> <span class='va'>recordTableSample</span>,
+                                    CTtable              <span class='op'>=</span> <span class='va'>camtraps</span>,
+                                   <span class='co'># camOp                = camop_problem,</span>
+                                    speciesCol           <span class='op'>=</span> <span class='st'>"Species"</span>,
+                                    stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                    setupCol             <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
+                                    retrievalCol         <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
+                                    CTDateFormat         <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>, 
+                                    recordDateTimeCol    <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                                    recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Argument 'camOp' is missing (expected since camtrapR 2.1). Will run legacy version of surveyReport (from camtrapR 2.0.3). See:  news(package = 'camtrapR') and ?surveyReport. This warning may be raised to an error in the future, so please adapt your code.</span></div><div class='output co'>#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "Total number of stations:  3"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "Number of operational stations:  3"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "n nights with cameras set up (operational or not. NOTE: only correct if 1 camera per station): 128"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "n nights with cameras set up and active (trap nights. NOTE: only correct if 1 camera per station): 128"
+#&gt; 
+#&gt; -------------------------------------------------------
+#&gt; [1] "total trapping period:  2009-04-02 - 2009-05-17"</div><div class='input'>
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># run again with sinkpath defined</span>
 <span class='va'>reportTest</span> <span class='op'>&lt;-</span> <span class='fu'>surveyReport</span> <span class='op'>(</span>recordTable          <span class='op'>=</span> <span class='va'>recordTableSample</span>,
