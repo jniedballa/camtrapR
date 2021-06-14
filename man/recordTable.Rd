@@ -96,6 +96,8 @@ If images are identified by metadata tagging, \code{metadataSpeciesTag} specifie
 
 \code{minDeltaTime} is a criterion for temporal independence of species recorded at the same station. Setting it to 0 will make the function return all records. Setting it to a higher value will remove records that were taken less than \code{minDeltaTime} minutes after the last record (\code{deltaTimeComparedTo = "lastRecord"}) or the last independent record (\code{deltaTimeComparedTo = "lastIndependentRecord"}).
 
+\code{removeDuplicateRecords} determines whether duplicate records (identical station, species, date/time, (and camera if applicable)) are are all returned (TRUE) or collapsed into a single unique record (FALSE). 
+
 \code{camerasIndependent} defines if the cameras at a station are to be considered independent. If \code{TRUE}, records of the same species taken by different cameras are considered independent (e.g. if they face different trails). Use \code{FALSE} if both cameras face each other and possibly \code{TRUE} ).
 
 \code{exclude} can be used to exclude "species" directories containing irrelevant images (e.g. "team", "blank", "unidentified"). \code{stationCol} can be set to match the station column name in the camera trap station table (see \code{\link{camtraps}}).
