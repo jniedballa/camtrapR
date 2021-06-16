@@ -20,7 +20,7 @@ checkSpeciesNames <- function(speciesNames,
 
   # query ITIS TSN (taxnonomic serial number)
   tsns <- try(
-    taxize::get_tsn(searchterm = speciesNames,
+    taxize::get_tsn(sci_com    = speciesNames,
                     searchtype = searchtype,
                     accepted   = accepted,
                     ask        = ask,
@@ -130,7 +130,9 @@ checkSpeciesNames <- function(speciesNames,
       dat.out$taxon_status[!is.na(dat.out$tsn)]  <- "valid"
     }
 
-    return(dat.out)
+    dat.out.sorted <- dat.out[match(dat.out$user_name, speciesNames),]
+    
+    return(dat.out.sorted)
 
   } else {stop("found no TSNs for speciesNames", call. = FALSE)}   # error if no tsns found
 }
