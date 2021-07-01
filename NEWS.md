@@ -17,6 +17,7 @@
 * recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata, reported by Sian Green)
 * imageRename: fixed error when hasCameraFolders is TRUE, but a station has only 1 camera (reported by Camille Coudrat and Ezekiel Gading)
 * detectionHistory: fixed a bug that caused errors when using multiple sessions and non-standard date/time formats (reported by Daniele Barcelos)
+* checkSpeciesNames: fixed error due to change in taxize::get_tsn (reported by Ivonne Oddoy)
 
 
 ## other changes
