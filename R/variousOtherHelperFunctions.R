@@ -206,7 +206,10 @@ assignSpeciesID <- function(intable,
         
         return(intable)
       } else {
-        warning(paste(dirs_short[i_tmp], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'.", sep = ""), call. = FALSE, immediate. = TRUE)
+        warning(paste(dirs_short[i_tmp], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'.", 
+                      ifelse(grepl(" ", metadataSpeciesTag, fixed = T), paste0("This is probably because of an empty space in '", metadataSpeciesTag, "'"), ""), 
+                      sep = ""), call. = FALSE, immediate. = TRUE)
+        
         return("found no species tag")
       }
     } else {
