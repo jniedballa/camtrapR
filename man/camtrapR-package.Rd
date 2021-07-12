@@ -9,7 +9,7 @@ Overview of the functions in the camtrapR package
 }
 \description{
 This package provides a streamlined workflow for processing data generated in camera trap-based wildlife studies and prepares input for further analyses, particularly in occupancy and spatial capture-recapture frameworks.
-It suggests a simple data structure and provides functions for managing digital camera trap photographs (and videos), generating record tables, maps of species richness and species detections and species activity diagrams. It further helps prepare subsequent analyses by creating detection/non-detection matrices for occupancy analyses, e.g. in the \pkg{unmarked} package, and \code{capthist} objects for spatial capture-recapture analyses in the \pkg{secr} package. In addition, basic survey statistics are computed. The functions build on one another in a logical sequence.
+It suggests a simple data structure and provides functions for managing digital camera trap photographs (and videos), generating record tables, maps of species richness and species detections and species activity diagrams. It further helps prepare subsequent analyses by creating detection/non-detection matrices for occupancy analyses, e.g. in the \pkg{unmarked} or \pkg{ubms} packages, and \code{capthist} objects for spatial capture-recapture analyses in the \pkg{secr} package. In addition, basic survey statistics are computed. The functions build on one another in a logical sequence.
 The only manual input needed is species (and individual) identification, which is achieved by moving images into species directories or by tagging images in image management software. Besides, a table holding basic information about camera trap station IDs, locations and trapping periods must be created in spreadsheet software.
 }
 
@@ -147,9 +147,6 @@ Phil Harvey's ExifTool \url{https://exiftool.org/} \cr
 \pkg{unmarked}
 \pkg{ubms}
 \pkg{secr}
-\pkg{plotrix}
-\pkg{taxize}
-\pkg{ritis}
 \pkg{wiqid}
 }
 
