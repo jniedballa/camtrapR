@@ -152,13 +152,20 @@ surveyReport <- function(recordTable,
                                list(CTtable[,stationCol]),
                                FUN = length)
   
+  df1  <- data.frame(station.tmp1, station.tmp2[,2])
+  colnames(df1) <- c("station", "setup", "retrieval")
+  df2  <- data.frame(image.tmp1, image.tmp2[,2])
+  colnames(df2) <- c(stationCol, "image_first", "image_last")
   
-  station_dates <- data.frame(station     = station.tmp1[,1], 
-                              setup       = station.tmp1[,2],
-                              image_first = image.tmp1[,2],
-                              image_last  = image.tmp2[,2],
-                              retrieval   = station.tmp2[,2],
-                              n_cameras   = n_cameras.tmp[,2])
+  station_dates <- merge(merge(df1, df2, all = TRUE), 
+                         n_cameras.tmp)
+  
+  # station_dates <- data.frame(station     = station.tmp1[,1], 
+  #                             setup       = station.tmp1[,2],
+  #                             image_first = image.tmp1[,2],
+  #                             image_last  = image.tmp2[,2],
+  #                             retrieval   = station.tmp2[,2],
+  #                             n_cameras   = n_cameras.tmp[,2])
   
   n_calendar_days_total <- rowSums(camOp >= 0, na.rm =TRUE)
   
