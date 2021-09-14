@@ -151,7 +151,10 @@ surveyReport <- function(recordTable,
   n_cameras.tmp   <- aggregate(CTtable[,stationCol],
                                list(CTtable[,stationCol]),
                                FUN = length)
+<<<<<<< HEAD
   colnames(n_cameras.tmp) <- c("station", "n_cameras")
+=======
+>>>>>>> 4155736ca3980d96413d860dd50213cc4175503f
   
   df1  <- data.frame(station.tmp1, station.tmp2[,2])
   colnames(df1) <- c("station", "setup", "retrieval")
