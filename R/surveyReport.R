@@ -153,6 +153,7 @@ surveyReport <- function(recordTable,
                                FUN = length)
 
   colnames(n_cameras.tmp) <- c("station", "n_cameras")
+
   
   df1  <- data.frame(station.tmp1, station.tmp2[,2])
   colnames(df1) <- c("station", "setup", "retrieval")
