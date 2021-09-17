@@ -171,7 +171,7 @@ recordTableIndividual <- function(inDir,
                                       ignore.case = TRUE, recursive = TRUE))
       message(paste(formatC(dirs_short[i], width = max_nchar_station, flag = "-"),  ":  ",
                     formatC(length.tmp, width = 5), " images      Skipping", sep = ""))
-      warning(paste(dirs_short[i],  ":  contains no images and was omitted"), call. = FALSE,  immediate. = FALSE)
+      warning(paste(dirs_short[i],  ":  contains no images and was omitted\n"), call. = FALSE,  immediate. = FALSE)
 
     } else {
 

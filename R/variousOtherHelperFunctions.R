@@ -80,7 +80,7 @@ runExiftool <- function(command.tmp,
   # find and remove ._ files created on Macs
   strangeMacFiles <- grep("^[._]", metadata.tmp$FileName, fixed = FALSE)
   if(length(strangeMacFiles) >= 1)  {
-    warning(paste("found", length(strangeMacFiles), "JPG files beginning with '._' in", paste(unique(metadata.tmp$Directory[strangeMacFiles]), collapse = ","), ". Will ignore them."), call. = FALSE, immediate. = TRUE)
+    warning(paste("found", length(strangeMacFiles), "JPG files beginning with '._' in", paste(unique(metadata.tmp$Directory[strangeMacFiles]), collapse = "\n"), ". \nThese images will be ignored."), call. = FALSE, immediate. = TRUE)
     metadata.tmp <- metadata.tmp[-strangeMacFiles,]
   }
   return(metadata.tmp)
@@ -679,14 +679,14 @@ createDateRangeTable <- function(cam.op,
   
   # check if images were taken between setup and retrieval dates (warning if images outside station date range)
   if(any(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp), na.rm = TRUE)){
-    warning(paste("At", sum(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp), na.rm = TRUE), "stations",
+    warning(paste("\nAt", sum(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp), na.rm = TRUE), "stations",
                   "there were records before camera operation date range: ",
                   paste(rownames(date_ranges)[which(date_ranges$rec.min < as.Date(date_ranges$cam.min, tz = timeZone_tmp))], 
                         sep = "\n", collapse = ", " )), call. = FALSE)
   }
   if(any(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp), na.rm = TRUE)) {
-    warning(paste("At", sum(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp), na.rm = TRUE), "stations",
-                  "there records after camera operation date range: ",
+    warning(paste("\nAt", sum(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp), na.rm = TRUE), "stations",
+                  "there were records after camera operation date range: ",
                   paste(rownames(date_ranges)[which(date_ranges$rec.max > as.Date(date_ranges$cam.max, tz = timeZone_tmp))], 
                         sep = "\n", collapse = ", " )), call. = FALSE)
   }
@@ -884,7 +884,8 @@ cleanSubsetSpecies <- function(subset_species2,
   remove.these2 <- which(subset_species2$DateTime2 > corrected_end_time_by_record)
   if(length(remove.these2) >= 1){
     
-    warning(paste(paste(length(remove.these2), 
+    warning(paste("\n", 
+                  paste(length(remove.these2), 
                         " records (out of ", 
                         nrow_subset_species2, 
                         ") were removed because they were taken after the end of the last occasion, e.g.:", sep = ""),

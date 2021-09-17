@@ -170,7 +170,7 @@ recordTable <- function(inDir,
                                       ignore.case = TRUE, recursive = TRUE))
       message(paste(formatC(dirs_short[i], width = max_nchar_station, flag = "-"),  ":  ",
                     formatC(length.tmp, width = 5), " files      Skipping", sep = ""))
-      warning(paste(dirs_short[i],  ":  contains no files of interest and was omitted"), call. = FALSE,  immediate. = FALSE)
+      warning(paste(dirs_short[i],  ":  contains no files of interest and was omitted\n"), call. = FALSE,  immediate. = FALSE)
     } else {
 
       # if video files extracted, add DateTimeOriginal and HierarchicalSubject
