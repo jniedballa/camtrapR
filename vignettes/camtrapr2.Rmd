@@ -58,7 +58,7 @@ Metadata tagging can be used to assign custom tags to images, e.g. species ID, i
 
 Here is a list of suitable software for metadata tagging:
 
-* digiKam (http://www.digikam.org)
+* digiKam (https://www.digikam.org)
 * Adobe Bridge
 * Adobe Lightroom
 
