@@ -34,3 +34,4 @@ before_install:
 # for tesseract
   - sudo apt-get install -y libtesseract-dev
   - sudo apt-get install -y libleptonica-dev
+  - sudo apt-get install tesseract-ocr-eng
