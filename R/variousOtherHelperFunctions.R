@@ -100,37 +100,62 @@ addMetadataAsColumns <- function(intable,
   
   # find all metadata categories, remove spaces
   list.tmp <- vector()
-  for(xy in 1:length(tmp3)){
+  
+  # loop over images, get name of tag groups
+    for(xy in 1:length(tmp3)){
     list.tmp <- c(list.tmp, gsub(pattern = " ",
                                  replacement = "",
-                                 x =  unlist(lapply(strsplit(tmp3[[xy]],
+                                 x =  sapply(strsplit(tmp3[[xy]],
                                                              split = metadataHierarchyDelimitor,
                                                              fixed = TRUE),
-                                                    FUN = function(Y){Y = Y[1]}))))
+                                                    FUN = function(Y){Y = Y[1]})))
   }
   cols2add <- unique(list.tmp)    # these are the columns to add
   
-  # add as columns
+  # add empty columns
   if(length(cols2add) >= 1){    # if anything to add
-    intable <- data.frame(intable, matrix(NA, ncol = length(cols2add), nrow = nrow(intable)), check.names = FALSE)
+    intable <- data.frame(intable, 
+                          matrix(NA, ncol = length(cols2add), nrow = nrow(intable)), 
+                          check.names = FALSE)
     colnames(intable)[seq((ncol(intable) - length(cols2add) + 1),ncol(intable))] <- cols2add
     
+    
     # fill metadata columns
-    for(xyz in 1:length(cols2add)){
-      intable[,cols2add[xyz]] <- unlist(lapply(lapply(tmp3, FUN = function(X) {sapply(strsplit(X[grep(x = X,
-                                                                                                      pattern = paste(cols2add[xyz],
-                                                                                                                      metadataHierarchyDelimitor,
-                                                                                                                      collapse = "",
-                                                                                                                      sep      = ""),
-                                                                                                      fixed = TRUE)],
-                                                                                               split = metadataHierarchyDelimitor,
-                                                                                               fixed = TRUE),
-                                                                                      FUN = function(Y){Y[2]})}),
-                                               FUN = function(Z){paste(Z, collapse = multiple_tag_separator)}))
+    for(index_new_col in 1:length(cols2add)){                 # loop over metadata tag groups
       
-      intable[which(intable[,cols2add[xyz]] == ""), cols2add[xyz]] <- NA
-    } # end for xyz
-  } # end if
+      taggroup <- paste0(cols2add[index_new_col],
+                         metadataHierarchyDelimitor)
+      
+
+      for(img in 1:length(tmp3)) {
+        
+        current <- tmp3[[img]]
+        if(length(current) == 1) if(current == "") intable[img, cols2add[index_new_col]] <- NA
+        
+        # remove leading space
+        current <- gsub("^ ", "", current)
+        
+        # subset to current tag group
+        current_subset <- subset_taggroup(current, taggroup)
+        
+        use_these <- vector(length = length(current_subset))
+        # check if current tag is included in another tag at a deeper level in the hierarchy
+        for(tag in 1:length(current_subset)){
+          use_these[tag] <- ifelse(is.na(charmatch(current_subset[tag], current_subset[-tag])), TRUE, FALSE)
+        }
+          
+          #get the deepest hierarchical level of the tag
+          current_subset_split <- sapply(current_subset[use_these], 
+                                         strsplit,
+                                         split = metadataHierarchyDelimitor,
+                                         fixed = TRUE)
+          tags_to_use <- sapply(current_subset_split, FUN = function(x) x [length(x)]) 
+          intable[img, cols2add[index_new_col]] <- paste(tags_to_use, collapse = multiple_tag_separator)
+          
+          rm(tags_to_use, current_subset_split, current_subset, current)
+        }
+    } # end for index_new_col
+  }  # end if(length(cols2add) >= 1){ 
   
   which_cols_to_rename <- which(colnames(intable) %in% cols2add)
   
@@ -139,6 +164,17 @@ addMetadataAsColumns <- function(intable,
   
   return(intable)
 }
+
+
+
+
+subset_taggroup <- function(x, parent) {
+  x[grep(x = x,
+         pattern = parent,
+         fixed = TRUE)]
+}
+
+
 
 
 # assign species IDs from metadata tags or directory names   ####
