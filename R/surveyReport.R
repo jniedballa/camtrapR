@@ -54,7 +54,7 @@ surveyReport <- function(recordTable,
   camop.info.df <- deparseCamOpRownames(camOp)   # only works if camOp is station-specific
   if("camera" %in% colnames(camop.info.df))  stop("camera operation matrix is camera-specific. Please provide a camera operation matrix that is by station (byCamera = FALSE).\nThis is necessary for correctly calculating the number of active days (taking into account whether cameras were independent or not).", call. = FALSE)
   if("session" %in% colnames(camop.info.df)) stop("camera operation matrix contains sessions. This is currently not supported. Please run the survey report separately for the different sessions.", call. = FALSE)
-  
+  colnames(camop.info.df) <- stationCol
   
   
   CTtable     <- dataFrameTibbleCheck(df = CTtable)
@@ -152,15 +152,15 @@ surveyReport <- function(recordTable,
                                list(CTtable[,stationCol]),
                                FUN = length)
 
-  colnames(n_cameras.tmp) <- c("station", "n_cameras")
+  colnames(n_cameras.tmp) <- c(stationCol, "n_cameras")
 
   
   df1  <- data.frame(station.tmp1, station.tmp2[,2])
-  colnames(df1) <- c("station", "setup", "retrieval")
+  colnames(df1) <- c(stationCol, "setup", "retrieval")
   df2  <- data.frame(image.tmp1, image.tmp2[,2])
   colnames(df2) <- c(stationCol, "image_first", "image_last")
   
-  station_dates <- merge(merge(df1, df2, all = TRUE), 
+  station_dates <- merge(merge(df1, df2, by = stationCol), 
                          n_cameras.tmp)
   
   # station_dates <- data.frame(station     = station.tmp1[,1], 
@@ -285,7 +285,7 @@ surveyReport <- function(recordTable,
   
   
   
-  station.info.combined <- merge(station_dates, camop.info.df2, by = "station")
+  station.info.combined <- merge(station_dates, camop.info.df2, by = stationCol)
   
   # adjust options for printing results
   options.tmp <- options()
