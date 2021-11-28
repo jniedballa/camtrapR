@@ -7,9 +7,11 @@
 #' The column name \code{stationCol} must be identical in \code{CTtable} and
 #' \code{recordTable} and station IDs must match.
 #' 
-#' Shapefile creation depends on the packages \pkg{sp} and \pkg{rgdal}.
+#' Shapefile creation depends on the packages \pkg{sf}.
 #' Argument \code{shapefileProjection} must be a valid argument of
-#' \code{\link[sp:CRS-class]{CRS}}. If \code{shapefileProjection} is undefined,
+#' \code{\link[sf]{st_crs}} (one of (i) character: a string accepted by GDAL, 
+#' (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
+#' If \code{shapefileProjection} is undefined,
 #' the resulting shapefile will lack a coordinate reference system.
 #' 
 #' @param CTtable data.frame. contains station IDs and coordinates
@@ -54,7 +56,7 @@
 #' 
 #' @author Juergen Niedballa
 #' 
-#' @references A great resource for \code{\link[sp:CRS-class]{CRS}} arguments
+#' @references A great resource for coordinate system information
 #' is \url{https://spatialreference.org/}. Use the Proj4 string as
 #' \code{shapefileProjection} argument.
 #' 
@@ -106,6 +108,8 @@
 #'                            richnessPlot      = TRUE,
 #'                            addLegend         = TRUE
 #' )
+#' 
+#' 
 #' 
 #' 
 #' 
@@ -347,18 +351,18 @@ detectionMaps <- function(CTtable,
 
       # this works. migrate everything to ggplot?
 
-      #       ggplot(dat2, aes(dat2[,Xcol], dat2[,Ycol])) +
-      #         geom_point(cex =  cex_pt1_gg , fill = "white", colour = "black", pch = 21) +
-      #         geom_point(aes(size = factor(t4$n_species)), colour = "black") +
-      #         theme_bw() +
-      #         theme(legend.position = "right",
-      #               legend.box = "vertical",
-      #               legend.key = element_blank()) +
-      #         labs(x = Xcol,
-      #              y = Ycol,
-      #              title = "Species Richness")  +
-      #         coord_fixed(ratio = 1) +
-      #         scale_size_discrete(name = "n species")
+            # ggplot(dat2, aes(dat2[,Xcol], dat2[,Ycol])) +
+            #   geom_point(cex =  cex_pt1_gg , fill = "white", colour = "black", pch = 21) +
+            #   geom_point(aes(size = factor(t4$n_species)), colour = "black") +
+            #   theme_bw() +
+            #   theme(legend.position = "right",
+            #         legend.box = "vertical",
+            #         legend.key = element_blank()) +
+            #   labs(x = Xcol,
+            #        y = Ycol,
+            #        title = "Species Richness")  +
+            #   coord_fixed(ratio = 1) +
+            #   scale_size_discrete(name = "n species")
 
 
       plot(x = 0, type = "n", 
@@ -505,19 +509,38 @@ detectionMaps <- function(CTtable,
   
   rownames(outtable) <- NULL
   # write Shapefile
-  if(writeShapefile == TRUE){
-    if(hasArg(shapefileProjection)){proj.tmp <- shapefileProjection } else {proj.tmp <- NA}
-    if(hasArg(shapefileName)){layer.tmp <- shapefileName } else {layer.tmp <- paste("species_detection_", Sys.Date(), sep = "")}
-    
-    spdf <- SpatialPointsDataFrame(coords = outtable[,c(Xcol, Ycol)],
-                                       data = outtable,
-                                       proj4string = CRS(as.character(proj.tmp)))
-    
-    rgdal::writeOGR(obj = spdf,
-                    dsn = shapefileDirectory,
-                    layer = layer.tmp,
-                    driver = "ESRI Shapefile")
-  }
   
-  return(invisible(outtable))
+  if(writeShapefile == TRUE){
+    #if(hasArg(shapefileProjection)){proj.tmp <- shapefileProjection } else {proj.tmp <- NA}
+    if(hasArg(shapefileName)){
+      layer.tmp <- shapefileName 
+    } else {
+      layer.tmp <- paste("species_detection_", Sys.Date(), sep = "")
+    }
+    
+    # spdf <- SpatialPointsDataFrame(coords = outtable[,c(Xcol, Ycol)],
+    #                                    data = outtable,
+    #                                    proj4string = CRS(as.character(proj.tmp)))
+    # 
+    # rgdal::writeOGR(obj = spdf,
+    #                 dsn = shapefileDirectory,
+    #                 layer = layer.tmp,
+    #                 driver = "ESRI Shapefile")
+    
+    outtable_sf <- st_as_sf(outtable, 
+                            coords = c(Xcol, Ycol))
+    
+    if(hasArg(shapefileProjection)) outtable_sf <- st_set_crs(outtable_sf, shapefileProjection)
+    
+    st_write(obj = outtable_sf,
+             dsn = shapefileDirectory,
+             layer = layer.tmp,
+             driver = "ESRI Shapefile")
+    
+    
+    return(invisible(outtable_sf))
+    
+  } else {
+    return(invisible(outtable))
+  }
 }
