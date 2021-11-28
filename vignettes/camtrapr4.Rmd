@@ -15,7 +15,7 @@ output:
 vignette: >
   %\VignetteIndexEntry{4. Data exploration and visualisation}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteDepends{raster, sp, rgdal, overlap}
+  %\VignetteDepends{raster, sf, overlap}
   \usepackage[utf8]{inputenc}
 ---
 
@@ -89,19 +89,26 @@ The number of independent observations depends on the argument `minDeltaTime` in
 
 Function `detectionMaps` comes with 4 arguments that allow for and control creation of ESRI shapefile for use in GIS software: `writeShapefile`, `shapefileName`, `shapefileDirectory` and `shapefileProjection`. The resulting shapefile will show stations as point features (as the map above), with coordinates, total species number and number of observations per species in the attribute table. The shapefile attribute table is identical to the resulting `data.frame` of the `detectionMaps` function. 
 
-The following example demonstrates the creation of a shapefile using `detectionMaps`. Please note that for demonstration the shapefile is saved to a temporary directory, which makes no sense in real data and must be changed by the user. The argument `shapefileProjection` must be a valid argument to the function `CRS` from the package `sp`, i.e., a PROJ.4 string. These can be found under https://spatialreference.org/. There, find the projection your coordinates are in, click on "Proj4" and copy the text. In this example, it is a projected coordinate system, UTM 50N with the WGS84 ellipsoid. Its PROJ.4 string is \"+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs\". Because it is so widespread, here's the PROJ4 string for standard Lat/Long coordinates using the WGS84 ellipsoid (a standard used by most GPS devices): \"+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs\".
+The following example demonstrates the creation of a shapefile using `detectionMaps`. Please note that for demonstration the shapefile is saved to a temporary directory, which makes no sense in real data and must be changed by the user. The argument `shapefileProjection` must be a valid argument to the function `st_crs` from the package `sf`. It can be one of one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs. 
+
+In contrast to previous versions, the EPSG code is the easiest way to pass the coordinate system information. 
+These can be found under https://spatialreference.org/. In this case, it's UTM zone 50N in WGS84 ellipsoid. In this case the EPSG code is 32648. You can  provide the projection information as one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
+
+Because it is so widespread, here's the PROJ4 string for standard Lat/Long coordinates using the WGS84 ellipsoid (a standard used by most GPS devices): EPSG:4326, or \"+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs\".
 
 ```{r  message=FALSE}
-# writing shapefiles requires packages rgdal and sp
- library(rgdal)
- library(sp)
+# writing shapefiles requires package sf
+ library(sf)
 ```
  
  
 ```{r}
  # define shapefile name
  shapefileName       <- "recordShapefileTest"
- shapefileProjection <- "+proj=utm +zone=50 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+
+# projection: WGS 84 / UTM zone 50N = EPSG:32650
+# see: https://spatialreference.org/ref/epsg/32650/
+ shapefileProjection <- 32650
  
 # run detectionMaps with shapefile creation
 Mapstest3 <- detectionMaps(CTtable            = camtraps,
@@ -121,32 +128,53 @@ Mapstest3 <- detectionMaps(CTtable            = camtraps,
 # check for the files that were created
 list.files(tempdir(), pattern = shapefileName)
 
+# if writeShapefile = TRUE the output is a sf object
+Mapstest3
+
 # load it as shapefile
-shapefileTest <- readOGR(dsn   = tempdir(), 
+detections_sf <- st_read(dsn   = tempdir(), 
                          layer = shapefileName)
 
 # we have a look at the attribute table
-shapefileTest@data
+detections_sf
 
 # the output of detectionMaps is used as shapefile attribute table. Therefore, they are identical:
-all(shapefileTest@data == Mapstest3)
+all(detections_sf == Mapstest3)
  
 ```
 
+
+A simple way of plotting these data in a map is via the mapview package. It opens an interactive map window, so it is not shown in this vignette.
+
+```{r eval = FALSE}
+library(mapview)
+mapview(detections_sf)
+```
+
+One can also color the points by values, e.g. 
+
+```{r eval = FALSE}
+mapview(detections_sf, zcol = "n_species")
+```
+
+The map viewer is interactive and allows different base maps, including satellite imagery. Here is an example with OpenStreetMap: 
+
+![Example map in mapview (the locations are fictional)](mapview_example.png)
+
 ## Making and using a SpatialPointsDataFrame
 
-The data frame that `detectionMaps` returns can be turned into a SpatialPointsDataFrame as defined in the package `sp`.  SpatialPointsDataFrames can be used for spatial analyses and queries in R, e.g. for extracting data from raster layers such as elevation maps.
+If writeShapefile = TRUE, the output of detectionMaps is a sf object (a data frame with a column contain the spatial information). If writeShapefile = TRUE, it can be converted to an sf object easily. 
 
-This is how it works. We use the output of `detectionMaps` created above and make a SpatialPointsDataFrame. Afterwards, a sample raster is created, plotted together with the points and the values are extracted.
+<!-- The data frame that `detectionMaps` returns can be turned into a SpatialPointsDataFrame as defined in the package `sp`. SpatialPointsDataFrames can be used for spatial analyses and queries in R, e.g. for extracting data from raster layers such as elevation maps. -->
+
+<!-- This is how it works. We use the output of `detectionMaps` created above and make a SpatialPointsDataFrame. Afterwards, a sample raster is created, plotted together with the points and the values are extracted. -->
 
 ```{r eval = "raster" %in% installed.packages()}
-detections_spdf <- SpatialPointsDataFrame(coords      = Mapstest3[,c("utm_x", "utm_y")],
-                                          data        = Mapstest3,
-                                          proj4string = CRS(shapefileProjection))
 
-detections_spdf
+# convert sf object to sp object
+detections_spdf <- as(detections_sf, "Spatial")
 
-# now we create a sample raster and extract data from it (if the raster package is available)
+# create a sample raster and extract data from it (if the raster package is available)
 if("raster" %in% installed.packages()){
   library(raster)
   raster_test <- raster(x = extend(extent(detections_spdf), y = 500), nrows = 10, ncols = 10)
@@ -178,9 +206,9 @@ if("raster" %in% installed.packages()){
 
 The same procedure also works with the camera trap station information table instead of the `detectionMaps` output.
 
-The SpatialPointsDataFrame can easily be converted to a sf object via 
+The SpatialPointsDataFrame can easily be converted back to a sf object via 
 
-```{r eval = FALSE}
+```{r}
 library(sf)
 detections_sf <- as(detections_spdf, "sf")
 ```
@@ -189,7 +217,7 @@ detections_sf <- as(detections_spdf, "sf")
 
 # Visualising species activity data
 
-Four different functions are provided to plot single-species and two-species activity patterns. Activity data are visualised using the time of day records were taken while ignoring the date. Record times are read from the record table created by `recordTable`. The criterion for temporal independence between records in the function `recordTable`, `minDeltaTime`, will affect the results of the activity plots. Imagine you make `recordTable` return all records by setting `minDeltaTime = 0` and you then plot activity of some species that loves to perform in front of cameras (e.g. Great Argus pheasants in Borneo), resuting in hundreds of images. The representation of activity will be biased towards the times the species happened to perform in front of your cameras. Likewise, setting cameras to shoot sequences of several images per trigger event and then returning all images will cause biased representations. Therefore, it is wise to set `minDeltaTime` to some higher number, e.g. 60 (minutes).
+Four different functions are provided to plot single-species and two-species activity patterns. Activity data are visualised using the time of day records were taken while ignoring the date. Record times are read from the record table created by `recordTable`. The criterion for temporal independence between records in the function `recordTable`, `minDeltaTime`, will affect the results of the activity plots. Imagine you make `recordTable` return all records by setting `minDeltaTime = 0` and you then plot activity of some species that loves to perform in front of cameras (e.g. Great Argus pheasants in Borneo), resulting in hundreds of images. The representation of activity will be biased towards the times the species happened to perform in front of your cameras. Likewise, setting cameras to shoot sequences of several images per trigger event and then returning all images will cause biased representations. Therefore, it is wise to set `minDeltaTime` to some higher number, e.g. 60 (minutes).
 
 If desired, all functions can save the plots as png files by setting argument `writePNG = TRUE`.
 
