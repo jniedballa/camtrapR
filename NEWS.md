@@ -10,6 +10,7 @@
 * function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument "lattice", which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)
 * surveyReport: new argument camOp (for a camera operation matrix), argument CTHasProblems is deprecated. Improved calculation of survey effort.
 * timeShiftImages / addCopyrightTag: added argument "ignoreMinorErrors", set it to TRUE if functions fails due to bad MakerNotes (reported by An The Truong Nguyen)
+* detectionMaps uses package sf instead of sp and rgdal
 
 ## bugfixes
 * cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character (reported by David Nicholls)
@@ -21,8 +22,9 @@
 
 
 ## other changes
-* lubdidate is a dependency now (for cameraOperation)
+* lubridate is a dependency now (for cameraOperation)
 * additional Suggests: magick and tesseract (for OCRdataFields), lattice (for camopPlot)
+* roxygen2 documentation
 
 # camtrapR 2.0.3
 
