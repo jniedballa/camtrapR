@@ -40,7 +40,10 @@
 
 
 <meta property="og:title" content="Generate a species record table from camera trap images and videos — recordTable" />
-<meta property="og:description" content="Generates a record table from camera trap images or videos. Images/videos must be sorted into station directories at least. The function can read species identification from a directory structure (Station/Species or Station/Camera/Species) or from image metadata tags." />
+<meta property="og:description" content="Generates a record table from camera trap images or videos. Images/videos
+must be sorted into station directories at least. The function can read
+species identification from a directory structure (Station/Species or
+Station/Camera/Species) or from image metadata tags." />
 
 
 
@@ -133,15 +136,19 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Generate a species record table from camera trap images and videos</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/jniedballa/camtrapR/blob/master/R/recordTable.R'><code>R/recordTable.R</code></a></small>
     <div class="hidden name"><code>recordTable.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generates a record table from camera trap images or videos. Images/videos must be sorted into station directories at least. The function can read species identification from a directory structure (Station/Species or Station/Camera/Species) or from image metadata tags.</p>
+    <p>Generates a record table from camera trap images or videos. Images/videos
+must be sorted into station directories at least. The function can read
+species identification from a directory structure (Station/Species or
+Station/Camera/Species) or from image metadata tags.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>recordTable</span><span class='op'>(</span><span class='va'>inDir</span>,
+    <pre class="usage"><span class='fu'>recordTable</span><span class='op'>(</span>
+  <span class='va'>inDir</span>,
   <span class='va'>IDfrom</span>,
   <span class='va'>cameraID</span>,
   <span class='va'>camerasIndependent</span>,
@@ -167,39 +174,55 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>inDir</th>
-      <td><p>character. Directory containing station directories. It must either contain images in species subdirectories (e.g. inDir/StationA/SpeciesA) or images with species metadata tags (without species directories, e.g. inDir/StationA).</p></td>
+      <td><p>character. Directory containing station directories. It must
+either contain images in species subdirectories (e.g.
+inDir/StationA/SpeciesA) or images with species metadata tags (without
+species directories, e.g. inDir/StationA).</p></td>
     </tr>
     <tr>
       <th>IDfrom</th>
-      <td><p>character. Read species ID from image metadata ("metadata") of from species directory names ("directory")?</p></td>
+      <td><p>character. Read species ID from image metadata ("metadata") of
+from species directory names ("directory")?</p></td>
     </tr>
     <tr>
       <th>cameraID</th>
-      <td><p>character. Where should the function look for camera IDs: 'filename', 'directory'. 'filename' requires images renamed with <code><a href='imageRename.html'>imageRename</a></code>. 'directory' requires a camera subdirectory within station directories (station/camera/species). Can be missing.</p></td>
+      <td><p>character. Where should the function look for camera IDs:
+'filename', 'directory'. 'filename' requires images renamed with
+<code><a href='imageRename.html'>imageRename</a></code>. 'directory' requires a camera subdirectory within
+station directories (station/camera/species). Can be missing.</p></td>
     </tr>
     <tr>
       <th>camerasIndependent</th>
-      <td><p>logical. If <code>TRUE</code>, species records are considered to be independent between cameras at a station.</p></td>
+      <td><p>logical. If <code>TRUE</code>, species records are
+considered to be independent between cameras at a station.</p></td>
     </tr>
     <tr>
       <th>exclude</th>
-      <td><p>character. Vector of species names to be excluded from the record table</p></td>
+      <td><p>character. Vector of species names to be excluded from the
+record table</p></td>
     </tr>
     <tr>
       <th>minDeltaTime</th>
-      <td><p>integer. Time difference between records of the same species at the same station to be considered independent (in minutes)</p></td>
+      <td><p>integer. Time difference between records of the same
+species at the same station to be considered independent (in minutes)</p></td>
     </tr>
     <tr>
       <th>deltaTimeComparedTo</th>
-      <td><p>character. For two records to be considered independent, must the second one be at least <code>minDeltaTime</code> minutes after the last independent record of the same species (<code>"lastIndependentRecord"</code>), or <code>minDeltaTime</code> minutes after the last record (<code>"lastRecord"</code>)?</p></td>
+      <td><p>character. For two records to be considered
+independent, must the second one be at least <code>minDeltaTime</code> minutes
+after the last independent record of the same species
+(<code>"lastIndependentRecord"</code>), or <code>minDeltaTime</code> minutes after the
+last record (<code>"lastRecord"</code>)?</p></td>
     </tr>
     <tr>
       <th>timeZone</th>
-      <td><p>character. Must be a value returned by <code><a href='https://rdrr.io/r/base/timezones.html'>OlsonNames</a></code></p></td>
+      <td><p>character. Must be a value returned by
+<code><a href='https://rdrr.io/r/base/timezones.html'>OlsonNames</a></code></p></td>
     </tr>
     <tr>
       <th>stationCol</th>
-      <td><p>character. Name of the camera trap station column. Assuming "Station" if undefined.</p></td>
+      <td><p>character. Name of the camera trap station column.
+Assuming "Station" if undefined.</p></td>
     </tr>
     <tr>
       <th>writecsv</th>
@@ -207,82 +230,150 @@
     </tr>
     <tr>
       <th>outDir</th>
-      <td><p>character. Directory to save csv to. If NULL and <code>writecsv = TRUE</code>, recordTable will be written to <code>inDir</code>.</p></td>
+      <td><p>character. Directory to save csv to. If NULL and
+<code>writecsv = TRUE</code>, recordTable will be written to <code>inDir</code>.</p></td>
     </tr>
     <tr>
       <th>metadataHierarchyDelimitor</th>
-      <td><p>character. The character delimiting hierarchy levels in image metadata tags in field "HierarchicalSubject". Either "|" or ":".</p></td>
+      <td><p>character. The character delimiting
+hierarchy levels in image metadata tags in field "HierarchicalSubject".
+Either "|" or ":".</p></td>
     </tr>
     <tr>
       <th>metadataSpeciesTag</th>
-      <td><p>character. In custom image metadata, the species ID tag name.</p></td>
+      <td><p>character. In custom image metadata, the species
+ID tag name.</p></td>
     </tr>
     <tr>
       <th>additionalMetadataTags</th>
-      <td><p>character. Additional camera model-specific metadata tags to be extracted. (If possible specify tag groups as returned by <code><a href='exifTagNames.html'>exifTagNames</a></code>)</p></td>
+      <td><p>character. Additional camera model-specific
+metadata tags to be extracted. (If possible specify tag groups as returned
+by <code><a href='exifTagNames.html'>exifTagNames</a></code>)</p></td>
     </tr>
     <tr>
       <th>removeDuplicateRecords</th>
-      <td><p>logical. If there are several records of the same species at the same station (also same camera if cameraID is defined) at exactly the same time, show only one?</p></td>
+      <td><p>logical. If there are several records of the
+same species at the same station (also same camera if cameraID is defined)
+at exactly the same time, show only one?</p></td>
     </tr>
     <tr>
       <th>returnFileNamesMissingTags</th>
-      <td><p>logical. If species are assigned with metadata and images are not tagged, return a few file names of these images as a message?</p></td>
+      <td><p>logical. If species are assigned with
+metadata and images are not tagged, return a few file names of these images
+as a message?</p></td>
     </tr>
     <tr>
       <th>eventSummaryColumn</th>
-      <td><p>character. A column in the record table (e.g. from a metadata tag) by to summarise non-independent records (those within <code>minDeltaTime</code> of a given record)  with a user-defined function (<code>eventSummaryFunction</code>)</p></td>
+      <td><p>character. A column in the record table (e.g. from
+a metadata tag) by to summarise non-independent records (those within
+<code>minDeltaTime</code> of a given record) with a user-defined function
+(<code>eventSummaryFunction</code>)</p></td>
     </tr>
     <tr>
       <th>eventSummaryFunction</th>
-      <td><p>character. The function by which to summarise <code>eventSummaryColumn</code> of  non-independent records, e.g. "sum", "max" (optional)</p></td>
+      <td><p>character. The function by which to summarise
+<code>eventSummaryColumn</code> of non-independent records, e.g. "sum", "max"
+(optional)</p></td>
     </tr>
     <tr>
       <th>video</th>
-      <td><p>list. Contains information on how to handle video data (optional). See details.</p></td>
+      <td><p>list. Contains information on how to handle video data
+(optional). See details.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A data frame containing species records and additional information
+about stations, date, time and (optionally) further metadata.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The function can handle a number of different ways of storing images, and supports species identification by moving images into species directories as well as metadata tagging. In every case, images need to be stored into station directories. If images are identified by moving them into species directories, a camera directory is optional: "Station/Species/XY.JPG" or "Station/Camera/Species/XY.JPG". Likewise, if images are identified using metadata tagging, a camera directory can be used optionally: "Station/XY.JPG" or "Station/Camera/XY.JPG".</p>
-<p>If images are identified by metadata tagging, <code>metadataSpeciesTag</code> specifies the metadata tag group name that contains species identification tags. <code>metadataHierarchyDelimitor</code> is "|" for images tagged in DigiKam and images tagged in Adobe Bridge / Lightroom with the default settings. It is only necessary to change it if the default was changed in these programs.</p>
-<p><code>minDeltaTime</code> is a criterion for temporal independence of species recorded at the same station. Setting it to 0 will make the function return all records. Setting it to a higher value will remove records that were taken less than <code>minDeltaTime</code> minutes after the last record (<code>deltaTimeComparedTo = "lastRecord"</code>) or the last independent record (<code>deltaTimeComparedTo = "lastIndependentRecord"</code>).</p>
-<p><code>removeDuplicateRecords</code> determines whether duplicate records (identical station, species, date/time, (and camera if applicable)) are are all returned (TRUE) or collapsed into a single unique record (FALSE).</p>
-<p><code>camerasIndependent</code> defines if the cameras at a station are to be considered independent. If <code>TRUE</code>, records of the same species taken by different cameras are considered independent (e.g. if they face different trails). Use <code>FALSE</code> if both cameras face each other and possibly <code>TRUE</code> ).</p>
-<p><code>exclude</code> can be used to exclude "species" directories containing irrelevant images (e.g. "team", "blank", "unidentified"). <code>stationCol</code> can be set to match the station column name in the camera trap station table (see <code><a href='camtraps.html'>camtraps</a></code>).</p>
-<p>Many digital images contain  Exif metadata tags such as "AmbientTemperature" or "MoonPhase" that can be extracted if specified in <code>metadataTags</code>. Because these are manufacturer-specific and not standardized, function <code><a href='exifTagNames.html'>exifTagNames</a></code> provides a vector of all available tag names. Multiple names can be specified as a character vector as: <code><a href='https://rdrr.io/r/base/c.html'>c(Tag1, Tag2, ...)</a></code>. The metadata tags thus extracted may be used as covariates in modelling species distributions.</p>
-<p><code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> can be used to extract summary statistics for independent sampling events. For example, you assigned a "count" tag to your images, indicating the number of individuals in a picture. In a sequence of pictures taken within 1 minute, most pictures show one individual, but one image shows two individuals. You tagged the images accordingly (count = 1 or count = 2) and run <code>recordTable</code>. Set <code>eventSummaryColumn = "count"</code> and <code>eventSummaryFunction = "max"</code> to obtain the maximum number of <code>count</code> in all images within <code>minDeltaTime</code> minutes of a given record. The results is in a new column, in this example <code>count_max</code>. You can also calculate several statistics at the same time, by supplying vectors of values, e.g. <code>eventSummaryColumn = c("count", "count", "camera")</code> and <code>eventSummaryFunction = c("min", "max", "unique")</code> to get minimum and maximum count and all unique camera IDs for that event. Note that <code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> must be of same length.</p>
-<p>Argument <code>video</code> is a named list with 2 or 4 items. 2 items (<code>file_formats</code>, <code>dateTimeTag</code>) are always required, and are sufficent if <code>IDfrom = "directory"</code>. In that case, no digiKam tags will be returned. 
-To return digiKam tags, two additional items are required (<code>db_directory</code>, <code>db_filename</code>). This is essential when using <code>IDfrom = "metadata"</code>. When using <code>IDfrom = "directory"</code>, it is optional, but allows to extract metadata tags assigned to videos in digiKam. This workaround is necessary because digiKam tags are not written into video metadata, but are only saved in the digiKam database. So in contrast to JPG images, they can not be extracted with ExifTool. It also requires that <code>inDir</code> is in your digiKam database.</p>
+    <p>The function can handle a number of different ways of storing images, and
+supports species identification by moving images into species directories as
+well as metadata tagging. In every case, images need to be stored into
+station directories. If images are identified by moving them into species
+directories, a camera directory is optional: "Station/Species/XY.JPG" or
+"Station/Camera/Species/XY.JPG". Likewise, if images are identified using
+metadata tagging, a camera directory can be used optionally:
+"Station/XY.JPG" or "Station/Camera/XY.JPG".</p>
+<p>If images are identified by metadata tagging, <code>metadataSpeciesTag</code>
+specifies the metadata tag group name that contains species identification
+tags. <code>metadataHierarchyDelimitor</code> is "|" for images tagged in DigiKam
+and images tagged in Adobe Bridge / Lightroom with the default settings. It
+is only necessary to change it if the default was changed in these programs.</p>
+<p><code>minDeltaTime</code> is a criterion for temporal independence of species
+recorded at the same station. Setting it to 0 will make the function return
+all records. Setting it to a higher value will remove records that were
+taken less than <code>minDeltaTime</code> minutes after the last record
+(<code>deltaTimeComparedTo = "lastRecord"</code>) or the last independent record
+(<code>deltaTimeComparedTo = "lastIndependentRecord"</code>).</p>
+<p><code>removeDuplicateRecords</code> determines whether duplicate records
+(identical station, species, date/time, (and camera if applicable)) are are
+all returned (TRUE) or collapsed into a single unique record (FALSE).</p>
+<p><code>camerasIndependent</code> defines if the cameras at a station are to be
+considered independent. If <code>TRUE</code>, records of the same species taken by
+different cameras are considered independent (e.g. if they face different
+trails). Use <code>FALSE</code> if both cameras face each other and possibly
+<code>TRUE</code> ).</p>
+<p><code>exclude</code> can be used to exclude "species" directories containing
+irrelevant images (e.g. "team", "blank", "unidentified"). <code>stationCol</code>
+can be set to match the station column name in the camera trap station table
+(see <code><a href='camtraps.html'>camtraps</a></code>).</p>
+<p>Many digital images contain Exif metadata tags such as "AmbientTemperature"
+or "MoonPhase" that can be extracted if specified in <code>metadataTags</code>.
+Because these are manufacturer-specific and not standardized, function
+<code><a href='exifTagNames.html'>exifTagNames</a></code> provides a vector of all available tag names.
+Multiple names can be specified as a character vector as: <code><a href='https://rdrr.io/r/base/c.html'>c(Tag1,
+Tag2, ...)</a></code>. The metadata tags thus extracted may be used as covariates in
+modelling species distributions.</p>
+<p><code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> can be used to
+extract summary statistics for independent sampling events. For example, you
+assigned a "count" tag to your images, indicating the number of individuals
+in a picture. In a sequence of pictures taken within 1 minute, most pictures
+show one individual, but one image shows two individuals. You tagged the
+images accordingly (count = 1 or count = 2) and run <code>recordTable</code>. Set
+<code>eventSummaryColumn = "count"</code> and <code>eventSummaryFunction = "max"</code>
+to obtain the maximum number of <code>count</code> in all images within
+<code>minDeltaTime</code> minutes of a given record. The results is in a new
+column, in this example <code>count_max</code>. You can also calculate several
+statistics at the same time, by supplying vectors of values, e.g.
+<code>eventSummaryColumn = c("count", "count", "camera")</code> and
+<code>eventSummaryFunction = c("min", "max", "unique")</code> to get minimum and
+maximum count and all unique camera IDs for that event. Note that
+<code>eventSummaryColumn</code> and <code>eventSummaryFunction</code> must be of same
+length.</p>
+<p>Argument <code>video</code> is a named list with 2 or 4 items. 2 items
+(<code>file_formats</code>, <code>dateTimeTag</code>) are always required, and are
+sufficent if <code>IDfrom = "directory"</code>. In that case, no digiKam tags will
+be returned.  To return digiKam tags, two additional items are required
+(<code>db_directory</code>, <code>db_filename</code>). This is essential when using
+<code>IDfrom = "metadata"</code>. When using <code>IDfrom = "directory"</code>, it is
+optional, but allows to extract metadata tags assigned to videos in digiKam.
+This workaround is necessary because digiKam tags are not written into video
+metadata, but are only saved in the digiKam database. So in contrast to JPG
+images, they can not be extracted with ExifTool. It also requires that
+<code>inDir</code> is in your digiKam database.</p>
 <p>The items of argument <code>video</code> are:</p>
 <table class='table'>
-<tr><td><code>file_formats</code></td><td>The video formats to extract (include "jpg" if you want .JPG image metadata)</td></tr>
-<tr><td><code>dateTimeTag</code></td><td>the metadata tag to extract date/time from (use <code><a href='exifTagNames.html'>exifTagNames</a></code> to find out which tag is suitable)</td></tr>
-<tr><td><code>db_directory</code></td><td>The directory containing digiKam database (optional if <code>IDfrom = "directory"</code>)</td></tr>
-<tr><td><code>db_filename</code></td><td>The digiKam database file in <code>db_directory</code> (optional if <code>IDfrom = "directory"</code>)</td></tr>
+<tr><td><code>file_formats</code></td><td>The video formats to extract (include
+"jpg" if you want .JPG image metadata)</td></tr>
+<tr><td><code>dateTimeTag</code></td><td>the
+metadata tag to extract date/time from (use <code><a href='exifTagNames.html'>exifTagNames</a></code> to
+find out which tag is suitable)</td></tr>
+<tr><td><code>db_directory</code></td><td>The directory
+containing digiKam database (optional if <code>IDfrom = "directory"</code>)</td></tr>
+<tr><td><code>db_filename</code></td><td>The digiKam database file in <code>db_directory</code>
+(optional if <code>IDfrom = "directory"</code>)</td></tr>
 </table>
 
 
-
 <p>See the examples below for for how to specify the argument <code>video</code>.</p>
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A data frame containing species records and additional information about stations, date, time and (optionally) further metadata.</p>
-    <h2 class="hasAnchor" id="warning-"><a class="anchor" href="#warning-"></a>Warning </h2>
-
-    <p>Custom image metadata must be organised hierarchically (tag group - tag; e.g. "Species" - "Leopard Cat"). Detailed information on how to set up and use metadata tags can be found in <a href='https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html#metadata-tagging'>vignette 2: Species and Individual Identification</a>.</p>
-<p>Custom image metadata tags must be written to the images. The function cannot read tags from .xmp sidecar files. Make sure you set the preferences accordingly. In DigiKam, go to Settings/Configure digiKam/Metadata. There, make sure "Write to sidecar files" is unchecked.</p>
-<p>Please note the section about defining argument <code>timeZone</code> in the vignette on data extraction (accessible via <code>vignette("DataExtraction")</code> or online (<a href='https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html'>https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html</a>)).</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Phil Harvey's ExifTool <a href='https://exiftool.org/'>https://exiftool.org/</a></p>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Juergen Niedballa</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>The results of a number of other function will depend on the output of this function (namely on the arguments <code>exclude</code> for excluding species and <code>minDeltaTime</code>/ <code>deltaTimeComparedTo</code> for temporal independence):</p>
+    <p>The results of a number of other function will depend on the output of
+this function (namely on the arguments <code>exclude</code> for excluding species
+and <code>minDeltaTime</code>/ <code>deltaTimeComparedTo</code> for temporal
+independence):</p>
 <table class='table'>
 <tr><td><code><a href='detectionMaps.html'>detectionMaps</a></code></td></tr>
 <tr><td><code><a href='detectionHistory.html'>detectionHistory</a></code></td></tr>
@@ -296,9 +387,31 @@ To return digiKam tags, two additional items are required (<code>db_directory</c
 </table>
 
 
+    <h2 class="hasAnchor" id="warning-"><a class="anchor" href="#warning-"></a>Warning </h2>
+
+    <p>Custom image metadata must be organised hierarchically
+(tag group - tag; e.g. "Species" - "Leopard Cat"). Detailed information on
+how to set up and use metadata tags can be found in
+<a href='https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html#metadata-tagging'>vignette
+2: Species and Individual Identification</a>.</p>
+<p>Custom image metadata tags must be written to the images. The function
+cannot read tags from .xmp sidecar files. Make sure you set the preferences
+accordingly. In DigiKam, go to Settings/Configure digiKam/Metadata. There,
+make sure "Write to sidecar files" is unchecked.</p>
+<p>Please note the section about defining argument <code>timeZone</code> in the
+vignette on data extraction (accessible via
+<code>vignette("DataExtraction")</code> or online
+(<a href='https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html'>https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html</a>)).</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Phil Harvey's ExifTool <a href='https://exiftool.org/'>https://exiftool.org/</a></p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
+
 
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span>    <span class='co'># the examples take too long to pass CRAN tests</span>
 
@@ -404,6 +517,7 @@ To return digiKam tags, two additional items are required (<code>db_directory</c
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>)</span>
 <span class='op'>}</span>
 </div><div class='output co'>#&gt; <span class='message'>timeZone is not specified. Assuming UTC</span></div><div class='output co'>#&gt; <span class='error'>Error in recordTable(inDir = wd_images_ID_species, IDfrom = "directory",     minDeltaTime = 60, deltaTimeComparedTo = "lastRecord", writecsv = FALSE,     additionalMetadataTags = c("EXIF:Model", "EXIF:Make")): object 'wd_images_ID_species' not found</span></div><div class='input'>
+
 
 </div></pre>
   </div>

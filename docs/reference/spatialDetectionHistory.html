@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate a capthist object for spatial capture-recapture analyses from camera-trapping data — spatialDetectionHistory • camtrapR</title>
+<title>Generate a capthist object for spatial capture-recapture analyses
+from camera-trapping data — spatialDetectionHistory • camtrapR</title>
 
 
 <!-- jquery -->
@@ -39,8 +40,16 @@
 
 
 
-<meta property="og:title" content="Generate a capthist object for spatial capture-recapture analyses from camera-trapping data — spatialDetectionHistory" />
-<meta property="og:description" content="This function generates spatial detection histories of individuals of a species for spatial capture-recapture analyses with package secr. Data are stored in a capthist object. The capthist object contains detection histories, camera-trap station location and possibly individual and station-level covariates. Detection histories can have adjustable occasion length and occasion start time (as in the function detectionHistory)." />
+<meta property="og:title" content="Generate a capthist object for spatial capture-recapture analyses
+from camera-trapping data — spatialDetectionHistory" />
+<meta property="og:description" content="This function generates spatial detection histories of individuals of a
+species for spatial capture-recapture analyses with package
+secr. Data are stored in a
+capthist object. The capthist object
+contains detection histories, camera-trap station location and possibly
+individual and station-level covariates. Detection histories can have
+adjustable occasion length and occasion start time (as in the function
+detectionHistory)." />
 
 
 
@@ -132,16 +141,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate a <code>capthist</code> object for spatial capture-recapture analyses from camera-trapping data</h1>
-    
+    <h1>Generate a <code>capthist</code> object for spatial capture-recapture analyses
+from camera-trapping data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jniedballa/camtrapR/blob/master/R/spatialDetectionHistory.R'><code>R/spatialDetectionHistory.R</code></a></small>
     <div class="hidden name"><code>spatialDetectionHistory.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function generates spatial detection histories of individuals of a species for spatial capture-recapture analyses with package <code><a href='https://rdrr.io/pkg/secr/man/secr-package.html'>secr</a></code>. Data are stored in a <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object. The <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object contains detection histories, camera-trap station location and possibly individual and station-level covariates. Detection histories can have adjustable occasion length and occasion start time (as in the function <code><a href='detectionHistory.html'>detectionHistory</a></code>).</p>
+    <p>This function generates spatial detection histories of individuals of a
+species for spatial capture-recapture analyses with package
+<code><a href='https://rdrr.io/pkg/secr/man/secr-package.html'>secr</a></code>. Data are stored in a
+<code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object. The <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object
+contains detection histories, camera-trap station location and possibly
+individual and station-level covariates. Detection histories can have
+adjustable occasion length and occasion start time (as in the function
+<code><a href='detectionHistory.html'>detectionHistory</a></code>).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>spatialDetectionHistory</span><span class='op'>(</span><span class='va'>recordTableIndividual</span>,
+    <pre class="usage"><span class='fu'>spatialDetectionHistory</span><span class='op'>(</span>
+  <span class='va'>recordTableIndividual</span>,
   <span class='va'>species</span>,
   <span class='va'>camOp</span>,
   <span class='va'>CTtable</span>,
@@ -155,7 +173,7 @@
   <span class='va'>individualCol</span>,
   <span class='va'>individualCovariateCols</span>,
   recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
+  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd hms"</span>,
   <span class='va'>occasionLength</span>,
   <span class='va'>minActiveDaysPerOccasion</span>,
   occasionStartTime <span class='op'>=</span> <span class='st'>"deprecated"</span>,
@@ -174,63 +192,80 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>recordTableIndividual</th>
-      <td><p>data.frame. the record table with individual IDs created by <code><a href='recordTableIndividual.html'>recordTableIndividual</a></code></p></td>
+      <td><p>data.frame. the record table with individual
+IDs created by <code><a href='recordTableIndividual.html'>recordTableIndividual</a></code></p></td>
     </tr>
     <tr>
       <th>species</th>
-      <td><p>character. the species for which to compute the detection history</p></td>
+      <td><p>character. the species for which to compute the detection
+history</p></td>
     </tr>
     <tr>
       <th>camOp</th>
-      <td><p>The camera operability matrix as created by <code><a href='cameraOperation.html'>cameraOperation</a></code></p></td>
+      <td><p>The camera operability matrix as created by
+<code><a href='cameraOperation.html'>cameraOperation</a></code></p></td>
     </tr>
     <tr>
       <th>CTtable</th>
-      <td><p>data.frame. contains station IDs and coordinates. Same as used in <code><a href='cameraOperation.html'>cameraOperation</a></code>.</p></td>
+      <td><p>data.frame. contains station IDs and coordinates. Same as
+used in <code><a href='cameraOperation.html'>cameraOperation</a></code>.</p></td>
     </tr>
     <tr>
       <th>output</th>
-      <td><p>character. Return individual counts ("count") or binary observations ("binary")?</p></td>
+      <td><p>character. Return individual counts ("count") or binary
+observations ("binary")?</p></td>
     </tr>
     <tr>
       <th>stationCol</th>
-      <td><p>character. name of the column specifying Station ID in <code>recordTableIndividual</code> and <code>CTtable</code></p></td>
+      <td><p>character. name of the column specifying Station ID in
+<code>recordTableIndividual</code> and <code>CTtable</code></p></td>
     </tr>
     <tr>
       <th>speciesCol</th>
-      <td><p>character. name of the column specifying species in <code>recordTableIndividual</code></p></td>
+      <td><p>character. name of the column specifying species in
+<code>recordTableIndividual</code></p></td>
     </tr>
     <tr>
       <th>sessionCol</th>
-      <td><p>character. name of the column specifying session IDs, either in <code>recordTableIndividual</code> or in <code>CTtable</code>. See 'Details' for more information. Session ID values must be a sequence of integer numbers beginning with 1 (i.e., 1,2,3,...).</p></td>
+      <td><p>character. name of the column specifying session IDs,
+either in <code>recordTableIndividual</code> or in <code>CTtable</code>. See 'Details'
+for more information. Session ID values must be a sequence of integer
+numbers beginning with 1 (i.e., 1,2,3,...).</p></td>
     </tr>
     <tr>
       <th>Xcol</th>
-      <td><p>character. name of the column specifying x coordinates in <code>CTtable</code></p></td>
+      <td><p>character. name of the column specifying x coordinates in
+<code>CTtable</code></p></td>
     </tr>
     <tr>
       <th>Ycol</th>
-      <td><p>character. name of the column specifying y coordinates in <code>CTtable</code></p></td>
+      <td><p>character. name of the column specifying y coordinates in
+<code>CTtable</code></p></td>
     </tr>
     <tr>
       <th>stationCovariateCols</th>
-      <td><p>character. name of the column(s) specifying station-level covariates in <code>CTtable</code></p></td>
+      <td><p>character. name of the column(s) specifying
+station-level covariates in <code>CTtable</code></p></td>
     </tr>
     <tr>
       <th>individualCol</th>
-      <td><p>character. name of the column specifying individual IDs in <code>recordTableIndividual</code></p></td>
+      <td><p>character. name of the column specifying individual IDs
+in <code>recordTableIndividual</code></p></td>
     </tr>
     <tr>
       <th>individualCovariateCols</th>
-      <td><p>character. name of the column(s) specifying individual covariates in <code>recordTableIndividual</code></p></td>
+      <td><p>character. name of the column(s) specifying
+individual covariates in <code>recordTableIndividual</code></p></td>
     </tr>
     <tr>
       <th>recordDateTimeCol</th>
-      <td><p>character. name of the column specifying date and time in <code>recordTableIndividual</code></p></td>
+      <td><p>character. name of the column specifying date and
+time in <code>recordTableIndividual</code></p></td>
     </tr>
     <tr>
       <th>recordDateTimeFormat</th>
-      <td><p>format of column <code>recordDateTimeCol</code> in <code>recordTableIndividual</code></p></td>
+      <td><p>format of column <code>recordDateTimeCol</code> in
+<code>recordTableIndividual</code></p></td>
     </tr>
     <tr>
       <th>occasionLength</th>
@@ -238,77 +273,143 @@
     </tr>
     <tr>
       <th>minActiveDaysPerOccasion</th>
-      <td><p>integer. minimum number of active trap days for occasions to be included (optional)</p></td>
+      <td><p>integer. minimum number of active trap days
+for occasions to be included (optional)</p></td>
     </tr>
     <tr>
       <th>occasionStartTime</th>
-      <td><p>(DEPRECATED) integer. time of day (the full hour) at which to begin occasions. Please use argument <code>occasionStartTime</code> in <code><a href='cameraOperation.html'>cameraOperation</a></code> instead.</p></td>
+      <td><p>(DEPRECATED) integer. time of day (the full hour)
+at which to begin occasions. Please use argument <code>occasionStartTime</code> in
+<code><a href='cameraOperation.html'>cameraOperation</a></code> instead.</p></td>
     </tr>
     <tr>
       <th>maxNumberDays</th>
-      <td><p>integer. maximum number of trap days per station (optional)</p></td>
+      <td><p>integer. maximum number of trap days per station
+(optional)</p></td>
     </tr>
     <tr>
       <th>day1</th>
-      <td><p>character. When should occasions begin: station setup date ("station"), first day of survey ("survey"), a specific date (e.g. "2015-12-31")?</p></td>
+      <td><p>character. When should occasions begin: station setup date
+("station"), first day of survey ("survey"), a specific date (e.g.
+"2015-12-31")?</p></td>
     </tr>
     <tr>
       <th>buffer</th>
-      <td><p>integer. Makes the first occasion begin a number of days after station setup. (optional)</p></td>
+      <td><p>integer. Makes the first occasion begin a number of days after
+station setup. (optional)</p></td>
     </tr>
     <tr>
       <th>includeEffort</th>
-      <td><p>logical. Include trapping effort (number of active camera trap days per station and occasion) as usage in <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code>  object?</p></td>
+      <td><p>logical. Include trapping effort (number of active
+camera trap days per station and occasion) as usage in
+<code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object?</p></td>
     </tr>
     <tr>
       <th>scaleEffort</th>
-      <td><p>logical. scale and center effort matrix to mean = 0 and sd = 1? Currently not used. Must be FALSE.</p></td>
+      <td><p>logical. scale and center effort matrix to mean = 0 and
+sd = 1? Currently not used. Must be FALSE.</p></td>
     </tr>
     <tr>
       <th>binaryEffort</th>
-      <td><p>logical. Should effort be binary (1 if &gt;1 active day per occasion, 0 otherwise)?</p></td>
+      <td><p>logical. Should effort be binary (1 if &gt;1 active day per
+occasion, 0 otherwise)?</p></td>
     </tr>
     <tr>
       <th>timeZone</th>
-      <td><p>character. Must be a value returned by <code><a href='https://rdrr.io/r/base/timezones.html'>OlsonNames</a></code></p></td>
+      <td><p>character. Must be a value returned by
+<code><a href='https://rdrr.io/r/base/timezones.html'>OlsonNames</a></code></p></td>
     </tr>
     <tr>
       <th>makeRMarkInput</th>
-      <td><p>logical. If <code>FALSE</code>, output will be a data frame for RMark. If <code>FALSE</code> or not specified, a secr <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object</p></td>
+      <td><p>logical. If <code>FALSE</code>, output will be a data frame
+for RMark. If <code>FALSE</code> or not specified, a secr
+<code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>The function creates a <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object by combining three different objects: 1) a record table of identified individuals of a species, 2) a camera trap station table with station coordinates and 3) a camera operation matrix computed with <code><a href='cameraOperation.html'>cameraOperation</a></code>. The record table must contain a column with individual IDs and optionally individual covariates. The camera trap station table must contain station coordinates and optionally station-level covariates. The camera operation matrix provides the dates stations were active or not and the number of active stations.</p>
-<p><code>day1</code> defines if each stations detection history will begin on that station's setup day (<code>day1 = "station"</code>) or if all station's detection histories have a common origin (the day the first station was set up if <code>day1 = "survey"</code> or a fixed date if, e.g. <code>day1 = "2015-12-31"</code>).</p>
-<p><code>includeEffort</code> controls whether an effort matrix is computed or not. If TRUE, effort will be used for object <code><a href='https://rdrr.io/pkg/secr/man/usage.html'>usage</a></code> information in a <code><a href='https://rdrr.io/pkg/secr/man/traps.html'>traps</a></code>. <code>binaryEffort</code> makes the effort information binary. <code>scaleEffort</code> is currently not used and must be set to FALSE. The reason is that <code><a href='https://rdrr.io/pkg/secr/man/usage.html'>usage</a></code> can only be either binary, or nonnegative real values, whereas scaling effort would return negative values.</p>
-<p>The number of days that are aggregated is controlled by <code>occasionLength</code>. <code>occasionStartTime</code> will be removed from the function. It has moved to <code><a href='cameraOperation.html'>cameraOperation</a></code>, to ensure daily effort is computed correctly and takes the occasion start time into account.<!-- %\code{occasionStartTime} can be used to make occasions begin another hour than midnight (the default). This may be relevant for nocturnal animals, in which 1 whole night would be considered an occasion. --></p>
-<p>Output can be returned as individual counts per occasion (<code>output = "count"</code>) or as binary observation (<code>output = "binary"</code>).</p>
-<p>Argument <code>sessionCol</code> can be used to a create multi-session <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object. There are two different ways in which the argument is interpreted. It depends on whether a column with the name you specify in argument <code>sessionCol</code> exists in <code>recordTableIndividual</code> or in <code>CTtable</code>. If <code>sessionCol</code> is found in <code>recordTableIndividual</code>, the records will be assigned to the specified sessions, and it will be assumed that all camera trap station were used in all sessions. Alternatively, if <code>sessionCol</code> is found in<code>CTtable</code>, it will be assumed that only a subset of stations was used in each session, and the records will be assigned automatically (using the station IDs to identify which session they belong into). In both cases, session information must be provided as a sequence of integer numbers beginnign with 1, i.e., you provide the session number directly in <code>sessionCol</code>. See <code><a href='https://rdrr.io/pkg/secr/man/session.html'>session</a></code> for more information about sessions in <span class="pkg">secr</span>.</p>
-<p><code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> objects (as created by <code>spatialDetectionHistory</code> for spatial capture-recapture analyses) expect the units of coordinates (<code>Xcol</code> and <code>col</code> in <code>CTtable</code>) to be meters. Therefore, please use a suitable coordinate system (e.g. UTM).</p>
-<p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in <span class="pkg">lubridate</span> via <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument "orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in <code>recordDateTimeFormat</code>.</p>
-<p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either "%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
-    <h2 class="hasAnchor" id="warning-"><a class="anchor" href="#warning-"></a>Warning </h2>
-
-    <p>Please note the section about defining argument <code>timeZone</code> in the vignette on data extraction (accessible via <code>vignette("DataExtraction")</code> or online (<a href='https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html'>https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html</a>)).</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Output depends on argument <code>makeRMarkInput</code>:</p>
-<dt><code>makeRMarkInput = FALSE</code></dt><dd><p>A <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object</p></dd>
-<dt><code>makeRMarkInput = TRUE</code></dt><dd><p>A data frame for use in RMark</p></dd>
+<dt>list("makeRMarkInput = FALSE")</dt><dd><p>A <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object</p></dd>
+<dt>list("makeRMarkInput = TRUE")</dt><dd><p>A data frame for use in RMark</p></dd>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
+    <p>The function creates a <code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object by combining
+three different objects: 1) a record table of identified individuals of a
+species, 2) a camera trap station table with station coordinates and 3) a
+camera operation matrix computed with <code><a href='cameraOperation.html'>cameraOperation</a></code>. The
+record table must contain a column with individual IDs and optionally
+individual covariates. The camera trap station table must contain station
+coordinates and optionally station-level covariates. The camera operation
+matrix provides the dates stations were active or not and the number of
+active stations.</p>
+<p><code>day1</code> defines if each stations detection history will begin on that
+station's setup day (<code>day1 = "station"</code>) or if all station's detection
+histories have a common origin (the day the first station was set up if
+<code>day1 = "survey"</code> or a fixed date if, e.g. <code>day1 = "2015-12-31"</code>).</p>
+<p><code>includeEffort</code> controls whether an effort matrix is computed or not.
+If TRUE, effort will be used for object <code><a href='https://rdrr.io/pkg/secr/man/usage.html'>usage</a></code>
+information in a <code><a href='https://rdrr.io/pkg/secr/man/traps.html'>traps</a></code>. <code>binaryEffort</code> makes the
+effort information binary. <code>scaleEffort</code> is currently not used and must
+be set to FALSE. The reason is that <code><a href='https://rdrr.io/pkg/secr/man/usage.html'>usage</a></code> can only be
+either binary, or nonnegative real values, whereas scaling effort would
+return negative values.</p>
+<p>The number of days that are aggregated is controlled by
+<code>occasionLength</code>. <code>occasionStartTime</code> will be removed from the
+function. It has moved to <code><a href='cameraOperation.html'>cameraOperation</a></code>, to ensure daily
+effort is computed correctly and takes the occasion start time into
+account.<!-- %\code{occasionStartTime} can be used to make occasions begin -->
+another hour than midnight (the default). This may be relevant for nocturnal
+animals, in which 1 whole night would be considered an occasion.</p>
+<p>Output can be returned as individual counts per occasion (<code>output =
+"count"</code>) or as binary observation (<code>output = "binary"</code>).</p>
+<p>Argument <code>sessionCol</code> can be used to a create multi-session
+<code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> object. There are two different ways in which
+the argument is interpreted. It depends on whether a column with the name
+you specify in argument <code>sessionCol</code> exists in
+<code>recordTableIndividual</code> or in <code>CTtable</code>. If <code>sessionCol</code> is
+found in <code>recordTableIndividual</code>, the records will be assigned to the
+specified sessions, and it will be assumed that all camera trap station were
+used in all sessions. Alternatively, if <code>sessionCol</code> is found
+in<code>CTtable</code>, it will be assumed that only a subset of stations was used
+in each session, and the records will be assigned automatically (using the
+station IDs to identify which session they belong into). In both cases,
+session information must be provided as a sequence of integer numbers
+beginnign with 1, i.e., you provide the session number directly in
+<code>sessionCol</code>. See <code><a href='https://rdrr.io/pkg/secr/man/session.html'>session</a></code> for more information
+about sessions in <span class="pkg">secr</span>.</p>
+<p><code><a href='https://rdrr.io/pkg/secr/man/capthist.html'>capthist</a></code> objects (as created by
+<code>spatialDetectionHistory</code> for spatial capture-recapture
+analyses) expect the units of coordinates (<code>Xcol</code> and <code>col</code> in
+<code>CTtable</code>) to be meters. Therefore, please use a suitable coordinate
+system (e.g. UTM).</p>
+<p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS"
+convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be
+interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in
+<span class="pkg">lubridate</span> via <code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument
+"orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in
+<code>recordDateTimeFormat</code>.</p>
+<p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either
+"%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date
+and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or
+<code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
+    <h2 class="hasAnchor" id="warning-"><a class="anchor" href="#warning-"></a>Warning </h2>
+
+    <p>Please note the section about defining argument
+<code>timeZone</code> in the vignette on data extraction (accessible via
+<code>vignette("DataExtraction")</code> or online
+(<a href='https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html'>https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html</a>)).</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><span class="pkg">secr</span> <span class="pkg">RMark</span></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Juergen Niedballa</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><span class="pkg">secr</span>
-<span class="pkg">RMark</span></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
+
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableIndividualSample</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>camtraps</span><span class='op'>)</span>
 
@@ -319,7 +420,7 @@
                                  retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
                                  writecsv     <span class='op'>=</span> <span class='cn'>FALSE</span>,
                                  hasProblems  <span class='op'>=</span> <span class='cn'>TRUE</span>,
-                                 dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+                                 dateFormat   <span class='op'>=</span> <span class='st'>"dmy"</span>
 <span class='op'>)</span>
 
 <span class='va'>sdh</span> <span class='op'>&lt;-</span> <span class='fu'>spatialDetectionHistory</span><span class='op'>(</span>recordTableIndividual <span class='op'>=</span> <span class='va'>recordTableIndividualSample</span>,
@@ -333,13 +434,13 @@
                                Ycol                  <span class='op'>=</span> <span class='st'>"utm_y"</span>,
                                individualCol         <span class='op'>=</span> <span class='st'>"Individual"</span>,
                                recordDateTimeCol     <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
+                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"ymd hms"</span>,
                                occasionLength        <span class='op'>=</span> <span class='fl'>10</span>,
                                day1                  <span class='op'>=</span> <span class='st'>"survey"</span>,
                                includeEffort         <span class='op'>=</span> <span class='cn'>TRUE</span>,
                                timeZone              <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
   <span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
 <span class='co'># missing space in species = "LeopardCat" was introduced by recordTableIndividual</span>
 <span class='co'># (because of CRAN package policies.</span>
 <span class='co'># In your data you can have spaces in your directory names)</span>
@@ -384,7 +485,7 @@
                                       sessionCol   <span class='op'>=</span> <span class='st'>"session"</span>,
                                       retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
                                       hasProblems  <span class='op'>=</span> <span class='cn'>TRUE</span>,
-                                      dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+                                      dateFormat   <span class='op'>=</span> <span class='st'>"dmy"</span>
   <span class='op'>)</span>
 
 <span class='va'>sdh_multi</span> <span class='op'>&lt;-</span> <span class='fu'>spatialDetectionHistory</span><span class='op'>(</span>recordTableIndividual <span class='op'>=</span> <span class='va'>recordTableIndividualSampleMultiSeason</span>,
@@ -399,7 +500,7 @@
                                Ycol                  <span class='op'>=</span> <span class='st'>"utm_y"</span>,
                                individualCol         <span class='op'>=</span> <span class='st'>"Individual"</span>,
                                recordDateTimeCol     <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
+                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"ymd hms"</span>,
                                occasionLength        <span class='op'>=</span> <span class='fl'>10</span>,
                                day1                  <span class='op'>=</span> <span class='st'>"survey"</span>,
                                includeEffort         <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -407,7 +508,7 @@
                                stationCovariateCols  <span class='op'>=</span> <span class='st'>"utm_y"</span>,         <span class='co'># example</span>
                                individualCovariateCols <span class='op'>=</span> <span class='st'>"Individual"</span>   <span class='co'># example</span>
   <span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
   <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>sdh_multi</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; $`1`
 #&gt; Object class       capthist 
@@ -472,6 +573,7 @@
 #&gt; </div><div class='input'>  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sdh_multi</span>, tracks <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: screen layout does not allow for all sessions and some plots may be lost; set par mfrow</span></div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='spatialDetectionHistory-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;  1  2 
 #&gt; 15  6 </div><div class='input'>
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

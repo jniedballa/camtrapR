@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -39,7 +43,6 @@
 <meta property="og:description" content="This function serves 2 purposes: 1) it assesses possible misidentification of species and 2) compares double observer species identification (only if metadata tagging was used for species identification).
 Within each station, it assesses whether there are images of a species taken within a given time interval of another species. Often, it is unlikely that different species are encountered within a very short time intervals at the same location. This type of misidentification can arise easily if some images belonging to a sequence of images were accidentally moved into different species directories or tagged incorrectly.
 Double observer identification may be desirable to increase reliability of species identification. The function returns conflicts in species identification between 2 observers. These conflicts can then be corrected." />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -57,7 +60,7 @@ Double observer identification may be desirable to increase reliability of speci
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -71,7 +74,7 @@ Double observer identification may be desirable to increase reliability of speci
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -79,7 +82,7 @@ Double observer identification may be desirable to increase reliability of speci
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -97,13 +100,13 @@ Double observer identification may be desirable to increase reliability of speci
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -113,8 +116,8 @@ Double observer identification may be desirable to increase reliability of speci
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jniedballa/camtrapR">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/jniedballa/camtrapR/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -142,17 +145,17 @@ Double observer identification may be desirable to increase reliability of speci
 <p>Double observer identification may be desirable to increase reliability of species identification. The function returns conflicts in species identification between 2 observers. These conflicts can then be corrected.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>checkSpeciesIdentification</span>(<span class='no'>inDir</span>,
-  <span class='no'>IDfrom</span>,
-  <span class='no'>hasCameraFolders</span>,
-  <span class='no'>metadataSpeciesTag</span>,
-  <span class='no'>metadataSpeciesTagToCompare</span>,
-  <span class='kw'>metadataHierarchyDelimitor</span> <span class='kw'>=</span> <span class='st'>"|"</span>,
-  <span class='no'>maxDeltaTime</span>,
-  <span class='no'>excludeSpecies</span>,
-  <span class='no'>stationsToCheck</span>,
-  <span class='kw'>writecsv</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>checkSpeciesIdentification</span><span class='op'>(</span><span class='va'>inDir</span>, 
+  <span class='va'>IDfrom</span>,
+  <span class='va'>hasCameraFolders</span>,
+  <span class='va'>metadataSpeciesTag</span>,
+  <span class='va'>metadataSpeciesTagToCompare</span>,
+  metadataHierarchyDelimitor <span class='op'>=</span> <span class='st'>"|"</span>,
+  <span class='va'>maxDeltaTime</span>, 
+  <span class='va'>excludeSpecies</span>,
+  <span class='va'>stationsToCheck</span>,
+  writecsv <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -208,6 +211,9 @@ Double observer identification may be desirable to increase reliability of speci
 
     <p>A <code>list</code> containing 2 data frames. The first contains a data frame with images file names, directories, time stamp and species ID that were taken within <code>maxDeltaTime</code> seconds of another species image at a particular station.
 The second data frame contains images with conflicting species IDs (if <code>IDfrom = "metadata"</code> and <code>metadataSpeciesTagToCompare</code> is defined)</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>The function will not be able to find "isolated" images, i.e. images that were misidentified, but were not part of a sequence of images. Likewise, if all images of a sequence were misidentified, they cannot be found either.
@@ -216,17 +222,18 @@ From version 0.99.0, the function can also handle images identied with metadata 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># \donttest{</span>
-<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_species_dir"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='va'>wd_images_ID</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"pictures/sample_images_species_dir"</span>, package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span>
 
-<span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span>(<span class='st'>"exiftool"</span>) <span class='kw'>!=</span> <span class='st'>""</span>){        <span class='co'># only run this example if ExifTool is available</span>
-<span class='no'>check.folders</span> <span class='kw'>&lt;-</span> <span class='fu'>checkSpeciesIdentification</span>(<span class='kw'>inDir</span>             <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
-                                            <span class='kw'>IDfrom</span>            <span class='kw'>=</span> <span class='st'>"directory"</span>,
-                                            <span class='kw'>hasCameraFolders</span>  <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                            <span class='kw'>maxDeltaTime</span>      <span class='kw'>=</span> <span class='fl'>120</span>,
-                                            <span class='kw'>writecsv</span>          <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-
-<span class='no'>check.folders</span>   <span class='co'># In the example, 2 different species were photographed within 2 minutes. </span>
-}</div><div class='output co'>#&gt; <span class='message'>StationA : checking 8 images in 2 directories</span></div><div class='output co'>#&gt; <span class='message'>StationB : checking 23 images in 4 directories</span></div><div class='output co'>#&gt; <span class='message'>StationC : checking 37 images in 4 directories</span></div><div class='output co'>#&gt; $temporalIndependenceCheck
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Sys.which.html'>Sys.which</a></span><span class='op'>(</span><span class='st'>"exiftool"</span><span class='op'>)</span> <span class='op'>!=</span> <span class='st'>""</span><span class='op'>)</span><span class='op'>{</span>        <span class='co'># only run this example if ExifTool is available</span>
+<span class='va'>check.folders</span> <span class='op'>&lt;-</span> <span class='fu'>checkSpeciesIdentification</span><span class='op'>(</span>inDir             <span class='op'>=</span> <span class='va'>wd_images_ID</span>,
+                                            IDfrom            <span class='op'>=</span> <span class='st'>"directory"</span>,
+                                            hasCameraFolders  <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                            maxDeltaTime      <span class='op'>=</span> <span class='fl'>120</span>,
+                                            writecsv          <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+                                     
+<span class='va'>check.folders</span>   <span class='co'># In the example, 2 different species were photographed within 2 minutes. </span>
+<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='message'>StationA : checking 8 images in 2 directories</span></div><div class='output co'>#&gt; <span class='message'>StationB : checking 23 images in 4 directories</span></div><div class='output co'>#&gt; <span class='message'>StationC : checking 37 images in 4 directories</span></div><div class='output co'>#&gt; $temporalIndependenceCheck
 #&gt;     station
 #&gt; 7  StationC
 #&gt; 29 StationC
@@ -241,39 +248,33 @@ From version 0.99.0, the function can also handle images identied with metadata 
 #&gt; data frame with 0 columns and 0 rows
 #&gt; </div><div class='input'><span class='co'># }</span>
 
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># now exclude one of these 2 species </span>
-<span class='no'>check.folders2</span> <span class='kw'>&lt;-</span> <span class='fu'>checkSpeciesIdentification</span>(<span class='kw'>inDir</span>             <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
-                                             <span class='kw'>IDfrom</span>            <span class='kw'>=</span> <span class='st'>"directory"</span>,
-                                             <span class='kw'>hasCameraFolders</span>  <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                             <span class='kw'>maxDeltaTime</span>      <span class='kw'>=</span> <span class='fl'>120</span>,
-                                             <span class='kw'>excludeSpecies</span>    <span class='kw'>=</span> <span class='st'>"EGY"</span>,
-                                             <span class='kw'>writecsv</span>          <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-
-<span class='no'>check.folders2</span>   <span class='co'># the data frame is empty</span>
+<span class='va'>check.folders2</span> <span class='op'>&lt;-</span> <span class='fu'>checkSpeciesIdentification</span><span class='op'>(</span>inDir             <span class='op'>=</span> <span class='va'>wd_images_ID</span>,
+                                             IDfrom            <span class='op'>=</span> <span class='st'>"directory"</span>,
+                                             hasCameraFolders  <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                             maxDeltaTime      <span class='op'>=</span> <span class='fl'>120</span>,
+                                             excludeSpecies    <span class='op'>=</span> <span class='st'>"EGY"</span>,
+                                             writecsv          <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>           
+  
+<span class='va'>check.folders2</span>   <span class='co'># the data frame is empty</span>
 
 <span class='co'># now we check only one station</span>
-<span class='no'>check.folders3</span> <span class='kw'>&lt;-</span> <span class='fu'>checkSpeciesIdentification</span>(<span class='kw'>inDir</span>             <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
-                                             <span class='kw'>IDfrom</span>            <span class='kw'>=</span> <span class='st'>"directory"</span>,
-                                             <span class='kw'>hasCameraFolders</span>  <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                                             <span class='kw'>maxDeltaTime</span>      <span class='kw'>=</span> <span class='fl'>120</span>,
-                                             <span class='kw'>stationsToCheck</span>   <span class='kw'>=</span> <span class='st'>"StationB"</span>,
-                                             <span class='kw'>writecsv</span>          <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='no'>check.folders3</span>   <span class='co'># the data frame is empty</span>
-}</div></pre>
-  </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#note">Note</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+<span class='va'>check.folders3</span> <span class='op'>&lt;-</span> <span class='fu'>checkSpeciesIdentification</span><span class='op'>(</span>inDir             <span class='op'>=</span> <span class='va'>wd_images_ID</span>,
+                                             IDfrom            <span class='op'>=</span> <span class='st'>"directory"</span>,
+                                             hasCameraFolders  <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                             maxDeltaTime      <span class='op'>=</span> <span class='fl'>120</span>,
+                                             stationsToCheck   <span class='op'>=</span> <span class='st'>"StationB"</span>,
+                                             writecsv          <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+<span class='va'>check.folders3</span>   <span class='co'># the data frame is empty</span>
+<span class='op'>}</span>
 
-    <h2>Author</h2>
-    <p>Juergen Niedballa</p>
+</div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -284,7 +285,7 @@ From version 0.99.0, the function can also handle images identied with metadata 
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

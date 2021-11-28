@@ -40,11 +40,12 @@
 
 
 <meta property="og:title" content="Optical character recognition (OCR) from data fields in digital images — OCRdataFields" />
-<meta property="og:description" content="
-
-Extracts information from the data fields in camera trap images (not the metadata). Many camera traps include data fields in camera trap images, often including date and time of images, and sometimes other information. This function extracts the information from these fields using optical character recognition provided by the package tesseract after reading images using the package magick.
-Normally all these information should be in the image metadata. This function is meant as a last resort if image metadata are unreadable or were removed from images. OCR is not perfect and may misidentify characters, so check the output carefully.
-The output of this function can be used in writeDateTimeOriginal to write date/time into the DateTimeOriginal tag in image metadata, making these images available for automatic processing with  recordTable and other functions that extract image metadata." />
+<meta property="og:description" content="Extracts information from the data fields in camera trap images (not the
+metadata). Many camera traps include data fields in camera trap images,
+often including date and time of images, and sometimes other information.
+This function extracts the information from these fields using optical
+character recognition provided by the package tesseract after reading
+images using the package magick." />
 
 
 
@@ -137,58 +138,76 @@ The output of this function can be used in writeDateTimeOriginal to write date/t
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Optical character recognition (OCR) from data fields in digital images</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/jniedballa/camtrapR/blob/master/R/OCRdataFields.R'><code>R/OCRdataFields.R</code></a></small>
     <div class="hidden name"><code>OCRdataFields.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    
-
-<p>Extracts information from the data fields in camera trap images (not the metadata). Many camera traps include data fields in camera trap images, often including date and time of images, and sometimes other information. This function extracts the information from these fields using optical character recognition provided by the package <span class="pkg">tesseract</span> after reading images using the package <span class="pkg">magick</span>.</p>
-<p>Normally all these information should be in the image metadata. This function is meant as a last resort if image metadata are unreadable or were removed from images. OCR is not perfect and may misidentify characters, so check the output carefully.</p>
-<p>The output of this function can be used in <code><a href='writeDateTimeOriginal.html'>writeDateTimeOriginal</a></code> to write date/time into the DateTimeOriginal tag in image metadata, making these images available for automatic processing with  <code><a href='recordTable.html'>recordTable</a></code> and other functions that extract image metadata.</p>
+    <p>Extracts information from the data fields in camera trap images (not the
+metadata). Many camera traps include data fields in camera trap images,
+often including date and time of images, and sometimes other information.
+This function extracts the information from these fields using optical
+character recognition provided by the package <span class="pkg">tesseract</span> after reading
+images using the package <span class="pkg">magick</span>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>OCRdataFields</span><span class='op'>(</span><span class='va'>inDir</span>,
-              <span class='va'>geometries</span>,
-              invert <span class='op'>=</span> <span class='cn'>FALSE</span>
-              <span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>OCRdataFields</span><span class='op'>(</span><span class='va'>inDir</span>, <span class='va'>geometries</span>, invert <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>inDir</th>
-      <td><p>character. Directory containing camera trap images (or subdirectories containing images)</p></td>
+      <td><p>character. Directory containing camera trap images (or
+subdirectories containing images)</p></td>
     </tr>
     <tr>
       <th>geometries</th>
-      <td><p>list. A (possibly named) list of geometry strings defining the image area(s) to extract.</p></td>
+      <td><p>list. A (possibly named) list of geometry strings defining
+the image area(s) to extract.</p></td>
     </tr>
     <tr>
       <th>invert</th>
-      <td><p>logical. Invert colors in the image? Set to TRUE if text in data field is white on black background. Leave if FALSE if text is black in white background.</p></td>
+      <td><p>logical. Invert colors in the image? Set to TRUE if text in
+data field is white on black background. Leave if FALSE if text is black in
+white background.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A <code>data.frame</code> with original directory and file names, and
+additional columns for the OCR data of each extracted geometry.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    
+    <p>Normally all these information should be in the image metadata. This
+function is meant as a last resort if image metadata are unreadable or were
+removed from images. OCR is not perfect and may misidentify characters, so
+check the output carefully.</p>
+<p>The output of this function can be used in
+<code><a href='writeDateTimeOriginal.html'>writeDateTimeOriginal</a></code> to write date/time into the
+DateTimeOriginal tag in image metadata, making these images available for
+automatic processing with <code><a href='recordTable.html'>recordTable</a></code> and other functions that
+extract image metadata.</p>
 
-<p>This function reads all images in inDir (including subdirectories), crops them to the geometries in the "geometries" list, and performs optical character recognition (OCR) on each of these fields (leveraging the magick and tesseract packages).</p>
-<p>Geometries are defined with <code>geometry_area</code> from <span class="pkg">magick</span>. See <code><a href='https://docs.ropensci.org/magick/reference/geometry.html'>geometry</a></code> for details on how to specify geometries with <code>geometry_area</code>. The format is: "widthxheight+x_off+y_off", where:</p>
-
-<p></p><dl>
-    <dt>width</dt><dd><p>width of the area of interest</p></dd>
-    <dt>height</dt><dd><p>height of the area of interest</p></dd>
-    <dt>x_off</dt><dd><p>offset from the left side of the image</p></dd>
-    <dt>y_off</dt><dd><p>offset from the top of the image</p></dd>
-
+<p>This function reads all images in inDir (including subdirectories), crops
+them to the geometries in the "geometries" list, and performs optical
+character recognition (OCR) on each of these fields (leveraging the magick
+and tesseract packages).</p>
+<p>Geometries are defined with <code>geometry_area</code> from <span class="pkg">magick</span>. See
+<code><a href='https://docs.ropensci.org/magick/reference/geometry.html'>geometry</a></code> for details on how to specify geometries with
+<code>geometry_area</code>. The format is: "widthxheight+x_off+y_off", where:</p>
+<dl>
+<dt>width</dt><dd><p>width of the area of interest</p></dd> <dt>height</dt><dd><p>height
+of the area of interest</p></dd> <dt>x_off</dt><dd><p>offset from the left side of the
+image</p></dd> <dt>y_off</dt><dd><p>offset from the top of the image</p></dd> 
 </dl>
 
-
-
-<p>Units are pixels for all fields. digiKam can help in identifying the correct specification for geometries. Open the Image Editor, left-click and draw a box around the data field of interest. Ensure the entire text field is included inside the box, but nothing else. Now note two pairs of numbers at the bottom of the window, showing the offsets and box size as e.g.:</p>
+<p>Units are pixels for all fields. digiKam can help in identifying the correct
+specification for geometries. Open the Image Editor, left-click and draw a
+box around the data field of interest. Ensure the entire text field is
+included inside the box, but nothing else. Now note two pairs of numbers at
+the bottom of the window, showing the offsets and box size as e.g.:</p>
 <p>"(400, 1800) (300 x 60)"</p>
 <p>This corresponds to the geometry values as follows:</p>
 <p>"(x_off, y_off) (width x height)"</p>
@@ -197,22 +216,22 @@ The output of this function can be used in writeDateTimeOriginal to write date/t
 <p>and receive</p>
 <p>"300x60+400+1800"</p>
 <p>as your geometry.</p>
-
-<p>OCR in tesseract has problems with white font on black background. If that is the case in your images, set <code>invert</code> to <code>TRUE</code> to invert the image and ensure OCR uses black text on white background.</p>
-
-<p>Even then, output will not be perfect. Error rates in OCR depend on multiple factors, including the text size and font type used. We don't have control over these, so check the output carefully and edit as required.</p>
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A <code>data.frame</code> with original directory and file names, and additional columns for the OCR data of each extracted geometry.</p>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Juergen Niedballa</p>
+<p>OCR in tesseract has problems with white font on black background. If that
+is the case in your images, set <code>invert</code> to <code>TRUE</code> to invert the
+image and ensure OCR uses black text on white background.</p>
+<p>Even then, output will not be perfect. Error rates in OCR depend on multiple
+factors, including the text size and font type used. We don't have control
+over these, so check the output carefully and edit as required.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='writeDateTimeOriginal.html'>writeDateTimeOriginal</a></code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
+
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='co'># dontrun is to avoid forcing users to install additional dependencies</span>
 
@@ -244,6 +263,7 @@ The output of this function can be used in writeDateTimeOriginal to write date/t
 <span class='co'># date and time are correct though</span>
                    
 <span class='op'>}</span>
+
 
 
 </div></pre>

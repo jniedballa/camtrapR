@@ -216,8 +216,8 @@
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>species</code> must be in the <code>speciesCol</code> of <code>recordTable</code>.</p>
-<p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in <span class="pkg">lubridate</span> via <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument "orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in <code>recordDateTimeFormat</code>.</p>
-<p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either "%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
+<p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in <span class="pkg">lubridate</span> via <code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument "orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in <code>recordDateTimeFormat</code>.</p>
+<p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either "%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or <code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Returns invisibly a vector of species record observation times in radians, i.e. scaled to  [\(0, 2\pi\)].
@@ -238,19 +238,15 @@ Mike Meredith and Martin Ridout (2018). overlap: Estimates of coefficient of ove
     <pre class="examples"><div class='input'><span class='co'># load record table</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>)</span>
 
-<span class='va'>species4activity</span> <span class='op'>&lt;-</span> <span class='st'>"VTA"</span>    <span class='co'># = Viverra tangalunga, Malay Civet</span>
+<span class='va'>species4activity</span> <span class='op'>&lt;-</span> <span class='st'>"VTA"</span>  <span class='co'># = Viverra tangalunga, Malay Civet</span>
 
-<span class='fu'>activityDensity</span><span class='op'>(</span>recordTable <span class='op'>=</span> <span class='va'>recordTableSample</span>,
-                species     <span class='op'>=</span> <span class='va'>species4activity</span><span class='op'>)</span>
+<span class='fu'>activityDensity</span><span class='op'>(</span>recordTable <span class='op'>=</span> <span class='va'>recordTableSample</span>, species <span class='op'>=</span> <span class='va'>species4activity</span><span class='op'>)</span>
 </div><div class='img'><img src='activityDensity-1.png' alt='' width='700' height='433' /></div><div class='input'>
 
 <span class='co'># all species at once</span>
 
-<span class='fu'>activityDensity</span><span class='op'>(</span>recordTable <span class='op'>=</span> <span class='va'>recordTableSample</span>,
-                allSpecies  <span class='op'>=</span> <span class='cn'>TRUE</span>,
-                writePNG    <span class='op'>=</span> <span class='cn'>FALSE</span>,
-                plotR       <span class='op'>=</span> <span class='cn'>TRUE</span>,
-                add.rug     <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'>activityDensity</span><span class='op'>(</span>recordTable <span class='op'>=</span> <span class='va'>recordTableSample</span>, allSpecies <span class='op'>=</span> <span class='cn'>TRUE</span>, writePNG <span class='op'>=</span> <span class='cn'>FALSE</span>,
+    plotR <span class='op'>=</span> <span class='cn'>TRUE</span>, add.rug <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='img'><img src='activityDensity-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='activityDensity-3.png' alt='' width='700' height='433' /></div><div class='img'><img src='activityDensity-4.png' alt='' width='700' height='433' /></div><div class='img'><img src='activityDensity-5.png' alt='' width='700' height='433' /></div><div class='img'><img src='activityDensity-6.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

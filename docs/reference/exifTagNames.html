@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -98,13 +98,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -115,7 +115,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jniedballa/camtrapR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -141,11 +141,11 @@
     <p>The function will return metadata values, metadata tag names and group names of Exif metadata of JPEG images or other formats.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>exifTagNames</span>(<span class='no'>inDir</span>,
-  <span class='kw'>whichSubDir</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='no'>fileName</span>,
-  <span class='kw'>returnMetadata</span> <span class='kw'>=</span> <span class='st'>"DEPRECATED"</span>,
-  <span class='kw'>returnTagGroup</span> <span class='kw'>=</span> <span class='st'>"DEPRECATED"</span>)</pre>
+    <pre class="usage"><span class='fu'>exifTagNames</span><span class='op'>(</span><span class='va'>inDir</span>, 
+  whichSubDir <span class='op'>=</span> <span class='fl'>1</span>,
+  <span class='va'>fileName</span>,
+  returnMetadata <span class='op'>=</span> <span class='st'>"DEPRECATED"</span>,
+  returnTagGroup <span class='op'>=</span> <span class='st'>"DEPRECATED"</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -182,41 +182,46 @@
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Phil Harvey's ExifTool <a href='https://exiftool.org/'>https://exiftool.org/</a> <br /></p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='recordTable.html'>recordTable</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 
-<span class='no'>wd_images_ID</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_species_dir"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='va'>wd_images_ID</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"pictures/sample_images_species_dir"</span>,
+    package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span>
 
-<span class='co'># specify directory, camtrapR will automatically take first image from first subdirectory</span>
-<span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID</span>)
+<span class='co'># specify directory, camtrapR will automatically take first</span>
+<span class='co'># image from first subdirectory</span>
+<span class='fu'>exifTagNames</span><span class='op'>(</span>inDir <span class='op'>=</span> <span class='va'>wd_images_ID</span><span class='op'>)</span>
 
 <span class='co'># specify subdirectory by name, camtrapR will use first image</span>
-<span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
-             <span class='kw'>whichSubDir</span>    <span class='kw'>=</span> <span class='st'>"StationA"</span>)
+<span class='fu'>exifTagNames</span><span class='op'>(</span>inDir <span class='op'>=</span> <span class='va'>wd_images_ID</span>, whichSubDir <span class='op'>=</span> <span class='st'>"StationA"</span><span class='op'>)</span>
 
 <span class='co'># specifying fileName only (line break due to R package policy)</span>
-<span class='fu'>exifTagNames</span>(<span class='kw'>fileName</span>       <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>wd_images_ID</span>, <span class='st'>"StationC"</span>, <span class='st'>"TRA"</span>,
-                                        <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span>))
+<span class='fu'>exifTagNames</span><span class='op'>(</span>fileName <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>wd_images_ID</span>, <span class='st'>"StationC"</span>, <span class='st'>"TRA"</span>,
+    <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># specify inDir and fileName</span>
-<span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID</span>,
-             <span class='kw'>fileName</span>       <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"StationC"</span>, <span class='st'>"TRA"</span>, <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span>))
+<span class='fu'>exifTagNames</span><span class='op'>(</span>inDir <span class='op'>=</span> <span class='va'>wd_images_ID</span>, fileName <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"StationC"</span>,
+    <span class='st'>"TRA"</span>, <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># it also works this way</span>
-<span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='no'>wd_images_ID</span>, <span class='st'>"StationC"</span>, <span class='st'>"TRA"</span>),
-             <span class='kw'>fileName</span>       <span class='kw'>=</span> <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span>)
+<span class='fu'>exifTagNames</span><span class='op'>(</span>inDir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>wd_images_ID</span>, <span class='st'>"StationC"</span>, <span class='st'>"TRA"</span><span class='op'>)</span>,
+    fileName <span class='op'>=</span> <span class='st'>"StationC__2009-05-02__00-10-00(1).JPG"</span><span class='op'>)</span>
 
 
 <span class='co'># with tagged sample images</span>
-<span class='no'>wd_images_ID_tagged</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/sample_images_indiv_tag"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
-<span class='fu'>exifTagNames</span>(<span class='kw'>inDir</span>          <span class='kw'>=</span> <span class='no'>wd_images_ID_tagged</span>)
+<span class='va'>wd_images_ID_tagged</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"pictures/sample_images_indiv_tag"</span>,
+    package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span>
+<span class='fu'>exifTagNames</span><span class='op'>(</span>inDir <span class='op'>=</span> <span class='va'>wd_images_ID_tagged</span><span class='op'>)</span>
 
-}</div></pre>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -232,7 +237,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

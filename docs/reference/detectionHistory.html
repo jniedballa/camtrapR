@@ -40,7 +40,11 @@
 
 
 <meta property="og:title" content="Species detection histories for occupancy analyses — detectionHistory" />
-<meta property="og:description" content="This function generates species detection histories that can be used in occupancy analyses, e.g. with package unmarked. It generates detection histories in different formats, with adjustable occasion length and occasion start time." />
+<meta property="og:description" content="This function generates species detection histories that can be used in
+occupancy analyses, e.g. with package
+unmarked. It generates detection histories
+in different formats, with adjustable occasion length and occasion start
+time." />
 
 
 
@@ -133,35 +137,40 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Species detection histories for occupancy analyses</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/jniedballa/camtrapR/blob/master/R/detectionHistory.R'><code>R/detectionHistory.R</code></a></small>
     <div class="hidden name"><code>detectionHistory.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function generates species detection histories that can be used in occupancy analyses, e.g. with package <a href='https://rdrr.io/pkg/unmarked/man/unmarked-package.html'>unmarked</a>. It generates detection histories in different formats, with adjustable occasion length and occasion start time.</p>
+    <p>This function generates species detection histories that can be used in
+occupancy analyses, e.g. with package
+<a href='https://rdrr.io/pkg/unmarked/man/unmarked-package.html'>unmarked</a>. It generates detection histories
+in different formats, with adjustable occasion length and occasion start
+time.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>detectionHistory</span><span class='op'>(</span><span class='va'>recordTable</span>,
- <span class='va'>species</span>,
- <span class='va'>camOp</span>,
- output <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"binary"</span>, <span class='st'>"count"</span><span class='op'>)</span>,
- stationCol <span class='op'>=</span> <span class='st'>"Station"</span>,
- speciesCol <span class='op'>=</span> <span class='st'>"Species"</span>,
- recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
- recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>,
- <span class='va'>occasionLength</span>,
- <span class='va'>minActiveDaysPerOccasion</span>,
- <span class='va'>maxNumberDays</span>,
- <span class='va'>day1</span>,
- <span class='va'>buffer</span>,
- includeEffort <span class='op'>=</span> <span class='cn'>TRUE</span>,
- scaleEffort <span class='op'>=</span> <span class='cn'>FALSE</span>,
- occasionStartTime <span class='op'>=</span> <span class='st'>"deprecated"</span>,
- datesAsOccasionNames <span class='op'>=</span> <span class='cn'>FALSE</span>,
- <span class='va'>timeZone</span>,
- writecsv <span class='op'>=</span> <span class='cn'>FALSE</span>,
- <span class='va'>outDir</span>,
- <span class='va'>unmarkedMultFrameInput</span>
+    <pre class="usage"><span class='fu'>detectionHistory</span><span class='op'>(</span>
+  <span class='va'>recordTable</span>,
+  <span class='va'>species</span>,
+  <span class='va'>camOp</span>,
+  output <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"binary"</span>, <span class='st'>"count"</span><span class='op'>)</span>,
+  stationCol <span class='op'>=</span> <span class='st'>"Station"</span>,
+  speciesCol <span class='op'>=</span> <span class='st'>"Species"</span>,
+  recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd hms"</span>,
+  <span class='va'>occasionLength</span>,
+  <span class='va'>minActiveDaysPerOccasion</span>,
+  <span class='va'>maxNumberDays</span>,
+  <span class='va'>day1</span>,
+  <span class='va'>buffer</span>,
+  includeEffort <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  scaleEffort <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  occasionStartTime <span class='op'>=</span> <span class='st'>"deprecated"</span>,
+  datesAsOccasionNames <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>timeZone</span>,
+  writecsv <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>outDir</span>,
+  <span class='va'>unmarkedMultFrameInput</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -169,35 +178,43 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>recordTable</th>
-      <td><p>data.frame. the record table created by <code><a href='recordTable.html'>recordTable</a></code></p></td>
+      <td><p>data.frame. the record table created by
+<code><a href='recordTable.html'>recordTable</a></code></p></td>
     </tr>
     <tr>
       <th>species</th>
-      <td><p>character. the species for which to compute the detection history</p></td>
+      <td><p>character. the species for which to compute the detection
+history</p></td>
     </tr>
     <tr>
       <th>camOp</th>
-      <td><p>The camera operability matrix as created by <code><a href='cameraOperation.html'>cameraOperation</a></code></p></td>
+      <td><p>The camera operability matrix as created by
+<code><a href='cameraOperation.html'>cameraOperation</a></code></p></td>
     </tr>
     <tr>
       <th>output</th>
-      <td><p>character. Return binary detections ("binary") or counts of detections ("count")</p></td>
+      <td><p>character. Return binary detections ("binary") or counts of
+detections ("count")</p></td>
     </tr>
     <tr>
       <th>stationCol</th>
-      <td><p>character. name of the column specifying Station ID in <code>recordTable</code></p></td>
+      <td><p>character. name of the column specifying Station ID in
+<code>recordTable</code></p></td>
     </tr>
     <tr>
       <th>speciesCol</th>
-      <td><p>character. name of the column specifying species in <code>recordTable</code></p></td>
+      <td><p>character. name of the column specifying species in
+<code>recordTable</code></p></td>
     </tr>
     <tr>
       <th>recordDateTimeCol</th>
-      <td><p>character. name of the column specifying date and time in <code>recordTable</code></p></td>
+      <td><p>character. name of the column specifying date and
+time in <code>recordTable</code></p></td>
     </tr>
     <tr>
       <th>recordDateTimeFormat</th>
-      <td><p>character. Format of column <code>recordDateTimeCol</code> in <code>recordTable</code></p></td>
+      <td><p>character. Format of column
+<code>recordDateTimeCol</code> in <code>recordTable</code></p></td>
     </tr>
     <tr>
       <th>occasionLength</th>
@@ -205,39 +222,50 @@
     </tr>
     <tr>
       <th>minActiveDaysPerOccasion</th>
-      <td><p>integer. minimum number of active trap days for occasions to be included (optional)</p></td>
+      <td><p>integer. minimum number of active trap days
+for occasions to be included (optional)</p></td>
     </tr>
     <tr>
       <th>maxNumberDays</th>
-      <td><p>integer. maximum number of trap days per station (optional)</p></td>
+      <td><p>integer. maximum number of trap days per station
+(optional)</p></td>
     </tr>
     <tr>
       <th>day1</th>
-      <td><p>character. When should occasions begin: station setup date ("station"), first day of survey ("survey"), a specific date (e.g. "2015-12-31")?</p></td>
+      <td><p>character. When should occasions begin: station setup date
+("station"), first day of survey ("survey"), a specific date (e.g.
+"2015-12-31")?</p></td>
     </tr>
     <tr>
       <th>buffer</th>
-      <td><p>integer. Makes the first occasion begin a number of days after station setup. (optional)</p></td>
+      <td><p>integer. Makes the first occasion begin a number of days after
+station setup. (optional)</p></td>
     </tr>
     <tr>
       <th>includeEffort</th>
-      <td><p>logical. Compute trapping effort (number of active camera trap days per station and occasion)?</p></td>
+      <td><p>logical. Compute trapping effort (number of active
+camera trap days per station and occasion)?</p></td>
     </tr>
     <tr>
       <th>scaleEffort</th>
-      <td><p>logical. scale and center effort matrix to mean = 0 and sd = 1?</p></td>
+      <td><p>logical. scale and center effort matrix to mean = 0 and
+sd = 1?</p></td>
     </tr>
     <tr>
       <th>occasionStartTime</th>
-      <td><p>(DEPRECATED) integer. time of day (the full hour) at which to begin occasions. Please use argument <code>occasionStartTime</code> in <code><a href='cameraOperation.html'>cameraOperation</a></code> instead.</p></td>
+      <td><p>(DEPRECATED) integer. time of day (the full hour)
+at which to begin occasions. Please use argument <code>occasionStartTime</code> in
+<code><a href='cameraOperation.html'>cameraOperation</a></code> instead.</p></td>
     </tr>
     <tr>
       <th>datesAsOccasionNames</th>
-      <td><p>If <code>day1 = "survey"</code>, occasion names in the detection history will be composed of first and last day of that occasion.</p></td>
+      <td><p>If <code>day1 = "survey"</code>, occasion names in the
+detection history will be composed of first and last day of that occasion.</p></td>
     </tr>
     <tr>
       <th>timeZone</th>
-      <td><p>character. Must be a value returned by <code><a href='https://rdrr.io/r/base/timezones.html'>OlsonNames</a></code></p></td>
+      <td><p>character. Must be a value returned by
+<code><a href='https://rdrr.io/r/base/timezones.html'>OlsonNames</a></code></p></td>
     </tr>
     <tr>
       <th>writecsv</th>
@@ -245,43 +273,93 @@
     </tr>
     <tr>
       <th>outDir</th>
-      <td><p>character. Directory into which detection history .csv file is saved</p></td>
+      <td><p>character. Directory into which detection history .csv file is
+saved</p></td>
     </tr>
     <tr>
       <th>unmarkedMultFrameInput</th>
-      <td><p>logical. Return input for multi-season occupancy models in unmarked (argument "y" in <code><a href='https://rdrr.io/pkg/unmarked/man/unmarkedMultFrame.html'>unmarkedMultFrame</a></code>?</p></td>
+      <td><p>logical. Return input for multi-season
+occupancy models in unmarked (argument "y" in
+<code><a href='https://rdrr.io/pkg/unmarked/man/unmarkedMultFrame.html'>unmarkedMultFrame</a></code>?</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    
-
-<p>The function computes a species detection matrix, either as a detection-by-date or a detection-by-occasion matrix. <code>day1</code> defines if each stations detection history will begin on that station's setup day (<code>day1 = "station"</code>) or if all station's detection histories have a common origin (the day the first station was set up if <code>day1 = "survey"</code> or a fixed date if, e.g. <code>day1 = "2015-12-31"</code>). If <code>day1</code> is a date, <code><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></code> must be able to understand it. The most suitable format is "YYYY-MM-DD", e.g. "2015-12-31".</p>
-<p><code>output</code> is analogous to <code><a href='spatialDetectionHistory.html'>spatialDetectionHistory</a></code>. It makes the function return either counts of detections during occasions, or a binary indicator for whether the species was detected.</p>
-<p><code>includeEffort</code> controls whether an additional effort matrix is computed or not. This also affects the detection matrices. If <code>includeEffort = FALSE</code>, all occasions in which a station was not set up or malfunctioning (NA or 0 in <code>camOp</code>) will result in NAs in the detection history. If <code>includeEffort = TRUE</code>, the record history will only contain 0 and 1, and no NAs. The effort matrix can then be included in occupancy models as a (continuous) observation covariate to estimate the effect of effort on detection probability.</p>
-<p>The number of days that are aggregated is controlled by <code>occasionLength</code>. <code>occasionStartTime</code> will be removed from the function. It has moved to <code><a href='cameraOperation.html'>cameraOperation</a></code>, to ensure daily effort is computed correctly and takes the occasion start time into account. <!-- %can be used to make occasions begin another hour than midnight (the default). This may be relevant for nocturnal animals, in which 1 whole night would be considered an occasion. --></p>
-<p>The values of <code>stationCol</code> in <code>recordTable</code> must be matched by the row names of <code>camOp</code> (case-insensitive), otherwise an error is raised.</p>
-<p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in <span class="pkg">lubridate</span> via <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument "orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in <code>recordDateTimeFormat</code>.</p>
-<p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either "%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or <code><a href='http://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
-<p>If the camera operation matrix (<code>camOp</code>) was created for a multi-season study (argument <code>sesssionCol</code> in <code><a href='cameraOperation.html'>cameraOperation</a></code> was set, it will be detected automatically. Output can be for unmarkedMultFrame by setting <code>unmarkedMultFrameInput = TRUE</code>. Each row corresponds to a site, and the columns are in season-major, occasion-minor order, e.g. season1-occasion1, season1-occasion2, etc.).</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Depending on the value of <code>includeEffort</code> and <code>scaleEffort</code>, a list with either 1, 2 or 3 elements. The first element is the species detection history. The second is the optional effort matrix and the third contains the effort scaling parameters.</p>
-<dt>detection_history</dt><dd><p>A species detection matrix</p></dd>
-  <dt>effort</dt><dd><p>A matrix giving the number of active camera trap days per station and occasion (= camera trapping effort). It is only returned if <code>includeEffort = TRUE</code></p></dd>
-  <dt>effort_scaling_parameters</dt><dd><p>Scaling parameters of the effort matrix. It is only returned if <code>includeEffort</code> and <code>scaleEffort</code> are <code>TRUE</code></p></dd>
+    <p>Depending on the value of <code>includeEffort</code> and
+<code>scaleEffort</code>, a list with either 1, 2 or 3 elements. The first element
+is the species detection history. The second is the optional effort matrix
+and the third contains the effort scaling parameters.</p>
+<dt>detection_history</dt><dd><p>A species detection matrix</p></dd> <dt>effort</dt><dd><p>A matrix
+giving the number of active camera trap days per station and occasion (=
+camera trapping effort). It is only returned if <code>includeEffort = TRUE</code></p></dd>
+<dt>effort_scaling_parameters</dt><dd><p>Scaling parameters of the effort matrix. It
+is only returned if <code>includeEffort</code> and <code>scaleEffort</code> are
+<code>TRUE</code></p></dd>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The function computes a species detection matrix, either as a
+detection-by-date or a detection-by-occasion matrix. <code>day1</code> defines if
+each stations detection history will begin on that station's setup day
+(<code>day1 = "station"</code>) or if all station's detection histories have a
+common origin (the day the first station was set up if <code>day1 =
+"survey"</code> or a fixed date if, e.g. <code>day1 = "2015-12-31"</code>). If
+<code>day1</code> is a date, <code><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></code> must be able to
+understand it. The most suitable format is "YYYY-MM-DD", e.g. "2015-12-31".</p>
+<p><code>output</code> is analogous to <code><a href='spatialDetectionHistory.html'>spatialDetectionHistory</a></code>. It
+makes the function return either counts of detections during occasions, or a
+binary indicator for whether the species was detected.</p>
+<p><code>includeEffort</code> controls whether an additional effort matrix is
+computed or not. This also affects the detection matrices. If
+<code>includeEffort = FALSE</code>, all occasions in which a station was not set
+up or malfunctioning (NA or 0 in <code>camOp</code>) will result in NAs in the
+detection history. If <code>includeEffort = TRUE</code>, the record history will
+only contain 0 and 1, and no NAs. The effort matrix can then be included in
+occupancy models as a (continuous) observation covariate to estimate the
+effect of effort on detection probability.</p>
+<p>The number of days that are aggregated is controlled by
+<code>occasionLength</code>. <code>occasionStartTime</code> will be removed from the
+function. It has moved to <code><a href='cameraOperation.html'>cameraOperation</a></code>, to ensure daily
+effort is computed correctly and takes the occasion start time into account.
+<!-- %can be used to make occasions begin another hour than midnight (the -->
+default). This may be relevant for nocturnal animals, in which 1 whole night
+would be considered an occasion.</p>
+<p>The values of <code>stationCol</code> in <code>recordTable</code> must be matched by the
+row names of <code>camOp</code> (case-insensitive), otherwise an error is raised.</p>
+<p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS"
+convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be
+interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in
+<span class="pkg">lubridate</span> via <code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument
+"orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in
+<code>recordDateTimeFormat</code>.</p>
+<p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either
+"%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date
+and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or
+<code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
+<p>If the camera operation matrix (<code>camOp</code>) was created for a multi-season
+study (argument <code>sesssionCol</code> in <code><a href='cameraOperation.html'>cameraOperation</a></code> was set,
+it will be detected automatically. Output can be for unmarkedMultFrame by
+setting <code>unmarkedMultFrameInput = TRUE</code>. Each row corresponds to a
+site, and the columns are in season-major, occasion-minor order, e.g.
+season1-occasion1, season1-occasion2, etc.).</p>
     <h2 class="hasAnchor" id="warning"><a class="anchor" href="#warning"></a>Warning</h2>
 
-    <p>Setting <code>output = "count"</code> returns a count of detections, not individuals. We strongly advise against using it as input for models of animal abundance (such as N-Mixture models) models which use counts as input.</p>
-<p>Please note the section about defining argument <code>timeZone</code> in the vignette on data extraction (accessible via <code>vignette("DataExtraction")</code> or online (<a href='https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html'>https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html</a>)).</p>
+    <p>Setting <code>output = "count"</code> returns a count of
+detections, not individuals. We strongly advise against using it as input
+for models of animal abundance (such as N-Mixture models) models which use
+counts as input.</p>
+<p>Please note the section about defining argument <code>timeZone</code> in the
+vignette on data extraction (accessible via
+<code>vignette("DataExtraction")</code> or online
+(<a href='https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html'>https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html</a>)).</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Juergen Niedballa</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
+
 <span class='co'># define image directory</span>
 <span class='va'>wd_images_ID</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"pictures/sample_images_species_dir"</span>, package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span>
 
@@ -294,7 +372,7 @@
                                     setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
                                     retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
                                     hasProblems  <span class='op'>=</span> <span class='cn'>FALSE</span>,
-                                    dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+                                    dateFormat   <span class='op'>=</span> <span class='st'>"dmy"</span>
 <span class='op'>)</span>
 
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
@@ -326,7 +404,7 @@
                             includeEffort        <span class='op'>=</span> <span class='cn'>FALSE</span>,
                             timeZone             <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
 <span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
 <span class='va'>DetHist1</span>                     <span class='co'># this is a list with 1 element</span>
 </div><div class='output co'>#&gt; $detection_history
 #&gt;          o1 o2 o3 o4 o5 o6 o7
@@ -353,7 +431,7 @@
                              scaleEffort          <span class='op'>=</span> <span class='cn'>FALSE</span>,
                              timeZone             <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
 <span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
 <span class='va'>DetHist2</span><span class='op'>$</span><span class='va'>detection_history</span>  <span class='co'># detection history  (alternatively, use: DetHist2[[1]])</span>
 </div><div class='output co'>#&gt;          o1 o2 o3 o4 o5 o6 o7
 #&gt; StationA  0  1  0  0  1  0  0
@@ -365,19 +443,19 @@
 #&gt; StationC 6.5  7  7  7  7  7 1.5</div><div class='input'>
 <span class='co'># with effort / using lubridate package to define recordDateTimeFormat</span>
 <span class='va'>DetHist2_lub</span> <span class='op'>&lt;-</span> <span class='fu'>detectionHistory</span><span class='op'>(</span>recordTable          <span class='op'>=</span> <span class='va'>recordTableSample</span>,
-                             camOp                <span class='op'>=</span> <span class='va'>camop_no_problem</span>,
-                             stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
-                             speciesCol           <span class='op'>=</span> <span class='st'>"Species"</span>,
-                             recordDateTimeCol    <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                             recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd HMS"</span>,
-                             species              <span class='op'>=</span> <span class='st'>"VTA"</span>,
-                             occasionLength       <span class='op'>=</span> <span class='fl'>7</span>,
-                             day1                 <span class='op'>=</span> <span class='st'>"station"</span>,
-                             datesAsOccasionNames <span class='op'>=</span> <span class='cn'>FALSE</span>,
-                             includeEffort        <span class='op'>=</span> <span class='cn'>TRUE</span>,
-                             scaleEffort          <span class='op'>=</span> <span class='cn'>FALSE</span>,
-                             timeZone             <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
-<span class='op'>)</span>
+                                 camOp                <span class='op'>=</span> <span class='va'>camop_no_problem</span>,
+                                 stationCol           <span class='op'>=</span> <span class='st'>"Station"</span>,
+                                 speciesCol           <span class='op'>=</span> <span class='st'>"Species"</span>,
+                                 recordDateTimeCol    <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+                                 recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd HMS"</span>,
+                                 species              <span class='op'>=</span> <span class='st'>"VTA"</span>,
+                                 occasionLength       <span class='op'>=</span> <span class='fl'>7</span>,
+                                 day1                 <span class='op'>=</span> <span class='st'>"station"</span>,
+                                 datesAsOccasionNames <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                 includeEffort        <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                                 scaleEffort          <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                                 timeZone             <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
+<span class='op'>)</span>    
 
 <span class='va'>DetHist2_lub</span><span class='op'>$</span><span class='va'>detection_history</span>  <span class='co'># detection history  (alternatively, use: DetHist2_lub[[1]])</span>
 </div><div class='output co'>#&gt;          o1 o2 o3 o4 o5 o6 o7
@@ -402,7 +480,7 @@
                                     sessionCol   <span class='op'>=</span> <span class='st'>"session"</span>,
                                     retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
                                     hasProblems  <span class='op'>=</span> <span class='cn'>TRUE</span>,
-                                    dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+                                    dateFormat   <span class='op'>=</span> <span class='st'>"dmy"</span>
 <span class='op'>)</span>
 
 <span class='co'># multi-season detection history</span>
@@ -419,7 +497,7 @@
                             timeZone               <span class='op'>=</span> <span class='st'>"UTC"</span>,
                             unmarkedMultFrameInput <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
 <span class='va'>DetHist_multi</span>
 </div><div class='output co'>#&gt; $detection_history
 #&gt;          o1 o2 o3 o4 o5 o6 o7 o8 o1 o2 o3 o4 o5 o6 o7 o8
@@ -435,6 +513,7 @@
 #&gt; StationC 9.5 10 10  8  NA NA NA NA 9.5 10 10  8  NA NA NA  NA
 #&gt; StationD  NA NA NA NA  NA NA NA NA 9.5 10 10 10 6.0  3 10 4.5
 #&gt; </div><div class='input'>
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

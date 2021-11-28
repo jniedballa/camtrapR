@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -98,13 +98,13 @@
       <a href="../articles/camtrapr1.html">1. Organising raw camera trap images in camtrapR</a>
     </li>
     <li>
-      <a href="../articles/camtrapr2.html">2. Identifying species and individuals in camtrapR</a>
+      <a href="../articles/camtrapr2.html">2. Species and Individual Identification</a>
     </li>
     <li>
-      <a href="../articles/camtrapr3.html">3. Extracting Data from Camera Trapping Images and videos, creating occupancy &amp; secr input</a>
+      <a href="../articles/camtrapr3.html">3. Data Extraction from Images and videos, creating occupancy &amp; secr input</a>
     </li>
     <li>
-      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation in camtrapR</a>
+      <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
   </ul>
 </li>
@@ -115,7 +115,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jniedballa/camtrapR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -141,13 +141,13 @@
     <p>The function renames and copies raw camera trap images into a new location where they can be identified. Images are renamed with camera trap station ID, camera ID (optional), creation date and a numeric identifier for images taken within one minute of each other at a given station. Station ID and camera ID are derived from the raw image directory structure. The creation date is extracted from image metadata using ExifTool.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>imageRename</span>(<span class='no'>inDir</span>,
-  <span class='no'>outDir</span>,
-  <span class='no'>hasCameraFolders</span>,
-  <span class='no'>keepCameraSubfolders</span>,
-  <span class='kw'>createEmptyDirectories</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>copyImages</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>writecsv</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>imageRename</span><span class='op'>(</span><span class='va'>inDir</span>, 
+  <span class='va'>outDir</span>, 
+  <span class='va'>hasCameraFolders</span>,
+  <span class='va'>keepCameraSubfolders</span>,
+  createEmptyDirectories <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  copyImages <span class='op'>=</span> <span class='cn'>FALSE</span>, 
+  writecsv <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -195,50 +195,54 @@
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Phil Harvey's ExifTool <a href='https://exiftool.org/'>https://exiftool.org/</a></p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Juergen Niedballa</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 
-  <span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-
+  <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+  
 <span class='co'>### "trial" run. create a table with file names after renaming, but don't copy images.</span>
 
 <span class='co'># first, find sample image directory in package directory:</span>
-<span class='no'>wd_images_raw</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/raw_images"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='va'>wd_images_raw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"pictures/raw_images"</span>, package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span>
 
 <span class='co'># because copyImages = FALSE, outDir does not need to be defined</span>
-<span class='no'>renaming.table</span> <span class='kw'>&lt;-</span> <span class='fu'>imageRename</span>(<span class='kw'>inDir</span>               <span class='kw'>=</span> <span class='no'>wd_images_raw</span>,
-                              <span class='kw'>hasCameraFolders</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                              <span class='kw'>copyImages</span>          <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                              <span class='kw'>writecsv</span>            <span class='kw'>=</span> <span class='fl'>FALSE</span>
-  )
+<span class='va'>renaming.table</span> <span class='op'>&lt;-</span> <span class='fu'>imageRename</span><span class='op'>(</span>inDir               <span class='op'>=</span> <span class='va'>wd_images_raw</span>,     
+                              hasCameraFolders <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                              copyImages          <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                              writecsv            <span class='op'>=</span> <span class='cn'>FALSE</span>
+  <span class='op'>)</span>
 
 
-
+  
 <span class='co'>### a real example in which images are copied and renamed </span>
 
   <span class='co'># define raw image location</span>
-<span class='no'>wd_images_raw</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"pictures/raw_images"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"camtrapR"</span>)
+<span class='va'>wd_images_raw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"pictures/raw_images"</span>, package <span class='op'>=</span> <span class='st'>"camtrapR"</span><span class='op'>)</span> 
 
   <span class='co'># define destination for renamed images</span>
-<span class='no'>wd_images_raw_renamed</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span>(), <span class='st'>"raw_images_renamed"</span>)
+<span class='va'>wd_images_raw_renamed</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"raw_images_renamed"</span><span class='op'>)</span>       
 
 
   <span class='co'># now we have to define outDir because copyImages = TRUE</span>
-<span class='no'>renaming.table2</span> <span class='kw'>&lt;-</span> <span class='fu'>imageRename</span>(<span class='kw'>inDir</span>               <span class='kw'>=</span> <span class='no'>wd_images_raw</span>,
-                               <span class='kw'>outDir</span>              <span class='kw'>=</span> <span class='no'>wd_images_raw_renamed</span>,
-                               <span class='kw'>hasCameraFolders</span>    <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-                               <span class='kw'>copyImages</span>          <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-                               <span class='kw'>writecsv</span>            <span class='kw'>=</span> <span class='fl'>FALSE</span>
-  )
-
+<span class='va'>renaming.table2</span> <span class='op'>&lt;-</span> <span class='fu'>imageRename</span><span class='op'>(</span>inDir               <span class='op'>=</span> <span class='va'>wd_images_raw</span>,
+                               outDir              <span class='op'>=</span> <span class='va'>wd_images_raw_renamed</span>,       
+                               hasCameraFolders    <span class='op'>=</span> <span class='cn'>FALSE</span>,
+                               copyImages          <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                               writecsv            <span class='op'>=</span> <span class='cn'>FALSE</span>
+  <span class='op'>)</span>
+  
   <span class='co'># show output files</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span>(<span class='no'>wd_images_raw_renamed</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
+  <span class='fu'><a href='https://rdrr.io/r/base/list.files.html'>list.files</a></span><span class='op'>(</span><span class='va'>wd_images_raw_renamed</span>, recursive <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+  
   <span class='co'># output table</span>
-  <span class='no'>renaming.table2</span>
-
-  }</div></pre>
+  <span class='va'>renaming.table2</span>
+  
+  <span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -254,7 +258,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

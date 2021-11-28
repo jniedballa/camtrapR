@@ -156,6 +156,7 @@
 <li>function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument “lattice”, which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)</li>
 <li>surveyReport: new argument camOp (for a camera operation matrix), argument CTHasProblems is deprecated. Improved calculation of survey effort.</li>
 <li>timeShiftImages / addCopyrightTag: added argument “ignoreMinorErrors”, set it to TRUE if functions fails due to bad MakerNotes (reported by An The Truong Nguyen)</li>
+<li>detectionMaps uses package sf instead of sp and rgdal</li>
 </ul>
 </div>
 <div id="bugfixes" class="section level2">
@@ -174,8 +175,9 @@
 <h2 class="hasAnchor">
 <a href="#other-changes" class="anchor"></a>other changes</h2>
 <ul>
-<li>lubdidate is a dependency now (for cameraOperation)</li>
+<li>lubridate is a dependency now (for cameraOperation)</li>
 <li>additional Suggests: magick and tesseract (for OCRdataFields), lattice (for camopPlot)</li>
+<li>roxygen2 documentation</li>
 </ul>
 </div>
 </div>
@@ -355,7 +357,7 @@
 <li>tibbles (tidyverse) or data.tables support: all functions that require input data frames don’t throw errors if these are are tibbles or data.tables, instead they automatically convert them to data.frames with a message</li>
 <li>lubridate support: date and date-time formats as defined by lubridate are now supported (e.g. “ymd” instead of “%Y-%m-%d” or “ymd HMS” instead of “%Y-%m-%d %H:%M:%S”)</li>
 <li>activityOverlap: main plot title contains species names by default without being specified</li>
-<li>recordTable / recordTableIndividual: 2 new arguments, “eventSummaryColumn”" and “eventSummaryFunction” for statistics by event (e.g. max count)</li>
+<li>recordTable / recordTableIndividual: 2 new arguments, “eventSummaryColumn”” and “eventSummaryFunction” for statistics by event (e.g. max count)</li>
 <li>recordTable / recordTableIndividual: return additional column “n_images” indicating the number of images in an event</li>
 <li>progress bar in console for all functions that extract image metadata</li>
 <li>exifTagNames: more flexible, users can define subdirectories by name and give desired file names</li>
