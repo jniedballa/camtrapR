@@ -158,7 +158,7 @@
 #' @section Warning : Custom image metadata must be organised hierarchically
 #' (tag group - tag; e.g. "Species" - "Leopard Cat"). Detailed information on
 #' how to set up and use metadata tags can be found in
-#' \href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html#metadata-taggingvignette
+#' \href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html#metadata-tagging}{vignette
 #' 2: Species and Individual Identification}.
 #' 
 #' Custom image metadata tags must be written to the images. The function
