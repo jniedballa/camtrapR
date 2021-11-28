@@ -1,3 +1,116 @@
+#' Generate maps of observed species richness and species presences by station
+#' 
+#' Generates maps of observed species richness and species presence by species
+#' and station. Output can be R graphics, PNG graphics or a shapefile for use
+#' in GIS software.
+#' 
+#' The column name \code{stationCol} must be identical in \code{CTtable} and
+#' \code{recordTable} and station IDs must match.
+#' 
+#' Shapefile creation depends on the packages \pkg{sp} and \pkg{rgdal}.
+#' Argument \code{shapefileProjection} must be a valid argument of
+#' \code{\link[sp:CRS-class]{CRS}}. If \code{shapefileProjection} is undefined,
+#' the resulting shapefile will lack a coordinate reference system.
+#' 
+#' @param CTtable data.frame. contains station IDs and coordinates
+#' @param Xcol character. name of the column specifying x coordinates in
+#' \code{CTtable}
+#' @param Ycol character. name of the column specifying y coordinates in
+#' \code{CTtable}
+#' @param backgroundPolygon SpatialPolygons or SpatialPolygonsDataFrame.
+#' Polygon to be plotted in the background of the map (e.g. project area
+#' boundary)
+#' @param stationCol character. name of the column specifying station ID in
+#' \code{CTtable} and \code{recordTable}
+#' @param recordTable data.frame. the record table created by
+#' \code{\link{recordTable}}
+#' @param speciesCol character. name of the column specifying species in
+#' \code{recordTable}
+#' @param speciesToShow character. Species to include in the maps. If missing,
+#' all species in \code{recordTable} will be included.
+#' @param writePNG logical. Create PNGs of the plots?
+#' @param plotR logical. Create plots in R graphics device?
+#' @param plotDirectory character. Directory in which to save the PNGs
+#' @param createPlotDir logical. Create \code{plotDirectory}?
+#' @param richnessPlot logical. Generate a species richness plot?
+#' @param speciesPlots logical. Generate plots of all species number of
+#' independent events?
+#' @param printLabels logical. Add station labels to the plots?
+#' @param smallPoints numeric. Number by which to decrease point sizes in plots
+#' (optional).
+#' @param addLegend logical. Add legends to the plots?
+#' @param pngMaxPix integer. number of pixels in pngs on the longer side
+#' @param writeShapefile logical. Create a shapefile from the output?
+#' @param shapefileName character. Name of the shapefile to be saved. If empty,
+#' a name will be generated automatically.
+#' @param shapefileDirectory character. Directory in which to save the
+#' shapefile.
+#' @param shapefileProjection character. A character string of projection
+#' arguments to use in the shapefile.
+#' 
+#' @return An invisible \code{data.frame} with station coordinates, numbers of
+#' events by species at each station and total species number by station. In
+#' addition and optionally, R graphics or png image files.
+#' 
+#' @author Juergen Niedballa
+#' 
+#' @references A great resource for \code{\link[sp:CRS-class]{CRS}} arguments
+#' is \url{https://spatialreference.org/}. Use the Proj4 string as
+#' \code{shapefileProjection} argument.
+#' 
+#' @examples
+#' 
+#' 
+#' # load station information
+#' data(camtraps)
+#' 
+#' # load record table
+#' data(recordTableSample)
+#' 
+#' 
+#' # create maps
+#' Mapstest <- detectionMaps(CTtable           = camtraps,
+#'                           recordTable       = recordTableSample,
+#'                           Xcol              = "utm_x",
+#'                           Ycol              = "utm_y",
+#'                           stationCol        = "Station",
+#'                           speciesCol        = "Species",
+#'                           writePNG          = FALSE,
+#'                           plotR             = TRUE,
+#'                           printLabels       = TRUE,
+#'                           richnessPlot      = TRUE,
+#'                           addLegend         = TRUE
+#' )
+#' 
+#' 
+#' 
+#' # with a polygon in the background, and for one species only
+#' 
+#' # make a dummy polygon for the background
+#' library(sp)
+#' poly1 <- Polygon(cbind(c(521500,526500,527000, 521500),c(607500, 608000, 603500, 603500)))
+#' poly2 <- Polygons(list(poly1), "s1")
+#' poly3 <- SpatialPolygons(list(poly2))
+#' 
+#' Mapstest2 <- detectionMaps(CTtable           = camtraps,
+#'                            recordTable       = recordTableSample,
+#'                            Xcol              = "utm_x",
+#'                            Ycol              = "utm_y",
+#'                            backgroundPolygon = poly3,             # this was added
+#'                            speciesToShow     = c("PBE", "VTA"),   # this was added
+#'                            stationCol        = "Station",
+#'                            speciesCol        = "Species",
+#'                            writePNG          = FALSE,
+#'                            plotR             = TRUE,
+#'                            printLabels       = TRUE,
+#'                            richnessPlot      = TRUE,
+#'                            addLegend         = TRUE
+#' )
+#' 
+#' 
+#' 
+#' @export detectionMaps
+#' 
 detectionMaps <- function(CTtable,
                           recordTable,
                           Xcol,

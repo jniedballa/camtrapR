@@ -54,3 +54,4 @@ URL: https://github.com/jniedballa/camtrapR, https://jniedballa.github.io/camtra
 BugReports: https://groups.google.com/forum/#!forum/camtrapr
 Encoding: UTF-8
 License: GPL (>= 2)
+RoxygenNote: 7.1.2

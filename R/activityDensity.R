@@ -1,3 +1,83 @@
+#' Plot kernel density estimation of single-species activity
+#' 
+#' The function plots a kernel density estimation of species diel activity
+#' using function \code{\link[overlap]{densityPlot}} from package
+#' \pkg{overlap}.
+#' 
+#' \code{species} must be in the \code{speciesCol} of \code{recordTable}.
+#' 
+#' \code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS"
+#' convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be
+#' interpreted either by base-R via \code{\link[base]{strptime}} or in
+#' \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument
+#' "orders"). \pkg{lubridate} will be used if there are no "\%" characters in
+#' \code{recordDateTimeFormat}.
+#' 
+#' For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either
+#' "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date
+#' and time formats in R see \code{\link[base]{strptime}} or
+#' \code{\link[lubridate]{parse_date_time}}.
+#' 
+#' @param recordTable data.frame. the record table created by
+#' \code{\link{recordTable}}
+#' @param species Name of the species for which to create an kernel density
+#' plot of activity
+#' @param allSpecies logical. Create plots for all species in \code{speciesCol}
+#' of \code{recordTable}? Overrides argument \code{species}
+#' @param speciesCol character. name of the column specifying species names in
+#' \code{recordTable}
+#' @param recordDateTimeCol character. name of the column specifying date and
+#' time in \code{recordTable}
+#' @param recordDateTimeFormat character. format of column
+#' \code{recordDateTimeCol} in \code{recordTable}
+#' @param plotR logical. Show plots in R graphics device?
+#' @param writePNG logical. Create pngs of the plots?
+#' @param plotDirectory character. Directory in which to create png plots if
+#' \code{writePNG = TRUE}
+#' @param createDir logical. Create \code{plotDirectory} if \code{writePNG =
+#' TRUE}?
+#' @param pngMaxPix integer. image size of png (pixels along x-axis)
+#' @param add.rug logical. add a rug to the plot?
+#' @param \dots additional arguments to be passed to function
+#' \code{densityPlot}
+#' 
+#' @return Returns invisibly a vector of species record observation times in
+#' radians, i.e. scaled to [\eqn{0, 2\pi}]. If \code{allSpecies == TRUE}, all
+#' species' vectors are returned in an invisible named list.
+#' 
+#' @author Juergen Niedballa
+#' 
+#' @seealso \code{\link{activityHistogram}}, \code{\link{activityRadial}},
+#' \code{\link{activityOverlap}}
+#' \url{https://www.kent.ac.uk/smsas/personal/msr/overlap.html}
+#' 
+#' @references Martin Ridout and Matthew Linkie (2009). Estimating overlap of
+#' daily activity patterns from camera trap data. Journal of Agricultural,
+#' Biological and Environmental Statistics, 14(3), 322-337 \cr Mike Meredith
+#' and Martin Ridout (2018). overlap: Estimates of coefficient of overlapping
+#' for animal activity patterns. R package version 0.3.2.
+#' \url{https://CRAN.R-project.org/package=overlap}
+#' 
+#' @examples
+#' 
+#' # load record table
+#' data(recordTableSample)
+#' 
+#' species4activity <- "VTA"    # = Viverra tangalunga, Malay Civet
+#' 
+#' activityDensity(recordTable = recordTableSample,
+#'                 species     = species4activity)
+#' 
+#' 
+#' # all species at once
+#' 
+#' activityDensity(recordTable = recordTableSample,
+#'                 allSpecies  = TRUE,
+#'                 writePNG    = FALSE,
+#'                 plotR       = TRUE,
+#'                 add.rug     = TRUE)
+#' 
+#' @export activityDensity
 activityDensity <- function(recordTable,
                             species,
                             allSpecies = FALSE,

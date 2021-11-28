@@ -1,3 +1,68 @@
+#' Add or remove species names from JPEG image filenames
+#' 
+#' Add or remove species names from JPEG image filenames. It makes it easier to
+#' find images of a species.
+#' 
+#' Species names can be appended or removed from image filenames. Before
+#' running the function, you may want to run
+#' \code{\link{checkSpeciesIdentification}} to detect possible
+#' misidentifications. As an example, the function would change an image file
+#' name from "StationA__2015-05-41__20-59-59(1).JPG" to
+#' "StationA__2015-05-41__20-59-59(1)__Species Name.JPG". If species names were
+#' appended several times by accident, they can all be removed by running the
+#' function with \code{removeNames = TRUE}
+#' 
+#' @param inDir character. Directory containing camera trap images sorted into
+#' station subdirectories (e.g. inDir/StationA/)
+#' @param IDfrom character. Read species ID from image metadata ("metadata") of
+#' from species directory names ("directory")?
+#' @param hasCameraFolders logical. Do the station subdirectories of
+#' \code{inDir} have camera-subdirectories (e.g. inDir/StationA/CameraA1;
+#' inDir/StationA/CameraA2)?
+#' @param metadataSpeciesTag character. The species ID tag name in image
+#' metadata (if IDfrom = "metadata").
+#' @param metadataHierarchyDelimitor character. The character delimiting
+#' hierarchy levels in image metadata tags in field "HierarchicalSubject".
+#' Either "|" or ":".
+#' @param removeNames logical. remove appended species names?
+#' @param writecsv logical. write csv table containing old and new file names
+#' into \code{inDir}?
+#' 
+#' @return A \code{data.frame} containing the old and new file names and
+#' directories.
+#' 
+#' @author Juergen Niedballa
+#' 
+#' @examples
+#' 
+#' \dontrun{
+#' 
+#' # copy sample images to another location (so we don't mess around in the package directory)
+#' wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
+#' file.copy(from = wd_images_ID, to = getwd(), recursive = TRUE)       
+#' wd_images_ID_copy <- file.path(getwd(), "sample_images_species_dir")
+#' 
+#' # append species names
+#' SpecNameAppend1 <- appendSpeciesNames(inDir            = wd_images_ID_copy,
+#'                                       IDfrom           = "directory",
+#'                                       hasCameraFolders = FALSE,
+#'                                       removeNames      = FALSE,
+#'                                       writecsv         = FALSE)
+#'   
+#' SpecNameAppend1
+#' 
+#' # remove species names
+#' SpecNameRemove1 <- appendSpeciesNames(inDir            = wd_images_ID_copy,
+#'                                       IDfrom           = "directory",
+#'                                       hasCameraFolders = FALSE,
+#'                                       removeNames      = TRUE,
+#'                                       writecsv         = FALSE)
+#'   
+#' SpecNameRemove1
+#' }
+#' 
+#' @export appendSpeciesNames
+#' 
 appendSpeciesNames <- function(inDir,
                                IDfrom,
                                hasCameraFolders,

@@ -1,3 +1,72 @@
+#' Plot histogram of single-species activity
+#' 
+#' The function generates a histogram of species diel activity in 1-hour
+#' intervals.
+#' 
+#' Activity is calculated from the time of day of records. The date is ignored.
+#' 
+#' \code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS"
+#' convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be
+#' interpreted either by base-R via \code{\link[base]{strptime}} or in
+#' \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument
+#' "orders"). \pkg{lubridate} will be used if there are no "\%" characters in
+#' \code{recordDateTimeFormat}.
+#' 
+#' For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either
+#' "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date
+#' and time formats in R see \code{\link[base]{strptime}} or
+#' \code{\link[lubridate]{parse_date_time}}.
+#' 
+#' @param recordTable data.frame. the record table created by
+#' \code{\link{recordTable}}
+#' @param species Name of the single species for which to create a histogram of
+#' activity
+#' @param allSpecies logical. Create plots for all species in \code{speciesCol}
+#' of \code{recordTable}? Overrides argument \code{species}
+#' @param speciesCol character. name of the column specifying species names in
+#' \code{recordTable}
+#' @param recordDateTimeCol character. name of the column specifying date and
+#' time in \code{recordTable}
+#' @param recordDateTimeFormat character. format of column
+#' \code{recordDateTimeCol} in \code{recordTable}
+#' @param plotR logical. Show plots in R graphics device?
+#' @param writePNG logical. Create pngs of the plots?
+#' @param plotDirectory character. Directory in which to create png plots if
+#' \code{writePNG = TRUE}
+#' @param createDir logical. Create \code{plotDirectory}?
+#' @param pngMaxPix integer. image size of png (pixels along x-axis)
+#' @param \dots additional arguments to be passed to function
+#' \code{\link[graphics]{hist}}
+#' @return It returns invisibly a vector of species record date and time in
+#' \code{POSIXlt} format. If \code{allSpecies == TRUE}, all species' vectors
+#' are returned in an invisible named list.
+#' 
+#' @note If you have a sufficiently large number of records you may wish to
+#' consider using \code{\link{activityDensity}} instead. Please be aware that
+#' this function (like the other activity... function of this package) use
+#' clock time. If your survey was long enough to see changes in sunrise and
+#' sunset times, this may result in biased representations of species activity.
+#' 
+#' @author Juergen Niedballa
+#' 
+#' @seealso \code{\link{activityDensity}}, \code{\link{activityRadial}},
+#' \code{\link{activityOverlap}}
+#' 
+#' @examples
+#' 
+#' 
+#' # load record table
+#' data(recordTableSample)
+#' 
+#' # generate activity histogram
+#' species4activity <- "VTA"    # = Viverra tangalunga, Malay Civet
+#' 
+#' activityHistogram (recordTable = recordTableSample,
+#'                    species     = species4activity,
+#'                    allSpecies = FALSE)
+#' 
+#' @export activityHistogram
+#' 
 activityHistogram <- function(recordTable,
                               species,
                               allSpecies = FALSE,

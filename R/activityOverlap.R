@@ -1,3 +1,115 @@
+#' Plot overlapping kernel densities of two-species activities
+#' 
+#' This function plots kernel density estimates of two species' diel activity
+#' data by calling the function \code{\link[overlap]{overlapPlot}} from package
+#' \pkg{overlap}. It further computes the overlap coefficient Dhat1 by calling
+#' \code{\link[overlap]{overlapEst}}.
+#' 
+#' \code{...} can be graphical parameters passed on to function
+#' \code{\link[overlap]{overlapPlot}}, e.g. \code{linetype}, \code{linewidth},
+#' \code{linecol} (see example below).
+#' 
+#' \code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS"
+#' convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be
+#' interpreted either by base-R via \code{\link[base]{strptime}} or in
+#' \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument
+#' "orders"). \pkg{lubridate} will be used if there are no "\%" characters in
+#' \code{recordDateTimeFormat}.
+#' 
+#' For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either
+#' "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date
+#' and time formats in R see \code{\link[base]{strptime}} or
+#' \code{\link[lubridate]{parse_date_time}}.
+#' 
+#' @param recordTable data.frame. the record table created by
+#' \code{\link{recordTable}}
+#' @param speciesA Name of species 1 (as found in \code{speciesCol} of
+#' recordTable)
+#' @param speciesB Name of species 2 (as found in \code{speciesCol} of
+#' recordTable)
+#' @param speciesCol character. name of the column specifying species names in
+#' \code{recordTable}
+#' @param recordDateTimeCol character. name of the column specifying date and
+#' time in \code{recordTable}
+#' @param recordDateTimeFormat character. format of column
+#' \code{recordDateTimeCol} in \code{recordTable}
+#' @param plotR logical. Show plots in R graphics device?
+#' @param writePNG logical. Create pngs of the plots?
+#' @param addLegend logical. Add a legend to the plots?
+#' @param legendPosition character. Position of the legend (keyword)
+#' @param plotDirectory character. Directory in which to create png plots if
+#' \code{writePNG = TRUE}
+#' @param createDir logical. Create \code{plotDirectory}?
+#' @param pngMaxPix integer. image size of png (pixels along x-axis)
+#' @param add.rug logical. add a rug to the plot?
+#' @param overlapEstimator character. Which overlap estimator to return (passed
+#' on to argument \code{type} in \code{\link[overlap]{overlapEst}})
+#' @param \dots additional arguments to be passed to function
+#' \code{\link[overlap]{overlapPlot}}
+#' 
+#' @return Returns invisibly the \code{data.frame} with plot coordinates
+#' returned by \code{\link[overlap]{overlapPlot}}.
+#' 
+#' @note Please be aware that the function (like the other activity... function
+#' of this package) use clock time, not solar time. If your survey was long
+#' enough to see changes in sunrise and sunset times, this may result in biased
+#' representations of species activity.
+#' 
+#' @author Juergen Niedballa
+#' 
+#' @seealso \code{\link{activityDensity}} \cr
+#' \url{https://www.kent.ac.uk/smsas/personal/msr/overlap.html}
+#' 
+#' @references Mike Meredith and Martin Ridout (2018). overlap: Estimates of
+#' coefficient of overlapping for animal activity patterns. R package version
+#' 0.3.2. \url{https://CRAN.R-project.org/package=overlap} \cr Ridout, M.S. and
+#' Linkie, M. (2009) Estimating overlap of daily activity patterns from camera
+#' trap data. Journal of Agricultural, Biological and Environmental Statistics,
+#' 14, 322-337.
+#' 
+#' @examples
+#' 
+#' # load record table
+#' data(recordTableSample)
+#' 
+#' # define species of interest
+#' speciesA_for_activity <- "VTA"    # = Viverra tangalunga, Malay Civet
+#' speciesB_for_activity <- "PBE"    # = Prionailurus bengalensis, Leopard Cat
+#' 
+#' # create activity overlap plot (basic)
+#' activityOverlap (recordTable = recordTableSample,
+#'                  speciesA    = "VTA",    # = Viverra tangalunga, Malay Civet
+#'                  speciesB    = "PBE",    # = Prionailurus bengalensis, Leopard Cat
+#'                  writePNG    = FALSE,
+#'                  plotR       = TRUE
+#' )
+#' 
+#' 
+#'                                      
+#' # create activity overlap plot (prettier and with some overlapPlot arguments set)
+#' 
+#' activityOverlap (recordTable = recordTableSample,
+#'                  speciesA    = speciesA_for_activity,
+#'                  speciesB    = speciesB_for_activity,
+#'                  writePNG    = FALSE,
+#'                  plotR       = TRUE,
+#'                  createDir   = FALSE,
+#'                  pngMaxPix   = 1000,
+#'                  linecol     = c("black", "blue"),
+#'                  linewidth   = c(5,3),
+#'                  linetype    = c(1, 2),
+#'                  olapcol     = "darkgrey",
+#'                  add.rug     = TRUE,
+#'                  extend      = "lightgrey",
+#'                  ylim        = c(0, 0.25),
+#'                  main        = paste("Activity overlap between ", 
+#'                                      speciesA_for_activity, "and", 
+#'                                      speciesB_for_activity)
+#' )
+#' 
+#' 
+#' @export activityOverlap
+#' 
 activityOverlap <- function(recordTable,
                             speciesA,
                             speciesB,
