@@ -152,7 +152,7 @@
 #'                                     retrievalCol = "Retrieval_date",
 #'                                     writecsv     = FALSE,
 #'                                     hasProblems  = FALSE,
-#'                                     dateFormat   = "%d/%m/%Y"
+#'                                     dateFormat   = "dmy"
 #' )
 #' 
 #' # with problems/malfunction
@@ -162,17 +162,17 @@
 #'                                  retrievalCol = "Retrieval_date",
 #'                                  writecsv     = FALSE,
 #'                                  hasProblems  = TRUE,
-#'                                  dateFormat   = "%d/%m/%Y"
+#'                                  dateFormat   = "dmy"
 #' )
 #' 
-#' # with problems/malfunction / dateFormat in lubridate format
+#' # with problems/malfunction / dateFormat in strptime format
 #' camop_problem_lubridate <- cameraOperation(CTtable      = camtraps,
 #'                                            stationCol   = "Station",
 #'                                            setupCol     = "Setup_date",
 #'                                            retrievalCol = "Retrieval_date",
 #'                                            writecsv     = FALSE,
 #'                                            hasProblems  = TRUE,
-#'                                            dateFormat   = "dmy"
+#'                                            dateFormat   = "%d/%m/%Y"
 #' )
 #' 
 #' camop_no_problem
@@ -191,7 +191,7 @@ cameraOperation <- function(CTtable,
                             byCamera,
                             allCamsOn,
                             camerasIndependent,
-                            dateFormat = "%Y-%m-%d",
+                            dateFormat = "ymd",
                             occasionStartTime = 0,
                             writecsv = FALSE,
                             outDir){

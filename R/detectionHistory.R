@@ -141,7 +141,7 @@
 #'                                     setupCol     = "Setup_date",
 #'                                     retrievalCol = "Retrieval_date",
 #'                                     hasProblems  = FALSE,
-#'                                     dateFormat   = "%d/%m/%Y"
+#'                                     dateFormat   = "dmy"
 #' )
 #' 
 #' \dontrun{
@@ -198,19 +198,19 @@
 #' 
 #' # with effort / using lubridate package to define recordDateTimeFormat
 #' DetHist2_lub <- detectionHistory(recordTable          = recordTableSample,
-#'                              camOp                = camop_no_problem,
-#'                              stationCol           = "Station",
-#'                              speciesCol           = "Species",
-#'                              recordDateTimeCol    = "DateTimeOriginal",
-#'                              recordDateTimeFormat = "ymd HMS",
-#'                              species              = "VTA",
-#'                              occasionLength       = 7,
-#'                              day1                 = "station",
-#'                              datesAsOccasionNames = FALSE,
-#'                              includeEffort        = TRUE,
-#'                              scaleEffort          = FALSE,
-#'                              timeZone             = "Asia/Kuala_Lumpur"
-#' )
+#'                                  camOp                = camop_no_problem,
+#'                                  stationCol           = "Station",
+#'                                  speciesCol           = "Species",
+#'                                  recordDateTimeCol    = "DateTimeOriginal",
+#'                                  recordDateTimeFormat = "ymd HMS",
+#'                                  species              = "VTA",
+#'                                  occasionLength       = 7,
+#'                                  day1                 = "station",
+#'                                  datesAsOccasionNames = FALSE,
+#'                                  includeEffort        = TRUE,
+#'                                  scaleEffort          = FALSE,
+#'                                  timeZone             = "Asia/Kuala_Lumpur"
+#' )    
 #' 
 #' DetHist2_lub$detection_history  # detection history  (alternatively, use: DetHist2_lub[[1]])
 #' DetHist2_lub$effort             # effort (alternatively, use: DetHist2_lub[[2]])
@@ -229,7 +229,7 @@
 #'                                     sessionCol   = "session",
 #'                                     retrievalCol = "Retrieval_date",
 #'                                     hasProblems  = TRUE,
-#'                                     dateFormat   = "%d/%m/%Y"
+#'                                     dateFormat   = "dmy"
 #' )
 #' 
 #' # multi-season detection history
@@ -259,7 +259,7 @@ detectionHistory <- function(recordTable,
                              stationCol = "Station",
                              speciesCol = "Species",
                              recordDateTimeCol = "DateTimeOriginal",
-                             recordDateTimeFormat = "%Y-%m-%d %H:%M:%S",
+                             recordDateTimeFormat = "ymd hms",
                              occasionLength,
                              minActiveDaysPerOccasion,
                              maxNumberDays,

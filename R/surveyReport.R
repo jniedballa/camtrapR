@@ -101,7 +101,7 @@
 #'                                     retrievalCol = "Retrieval_date",
 #'                                     writecsv     = FALSE,
 #'                                     hasProblems  = FALSE,
-#'                                     dateFormat   = "%d/%m/%Y"
+#'                                     dateFormat   = "dmy"
 #' )
 #' 
 #' reportTest <- surveyReport (recordTable          = recordTableSample,
@@ -111,9 +111,9 @@
 #'                             stationCol           = "Station",
 #'                             setupCol             = "Setup_date",
 #'                             retrievalCol         = "Retrieval_date",
-#'                             CTDateFormat         = "%d/%m/%Y", 
+#'                             CTDateFormat         = "dmy", 
 #'                             recordDateTimeCol    = "DateTimeOriginal",
-#'                             recordDateTimeFormat = "%Y-%m-%d %H:%M:%S")
+#'                             recordDateTimeFormat = "ymd hms")
 #' 
 #' class(reportTest)  # a list with
 #' length(reportTest) # 5 elements
@@ -132,7 +132,7 @@
 #'                                  retrievalCol = "Retrieval_date",
 #'                                  writecsv     = FALSE,
 #'                                  hasProblems  = TRUE,
-#'                                  dateFormat   = "%d/%m/%Y"
+#'                                  dateFormat   = "dmy"
 #' )
 #' 
 #' reportTest_problem <- surveyReport (recordTable          = recordTableSample,
@@ -142,9 +142,9 @@
 #'                                     stationCol           = "Station",
 #'                                     setupCol             = "Setup_date",
 #'                                     retrievalCol         = "Retrieval_date",
-#'                                     CTDateFormat         = "%d/%m/%Y", 
+#'                                     CTDateFormat         = "dmy", 
 #'                                     recordDateTimeCol    = "DateTimeOriginal",
-#'                                     recordDateTimeFormat = "%Y-%m-%d %H:%M:%S")
+#'                                     recordDateTimeFormat = "ymd hms")
 #' 
 #' reportTest_problem$survey_dates
 #' 
@@ -153,15 +153,15 @@
 #' ## if camOp is missing, the legacy version (from 2.0.3) will be used:
 #' 
 #' reportTest_problem_old <- surveyReport (recordTable          = recordTableSample,
-#'                                     CTtable              = camtraps,
-#'                                    # camOp                = camop_problem,
-#'                                     speciesCol           = "Species",
-#'                                     stationCol           = "Station",
-#'                                     setupCol             = "Setup_date",
-#'                                     retrievalCol         = "Retrieval_date",
-#'                                     CTDateFormat         = "%d/%m/%Y", 
-#'                                     recordDateTimeCol    = "DateTimeOriginal",
-#'                                     recordDateTimeFormat = "%Y-%m-%d %H:%M:%S")
+#'                                         CTtable              = camtraps,
+#'                                        # camOp                = camop_problem,
+#'                                         speciesCol           = "Species",
+#'                                         stationCol           = "Station",
+#'                                         setupCol             = "Setup_date",
+#'                                         retrievalCol         = "Retrieval_date",
+#'                                         CTDateFormat         = "dmy", 
+#'                                         recordDateTimeCol    = "DateTimeOriginal",
+#'                                         recordDateTimeFormat = "ymd hms")
 #' 
 #' \dontrun{
 #' # run again with sinkpath defined
@@ -172,9 +172,9 @@
 #'                             stationCol           = "Station",
 #'                             setupCol             = "Setup_date",
 #'                             retrievalCol         = "Retrieval_date",
-#'                             CTDateFormat         = "%d/%m/%Y", 
+#'                             CTDateFormat         = "dmy",, 
 #'                             recordDateTimeCol    = "DateTimeOriginal",
-#'                             recordDateTimeFormat = "%Y-%m-%d %H:%M:%S",
+#'                             recordDateTimeFormat = "ymd hms",
 #'                             sinkpath             = getwd())
 #' 
 #' # have a look at the text file
@@ -192,10 +192,10 @@ surveyReport <- function(recordTable,
                          cameraCol,
                          setupCol,
                          retrievalCol,
-                         CTDateFormat = "%Y-%m-%d",
+                         CTDateFormat = "ymd",
                          CTHasProblems = "deprecated",
                          recordDateTimeCol = "DateTimeOriginal",
-                         recordDateTimeFormat = "%Y-%m-%d %H:%M:%S",
+                         recordDateTimeFormat = "ymd hms",
                          Xcol,
                          Ycol,
                          sinkpath,
