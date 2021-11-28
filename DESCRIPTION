@@ -26,15 +26,17 @@ Depends:
         R (>= 3.1.0)
 Imports: 
         methods, 
-        sp, 
+        sf, 
+        sp,
         overlap, 
         secr, 
         data.table,
-        lubridate
+        lubridate,
+        ggplot2
 Suggests: 
         knitr, 
         raster,  
-        rgdal, 
+        rgdal,
         ritis, 
         rmarkdown, 
         taxize, 
