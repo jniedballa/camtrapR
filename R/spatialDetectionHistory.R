@@ -163,7 +163,7 @@
 #'                                  retrievalCol = "Retrieval_date",
 #'                                  writecsv     = FALSE,
 #'                                  hasProblems  = TRUE,
-#'                                  dateFormat   = "%d/%m/%Y"
+#'                                  dateFormat   = "dmy"
 #' )
 #' 
 #' sdh <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSample,
@@ -177,7 +177,7 @@
 #'                                Ycol                  = "utm_y",
 #'                                individualCol         = "Individual",
 #'                                recordDateTimeCol     = "DateTimeOriginal",
-#'                                recordDateTimeFormat  = "%Y-%m-%d %H:%M:%S",
+#'                                recordDateTimeFormat  = "ymd hms",
 #'                                occasionLength        = 10,
 #'                                day1                  = "survey",
 #'                                includeEffort         = TRUE,
@@ -207,7 +207,7 @@
 #'                                       sessionCol   = "session",
 #'                                       retrievalCol = "Retrieval_date",
 #'                                       hasProblems  = TRUE,
-#'                                       dateFormat   = "%d/%m/%Y"
+#'                                       dateFormat   = "dmy"
 #'   )
 #' 
 #' sdh_multi <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSampleMultiSeason,
@@ -222,7 +222,7 @@
 #'                                Ycol                  = "utm_y",
 #'                                individualCol         = "Individual",
 #'                                recordDateTimeCol     = "DateTimeOriginal",
-#'                                recordDateTimeFormat  = "%Y-%m-%d %H:%M:%S",
+#'                                recordDateTimeFormat  = "ymd hms",
 #'                                occasionLength        = 10,
 #'                                day1                  = "survey",
 #'                                includeEffort         = TRUE,
@@ -251,7 +251,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
                                     individualCol,
                                     individualCovariateCols,
                                     recordDateTimeCol = "DateTimeOriginal",
-                                    recordDateTimeFormat = "%Y-%m-%d %H:%M:%S",
+                                    recordDateTimeFormat = "ymd hms",
                                     occasionLength,
                                     minActiveDaysPerOccasion,
                                     occasionStartTime = "deprecated",
