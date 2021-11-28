@@ -31,14 +31,14 @@ The variables are as follows:
 \keyword{datasets}
 
 \examples{
-	# data were created with the following code:
+# data were created with the following code:
 
-	data(recordTableSample)
-	recordTableSample_season2 <- recordTableSample
-	
-	# substitute 2009 with 2010
-	recordTableSample_season2$DateTimeOriginal <- gsub("2009", "2010", 
-	     recordTableSample_season2$DateTimeOriginal) 
-  # combine with season 2009
-	recordTableSampleMultiSeason <- rbind(recordTableSample, recordTableSample_season2)    
+data(recordTableSample)
+recordTableSample_season2 <- recordTableSample
+
+# substitute 2009 with 2010
+recordTableSample_season2$DateTimeOriginal <- gsub("2009", "2010",
+    recordTableSample_season2$DateTimeOriginal)
+# combine with season 2009
+recordTableSampleMultiSeason <- rbind(recordTableSample, recordTableSample_season2)
 }

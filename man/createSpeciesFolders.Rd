@@ -46,8 +46,8 @@ Juergen Niedballa
 \examples{
 \dontrun{
 
-# create dummy directories for tests
-# (normally, you'd use directory containing renamed, unsorted images)
+# create dummy directories for tests (normally, you'd use
+# directory containing renamed, unsorted images)
 
 # this will be used as inDir
 wd_createDirTest <- file.path(getwd(), "createSpeciesFoldersTest")
@@ -60,21 +60,17 @@ sapply(dirs_to_create, FUN = dir.create, recursive = TRUE)
 species <- c("Sambar Deer", "Bay Cat")
 
 # create species subdirectories
-SpecFolderCreate1 <- createSpeciesFolders (inDir               = wd_createDirTest,
-                                           species             = species,
-                                           hasCameraFolders = FALSE,
-                                           removeFolders       = FALSE)
-  
+SpecFolderCreate1 <- createSpeciesFolders(inDir = wd_createDirTest,
+    species = species, hasCameraFolders = FALSE, removeFolders = FALSE)
+
 SpecFolderCreate1
 
 # check if directories were created
 list.dirs(wd_createDirTest)
 
 # delete empty species directories
-SpecFolderCreate2 <- createSpeciesFolders (inDir               = wd_createDirTest,
-                                           species             = species,
-                                           hasCameraFolders = FALSE,
-                                           removeFolders       = TRUE)
+SpecFolderCreate2 <- createSpeciesFolders(inDir = wd_createDirTest,
+    species = species, hasCameraFolders = FALSE, removeFolders = TRUE)
 
 SpecFolderCreate2
 

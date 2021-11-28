@@ -30,4 +30,3 @@ The variables are as follows:
 The coordinates can be in the units of any coordinate system. UTM was chosen as an example, but it could be latlong or anything else, too. \code{\link[secr]{capthist}} objects (as created by \code{\link{spatialDetectionHistory}} for spatial capture-recapture analyses) expect the unit to be meters.
 }
 \keyword{datasets}
-

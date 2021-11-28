@@ -88,14 +88,12 @@ Juergen Niedballa
 \code{\link{activityDensity}}, \code{\link{activityRadial}}, \code{\link{activityOverlap}}
 }
 \examples{
-
 # load record table
 data(recordTableSample)
 
 # generate activity histogram
-species4activity <- "VTA"    # = Viverra tangalunga, Malay Civet
+species4activity <- "VTA"  # = Viverra tangalunga, Malay Civet
 
-activityHistogram (recordTable = recordTableSample,
-                   species     = species4activity,
-                   allSpecies = FALSE)
+activityHistogram(recordTable = recordTableSample, species = species4activity,
+    allSpecies = FALSE)
 }

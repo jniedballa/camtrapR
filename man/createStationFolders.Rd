@@ -47,17 +47,17 @@ Juergen Niedballa
 \dontrun{
 
 # create dummy directory for tests (this will be used as inDir)
-# (normally, you'd set up an empty directory, e.g. .../myStudy/rawImages)
+# (normally, you'd set up an empty directory, e.g.
+# .../myStudy/rawImages)
 wd_createStationDir <- file.path(tempdir(), "createStationFoldersTest")
 
 # now we load the sample camera trap station data frame
 data(camtraps)
 
 # create station directories in wd_createStationDir
-StationFolderCreate1 <- createStationFolders (inDir       = wd_createStationDir,
-                                              stations    = as.character(camtraps$Station),
-                                              createinDir = TRUE)
-  
+StationFolderCreate1 <- createStationFolders(inDir = wd_createStationDir,
+    stations = as.character(camtraps$Station), createinDir = TRUE)
+
 StationFolderCreate1
 
 # check if directories were created

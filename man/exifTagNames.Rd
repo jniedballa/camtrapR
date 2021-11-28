@@ -52,34 +52,35 @@ Juergen Niedballa
 \code{\link{recordTable}}
 }
 \examples{
-
 \dontrun{
 
-wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
+wd_images_ID <- system.file("pictures/sample_images_species_dir",
+    package = "camtrapR")
 
-# specify directory, camtrapR will automatically take first image from first subdirectory
-exifTagNames(inDir          = wd_images_ID)
+# specify directory, camtrapR will automatically take first
+# image from first subdirectory
+exifTagNames(inDir = wd_images_ID)
 
 # specify subdirectory by name, camtrapR will use first image
-exifTagNames(inDir          = wd_images_ID,
-             whichSubDir    = "StationA")
+exifTagNames(inDir = wd_images_ID, whichSubDir = "StationA")
 
 # specifying fileName only (line break due to R package policy)
-exifTagNames(fileName       = file.path(wd_images_ID, "StationC", "TRA", 
-                                        "StationC__2009-05-02__00-10-00(1).JPG"))
-                                        
+exifTagNames(fileName = file.path(wd_images_ID, "StationC", "TRA",
+    "StationC__2009-05-02__00-10-00(1).JPG"))
+
 # specify inDir and fileName
-exifTagNames(inDir          = wd_images_ID,
-             fileName       = file.path("StationC", "TRA", "StationC__2009-05-02__00-10-00(1).JPG"))
-             
+exifTagNames(inDir = wd_images_ID, fileName = file.path("StationC",
+    "TRA", "StationC__2009-05-02__00-10-00(1).JPG"))
+
 # it also works this way
-exifTagNames(inDir          = file.path(wd_images_ID, "StationC", "TRA"),
-             fileName       = "StationC__2009-05-02__00-10-00(1).JPG")
-             
+exifTagNames(inDir = file.path(wd_images_ID, "StationC", "TRA"),
+    fileName = "StationC__2009-05-02__00-10-00(1).JPG")
+
 
 # with tagged sample images
-wd_images_ID_tagged <- system.file("pictures/sample_images_indiv_tag", package = "camtrapR")
-exifTagNames(inDir          = wd_images_ID_tagged)
+wd_images_ID_tagged <- system.file("pictures/sample_images_indiv_tag",
+    package = "camtrapR")
+exifTagNames(inDir = wd_images_ID_tagged)
 
 }
 }

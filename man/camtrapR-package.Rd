@@ -149,4 +149,3 @@ Phil Harvey's ExifTool \url{https://exiftool.org/} \cr
 \pkg{secr}
 \pkg{wiqid}
 }
-

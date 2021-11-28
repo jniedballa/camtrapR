@@ -66,27 +66,25 @@ Juergen Niedballa
 \examples{
 \dontrun{
 
-# copy sample images to another location (so we don't mess around in the package directory)
-wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
-file.copy(from = wd_images_ID, to = getwd(), recursive = TRUE)       
+# copy sample images to another location (so we don't mess
+# around in the package directory)
+wd_images_ID <- system.file("pictures/sample_images_species_dir",
+    package = "camtrapR")
+file.copy(from = wd_images_ID, to = getwd(), recursive = TRUE)
 wd_images_ID_copy <- file.path(getwd(), "sample_images_species_dir")
 
 # append species names
-SpecNameAppend1 <- appendSpeciesNames(inDir            = wd_images_ID_copy,
-                                      IDfrom           = "directory",
-                                      hasCameraFolders = FALSE,
-                                      removeNames      = FALSE,
-                                      writecsv         = FALSE)
-  
+SpecNameAppend1 <- appendSpeciesNames(inDir = wd_images_ID_copy,
+    IDfrom = "directory", hasCameraFolders = FALSE, removeNames = FALSE,
+    writecsv = FALSE)
+
 SpecNameAppend1
 
 # remove species names
-SpecNameRemove1 <- appendSpeciesNames(inDir            = wd_images_ID_copy,
-                                      IDfrom           = "directory",
-                                      hasCameraFolders = FALSE,
-                                      removeNames      = TRUE,
-                                      writecsv         = FALSE)
-  
+SpecNameRemove1 <- appendSpeciesNames(inDir = wd_images_ID_copy,
+    IDfrom = "directory", hasCameraFolders = FALSE, removeNames = TRUE,
+    writecsv = FALSE)
+
 SpecNameRemove1
 }
 }

@@ -23,4 +23,3 @@ The variables are as follows:
  }
 }
 \keyword{datasets}
-

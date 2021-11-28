@@ -38,32 +38,34 @@ The coordinates can be in the units of any coordinate system. UTM was chosen as 
 \examples{
 # data were created with the following code:
 data(camtraps)
-	
+
 camtraps_season2 <- camtraps
 
 # change 2009 to 2010
-camtraps_season2[, "Setup_date"]     <- gsub("2009", "2010", camtraps_season2[, "Setup_date"])
-camtraps_season2[, "Retrieval_date"] <- gsub("2009", "2010", camtraps_season2[, "Retrieval_date"])
-camtraps_season2[, "Problem1_from"]  <- gsub("2009", "2010", camtraps_season2[, "Problem1_from"])
-camtraps_season2[, "Problem1_to"]    <- gsub("2009", "2010", camtraps_season2[, "Problem1_to"])
+camtraps_season2[, "Setup_date"] <- gsub("2009", "2010", camtraps_season2[,
+    "Setup_date"])
+camtraps_season2[, "Retrieval_date"] <- gsub("2009", "2010", camtraps_season2[,
+    "Retrieval_date"])
+camtraps_season2[, "Problem1_from"] <- gsub("2009", "2010", camtraps_season2[,
+    "Problem1_from"])
+camtraps_season2[, "Problem1_to"] <- gsub("2009", "2010", camtraps_season2[,
+    "Problem1_to"])
 
 # add an extra station with different dates in session 2010
 camtraps_season2 <- rbind(camtraps_season2, NA)
 camtraps_season2$Station[4] <- "StationD"
-camtraps_season2$utm_y[4]  <- 607050
-camtraps_season2$utm_x[4]  <- 525000
-camtraps_season2$Setup_date[4]      <- "04/04/2010"
-camtraps_season2$Retrieval_date[4]  <- "17/06/2010"
-camtraps_season2$Problem1_from[4]   <- "20/05/2010"
-camtraps_season2$Problem1_to[4]     <- "30/05/2010"
+camtraps_season2$utm_y[4] <- 607050
+camtraps_season2$utm_x[4] <- 525000
+camtraps_season2$Setup_date[4] <- "04/04/2010"
+camtraps_season2$Retrieval_date[4] <- "17/06/2010"
+camtraps_season2$Problem1_from[4] <- "20/05/2010"
+camtraps_season2$Problem1_to[4] <- "30/05/2010"
 
 # add season column
-camtraps$session         <- 2009
+camtraps$session <- 2009
 camtraps_season2$session <- 2010
 
 # combine the tables for 2 seasons
 camtrapsMultiSeason <- rbind(camtraps, camtraps_season2)
-
 }
 \keyword{datasets}
-

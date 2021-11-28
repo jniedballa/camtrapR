@@ -59,7 +59,6 @@ Juergen Niedballa
 }
 
 \examples{
-
 \dontrun{
 # dontrun is to avoid forcing users to install additional dependencies
 
@@ -76,14 +75,14 @@ geometry5 <- geometry_area(x_off = 0, y_off = 793, width = 320, height = 17)
 
 # combine geometries into list
 geometries <- list(date = geometry1, 
-                   time = geometry2, 
-                   sequence_id = geometry3,
-                   temperature = geometry4,
-                   camera_model = geometry5)
+               time = geometry2, 
+               sequence_id = geometry3,
+               temperature = geometry4,
+               camera_model = geometry5)
 
 df_image_data  <- OCRdataFields(inDir = wd_images_OCR,
-                                geometries = geometries, 
-                                invert = TRUE)       
+                            geometries = geometries, 
+                            invert = TRUE)       
 df_image_data
 
 
@@ -100,10 +99,8 @@ cl <- makeCluster(3)
 
 # assign new DateTimeOriginal
 writeDateTimeOriginal(DateTimeOriginal = df_image_data$DateTimeOriginal,
-                      fileNames = df_image_data$DateTimeOriginal,
-                      parallel = cl)
-                   
+                  fileNames = df_image_data$DateTimeOriginal,
+                  parallel = cl)
+               
 }
-
-
 }

@@ -39,11 +39,10 @@ The variables are as follows:
 # example data were created as follows:
 data(recordTableIndividualSample)
 
-recordTableIndividualSample_season2 <- recordTableIndividualSample[1:10,]
-recordTableIndividualSample_season2$DateTimeOriginal <- gsub("2009", "2010", 
-      recordTableIndividualSample_season2$DateTimeOriginal)
-recordTableIndividualSampleMultiSeason <- rbind(recordTableIndividualSample, 
-      recordTableIndividualSample_season2)
+recordTableIndividualSample_season2 <- recordTableIndividualSample[1:10, ]
+recordTableIndividualSample_season2$DateTimeOriginal <- gsub("2009", "2010",
+    recordTableIndividualSample_season2$DateTimeOriginal)
+recordTableIndividualSampleMultiSeason <- rbind(recordTableIndividualSample,
+    recordTableIndividualSample_season2)
 }
 \keyword{datasets}
-

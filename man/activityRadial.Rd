@@ -94,33 +94,18 @@ Juergen Niedballa
 \code{\link{activityDensity}}, \code{\link{activityHistogram}}, \code{\link{activityOverlap}}
 }
 \examples{
-
 # load record table
 data(recordTableSample)
 
-species4activity <- "PBE"    # = Prionailurus bengalensis, Leopard Cat
+species4activity <- "PBE"  # = Prionailurus bengalensis, Leopard Cat
 
-activityRadial(recordTable       = recordTableSample,
-               species           = species4activity,
-               allSpecies        = FALSE,
-               speciesCol        = "Species",
-               recordDateTimeCol = "DateTimeOriginal",
-               plotR             = TRUE,
-               writePNG          = FALSE,
-               lwd               = 5
-)
+activityRadial(recordTable = recordTableSample, species = species4activity,
+    allSpecies = FALSE, speciesCol = "Species", recordDateTimeCol = "DateTimeOriginal",
+    plotR = TRUE, writePNG = FALSE, lwd = 5)
 
 # plot type = polygon
 
-activityRadial(recordTable       = recordTableSample,
-               species           = species4activity,
-               allSpecies        = FALSE,
-               speciesCol        = "Species",
-               recordDateTimeCol = "DateTimeOriginal",
-               plotR             = TRUE,
-               writePNG          = FALSE,
-               lwd               = 5,
-               rp.type           = "p"      
-)
-
+activityRadial(recordTable = recordTableSample, species = species4activity,
+    allSpecies = FALSE, speciesCol = "Species", recordDateTimeCol = "DateTimeOriginal",
+    plotR = TRUE, writePNG = FALSE, lwd = 5, rp.type = "p")
 }

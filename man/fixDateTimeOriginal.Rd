@@ -49,7 +49,6 @@ Tobler, Mathias (2015). Camera Base Version 1.7 User Guide \url{http://www.atriu
 
 wd_images_hyperfire <- "C:/Some/Directory"
 
-fixDateTimeOriginal(inDir     = wd_images_hyperfire,
-                    recursive = TRUE)
+fixDateTimeOriginal(inDir = wd_images_hyperfire, recursive = TRUE)
 }
 }

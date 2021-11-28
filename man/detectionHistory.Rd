@@ -135,7 +135,6 @@ Juergen Niedballa
 }
 
 \examples{
-
 # define image directory
 wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
 
@@ -154,11 +153,11 @@ camop_no_problem <- cameraOperation(CTtable      = camtraps,
 \dontrun{
 if (Sys.which("exiftool") != ""){        # only run this function if ExifTool is available
 recordTableSample <- recordTable(inDir               = wd_images_ID,
-                                 IDfrom              = "directory",
-                                 minDeltaTime        = 60,
-                                 deltaTimeComparedTo = "lastRecord",
-                                 exclude             = "UNID",
-                                 timeZone            = "Asia/Kuala_Lumpur"
+                             IDfrom              = "directory",
+                             minDeltaTime        = 60,
+                             deltaTimeComparedTo = "lastRecord",
+                             exclude             = "UNID",
+                             timeZone            = "Asia/Kuala_Lumpur"
 )
 }
 }
@@ -255,5 +254,4 @@ DetHist_multi <- detectionHistory(recordTable      = recordTableSampleMultiSeaso
 )
 
 DetHist_multi
-
 }
