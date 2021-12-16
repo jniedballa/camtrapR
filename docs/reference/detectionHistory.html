@@ -157,7 +157,7 @@ time.</p>
   stationCol <span class='op'>=</span> <span class='st'>"Station"</span>,
   speciesCol <span class='op'>=</span> <span class='st'>"Species"</span>,
   recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd hms"</span>,
+  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd HMS"</span>,
   <span class='va'>occasionLength</span>,
   <span class='va'>minActiveDaysPerOccasion</span>,
   <span class='va'>maxNumberDays</span>,
@@ -404,7 +404,7 @@ vignette on data extraction (accessible via
                             includeEffort        <span class='op'>=</span> <span class='cn'>FALSE</span>,
                             timeZone             <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
+
 <span class='va'>DetHist1</span>                     <span class='co'># this is a list with 1 element</span>
 </div><div class='output co'>#&gt; $detection_history
 #&gt;          o1 o2 o3 o4 o5 o6 o7
@@ -431,7 +431,7 @@ vignette on data extraction (accessible via
                              scaleEffort          <span class='op'>=</span> <span class='cn'>FALSE</span>,
                              timeZone             <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
+
 <span class='va'>DetHist2</span><span class='op'>$</span><span class='va'>detection_history</span>  <span class='co'># detection history  (alternatively, use: DetHist2[[1]])</span>
 </div><div class='output co'>#&gt;          o1 o2 o3 o4 o5 o6 o7
 #&gt; StationA  0  1  0  0  1  0  0
@@ -497,7 +497,7 @@ vignette on data extraction (accessible via
                             timeZone               <span class='op'>=</span> <span class='st'>"UTC"</span>,
                             unmarkedMultFrameInput <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
+
 <span class='va'>DetHist_multi</span>
 </div><div class='output co'>#&gt; $detection_history
 #&gt;          o1 o2 o3 o4 o5 o6 o7 o8 o1 o2 o3 o4 o5 o6 o7 o8

@@ -12,7 +12,7 @@ detectionHistory(
   stationCol = "Station",
   speciesCol = "Species",
   recordDateTimeCol = "DateTimeOriginal",
-  recordDateTimeFormat = "ymd hms",
+  recordDateTimeFormat = "ymd HMS",
   occasionLength,
   minActiveDaysPerOccasion,
   maxNumberDays,

@@ -113,7 +113,7 @@
 #'                             retrievalCol         = "Retrieval_date",
 #'                             CTDateFormat         = "dmy", 
 #'                             recordDateTimeCol    = "DateTimeOriginal",
-#'                             recordDateTimeFormat = "ymd hms")
+#'                             recordDateTimeFormat = "ymd HMS")
 #' 
 #' class(reportTest)  # a list with
 #' length(reportTest) # 5 elements
@@ -144,7 +144,7 @@
 #'                                     retrievalCol         = "Retrieval_date",
 #'                                     CTDateFormat         = "dmy", 
 #'                                     recordDateTimeCol    = "DateTimeOriginal",
-#'                                     recordDateTimeFormat = "ymd hms")
+#'                                     recordDateTimeFormat = "ymd HMS")
 #' 
 #' reportTest_problem$survey_dates
 #' 
@@ -161,7 +161,7 @@
 #'                                         retrievalCol         = "Retrieval_date",
 #'                                         CTDateFormat         = "dmy", 
 #'                                         recordDateTimeCol    = "DateTimeOriginal",
-#'                                         recordDateTimeFormat = "ymd hms")
+#'                                         recordDateTimeFormat = "ymd HMS")
 #' 
 #' \dontrun{
 #' # run again with sinkpath defined
@@ -174,7 +174,7 @@
 #'                             retrievalCol         = "Retrieval_date",
 #'                             CTDateFormat         = "dmy",, 
 #'                             recordDateTimeCol    = "DateTimeOriginal",
-#'                             recordDateTimeFormat = "ymd hms",
+#'                             recordDateTimeFormat = "ymd HMS",
 #'                             sinkpath             = getwd())
 #' 
 #' # have a look at the text file
@@ -195,7 +195,7 @@ surveyReport <- function(recordTable,
                          CTDateFormat = "ymd",
                          CTHasProblems = "deprecated",
                          recordDateTimeCol = "DateTimeOriginal",
-                         recordDateTimeFormat = "ymd hms",
+                         recordDateTimeFormat = "ymd HMS",
                          Xcol,
                          Ycol,
                          sinkpath,

@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Plot histogram of single-species activity — activityHistogram" />
-<meta property="og:description" content="The function generates a histogram of species diel activity in 1-hour intervals." />
+<meta property="og:description" content="The function generates a histogram of species diel activity in 1-hour
+intervals." />
 
 
 
@@ -133,53 +134,62 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot histogram of single-species activity</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/jniedballa/camtrapR/blob/master/R/activityHistogram.R'><code>R/activityHistogram.R</code></a></small>
     <div class="hidden name"><code>activityHistogram.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The function generates a histogram of species diel activity in 1-hour intervals.</p>
+    <p>The function generates a histogram of species diel activity in 1-hour
+intervals.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>activityHistogram</span><span class='op'>(</span><span class='va'>recordTable</span>, 
-  <span class='va'>species</span>, 
-  allSpecies <span class='op'>=</span> <span class='cn'>FALSE</span>, 
-  speciesCol <span class='op'>=</span> <span class='st'>"Species"</span>, 
-  recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>, 
-  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"%Y-%m-%d %H:%M:%S"</span>, 
-  plotR <span class='op'>=</span> <span class='cn'>TRUE</span>, 
-  writePNG <span class='op'>=</span> <span class='cn'>FALSE</span>, 
-  <span class='va'>plotDirectory</span>, 
-  createDir <span class='op'>=</span> <span class='cn'>FALSE</span>, 
+    <pre class="usage"><span class='fu'>activityHistogram</span><span class='op'>(</span>
+  <span class='va'>recordTable</span>,
+  <span class='va'>species</span>,
+  allSpecies <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  speciesCol <span class='op'>=</span> <span class='st'>"Species"</span>,
+  recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
+  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd HMS"</span>,
+  plotR <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  writePNG <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>plotDirectory</span>,
+  createDir <span class='op'>=</span> <span class='cn'>FALSE</span>,
   pngMaxPix <span class='op'>=</span> <span class='fl'>1000</span>,
-  <span class='va'>...</span><span class='op'>)</span></pre>
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>recordTable</th>
-      <td><p>data.frame. the record table created by <code><a href='recordTable.html'>recordTable</a></code></p></td>
+      <td><p>data.frame. the record table created by
+<code><a href='recordTable.html'>recordTable</a></code></p></td>
     </tr>
     <tr>
       <th>species</th>
-      <td><p>Name of the single species for which to create a histogram of activity</p></td>
+      <td><p>Name of the single species for which to create a histogram of
+activity</p></td>
     </tr>
     <tr>
       <th>allSpecies</th>
-      <td><p>logical. Create plots for all species in <code>speciesCol</code> of <code>recordTable</code>? Overrides argument <code>species</code></p></td>
+      <td><p>logical. Create plots for all species in <code>speciesCol</code>
+of <code>recordTable</code>? Overrides argument <code>species</code></p></td>
     </tr>
     <tr>
       <th>speciesCol</th>
-      <td><p>character. name of the column specifying species names in <code>recordTable</code></p></td>
+      <td><p>character. name of the column specifying species names in
+<code>recordTable</code></p></td>
     </tr>
     <tr>
       <th>recordDateTimeCol</th>
-      <td><p>character. name of the column specifying date and time in <code>recordTable</code></p></td>
+      <td><p>character. name of the column specifying date and
+time in <code>recordTable</code></p></td>
     </tr>
     <tr>
       <th>recordDateTimeFormat</th>
-      <td><p>character. format of column <code>recordDateTimeCol</code> in <code>recordTable</code></p></td>
+      <td><p>character. format of column
+<code>recordDateTimeCol</code> in <code>recordTable</code></p></td>
     </tr>
     <tr>
       <th>plotR</th>
@@ -191,7 +201,8 @@
     </tr>
     <tr>
       <th>plotDirectory</th>
-      <td><p>character. Directory in which to create png plots if <code>writePNG = TRUE</code></p></td>
+      <td><p>character. Directory in which to create png plots if
+<code>writePNG = TRUE</code></p></td>
     </tr>
     <tr>
       <th>createDir</th>
@@ -203,41 +214,58 @@
     </tr>
     <tr>
       <th>...</th>
-      <td><p>additional arguments to be passed to function <code><a href='https://rdrr.io/r/graphics/hist.html'>hist</a></code></p></td>
+      <td><p>additional arguments to be passed to function
+<code><a href='https://rdrr.io/r/graphics/hist.html'>hist</a></code></p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>It returns invisibly a vector of species record date and time in
+<code>POSIXlt</code> format. If <code>allSpecies == TRUE</code>, all species' vectors
+are returned in an invisible named list.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Activity is calculated from the time of day of records. The date is ignored.</p>
-<p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS" convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in <span class="pkg">lubridate</span> via <code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument "orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in <code>recordDateTimeFormat</code>.</p>
-<p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either "%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or <code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
- 
-
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>It returns invisibly a vector of species record date and time in <code>POSIXlt</code> format.
-If <code>allSpecies == TRUE</code>, all species' vectors are returned in an invisible named list.</p>
+<p><code>recordDateTimeFormat</code> defaults to the "YYYY-MM-DD HH:MM:SS"
+convention, e.g. "2014-09-30 22:59:59". <code>recordDateTimeFormat</code> can be
+interpreted either by base-R via <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or in
+<span class="pkg">lubridate</span> via <code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code> (argument
+"orders"). <span class="pkg">lubridate</span> will be used if there are no "%" characters in
+<code>recordDateTimeFormat</code>.</p>
+<p>For "YYYY-MM-DD HH:MM:SS", <code>recordDateTimeFormat</code> would be either
+"%Y-%m-%d %H:%M:%S" or "ymd HMS". For details on how to specify date
+and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>strptime</a></code> or
+<code><a href='https://lubridate.tidyverse.org/reference/parse_date_time.html'>parse_date_time</a></code>.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>If you have a sufficiently large number of records you may wish to consider using <code><a href='activityDensity.html'>activityDensity</a></code> instead. Please be aware that this function (like the other activity... function of this package) use clock time. If your survey was long enough to see changes in sunrise and sunset times, this may result in biased representations of species activity.</p>
+    <p>If you have a sufficiently large number of records you may wish to
+consider using <code><a href='activityDensity.html'>activityDensity</a></code> instead. Please be aware that
+this function (like the other activity... function of this package) use
+clock time. If your survey was long enough to see changes in sunrise and
+sunset times, this may result in biased representations of species activity.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='activityDensity.html'>activityDensity</a></code>, <code><a href='activityRadial.html'>activityRadial</a></code>,
+<code><a href='activityOverlap.html'>activityOverlap</a></code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Juergen Niedballa</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='activityDensity.html'>activityDensity</a></code>, <code><a href='activityRadial.html'>activityRadial</a></code>, <code><a href='activityOverlap.html'>activityOverlap</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># load record table</span>
+    <pre class="examples"><div class='input'>
+
+<span class='co'># load record table</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>)</span>
 
 <span class='co'># generate activity histogram</span>
-<span class='va'>species4activity</span> <span class='op'>&lt;-</span> <span class='st'>"VTA"</span>  <span class='co'># = Viverra tangalunga, Malay Civet</span>
+<span class='va'>species4activity</span> <span class='op'>&lt;-</span> <span class='st'>"VTA"</span>    <span class='co'># = Viverra tangalunga, Malay Civet</span>
 
-<span class='fu'>activityHistogram</span><span class='op'>(</span>recordTable <span class='op'>=</span> <span class='va'>recordTableSample</span>, species <span class='op'>=</span> <span class='va'>species4activity</span>,
-    allSpecies <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='img'><img src='activityHistogram-1.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'>activityHistogram</span> <span class='op'>(</span>recordTable <span class='op'>=</span> <span class='va'>recordTableSample</span>,
+                   species     <span class='op'>=</span> <span class='va'>species4activity</span>,
+                   allSpecies <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+</div><div class='img'><img src='activityHistogram-1.png' alt='' width='700' height='433' /></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -16,7 +16,7 @@ surveyReport(
   CTDateFormat = "ymd",
   CTHasProblems = "deprecated",
   recordDateTimeCol = "DateTimeOriginal",
-  recordDateTimeFormat = "ymd hms",
+  recordDateTimeFormat = "ymd HMS",
   Xcol,
   Ycol,
   sinkpath,
@@ -150,7 +150,7 @@ reportTest <- surveyReport (recordTable          = recordTableSample,
                             retrievalCol         = "Retrieval_date",
                             CTDateFormat         = "dmy", 
                             recordDateTimeCol    = "DateTimeOriginal",
-                            recordDateTimeFormat = "ymd hms")
+                            recordDateTimeFormat = "ymd HMS")
 
 class(reportTest)  # a list with
 length(reportTest) # 5 elements
@@ -181,7 +181,7 @@ reportTest_problem <- surveyReport (recordTable          = recordTableSample,
                                     retrievalCol         = "Retrieval_date",
                                     CTDateFormat         = "dmy", 
                                     recordDateTimeCol    = "DateTimeOriginal",
-                                    recordDateTimeFormat = "ymd hms")
+                                    recordDateTimeFormat = "ymd HMS")
 
 reportTest_problem$survey_dates
 
@@ -198,7 +198,7 @@ reportTest_problem_old <- surveyReport (recordTable          = recordTableSample
                                         retrievalCol         = "Retrieval_date",
                                         CTDateFormat         = "dmy", 
                                         recordDateTimeCol    = "DateTimeOriginal",
-                                        recordDateTimeFormat = "ymd hms")
+                                        recordDateTimeFormat = "ymd HMS")
 
 \dontrun{
 # run again with sinkpath defined
@@ -211,7 +211,7 @@ reportTest <- surveyReport (recordTable          = recordTableSample,
                             retrievalCol         = "Retrieval_date",
                             CTDateFormat         = "dmy",, 
                             recordDateTimeCol    = "DateTimeOriginal",
-                            recordDateTimeFormat = "ymd hms",
+                            recordDateTimeFormat = "ymd HMS",
                             sinkpath             = getwd())
 
 # have a look at the text file

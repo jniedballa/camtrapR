@@ -112,7 +112,10 @@
 #' 
 #' 
 #' 
-#' 
+#' @importFrom sf st_as_sf st_set_crs st_write
+#' @importFrom sp coordinates
+#' @importFrom grDevices col2rgb dev.off extendrange heat.colors png rgb
+#' @importFrom graphics abline axis box grconvertX grconvertY hist image legend lines mtext par plot plot.default  points polygon rect segments strheight strwidth text
 #' @export detectionMaps
 #' 
 detectionMaps <- function(CTtable,

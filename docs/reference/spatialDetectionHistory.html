@@ -173,7 +173,7 @@ adjustable occasion length and occasion start time (as in the function
   <span class='va'>individualCol</span>,
   <span class='va'>individualCovariateCols</span>,
   recordDateTimeCol <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd hms"</span>,
+  recordDateTimeFormat <span class='op'>=</span> <span class='st'>"ymd HMS"</span>,
   <span class='va'>occasionLength</span>,
   <span class='va'>minActiveDaysPerOccasion</span>,
   occasionStartTime <span class='op'>=</span> <span class='st'>"deprecated"</span>,
@@ -434,13 +434,13 @@ and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>s
                                Ycol                  <span class='op'>=</span> <span class='st'>"utm_y"</span>,
                                individualCol         <span class='op'>=</span> <span class='st'>"Individual"</span>,
                                recordDateTimeCol     <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"ymd hms"</span>,
+                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"ymd HMS"</span>,
                                occasionLength        <span class='op'>=</span> <span class='fl'>10</span>,
                                day1                  <span class='op'>=</span> <span class='st'>"survey"</span>,
                                includeEffort         <span class='op'>=</span> <span class='cn'>TRUE</span>,
                                timeZone              <span class='op'>=</span> <span class='st'>"Asia/Kuala_Lumpur"</span>
   <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
+
 <span class='co'># missing space in species = "LeopardCat" was introduced by recordTableIndividual</span>
 <span class='co'># (because of CRAN package policies.</span>
 <span class='co'># In your data you can have spaces in your directory names)</span>
@@ -467,7 +467,7 @@ and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>s
 #&gt; losses            0 0 0 0 0     0
 #&gt; detections        3 4 4 3 1    15
 #&gt; detectors visited 2 3 3 2 1    11
-#&gt; detectors used    3 3 3 3 2    14</div><div class='input'>  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sdh</span>, tracks <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+#&gt; detectors used    3 3 3 3 2    14</div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>sdh</span>, tracks <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-1.png' alt='' width='700' height='433' /></div><div class='input'>
   <span class='co'>## multi-season capthist object</span>
   <span class='co'># see vignette "3. Extracting Data from Camera Trapping Images, creating occupancy &amp; secr input"</span>
@@ -500,7 +500,7 @@ and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>s
                                Ycol                  <span class='op'>=</span> <span class='st'>"utm_y"</span>,
                                individualCol         <span class='op'>=</span> <span class='st'>"Individual"</span>,
                                recordDateTimeCol     <span class='op'>=</span> <span class='st'>"DateTimeOriginal"</span>,
-                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"ymd hms"</span>,
+                               recordDateTimeFormat  <span class='op'>=</span> <span class='st'>"ymd HMS"</span>,
                                occasionLength        <span class='op'>=</span> <span class='fl'>10</span>,
                                day1                  <span class='op'>=</span> <span class='st'>"survey"</span>,
                                includeEffort         <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -508,7 +508,7 @@ and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>s
                                stationCovariateCols  <span class='op'>=</span> <span class='st'>"utm_y"</span>,         <span class='co'># example</span>
                                individualCovariateCols <span class='op'>=</span> <span class='st'>"Individual"</span>   <span class='co'># example</span>
   <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: hms, hm and ms usage is deprecated, please use HMS, HM or MS instead. Deprecated in version '1.5.6'.</span></div><div class='input'>
+
   <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>sdh_multi</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; $`1`
 #&gt; Object class       capthist 
@@ -570,10 +570,9 @@ and time formats in R see <code><a href='https://rdrr.io/r/base/strptime.html'>s
 #&gt;  1:1       
 #&gt;  2:1       
 #&gt; 
-#&gt; </div><div class='input'>  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>sdh_multi</span>, tracks <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+#&gt; </div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>sdh_multi</span>, tracks <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: screen layout does not allow for all sessions and some plots may be lost; set par mfrow</span></div><div class='output co'>#&gt; <span class='warning'>Warning: track for repeat detections on same occasion joins points in arbitrary sequence</span></div><div class='img'><img src='spatialDetectionHistory-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='spatialDetectionHistory-3.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;  1  2 
 #&gt; 15  6 </div><div class='input'>
-
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

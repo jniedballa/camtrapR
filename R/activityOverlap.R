@@ -107,7 +107,7 @@
 #'                                      speciesB_for_activity)
 #' )
 #' 
-#' 
+#' @importFrom overlap overlapEst getBandWidth densityFit overlapPlot densityPlot
 #' @export activityOverlap
 #' 
 activityOverlap <- function(recordTable,
@@ -115,7 +115,7 @@ activityOverlap <- function(recordTable,
                             speciesB,
                             speciesCol = "Species",
                             recordDateTimeCol = "DateTimeOriginal",
-                            recordDateTimeFormat = "%Y-%m-%d %H:%M:%S",
+                            recordDateTimeFormat = "ymd HMS",
                             plotR = TRUE,
                             writePNG = FALSE,
                             addLegend = TRUE,

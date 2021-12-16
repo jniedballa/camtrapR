@@ -20,7 +20,7 @@ spatialDetectionHistory(
   individualCol,
   individualCovariateCols,
   recordDateTimeCol = "DateTimeOriginal",
-  recordDateTimeFormat = "ymd hms",
+  recordDateTimeFormat = "ymd HMS",
   occasionLength,
   minActiveDaysPerOccasion,
   occasionStartTime = "deprecated",
@@ -237,7 +237,7 @@ sdh <- spatialDetectionHistory(recordTableIndividual = recordTableIndividualSamp
                                Ycol                  = "utm_y",
                                individualCol         = "Individual",
                                recordDateTimeCol     = "DateTimeOriginal",
-                               recordDateTimeFormat  = "ymd hms",
+                               recordDateTimeFormat  = "ymd HMS",
                                occasionLength        = 10,
                                day1                  = "survey",
                                includeEffort         = TRUE,
@@ -282,7 +282,7 @@ sdh_multi <- spatialDetectionHistory(recordTableIndividual = recordTableIndividu
                                Ycol                  = "utm_y",
                                individualCol         = "Individual",
                                recordDateTimeCol     = "DateTimeOriginal",
-                               recordDateTimeFormat  = "ymd hms",
+                               recordDateTimeFormat  = "ymd HMS",
                                occasionLength        = 10,
                                day1                  = "survey",
                                includeEffort         = TRUE,
@@ -293,7 +293,6 @@ sdh_multi <- spatialDetectionHistory(recordTableIndividual = recordTableIndividu
 
   summary(sdh_multi)
   plot(sdh_multi, tracks = TRUE)
-
 
 }
 \seealso{

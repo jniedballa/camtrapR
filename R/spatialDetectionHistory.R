@@ -177,7 +177,7 @@
 #'                                Ycol                  = "utm_y",
 #'                                individualCol         = "Individual",
 #'                                recordDateTimeCol     = "DateTimeOriginal",
-#'                                recordDateTimeFormat  = "ymd hms",
+#'                                recordDateTimeFormat  = "ymd HMS",
 #'                                occasionLength        = 10,
 #'                                day1                  = "survey",
 #'                                includeEffort         = TRUE,
@@ -222,7 +222,7 @@
 #'                                Ycol                  = "utm_y",
 #'                                individualCol         = "Individual",
 #'                                recordDateTimeCol     = "DateTimeOriginal",
-#'                                recordDateTimeFormat  = "ymd hms",
+#'                                recordDateTimeFormat  = "ymd HMS",
 #'                                occasionLength        = 10,
 #'                                day1                  = "survey",
 #'                                includeEffort         = TRUE,
@@ -234,7 +234,7 @@
 #'   summary(sdh_multi)
 #'   plot(sdh_multi, tracks = TRUE)
 #' 
-#' 
+#' @importFrom secr read.traps make.capthist traps RMarkInput usage covariates
 #' @export spatialDetectionHistory
 #' 
 spatialDetectionHistory <- function(recordTableIndividual,
@@ -251,7 +251,7 @@ spatialDetectionHistory <- function(recordTableIndividual,
                                     individualCol,
                                     individualCovariateCols,
                                     recordDateTimeCol = "DateTimeOriginal",
-                                    recordDateTimeFormat = "ymd hms",
+                                    recordDateTimeFormat = "ymd HMS",
                                     occasionLength,
                                     minActiveDaysPerOccasion,
                                     occasionStartTime = "deprecated",
