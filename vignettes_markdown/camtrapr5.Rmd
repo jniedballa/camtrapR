@@ -1,0 +1,1015 @@
+---
+title: "5. Multi-species occupancy models"
+author: Juergen Niedballa (<camtrapr@gmail.com>)
+date: "`r Sys.Date()`"
+output:
+    html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 2
+    df_print: kable
+vignette: >
+  %\VignetteIndexEntry{5. Multi-species occupancy models}
+  %\VignetteDepends{raster}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r  results = "hide"}
+library(camtrapR)
+library(purrr)
+library(DT)
+```
+
+# Motivation
+
+Multi-species occupancy models are a powerful group of models that combine information from many species to estimate individual species' responses as well as community-level responses to environmental variables. 
+
+They are normally fit in Bayesian frameworks, e.g. BUGS, JAGS or Nimble. Creating the necessary input for these models from camera trapping data, writing the model code, setting parameters to monitor, initial values etc. can however be daunting, and even for seasoned users can be a tedious and time-consuming task. 
+
+A new extension of camtrapR aims to simplify this process by automatically and flexibly creating custom community occupancy models that are ready for analysis in JAGS or Nimble. The workflow supports:
+
+* continuous and categorical site covariates on detection and occupancy probability
+* fixed and random effects of these covariates
+* continuous and categorical observation-level covariates on detection probability
+* fixed or random intercepts of detection and occupancy probability
+* nested random effects
+* random effects of categorical site covariates
+* data augmentation (fully open community or known maximum species richness)
+* species richness estimates
+* models in JAGS and Nimble
+* Bayesian p-values (overall and by species)
+
+The main function is communityModel(). It automates:
+
+* writing model code
+* setting parameters to monitor
+* setting initial values
+* bundling input data
+
+The workflow provides methods for: 
+
+* fitting models
+* plotting marginal effect plots (response curves)
+* plotting effect sizes
+* spatial predictions of species occupancy probabilities
+* spatial predictions of species richness
+
+The output of fit() is an mcmc.list from the coda package and can be uses as such, so the summary(), plot(), etc. methods are available.
+
+The main function `communityModel` does not support R formula syntax the way packages like unmarked or ubms would. Instead, covariates and their effect types are specified via a few dedicated function arguments. This non-standard approach may change in the future to instead support formula syntax. On the other hand it might be less confusing than the lme4 syntax for random effects. 
+
+# Warning
+
+A word of caution, please always check the model code and make sure you understand the code and agree with it. The workflow is meant to be convenient and does not require you to even look at the model code, but you should (there are many comments in the model code make it easier). This workflow still requires a proper understanding of Bayesian modelling frameworks and the concepts behind multi-species occupancy models.
+
+# Quick example
+
+Here is a quick example using the sample data that are included in camtrapR. The data set only contains 5 species and 3 stations, and use made-up covariates, so the parameter estimates will be nonsense. It is only a technical demonstration for how community models fit into the camtrapR workflow.
+
+## Prepare data
+
+First we load the camera trap table and create a camera operation matrix:
+
+```{r}
+ data("camtraps")
+
+ # create camera operation matrix
+ camop_no_problem <- cameraOperation(CTtable      = camtraps,
+                                     stationCol   = "Station",
+                                     setupCol     = "Setup_date",
+                                     retrievalCol = "Retrieval_date",
+                                     hasProblems  = FALSE,
+                                     dateFormat   = "dmy"
+ )
+```
+
+Now we load the record table and create a list of detection histories. This is for all species, you may want to subset the record table first. Note that includeEffort = TRUE, hence the output for each species will be a list (detection history and effort matrix).
+
+```{r}
+ data("recordTableSample")
+
+ # list of detection histories
+ DetHist_list <- lapply(unique(recordTableSample$Species), FUN = function(x) {
+   detectionHistory(
+     recordTable         = recordTableSample,
+     camOp                = camop_no_problem,
+     stationCol           = "Station",
+     speciesCol           = "Species",
+     recordDateTimeCol    = "DateTimeOriginal",
+     species              = x,     # this gets modifies by lapply
+     occasionLength       = 7,
+     day1                 = "station",
+     datesAsOccasionNames = FALSE,
+     includeEffort        = TRUE,
+     scaleEffort          = TRUE,
+     timeZone             = "Asia/Kuala_Lumpur"
+   )}
+ )
+
+ # assign species names to list of detection histories
+ names(DetHist_list) <- unique(recordTableSample$Species)
+
+```
+
+ 
+Get the detection history of each species and put into a list (get rid of effort matrix).
+```{r}
+ ylist <- lapply(DetHist_list, FUN = function(x) x$detection_history)
+```
+
+Create some fake covariates (only for demonstration):
+```{r}
+ sitecovs <- camtraps[, c(1:3)]
+ sitecovs$elevation <- c(300, 500, 600)
+ sitecovs[, c(2:4)] <- scale(sitecovs[,-1])   # scale numeric covariates
+ sitecovs$fact <- factor(c("A", "A", "B"))    # categorical covariate
+
+```
+
+Now we bundle the necessary data for communityModel: 
+
+* ylist: the list of detection histories
+* siteCovs: data frame with site covariates
+* obsCovs: (named) list with observation level covariates. Requires at least the effort matrix.
+
+```{r}
+ data_list <- list(ylist    = ylist,
+                   siteCovs = sitecovs,
+                   obsCovs  = list(effort = DetHist_list[[1]]$effort))  # is identical for all species
+```
+
+
+Now data_list is a list containing the detection histories, site covariates and occasion level covariates. 
+
+
+N.B.: It is always necessary to provide an effort matrix. It is needed to ensure that detection probability is 0 when there was no effort. This is achieved by creating a binary effort matrix based on the user-provided effort matrix. The binary effort matrix is 0 for all cells where effort = NA, and 1 for all cells with values (no matter what values). Thus, all occasions with effort = NA in the effort matrix will have detection probability = 0.
+
+Also note that this does **not** include effort as a covariate on detection probability. To include effort as a covariate on detection probability, set argument `detCovsObservation` (you can specify a fixed or random effect). 
+
+
+## Fit model in JAGS
+
+Now the interesting part. The function communityModel() creates a new class, "commOccu". It is an object that contains all relevant information for running a community occupancy model. Here we will create a JAGS model (the default).
+
+
+```{r}
+# text file to save the model
+ modelfile1 <- tempfile(fileext = ".txt")
+
+ mod.jags <- communityModel(data_list,
+                            occuCovs = list(fixed = "utm_y", ranef = "elevation"),
+                            detCovsObservation = list(fixed = "effort"),
+                            intercepts = list(det = "ranef", occu = "ranef"),
+                            modelFile = modelfile1)
+```
+
+This defined a model with a fixed effect of utm_y on occupancy probability of all species, and a species-specific (random) effect of elevation on occupancy probability. Furthermore, effort is a covariate on detection probability (constant across species), and there are random effects of species on the intercepts of detection and occupancy probabilities.  
+
+There is a very basic summary method for commOccu objects:
+
+```{r}
+ summary(mod.jags)
+```
+
+The model is fit with fit().
+```{r message=FALSE}
+ fit.jags <- fit(mod.jags,
+                 n.iter = 1000,
+                 n.burnin = 500,
+                 chains = 3)
+```
+
+The output of the fit() method is an mcmc.list from the coda package. 
+Summarize posterior estimates:
+```{r}
+fit_summary <- summary(fit.jags)
+```
+
+Statistics of parameter estimates:
+```{r}
+# Note, colors may not render correctly in dark themes in RStudio.
+DT::datatable(round(fit_summary$statistics, 3))
+```
+
+
+
+Quantiles of parameter estimates:
+```{r}
+DT::datatable(round(fit_summary$statistics, 3))
+```
+
+
+Marginal effect plots (response curves) can be plotted with plot_effects(). Arguments submodel defines whether the output is for the detection or occupancy part of the model:
+
+```{r}
+ plot_effects(mod.jags,
+              fit.jags,
+              submodel = "state")
+
+ plot_effects(mod.jags,
+              fit.jags,
+              submodel = "det")
+```
+
+Likewise, we can plot effect sizes for easier comparison between species and for easily checking significance with plot_coef():
+
+```{r}
+ plot_coef(mod.jags,
+           fit.jags,
+           submodel = "state")
+
+ plot_coef(mod.jags,
+           fit.jags,
+           submodel = "det")
+```
+
+
+## Models in Nimble
+
+### Introduction
+
+NIMBLE is a system for building and sharing analysis methods for statistical models, especially for hierarchical models and computationally-intensive methods. NIMBLE is built in R but compiles your models and algorithms using C++ for speed. 
+
+(https://r-nimble.org/)
+
+It allows you to run the same models as BUGS or JAGS, but can be much faster in some situations.
+
+Using Nimble for community occupancy models requires the packages "nimble" and "nimbleEcology":
+
+```{r}
+library(nimble)
+library(nimbleEcology)
+```
+
+### Compilation and Rtools
+
+Using nimble only makes sense if one can compile the models (which runs them as fast C++ code). Compiling nimble code requires Rtools.
+
+You can obtain it from here: https://cran.r-project.org/bin/windows/Rtools/. 
+
+It then needs to be put in PATH, see here for how to do it: 
+https://cran.r-project.org/bin/windows/Rtools/#putting-rtools-on-the-path.
+
+Depending on where you installed Rtools, you should see something like "C:/rtools40/usr/bin" somewhere in the output of the following line (for me it's usually the first or second entry).
+
+```{r eval = FALSE}
+Sys.getenv("PATH") 
+```
+
+
+### Fit models in Nimble
+
+```{r include=FALSE}
+require(nimble)
+require(nimbleEcology)
+```
+
+We can fit the same model in Nimble using the exact same functions as for the JAGS model above. Only set `nimble = TRUE`.
+
+```{r}
+ modelfile2 <- tempfile(fileext = ".txt")
+
+ mod.nimble <- communityModel(data_list,
+                              occuCovs = list(fixed = "utm_x", ranef = "utm_y"),
+                              detCovsObservation = list(fixed = "effort"),
+                              intercepts = list(det = "ranef", occu = "ranef"),
+                              modelFile = modelfile2,
+                              nimble = TRUE)      # set nimble = TRUE
+```
+
+It is possible to fit uncompiled models, but it is usually extremely slow and should only be done for checking model structure and expected outputs, using very few iterations. 
+```{r}
+ fit.nimble.uncomp <- fit(mod.nimble,
+                          n.iter = 10,
+                          chains = 1)
+
+# the notes and the error message below are harmless
+```
+
+
+To fit a compiled model, set compile = TRUE:
+
+```{r}
+ fit.nimble.comp <- fit(mod.nimble,
+                        n.iter = 10000,
+                        n.burnin = 5000,
+                        chains = 3,
+                        compile = TRUE, 
+)
+```
+
+The output as an mcmc.list, just like for the JAGS model above, and can be treated just the same:
+
+```{r eval = FALSE}
+ # parameter summary statistics (not shown)
+ summary(fit.nimble.comp)
+```
+
+Response curves (= marginal effect plots)
+```{r}
+ plot_effects(mod.nimble,
+              fit.nimble.comp,
+              submodel = "state",
+              combine = TRUE)
+
+ plot_effects(mod.nimble,
+              fit.nimble.comp,
+              submodel = "det")
+```
+
+Effect size plots:
+```{r}
+ plot_coef(mod.nimble,
+           fit.nimble.comp,
+           submodel = "state")
+
+ plot_coef(mod.nimble,
+           fit.nimble.comp,
+           submodel = "det")
+```
+
+Traceplots (not shown)
+```{r eval = FALSE}
+ plot(fit.nimble.comp)
+```
+
+
+
+# More complete example
+
+The example above was very small and unrealistic. We can't provide a large camera trapping data set, but we can simulate one using the simComm function from the AHMbook package. 
+
+## Prepare data
+
+First, install GitHub version of AHMbook:
+```{r eval = FALSE}
+library(remotes)
+install_github("mikemeredith/AHMbook")
+```
+
+
+```{r}
+library(AHMbook)
+```
+
+
+Simulate community with simComm(). Here we simulate a community with 20 species, 30 camera trap stations and 5 occasions. 
+
+```{r}
+set.seed(1)
+com <- simComm(nspecies = 20, 
+                nsites = 30,
+                nreps = 5,
+                mean.psi = 0.25,     # community mean of psi over all species in community (probability scale)  (0.25 = -1.1 on logit scale)
+                sig.lpsi = 1,        # SD around intercept of logit(psi)
+                mean.p = 0.25,       # community mean of detection probability over all species (0.25 = -1.1 on logit scale)
+                sig.lp = 1,          # SD around intercept of logit(p)
+                mu.beta.lpsi = 0.5,  # mean (community) effect of habitat on logit(psi)
+                sig.beta.lpsi = 0.5, # SD around mean (community) effect of habitat on logit(psi)
+                mu.beta.lp = -0.5,   # mean (community) effect of wind on logit(p)
+                sig.beta.lp = 1)     # SD around mean (community) effect of wind on logit(p)
+```
+
+
+We need to wrangle the data a little to convert output of simComm() to input for communityModel(). This is only needed here because the data are generated by AHMbook::simComm.
+
+```{r}
+
+# get continuous site covariate "habitat"
+habitat <- com$habitat
+
+# create categorical covariate (2 levels)
+categ <- factor(rep(c("A", "B"), each = com$nsites / 2))
+
+# get observation covariate
+wind <- com$wind
+
+# list of detection histories
+ylist <- purrr::array_branch(com$y.all, 3)
+
+# remove unobserved species  (we leave that to data augmentation)
+ylist <- ylist[sapply(ylist, sum) >= 1]
+
+# here, effort was constant at all stations and occasions. Effort is thus a matrix of all 1
+effort <- matrix(1, nrow = nrow(ylist[[1]]), ncol =  ncol(ylist[[1]]))
+
+# bundle data
+input_AHM <- list(ylist = ylist, 
+                  siteCovs = data.frame(habitat = habitat,
+                                        categ   = categ),
+                  obsCovs = list(effort = effort,
+                                 wind = wind))
+```
+
+
+## JAGS Model
+
+Here's a model in JAGS, with a species-specific effect of habitat on occupancy and wind on detection, and species-specific intercepts
+
+```{r}
+modelFile_jags <- tempfile(fileext = ".txt")
+
+model1_jags <- communityModel(
+  occuCovs = list(ranef = c("habitat")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  modelFile = modelFile_jags)
+```
+
+
+```{r}
+out_ahm_jags <- fit(model1_jags, 
+                    n.iter = 5000, 
+                    n.burnin = 2500,
+                    thin = 5,
+                    chains = 3,
+                    cores = 1,      # seems faster if cores = 1
+                    quiet = T
+)
+```
+
+Summary statistics of model parameters
+```{r}
+DT::datatable(round(summary(out_ahm_jags)$statistics, 3))
+```
+
+Since we used simulated data we can compare model estimates with the truth. For example, the  true effect of habitat on occupancy was mean = 0.5 (SD = 0.5). See `beta.ranef.cont.habitat.mean` and `beta.ranef.cont.habitat.sigma` in the table above for estimates
+
+The mean effect of wind on detection probability was -0.5 (SD = 1). See `alpha.obs.ranef.cont.wind.mean` and `alpha.obs.ranef.cont.wind.sigma` in the table above for estimates. 
+
+
+
+Plot response curves (marginal effects)
+```{r}
+plot_resp_jags_occu <- plot_effects(model1_jags, 
+                                    out_ahm_jags)
+plot_resp_jags_occu
+
+
+plot_resp_jags_det <- plot_effects(model1_jags, 
+                                   out_ahm_jags,
+                                   submodel = "det")
+plot_resp_jags_det
+```
+
+Plot coefficient estimates
+```{r}
+plot_eff_jags_occu <- plot_coef(model1_jags, 
+                                out_ahm_jags)
+plot_eff_jags_occu
+
+
+plot_eff_jags_det <- plot_coef(model1_jags, 
+                               out_ahm_jags,
+                               submodel = "det")
+plot_eff_jags_det
+```
+
+
+By default, species are sorted by effect size. Alternatively, you can have them sorted by species names. Set `ordered = FALSE`:
+
+```{r}
+plot_eff_jags_occu2 <- plot_coef(model1_jags, 
+                                out_ahm_jags,
+                                ordered = FALSE)
+plot_eff_jags_occu2
+```
+
+
+## Nimble Model
+
+Here's the same model in Nimble:
+
+```{r}
+modelFile_nimble <- tempfile(fileext = ".txt")
+
+model1_nimble <- communityModel(
+  occuCovs = list(ranef = c("habitat")),
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  modelFile = modelFile_nimble,
+  nimble = TRUE)
+```
+
+We use some more iterations, since these Nimble models tend to require more iterations than equivalend JAGS models to achieve good estimates.
+```{r}
+# compiled model run
+out_ahm_nimble2 <- fit(model1_nimble, 
+                       n.iter = 5000,
+                       n.burnin = 2500,
+                       thin = 5,
+                       chains = 3,
+                       compile = TRUE,
+                       quiet = T
+)
+
+
+DT::datatable(round(summary(out_ahm_nimble2)$statistics, 3))
+```
+
+
+
+Plot responses (marginal effects)
+```{r}
+plot_resp_nimble_occu <- plot_effects(model1_nimble, 
+                                      out_ahm_nimble2)
+plot_resp_nimble_occu
+
+
+plot_resp_nimble_det <- plot_effects(model1_nimble, 
+                                     out_ahm_nimble2,
+                                     submodel = "det")
+plot_resp_nimble_det
+```
+
+
+Plot coefficient estimates
+```{r}
+plot_eff_nimble_occu <- plot_coef(model1_nimble, 
+                                  out_ahm_nimble2)
+plot_eff_nimble_occu
+
+
+plot_eff_nimble_det <- plot_coef(model1_nimble, 
+                                 out_ahm_nimble2,
+                                 submodel = "det")
+plot_eff_nimble_det
+```
+
+
+
+# Further possibilies
+
+
+This section demonstrates additional possibilities. The models here are (mostly) fit in JAGS, but can also be fitted with Nimble. 
+
+## Fixed effects
+
+One can define fixed effects of covariates if the responses are thought to be constant across all species. 
+
+
+## Data augmentation
+
+communityModel has an argument "augmentation", which can implement fully open data augmentation or data augmentation up to a known maximum number of species.
+
+
+We know there are 20 species in the community. We can inform the model that the community is known to consist of 20 species via: augmentation = c(maxknown = 20)
+
+```{r}
+modelFile_jags_aug1 <- tempfile(fileext = ".txt")
+
+model1_jags_aug1 <- communityModel(
+  occuCovs = list(ranef = c("habitat")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  augmentation = c(maxknown = 20),
+  modelFile = modelFile_jags_aug1)
+
+# short model run for demonstration
+out_ahm_jags_aug1 <- fit(model1_jags_aug1, 
+                         n.iter = 500, 
+                         n.burnin = 250,
+                         thin = 5,
+                         chains = 3,
+                         cores = 1 ,
+                         quiet = T
+)
+
+```
+
+Here is another example with fully open data augmentation (metacommunity size is unknown). The model will estimate the probability for each species to be part of the metacommunity.
+
+```{r}
+modelFile_jags_aug2 <- tempfile(fileext = ".txt")
+
+model1_jags_aug2 <- communityModel(
+  occuCovs = list(ranef = c("habitat")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  augmentation = c(full = 30),
+  modelFile = modelFile_jags_aug2)
+
+# short model run for demonstration
+out_ahm_jags_aug2 <- fit(model1_jags_aug2, 
+                         n.iter = 500, 
+                         n.burnin = 250,
+                         thin = 5,
+                         chains = 3,
+                         cores = 1,
+                         quiet = T
+)
+```
+
+See parameters "omega" and "w[1]" to "w[30]" in the model output:
+
+```{r}
+DT::datatable(round(summary(out_ahm_jags_aug2)$statistics, 3))
+```
+
+
+## Categorical covariates
+
+### Site covariates
+
+Site covariates will be interpreted as categorical if they are factors in the input data frame. If a random effect of a categorical covariate is defined, there will be independent species-level random effects within each factor level of the categorical covariate. In other words, each factor level will have its own and independent random effect of species.
+
+Here is an example with a categorical site covariate:
+
+```{r}
+modelFile_jags_categ1 <- tempfile(fileext = ".txt")
+
+model_jags_categ1 <- communityModel(
+  occuCovs = list(ranef = c("categ")),
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  modelFile = modelFile_jags_categ1)
+
+# short model run for demonstration
+out_ahm_jags_categ1 <- fit(model_jags_categ1, 
+                         n.iter = 500, 
+                         n.burnin = 250,
+                         thin = 5,
+                         chains = 3,
+                         cores = 1,
+                         quiet = T
+)
+```
+
+Plot the results:
+```{r}
+plot_effects(object = model_jags_categ1,
+             mcmc.list = out_ahm_jags_categ1)
+plot_coef(object = model_jags_categ1,
+          mcmc.list = out_ahm_jags_categ1)
+```
+
+
+See the arguments `beta.ranef.categ.categ`. The species effects have two indices: [species, factorLevel]. Accordingly, there are two estimates for `mean` and `SD`, respectively. All estimates for the first factor level are 0, since the intercept refers to the first factor level. 
+
+```{r}
+DT::datatable(round(summary(out_ahm_jags_categ1)$statistics, 3))
+```
+
+### Observation-level covariates
+
+Currently categorical observation-level covariates are only fully supported in JAGS, not Nimble. Observation-level covariates are matrices and can't be factors. Thus they need to be defined as character matrices.
+
+```{r}
+# Create example categorical observation covariate
+input_AHM$obsCovs$wind_categ <- ifelse(input_AHM$obsCovs$wind > 0, "windy", "calm")
+
+# result is a character matrix:
+str(input_AHM$obsCovs$wind_categ)
+```
+
+
+Model example:
+
+```{r}
+modelFile_jags_categ2 <- tempfile(fileext = ".txt")
+
+model_jags_categ2 <- communityModel(
+  occuCovs = list(fixed = c("habitat")), 
+  detCovsObservation = list(ranef = c("wind_categ")),     # "wind_categ" now
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  modelFile = modelFile_jags_categ2)
+
+out_ahm_jags_categ2 <- fit(model_jags_categ2, 
+                         n.iter = 500, 
+                         n.burnin = 250,
+                         thin = 5,
+                         chains = 3,
+                         cores = 1,
+                         quiet = T,
+                         compile = FALSE
+)
+```
+
+Model estimates. As above, the estimates for the first factor level are 0. The relevant parameters here are called `alpha.obs.ranef.categ.wind_categ`.
+
+```{r}
+DT::datatable(round(summary(out_ahm_jags_categ2)$statistics, 3))
+```
+
+Plot the results:
+```{r}
+plot_effects(object = model_jags_categ2, 
+             mcmc.list = out_ahm_jags_categ2,
+             submodel = "det")
+
+plot_coef(object = model_jags_categ2, 
+          mcmc.list = out_ahm_jags_categ2,
+          submodel = "det")
+```
+
+
+## Random effects other than species
+
+By default random effects are by species. Alternatively, you can specify random effects of a categorical site covariate2 on continous covariate1 using the pattern:
+
+occuCovs(ranef = c("covariate1|covariate2"))
+
+The same syntax can be used in 
+
+detCovs(ranef = c("covariate1|covariate2"))
+
+and 
+
+detCovs(ranef = c("covariate1|covariate2"))
+
+
+Here is an example, where the effect of "habitat" differs between levels of "categ".
+```{r}
+modelFile_jags_ranef <- tempfile(fileext = ".txt")
+
+model1_jags_ranef <- communityModel(
+  occuCovs = list(ranef = c("habitat|categ")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  modelFile = modelFile_jags_ranef)
+
+# short model run for demonstration
+out_ahm_jags_ranef <- fit(model1_jags_ranef, 
+                         n.iter = 500, 
+                         n.burnin = 250,
+                         thin = 5,
+                         chains = 3,
+                         cores = 1,
+                         quiet = T
+)
+```
+
+
+Search for the term "habitat_categ" in the table below. There are 2 estimates (for stations with "A" and "B"), plus the mean and sigma of the random effect (this is only for demonstration, 2 factor levels is of course not enough for applying random effects).
+
+```{r}
+DT::datatable(round(summary(out_ahm_jags_ranef)$statistics, 3))
+```
+
+Currently random effects other than species can not be plotted with plot_effects and plot_coef.
+
+## Nested random effects
+
+Consider a numeric covariate1 and categorical covariate2. 
+Use the keyword "+Species" to specify a species-specific random effect within each factor level of covariate2:
+
+occuCovs(ranef = c("covariate1|covariate2+Species"))
+
+
+Here is an example, with independent random effect of "categ" on "habitat" for each species:
+
+```{r}
+modelFile_jags_nested <- tempfile(fileext = ".txt")
+
+model1_jags_nested <- communityModel(
+  occuCovs = list(ranef = c("habitat|categ+Species")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  modelFile = modelFile_jags_nested)
+
+# short model run for demonstration
+out_ahm_jags_nested <- fit(model1_jags_nested, 
+                         n.iter = 500, 
+                         n.burnin = 250,
+                         thin = 5,
+                         chains = 3,
+                         cores = 1,
+                         quiet = T
+)
+```
+
+Search for the term "habitat_categ_Species" in the table below. 
+
+```{r}
+DT::datatable(round(summary(out_ahm_jags_nested)$statistics, 3))
+```
+
+Currently nested random effects can not be plotted with plot_effects and plot_coef.
+
+## Quadratic covariate effects
+
+
+The easiest way to include quadratic effects is by squaring the covariate and including it as a new covariate. The plot_* and predict methods will be able to identify the quadratic term via a required keyword (the suffix "_squared" by default). 
+
+Covariates should be scaled to prior to squaring ("habitat" in this examples is already scaled). 
+
+Create quadratic covariate
+
+```{r}
+input_AHM$siteCovs$habitat_squared <- input_AHM$siteCovs$habitat ^2
+```
+
+
+
+
+```{r}
+modelFile_jags_quadratic <- tempfile(fileext = ".txt")
+
+
+
+model1_jags_quadratic <- communityModel(
+  occuCovs = list(ranef = c("habitat", "habitat_squared")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  modelFile = modelFile_jags_quadratic)
+
+# short model run for demonstration
+out_ahm_jags_nested <- fit(model1_jags_quadratic, 
+                         n.iter = 500, 
+                         n.burnin = 250,
+                         thin = 5,
+                         chains = 3,
+                         cores = 1,
+                         quiet = T
+)
+
+```
+
+
+Thanks to to keyword "_squared", `plot_effects` will combine the effects of "habitat" and "habitat_squared" in response curves.
+
+```{r}
+plot_effects(model1_jags_quadratic, 
+             out_ahm_jags_nested)
+```
+
+The data have no quadratic relationship with covariates, hence the quadratic effects are rather weak 
+
+
+
+## WAIC
+
+Nimble models can return WAIC. Set argument `fit(..., WAIC = TRUE)`.
+
+
+```{r}
+out_ahm_nimble3 <- fit(model1_nimble, 
+                       n.iter = 500,
+                       n.burnin = 250,
+                       thin = 5,
+                       chains = 3,
+                       compile = TRUE,
+                       quiet = F, 
+                       WAIC = TRUE
+)
+```
+
+The message about "individual pWAIC values that are greater than 0.4" is likely due to the short model run. 
+
+If `WAIC = TRUE`, the output will be a list with 2 elements. The first ("samples") is the familiar mcmc.list, the second ("WAIC") is a waicList. 
+
+
+mcmc.list is accessible with $samples:
+```{r eval = FALSE}
+# not printed here
+summary(out_ahm_nimble3$samples)$statistics
+
+```
+
+WAIC:
+```{r}
+out_ahm_nimble3$WAIC
+```
+
+## Species richness estimates for categorical covariates
+
+This is only relevant for JAGS models. Argument "richnessCategories" can be used to calculate separate species richness estimates for different levels of categorical site covariates. If it is not defined, there will only be a global species richness estimate. 
+
+```{r}
+modelFile_jags_richness <- tempfile(fileext = ".txt")
+
+model1_jags_richness <- communityModel(
+  occuCovs = list(ranef = c("habitat")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  richnessCategories = "categ",
+  modelFile = modelFile_jags_richness)
+
+# short model run for demonstration
+out_ahm_jags_rich <- fit(model1_jags_richness, 
+                         n.iter = 500, 
+                         n.burnin = 250,
+                         thin = 5,
+                         chains = 3,
+                         cores = 1,
+                         quiet = T
+)
+```
+
+Now search for "Nspecies" in the table below. You will see 3 entries. "Nspecies" is overall, Nspecies_by_category[1] and ...[2] are for the stations with category "A" and "B", respectively.
+
+```{r}
+DT::datatable(round(summary(out_ahm_jags_rich)$statistics, 3))
+```
+
+
+## Spatial predictions
+
+You can create spatial predictions based on the occupancy models created with `communityModel` and their model fits.
+
+This requires the raster package
+
+```{r message=FALSE}
+  library(raster)
+```
+
+In this example we will just create a raster with random numbers. 
+```{r}
+raster_test <- raster(x = matrix(rnorm(400), ncol = 20))
+  
+  # add raster to list
+  stack_prediction <- stack(list(habitat = raster_test))
+
+```
+
+Species occupancy maps:
+```{r}
+# species occupancy estimates
+  predictions_psi <- predict(object    = model1_nimble, 
+                             mcmc.list = out_ahm_nimble2,
+                             x         = stack_prediction,
+                             type      = "psi",
+                             draws     = 1000)
+  
+  plot(predictions_psi$mean, zlim = c(0,1), col = hcl.colors(100))
+
+```
+
+Species richness maps:
+```{r}
+# species richness estimates
+  predictions_rich <- predict(object   = model1_nimble, 
+                             mcmc.list = out_ahm_nimble2,
+                             x         = stack_prediction,
+                             type      = "richness")
+  
+  plot(predictions_rich)
+  # mean = mean species richness estimate
+  # sd = standard deviation of richness estimate
+
+
+```
+
+In these examples we did not return confidence intervals. Doing so would be easy by setting intervals =  "confidence".
+
+Computation can take long on larger rasters and can require lots of RAM. Check RAM usage during computations. 
+
+
+## bayesplot
+
+We can also use the powerful bayesplot package for visualizing model estimates. One downside is that it won't automatically insert the species names.
+
+```{r message=FALSE}
+library(bayesplot)
+```
+
+Here is an example for density plots showing the species-level effects of habitat on occupancy:
+```{r}
+mcmc_areas(out_ahm_nimble2, regex_pars = "beta.ranef.cont.habitat")
+```
+
+bayesplot has many other visualization options beyond this example.
+
+
+## Model diagnostics
+
+Output of fit() is a coda::mcmc.list, so plot() provides traceplots (not shown here for space reasons):
+
+```{r eval = FALSE}
+plot(out_ahm_nimble2)
+```
+
+
+The Gelman-Rubin convergence statistic (potential scale reduction factor) can be calculated with `gelman.diag` from `coda`:
+
+```{r}
+gd <- gelman.diag(out_ahm_nimble2,  multivariate = FALSE)
+gd
+```
+
+One can also use `gelman.plot` to create Gelman-Rubin-Brooks plots (evolution of Gelman-Rubin statistic over iterations):
+
+```{r eval = FALSE}
+# not shown here due to space reasons
+gelman.plot(out_ahm_nimble2,  multivariate = FALSE)
+```
+
+
+
+## Single-species occupancy models
+
+The workflow above can be used for single-species models also. The code will be less streamlined and possibly slower than normal code for single-species models (due to the then unnecessary species loop), but it is possible. Simply pass a single detection history in the data_list$ylist of the input to `communityModel`. 
+Take care to only define fixed effects for all covariates and the intercepts, not random effects. 
+
