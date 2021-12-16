@@ -179,6 +179,11 @@
 #' camop_problem
 #' camop_problem_lubridate
 #' 
+#' @importFrom data.table rbindlist setDF setDT setkey foverlaps ":="
+#' @importFrom lubridate as_date as_datetime ddays dhours dseconds interval int_start int_end time_length "%within%"
+#' @importFrom methods hasArg is new
+#' @importFrom stats aggregate na.omit start end rnorm window quantile
+#' @importFrom utils capture.output modifyList write.csv zip head menu read.table
 #' @export cameraOperation
 #' 
 cameraOperation <- function(CTtable,
