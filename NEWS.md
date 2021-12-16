@@ -1,7 +1,8 @@
 # camtrapR 2.1.0
 
 ## new functions
-* OCRdataFields: allows automatic reading of text from data fields in images via optical character recognition (OCR), requires magick and tesseract packages. 
+* communityModel: create community occupancy models for JAGS and Nimble. Comes with summary(), fit(), and predict() methods, and two additional functions: plot_effects / plot_coef
+* OCRdataFields: allows automatic reading of text from data fields in images via optical character recognition (OCR), requires magick and tesseract packages
 * writeDateTimeOriginal: Write values to DateTimeOriginal tag to image metadata
 
 ## new features
@@ -9,7 +10,7 @@
 * cameraOperation: gained argument occasionStartTime (deprecated in detectionHistory / spatialDetectionHistory)
 * function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument "lattice", which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)
 * surveyReport: new argument camOp (for a camera operation matrix), argument CTHasProblems is deprecated. Improved calculation of survey effort.
-* timeShiftImages / addCopyrightTag: added argument "ignoreMinorErrors", set it to TRUE if functions fails due to bad MakerNotes (reported by An The Truong Nguyen)
+* timeShiftImages / addCopyrightTag: added argument "ignoreMinorErrors", set it to TRUE if functions fails due to bad MakerNotes (reported by An Nguyen)
 * detectionMaps uses package sf instead of sp and rgdal
 
 ## bugfixes
