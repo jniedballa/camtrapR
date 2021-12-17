@@ -75,7 +75,7 @@ The function returns several derived quantities, e.g. species richness, Bayesian
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -108,6 +108,9 @@ The function returns several derived quantities, e.g. species richness, Bayesian
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
+    </li>
+    <li>
+      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
     </li>
   </ul>
 </li>
@@ -193,7 +196,7 @@ The function returns several derived quantities, e.g. species richness, Bayesian
     </tr>
     <tr>
       <th>augmentation</th>
-      <td><p>If NULL, no data augmentation (only use species in <code>data_list$ylist</code>), otherwise list or named vector with total number of (potential) species. Names: "knownmax" or "full". Example: <code>augmentation = c(knownmax = 30)</code> or <code>augmentation = c(full = 30)</code></p></td>
+      <td><p>If NULL, no data augmentation (only use species in <code>data_list$ylist</code>), otherwise named list or vector with total number of (potential) species. Names: "knownmax" or "full". Example: <code>augmentation = c(knownmax = 30)</code> or <code>augmentation = c(full = 30)</code></p></td>
     </tr>
     <tr>
       <th>modelFile</th>
@@ -217,18 +220,7 @@ The function returns several derived quantities, e.g. species richness, Bayesian
   <dt>nimble</dt><dd><p>logical indicator for whether it is a Nimble model</p></dd>
   <dt>modelFile</dt><dd><p>Path of the text file containing the model code</p></dd>
   
-
-More specifically, the data slot is a list of model input data. While the exact content depends on function input, it can be summarized as:
-
-ll
-<code>y</code>  array of detection histories. Dimensions are: y[species, station, occasion] <br />
-<code>effort_binary</code>  matrix of binary (1/0) survey effort. Only used to ensure p = 0 when effort = 0. Dimensions are: effort_binary[station, occasion] <br />
-<code>site-occasion covariates</code>  The content of data_list$obsCovs as named matrices with dimensions [station, occasion] <br />
-<code>site covariates</code>  The columns of data_list$siteCovs as named vectors (length = number of stations) <br />
-<code>M</code>  Number of species <br />
-<code>J</code>  Number of stations <br />
-<code>maxocc</code>  Number of occasions <br />
-
+See <a href='commOccu-class.html'>commOccu-class</a>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -242,7 +234,7 @@ Furthermore, is is possible to use use nested random effects of species and anot
 <tr><td><code>Bpvalue</code></td><td>Bayesian p-value (overall)</td></tr>
 <tr><td><code>Bpvalue_species</code></td><td>Bayesian p-value (by species)</td></tr>
 <tr><td><code>Nspecies</code></td><td>Species richness (only in JAGS model)</td></tr>
-<tr><td><code>Nspecies_by_category</code></td><td>Species richness by categories (when using <code>richnessCategories</code>, only in JAGS model)</td></tr>
+<tr><td><code>Nspecies_Covariate</code></td><td>Species richness by categorical covariate (when using <code>richnessCategories</code>, only in JAGS model)</td></tr>
 <tr><td><code>R2</code></td><td>sum of Freeman-Tukey residuals of observed data within each species</td></tr>
 <tr><td><code>new.R2</code></td><td>sum of Freeman-Tukey residuals of simulated data within each species</td></tr>
 <tr><td><code>R3</code></td><td>Total sum of Freeman-Tukey residuals of observed data</td></tr>
@@ -254,7 +246,7 @@ Furthermore, is is possible to use use nested random effects of species and anot
 </table>
 
 
-<p>Quanitities in <em>italic</em> at the bottom are only returned in full data augmentation. <code>Nspecies_by_category</code> and <code>Nspecies_by_category</code> are only returned in JAGS models (because Nimble models don't explicitly return latent occupancy status z).</p>
+<p>Quantities in <em>italic</em> at the bottom are only returned in full data augmentation. <code>Nspecies</code> and <code>Nspecies_Covariate</code> are only returned in JAGS models (because Nimble models don't explicitly return latent occupancy status z).</p>
     <h2 class="hasAnchor" id="parameter-naming-convention"><a class="anchor" href="#parameter-naming-convention"></a>Parameter naming convention</h2>
 
     
@@ -291,7 +283,7 @@ Furthermore, is is possible to use use nested random effects of species and anot
 <p><b><code>alpha.obs.fixed.cont.effort</code></b> is the fixed effect (constant across species) of the continuous observation-level covariate 'effort' on detection probability</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Kery, M., and J. A. Royle. "Applied hierarchical modelling in ecology-Modeling distribution, abundance and species richness using R and BUGS." Volume 1: Prelude and Static Models. Elsevier/Academic Press, 2016.</p>
+    <p>Kéry, M., and J. A. Royle. "Applied hierarchical modelling in ecology - Modeling distribution, abundance and species richness using R and BUGS." Volume 1: Prelude and Static Models. Elsevier/Academic Press, 2016.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Juergen Niedballa</p>
@@ -308,13 +300,13 @@ Furthermore, is is possible to use use nested random effects of species and anot
                                     setupCol     <span class='op'>=</span> <span class='st'>"Setup_date"</span>,
                                     retrievalCol <span class='op'>=</span> <span class='st'>"Retrieval_date"</span>,
                                     hasProblems  <span class='op'>=</span> <span class='cn'>FALSE</span>,
-                                    dateFormat   <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span>
+                                    dateFormat   <span class='op'>=</span> <span class='st'>"dmy"</span>
 <span class='op'>)</span>
 
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"recordTableSample"</span><span class='op'>)</span>
 
 <span class='co'># list of detection histories</span>
-<span class='va'>DetHist_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>$</span><span class='va'>Species</span><span class='op'>)</span>, FUN <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>DetHist_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>$</span><span class='va'>Species</span><span class='op'>)</span>, FUN <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='fu'><a href='detectionHistory.html'>detectionHistory</a></span><span class='op'>(</span>
     recordTable         <span class='op'>=</span> <span class='va'>recordTableSample</span>,
     camOp                <span class='op'>=</span> <span class='va'>camop_no_problem</span>,
@@ -331,14 +323,14 @@ Furthermore, is is possible to use use nested random effects of species and anot
   <span class='op'>)</span><span class='op'>}</span>
 <span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>DetHist_list</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>$</span><span class='va'>Species</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/pkg/raster/man/names.html'>names</a></span><span class='op'>(</span><span class='va'>DetHist_list</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>recordTableSample</span><span class='op'>$</span><span class='va'>Species</span><span class='op'>)</span>
 
 <span class='va'>ylist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>DetHist_list</span>, FUN <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='va'>x</span><span class='op'>$</span><span class='va'>detection_history</span><span class='op'>)</span>
 
 <span class='co'># some fake covariates for demonstration</span>
-<span class='va'>sitecovs</span> <span class='op'>&lt;-</span> <span class='va'>camtraps</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span><span class='op'>]</span>
-<span class='va'>sitecovs</span><span class='op'>$</span><span class='va'>elevation</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>300</span>, <span class='fl'>500</span>, <span class='fl'>600</span><span class='op'>)</span>   
-<span class='va'>sitecovs</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/scale.html'>scale</a></span><span class='op'>(</span><span class='va'>sitecovs</span><span class='op'>[</span>,<span class='op'>-</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span>   <span class='co'># scale numeric covariates</span>
+<span class='va'>sitecovs</span> <span class='op'>&lt;-</span> <span class='va'>camtraps</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/nimble/man/nimble-R-functions.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>sitecovs</span><span class='op'>$</span><span class='va'>elevation</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/nimble/man/nimble-R-functions.html'>c</a></span><span class='op'>(</span><span class='fl'>300</span>, <span class='fl'>500</span>, <span class='fl'>600</span><span class='op'>)</span>   
+<span class='va'>sitecovs</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/nimble/man/nimble-R-functions.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>:</span><span class='fl'>4</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/raster/man/scale.html'>scale</a></span><span class='op'>(</span><span class='va'>sitecovs</span><span class='op'>[</span>,<span class='op'>-</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span>   <span class='co'># scale numeric covariates</span>
 
 
 <span class='co'># bundle input data for communityModel</span>
@@ -349,48 +341,57 @@ Furthermore, is is possible to use use nested random effects of species and anot
 
 <span class='co'># create community model for JAGS</span>
 <span class='va'>modelfile1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span><span class='op'>(</span>fileext <span class='op'>=</span> <span class='st'>".txt"</span><span class='op'>)</span>
-<span class='va'>mod_jags</span> <span class='op'>&lt;-</span> <span class='fu'>communityModel</span><span class='op'>(</span><span class='va'>data_list</span>,
+<span class='va'>mod.jags</span> <span class='op'>&lt;-</span> <span class='fu'>communityModel</span><span class='op'>(</span><span class='va'>data_list</span>,
                            occuCovs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed <span class='op'>=</span> <span class='st'>"utm_y"</span>, ranef <span class='op'>=</span> <span class='st'>"elevation"</span><span class='op'>)</span>,
                            detCovsObservation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed <span class='op'>=</span> <span class='st'>"effort"</span><span class='op'>)</span>,
                            intercepts <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>det <span class='op'>=</span> <span class='st'>"ranef"</span>, occu <span class='op'>=</span> <span class='st'>"ranef"</span><span class='op'>)</span>,
                            modelFile <span class='op'>=</span> <span class='va'>modelfile1</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>mod_jags</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>mod.jags</span><span class='op'>)</span>
 
 <span class='co'># fit in JAGS</span>
-<span class='va'>fit.jags</span> <span class='op'>&lt;-</span> <span class='fu'>fit</span><span class='op'>(</span><span class='va'>mod_jags</span>,
+<span class='va'>fit.jags</span> <span class='op'>&lt;-</span> <span class='fu'>fit</span><span class='op'>(</span><span class='va'>mod.jags</span>,
                 n.iter <span class='op'>=</span> <span class='fl'>1000</span>,
                 n.burnin <span class='op'>=</span> <span class='fl'>500</span>,
                 chains <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>   
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>fit.jags</span><span class='op'>)</span>
 
 <span class='co'># response curves (= marginal effect plots)</span>
-<span class='fu'>visualize</span><span class='op'>(</span><span class='va'>mod_jags</span>, 
+<span class='fu'><a href='plot_effects,commOccu-method.html'>plot_effects</a></span><span class='op'>(</span><span class='va'>mod.jags</span>, 
              <span class='va'>fit.jags</span>, 
              submodel <span class='op'>=</span> <span class='st'>"state"</span><span class='op'>)</span>
-<span class='fu'>visualize</span><span class='op'>(</span><span class='va'>mod_jags</span>, 
+<span class='fu'><a href='plot_effects,commOccu-method.html'>plot_effects</a></span><span class='op'>(</span><span class='va'>mod.jags</span>, 
              <span class='va'>fit.jags</span>, 
              submodel <span class='op'>=</span> <span class='st'>"det"</span><span class='op'>)</span>
+             
+<span class='co'># effect sizes plot</span>
+<span class='fu'><a href='plot_coef,commOccu-method.html'>plot_coef</a></span><span class='op'>(</span><span class='va'>mod.jags</span>, 
+          <span class='va'>fit.jags</span>, 
+          submodel <span class='op'>=</span> <span class='st'>"state"</span><span class='op'>)</span>
+<span class='fu'><a href='plot_coef,commOccu-method.html'>plot_coef</a></span><span class='op'>(</span><span class='va'>mod.jags</span>, 
+          <span class='va'>fit.jags</span>, 
+          submodel <span class='op'>=</span> <span class='st'>"det"</span><span class='op'>)</span>              
 
 <span class='co'># create community model for Nimble</span>
 <span class='va'>modelfile2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span><span class='op'>(</span>fileext <span class='op'>=</span> <span class='st'>".txt"</span><span class='op'>)</span>
-<span class='va'>mod_nimble</span> <span class='op'>&lt;-</span> <span class='fu'>communityModel</span><span class='op'>(</span><span class='va'>data_list</span>,
+<span class='va'>mod.nimble</span> <span class='op'>&lt;-</span> <span class='fu'>communityModel</span><span class='op'>(</span><span class='va'>data_list</span>,
                              occuCovs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed <span class='op'>=</span> <span class='st'>"utm_x"</span>, ranef <span class='op'>=</span> <span class='st'>"utm_y"</span><span class='op'>)</span>,
                              detCovsObservation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed <span class='op'>=</span> <span class='st'>"effort"</span><span class='op'>)</span>,
                              intercepts <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>det <span class='op'>=</span> <span class='st'>"ranef"</span>, occu <span class='op'>=</span> <span class='st'>"ranef"</span><span class='op'>)</span>,
                              modelFile <span class='op'>=</span> <span class='va'>modelfile2</span>, 
                              nimble <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>      <span class='co'># set nimble = TRUE</span>
 
-<span class='co'># load nimbleEcology package (currently necessary to do explicitly)</span>
+<span class='co'># load nimbleEcology package </span>
+<span class='co'># currently necessary to do explicitly, to avoid additional package dependencies</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/nimble-dev/nimbleEcology'>nimbleEcology</a></span><span class='op'>)</span>
 
 <span class='co'># fit uncompiled model in Nimble</span>
-<span class='va'>fit.nimble.uncomp</span> <span class='op'>&lt;-</span> <span class='fu'>fit</span><span class='op'>(</span><span class='va'>mod_nimble</span>, 
+<span class='va'>fit.nimble.uncomp</span> <span class='op'>&lt;-</span> <span class='fu'>fit</span><span class='op'>(</span><span class='va'>mod.nimble</span>, 
                          n.iter <span class='op'>=</span> <span class='fl'>10</span>, 
                          chains <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 
 <span class='co'># fit compiled model in Nimble</span>
-<span class='va'>fit.nimble.comp</span> <span class='op'>&lt;-</span> <span class='fu'>fit</span><span class='op'>(</span><span class='va'>mod_nimble</span>, 
+<span class='va'>fit.nimble.comp</span> <span class='op'>&lt;-</span> <span class='fu'>fit</span><span class='op'>(</span><span class='va'>mod.nimble</span>, 
                        n.iter <span class='op'>=</span> <span class='fl'>5000</span>, 
                        n.burnin <span class='op'>=</span> <span class='fl'>2500</span>,
                        chains <span class='op'>=</span> <span class='fl'>3</span>, 
@@ -401,16 +402,23 @@ Furthermore, is is possible to use use nested random effects of species and anot
 
 
 <span class='co'># response curves (= marginal effect plots)</span>
-<span class='fu'>visualize</span><span class='op'>(</span><span class='va'>mod_nimble</span>, 
-              <span class='va'>fit.nimble.comp</span>, 
-              submodel <span class='op'>=</span> <span class='st'>"state"</span><span class='op'>)</span>
-<span class='fu'>visualize</span><span class='op'>(</span><span class='va'>mod_nimble</span>, 
-              <span class='va'>fit.nimble.comp</span>, 
-              submodel <span class='op'>=</span> <span class='st'>"det"</span><span class='op'>)</span>
+<span class='fu'><a href='plot_effects,commOccu-method.html'>plot_effects</a></span><span class='op'>(</span><span class='va'>mod.nimble</span>, 
+             <span class='va'>fit.nimble.comp</span>, 
+             submodel <span class='op'>=</span> <span class='st'>"state"</span><span class='op'>)</span>
+<span class='fu'><a href='plot_effects,commOccu-method.html'>plot_effects</a></span><span class='op'>(</span><span class='va'>mod.nimble</span>, 
+             <span class='va'>fit.nimble.comp</span>, 
+             submodel <span class='op'>=</span> <span class='st'>"det"</span><span class='op'>)</span>
 
+<span class='co'>#' # effect sizes plot</span>
+<span class='fu'><a href='plot_coef,commOccu-method.html'>plot_coef</a></span><span class='op'>(</span><span class='va'>mod.nimble</span>, 
+          <span class='va'>fit.nimble.comp</span>, 
+          submodel <span class='op'>=</span> <span class='st'>"state"</span><span class='op'>)</span>
+<span class='fu'><a href='plot_coef,commOccu-method.html'>plot_coef</a></span><span class='op'>(</span><span class='va'>mod.nimble</span>, 
+          <span class='va'>fit.nimble.comp</span>, 
+          submodel <span class='op'>=</span> <span class='st'>"det"</span><span class='op'>)</span>   
 
 <span class='co'># traceplots</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>fit.nimble.comp</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/pkg/raster/man/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>fit.nimble.comp</span><span class='op'>)</span>
 
 
 <span class='op'>}</span>

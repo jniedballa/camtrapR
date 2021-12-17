@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Plot Marginal Effects of Covariates — plot_effects,commOccu-method" />
-<meta property="og:description" content="Plot marginal effect plots (= response curves if covariates are continuous) for all species in a community (multi-species) occupancy model." />
+<meta property="og:description" content="Plot marginal effect plots (= response curves if covariates are continuous) for all species in a community (multi-species) occupancy model. Takes into account species-specific intercepts (if any). Currently only supports continuous covariates, not categorical covariates." />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -106,6 +106,9 @@
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
+    <li>
+      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -133,18 +136,18 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot Marginal Effects of Covariates</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jniedballa/camtrapR/blob/master/R/communityModel.R'><code>R/communityModel.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/jniedballa/camtrapR/blob/master/R/plot.R'><code>R/plot.R</code></a></small>
     <div class="hidden name"><code>plot_effects-commOccu-method.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plot marginal effect plots (= response curves if covariates are continuous) for all species in a community (multi-species) occupancy model.</p>
+    <p>Plot marginal effect plots (= response curves if covariates are continuous) for all species in a community (multi-species) occupancy model. Takes into account species-specific intercepts (if any). Currently only supports continuous covariates, not categorical covariates.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for commOccu</span>
 <span class='fu'>plot_effects</span><span class='op'>(</span>
   <span class='va'>object</span>,
-  <span class='va'>mcmc_list</span>,
+  <span class='va'>mcmc.list</span>,
   submodel <span class='op'>=</span> <span class='st'>"state"</span>,
   draws <span class='op'>=</span> <span class='fl'>1000</span>,
   <span class='va'>outdir</span>,
@@ -161,7 +164,7 @@
       <td><p><code>commOccu</code> object</p></td>
     </tr>
     <tr>
-      <th>mcmc_list</th>
+      <th>mcmc.list</th>
       <td><p>mcmc.list. Output of <code>fit</code> called on a <code>commOccu</code> object</p></td>
     </tr>
     <tr>
@@ -186,7 +189,7 @@
     </tr>
     <tr>
       <th>...</th>
-      <td><p>currently ignored</p></td>
+      <td><p>additional arguments for <code><a href='https://ggplot2.tidyverse.org/reference/ggsave.html'>ggsave</a></code></p></td>
     </tr>
     </table>
 

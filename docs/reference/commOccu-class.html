@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -105,6 +105,9 @@
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
+    </li>
+    <li>
+      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
     </li>
   </ul>
 </li>
@@ -146,20 +149,6 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>commOccu</code> object</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>The <code>data</code> slot is a list of model input data. While the exact content depends on function input, it can be summarized as:</p>
-<table class='table'>
-<tr><td><code>y</code></td><td>array of detection histories. Dimensions are: y[species, station, occasion]</td></tr>
-<tr><td><code>effort_binary</code></td><td>matrix of binary (1/0) survey effort. Only used to ensure p = 0 when effort = 0. Dimensions are: effort_binary[station, occasion]</td></tr>
-<tr><td><code>site-occasion covariates</code></td><td>The content of data_list$obsCovs as named matrices with dimensions [station, occasion]</td></tr>
-<tr><td><code>site covariates</code></td><td>The columns of data_list$siteCovs as named vectors (length = number of stations)</td></tr>
-<tr><td><code>M</code></td><td>Number of species</td></tr>
-<tr><td><code>J</code></td><td>Number of stations</td></tr>
-<tr><td><code>maxocc</code></td><td>Number of occasions</td></tr>
-</table>
-
-
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     
@@ -179,7 +168,23 @@
 
 <dt><code>modelFile</code></dt><dd><p>Path of the text file containing the model code</p></dd>
 
+<dt><code>covariate_info</code></dt><dd><p>Data frame containing information about covariates. Only used internally in plot_* methods</p></dd>
+
 </dl>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>The <code>data</code> slot is a list of model input data. While the exact content depends on function input, it can be summarized as:</p>
+<table class='table'>
+<tr><td><code>y</code></td><td>array of detection histories. Dimensions are: y[species, station, occasion]</td></tr>
+<tr><td><code>effort_binary</code></td><td>matrix of binary (1/0) survey effort. Only used to ensure p = 0 when effort = 0. Dimensions are: effort_binary[station, occasion]</td></tr>
+<tr><td><code>site-occasion covariates</code></td><td>The content of data_list$obsCovs as named matrices with dimensions [station, occasion]</td></tr>
+<tr><td><code>site covariates</code></td><td>The columns of data_list$siteCovs as named vectors (length = number of stations)</td></tr>
+<tr><td><code>M</code></td><td>Number of species</td></tr>
+<tr><td><code>J</code></td><td>Number of stations</td></tr>
+<tr><td><code>maxocc</code></td><td>Number of occasions</td></tr>
+</table>
+
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

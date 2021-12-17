@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="Fit a community (multi-species) occupancy model — fit,commOccu-method" />
-<meta property="og:description" content="Fits a community occupancy model (defined in a commOccu object) in JAGS or Nimble." />
+<meta property="og:description" content="Convenience function for fitting community occupancy models (defined in a commOccu object) in JAGS or Nimble." />
 
 
 
@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -106,6 +106,9 @@
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
+    <li>
+      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -138,7 +141,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Fits a community occupancy model (defined in a commOccu object) in JAGS or Nimble.</p>
+    <p>Convenience function for fitting community occupancy models (defined in a commOccu object) in JAGS or Nimble.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for commOccu</span>
@@ -151,6 +154,8 @@
   cores <span class='op'>=</span> <span class='fl'>1</span>,
   chains <span class='op'>=</span> <span class='fl'>3</span>,
   compile <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  WAIC <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  quiet <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -190,6 +195,14 @@
       <td><p>logical. If Nimble model, compile model with <code><a href='https://rdrr.io/pkg/nimble/man/compileNimble.html'>compileNimble</a></code> before running model?</p></td>
     </tr>
     <tr>
+      <th>WAIC</th>
+      <td><p>logical. Return WAIC (only Nimble models)</p></td>
+    </tr>
+    <tr>
+      <th>quiet</th>
+      <td><p>if TRUE messages and progress bar will be suppressed</p></td>
+    </tr>
+    <tr>
       <th>...</th>
       <td><p>additional arguments to pass to <code><a href='https://rdrr.io/pkg/nimble/man/runMCMC.html'>runMCMC</a></code> (only relevant for Nimble)</p></td>
     </tr>
@@ -197,11 +210,12 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An coda::mcmc.list object</p>
+    <p>A coda::mcmc.list</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Models will be fit either in JAGS or Nimble, depending on the decision made in the <code>nimble</code> argument in <code><a href='communityModel.html'>communityModel</a></code>.</p>
 <p>For Nimble, compilation is strongly recommended for long model runs. Uncompiled models can run extremely slow. Compilation itself can take a while also, and requires that Rtools is available on the system.</p>
+<p>It is a convenience function only which hides some of the configuration options. If you require more control over model fitting, you can run all steps individually. See vignette 5 for details.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
