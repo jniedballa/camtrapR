@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -104,6 +104,9 @@
     </li>
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
+    </li>
+    <li>
+      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
     </li>
   </ul>
 </li>
@@ -143,7 +146,8 @@
 <h2 class="hasAnchor">
 <a href="#new-functions" class="anchor"></a>new functions</h2>
 <ul>
-<li>OCRdataFields: allows automatic reading of text from data fields in images via optical character recognition (OCR), requires magick and tesseract packages.</li>
+<li>communityModel: create community occupancy models for JAGS and Nimble. Comes with summary(), fit(), and predict() methods, and two additional functions: plot_effects / plot_coef</li>
+<li>OCRdataFields: allows automatic reading of text from data fields in images via optical character recognition (OCR), requires magick and tesseract packages</li>
 <li>writeDateTimeOriginal: Write values to DateTimeOriginal tag to image metadata</li>
 </ul>
 </div>
@@ -155,7 +159,7 @@
 <li>cameraOperation: gained argument occasionStartTime (deprecated in detectionHistory / spatialDetectionHistory)</li>
 <li>function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument “lattice”, which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)</li>
 <li>surveyReport: new argument camOp (for a camera operation matrix), argument CTHasProblems is deprecated. Improved calculation of survey effort.</li>
-<li>timeShiftImages / addCopyrightTag: added argument “ignoreMinorErrors”, set it to TRUE if functions fails due to bad MakerNotes (reported by An The Truong Nguyen)</li>
+<li>timeShiftImages / addCopyrightTag: added argument “ignoreMinorErrors”, set it to TRUE if functions fails due to bad MakerNotes (reported by An Nguyen)</li>
 <li>detectionMaps uses package sf instead of sp and rgdal</li>
 </ul>
 </div>

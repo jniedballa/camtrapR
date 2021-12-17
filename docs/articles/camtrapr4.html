@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -65,6 +65,9 @@
     <li>
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
+    <li>
+      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -94,7 +97,7 @@
       <h1 data-toc-skip>4. Data exploration and visualisation</h1>
                         <h4 class="author">Juergen Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 class="date">2021-11-28</h4>
+            <h4 class="date">2021-12-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/master/vignettes/camtrapr4.Rmd"><code>vignettes/camtrapr4.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr4.Rmd</code></div>
@@ -195,7 +198,7 @@
                           shapefileProjection <span class="op">=</span> <span class="va">shapefileProjection</span>
 <span class="op">)</span></code></pre></div>
 <pre><code>## Writing layer `recordShapefileTest' to data source 
-##   `C:\Users\Juergen\AppData\Local\Temp\RtmpAdcYBO' using driver `ESRI Shapefile'
+##   `C:\Users\Juergen\AppData\Local\Temp\RtmpSAcxhD' using driver `ESRI Shapefile'
 ## Writing 3 features with 7 fields and geometry type Point.</code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># check for the files that were created</span>
@@ -219,7 +222,7 @@
 <span class="va">detections_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html">st_read</a></span><span class="op">(</span>dsn   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, 
                          layer <span class="op">=</span> <span class="va">shapefileName</span><span class="op">)</span></code></pre></div>
 <pre><code>## Reading layer `recordShapefileTest' from data source 
-##   `C:\Users\Juergen\AppData\Local\Temp\RtmpAdcYBO' using driver `ESRI Shapefile'
+##   `C:\Users\Juergen\AppData\Local\Temp\RtmpSAcxhD' using driver `ESRI Shapefile'
 ## Simple feature collection with 3 features and 7 fields
 ## Geometry type: POINT
 ## Dimension:     XY
@@ -239,7 +242,7 @@
 ## 3 StationC   6   0   6   8   1         4 POINT (525000 607050)</code></pre>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># the output of detectionMaps is used as shapefile attribute table. Therefore, they are identical:</span>
-<span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="va">detections_sf</span> <span class="op">==</span> <span class="va">Mapstest3</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html">all</a></span><span class="op">(</span><span class="va">detections_sf</span> <span class="op">==</span> <span class="va">Mapstest3</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 <p>A simple way of plotting these data in a map is via the mapview package. It opens an interactive map window, so it is not shown in this vignette.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -267,7 +270,7 @@
 <span class="kw">if</span><span class="op">(</span><span class="st">"raster"</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
   <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster">raster</a></span><span class="op">)</span>
   <span class="va">raster_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html">raster</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extend.html">extend</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html">extent</a></span><span class="op">(</span><span class="va">detections_spdf</span><span class="op">)</span>, y <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, nrows <span class="op">=</span> <span class="fl">10</span>, ncols <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/raster/man/getValues.html">values</a></span><span class="op">(</span><span class="va">raster_test</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html">rpois</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, lambda <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>    <span class="co"># fill raster with random numbers</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/raster/man/getValues.html">values</a></span><span class="op">(</span><span class="va">raster_test</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html">rpois</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, lambda <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>    <span class="co"># fill raster with random numbers</span>
   
   <span class="co"># plot raster</span>
   <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html">plot</a></span><span class="op">(</span><span class="va">raster_test</span>,
@@ -294,9 +297,9 @@
 <pre><code>## Loading required package: sp</code></pre>
 <p><img src="camtrapr4_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <pre><code>##    Station EGY MNE PBE TRA VTA n_species raster_value
-## 1 StationA   0   0   4   0   2         2           76
-## 2 StationB   0   2   8   0   2         3           33
-## 3 StationC   6   0   6   8   1         4           19</code></pre>
+## 1 StationA   0   0   4   0   2         2           90
+## 2 StationB   0   2   8   0   2         3           37
+## 3 StationC   6   0   6   8   1         4           16</code></pre>
 <p>The same procedure also works with the camera trap station information table instead of the <code>detectionMaps</code> output.</p>
 <p>The SpatialPointsDataFrame can easily be converted back to a sf object via</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -396,13 +399,13 @@
                  plotR       <span class="op">=</span> <span class="cn">TRUE</span>,
                  createDir   <span class="op">=</span> <span class="cn">FALSE</span>,
                  pngMaxPix   <span class="op">=</span> <span class="fl">1000</span>,
-                 linecol     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"blue"</span><span class="op">)</span>,
-                 linewidth   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">3</span><span class="op">)</span>,
-                 linetype    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,
+                 linecol     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"blue"</span><span class="op">)</span>,
+                 linewidth   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">3</span><span class="op">)</span>,
+                 linetype    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,
                  olapcol     <span class="op">=</span> <span class="st">"darkgrey"</span>,
                  add.rug     <span class="op">=</span> <span class="cn">TRUE</span>,
                  extend      <span class="op">=</span> <span class="st">"lightgrey"</span>,
-                 ylim        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span><span class="op">)</span>,
+                 ylim        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span><span class="op">)</span>,
                  main        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Activity overlap: "</span>, <span class="va">speciesA_for_activity</span>, <span class="st">"-"</span>, <span class="va">speciesB_for_activity</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 <p><img src="camtrapr4_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>

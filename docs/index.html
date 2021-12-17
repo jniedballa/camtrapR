@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -64,6 +64,9 @@
     </li>
     <li>
       <a href="articles/camtrapr4.html">4. Data exploration and visualisation</a>
+    </li>
+    <li>
+      <a href="articles/camtrapr5.html">5. Multi-species occupancy models</a>
     </li>
   </ul>
 </li>
@@ -105,11 +108,12 @@
 <p>or you can install the latest development version from GitHub via:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org">remotes</a></span><span class="op">)</span>
-<span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"jniedballa/camtrapR"</span>, ref <span class="op">=</span> <span class="st">"dev"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"jniedballa/camtrapR"</span>, ref <span class="op">=</span> <span class="st">"dev"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>If no development branch exists at the time on GitHub, you can install from the master branch via:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org">remotes</a></span><span class="op">)</span>
-<span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"jniedballa/camtrapR"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"jniedballa/camtrapR"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><code>build_vignettes = TRUE</code> is necessary since v 2.1.1. due to the new static vignettes.</p>
 <p>You can also install a previous version (e.g. if a recent update broke the code you need to run urgently) via:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org">remotes</a></span><span class="op">)</span>
@@ -139,7 +143,7 @@
 <div id="further-reading" class="section level2">
 <h2 class="hasAnchor">
 <a href="#further-reading" class="anchor"></a>Further reading</h2>
-<p>See the <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600">Article in Methods in Ecology and Evolution</a> for an overview of the package. The four package vignettes provide examples for the entire workflow.</p>
+<p>See the <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600">Article in Methods in Ecology and Evolution</a> for an overview of the package. The five vignettes provide examples for the entire workflow.</p>
 </div>
 <div id="citation" class="section level2">
 <h2 class="hasAnchor">
@@ -190,7 +194,6 @@
 <ul class="list-unstyled">
 <li><a href="https://CRAN.R-project.org/package=camtrapR"><img src="https://www.r-pkg.org/badges/version/camtrapR" alt="CRAN status"></a></li>
 <li><a href="https://cran.r-project.org/package=camtrapR"><img src="http://cranlogs.r-pkg.org/badges/camtrapR"></a></li>
-<li><a href="https://travis-ci.org/jniedballa/camtrapR"><img src="https://travis-ci.org/jniedballa/camtrapR.svg?branch=master" alt="Build Status"></a></li>
 </ul>
 </div>
 </div>
