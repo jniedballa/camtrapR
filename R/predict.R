@@ -27,9 +27,32 @@ predictionMapsCommunity <- function(object,
   interval <- match.arg(interval, choices = c("none", "confidence"))
   
   # subset occupancy (beta) parameters
+  submodel <- "state"
   params <- object@params[grep("^beta", object@params)]
   
   categ_order <- match.arg(categ_order, choices = c("species,factor", "factor,species"))
+  
+  
+  cov_info_subset <- object@covariate_info[object@covariate_info$submodel == submodel & object@covariate_info$param == "param",]
+  if(nrow(cov_info_subset) == 0) stop(paste("No covariates in submodel", submodel), call. = F)
+  
+  skip <- NULL
+  if(any(!is.na(cov_info_subset$ranef_cov))){
+    stop(paste(cov_info_subset$covariate[!is.na(cov_info_subset$ranef_cov)], collapse = ", "), 
+            " has a random effect other than species. This is currently not supported.", call. = F)
+    skip <- c(skip, cov_info_subset$covariate[!is.na(cov_info_subset$ranef_cov)])
+  }
+  
+  if(any(isTRUE(cov_info_subset$ranef_nested ))) {
+    stop(paste(cov_info_subset$covariate[isTRUE(cov_info_subset$ranef_nested )], collapse = ", "), 
+            " has a nested random effect. This is currently not supported.", call. = F)
+    skip <- c(skip, cov_info_subset$covariate[isTRUE(cov_info_subset$ranef_nested)])
+  }
+  
+  
+  
+  
+  
   
   # subset posterior matrix
   posterior_matrix <- as.matrix(mcmc.list)
@@ -38,7 +61,7 @@ predictionMapsCommunity <- function(object,
   } 
   posterior_matrix <- posterior_matrix[,grep("^beta", colnames(posterior_matrix)), drop = FALSE]
   
-  if(nrow(posterior_matrix) > 1000) message("More than 1000 posterior samples. Watch RAM usage", immediate. = TRUE)
+  if(nrow(posterior_matrix) > 1000) message("More than 1000 posterior samples. Watch RAM usage")
   
   
   # get covariate that beta parameters refer to
@@ -50,7 +73,16 @@ predictionMapsCommunity <- function(object,
   list_responses <- list()
   
   # convert raster to covariate data frame
-  values_to_predict_all <- as.data.frame(raster::values(x))
+  if(class(x) == "RasterStack") {
+    values_to_predict_all <- as.data.frame(raster::values(x))
+  } else {
+    stop("x must be a data.frame")
+  }
+  # if(is.data.frame(x)){
+  #   #values_to_predict_all <- x
+  #   stop()
+  # }
+  
   
   index_not_na <- which(apply(values_to_predict_all, 1, FUN = function(x) all(!is.na(x))))
   
@@ -141,11 +173,12 @@ predictionMapsCommunity <- function(object,
       psi.sd.melt$Species <- dimnames(object@data$y)[[1]][psi.sd.melt$Species]
     }
     
+    #if(class(x) == "RasterStack") {
     raster_template <- raster::raster(x)
     r_pred_species <- r_pred_sd_species <- list()
     
     for(i in 1:length(unique(psi.mean.melt$Species))) {
-      r_pred_species[[i]] <- raster_template
+      r_pred_species[[i]]    <- raster_template
       r_pred_sd_species[[i]] <- raster_template
       
       raster::values(r_pred_species[[i]]) [index_not_na] <- psi.mean.melt$mean[psi.mean.melt$Species == unique(psi.mean.melt$Species)[i]]
@@ -155,8 +188,9 @@ predictionMapsCommunity <- function(object,
     
     stack_out_mean <- raster::stack(r_pred_species)
     stack_out_sd   <- raster::stack(r_pred_sd_species)
+    #}
     
-    
+
     
     if(interval == "confidence"){
       psi.lower <- apply(psi, MARGIN = c(1,2), quantile, ((1-level) / 2))                        # SLOW!!!
@@ -188,8 +222,8 @@ predictionMapsCommunity <- function(object,
       stack_out_lower   <- raster::stack(r_pred_lower_species)
       stack_out_upper   <- raster::stack(r_pred_upper_species)
       
-      return(list(mean = stack_out_mean,
-                  sd = stack_out_sd,
+      return(list(mean  = stack_out_mean,
+                  sd    = stack_out_sd,
                   lower = stack_out_lower,
                   upper = stack_out_upper))
     }
