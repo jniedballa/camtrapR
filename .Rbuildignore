@@ -10,4 +10,10 @@
 ^Image-ExifTool-11.94\.tar\.gz$
 ^Image-ExifTool-11.94$
 ^to_do.txt$
-^vignettes_markdown$
+^vignettes/camtrapr1.Rmd$
+^vignettes/camtrapr2.Rmd$
+^vignettes/camtrapr3.Rmd$
+^vignettes/camtrapr4.Rmd$
+^vignettes/camtrapr5.Rmd$
+^vignettes/mapview_example\.png$
+^vignettes/SpeciesID_digiKam\.png$
