@@ -12,7 +12,9 @@ output:
   df_print: kable
   html_document: null
 vignette: |
-  %\VignetteIndexEntry{4. Data exploration and visualisation} %\VignetteDepends{raster, sf, overlap} \usepackage[utf8]{inputenc}
+  %\VignetteIndexEntry{4. Data exploration and visualisation} 
+  %\VignetteDepends{raster, sf, overlap} 
+  \usepackage[utf8]{inputenc}
 ---
 
 ```{r  results = "hide"}

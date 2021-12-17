@@ -64,6 +64,19 @@ The main function `communityModel` does not support R formula syntax the way pac
 
 A word of caution, please always check the model code and make sure you understand the code and agree with it. The workflow is meant to be convenient and does not require you to even look at the model code, but you should (there are many comments in the model code make it easier). This workflow still requires a proper understanding of Bayesian modelling frameworks and the concepts behind multi-species occupancy models.
 
+# Limitations
+
+The workflow is still rather experimental, so please remain critical of the results and check carefully. If you encounter any problems, please let me know. 
+
+There are currently a few limitations in the workflow: 
+
+* priors can not be customized yet.
+* models with categorical observation-level covariates cannot be compiled in Nimble and must be fit in JAGS
+* nested random effects and random effects of site covariates are still experimental, and the plot_* methods don't work on these yet
+* likewise, the output of `predict` may not be correct for these
+* predict currently only works for RasterStacks, not data.frames
+* input checks are a bit limited and may not always lead to meaningful error messages. This will improve over time with user feedback.
+
 # Quick example
 
 Here is a quick example using the sample data that are included in camtrapR. The data set only contains 5 species and 3 stations, and use made-up covariates, so the parameter estimates will be nonsense. It is only a technical demonstration for how community models fit into the camtrapR workflow.
@@ -358,7 +371,7 @@ library(AHMbook)
 Simulate community with simComm(). Here we simulate a community with 20 species, 30 camera trap stations and 5 occasions. 
 
 ```{r}
-set.seed(1)
+set.seed(10)
 com <- simComm(nspecies = 20, 
                 nsites = 30,
                 nreps = 5,
@@ -551,6 +564,13 @@ This section demonstrates additional possibilities. The models here are (mostly)
 
 One can define fixed effects of covariates if the responses are thought to be constant across all species. 
 
+
+## Priors
+
+It is not yet possible to customize priors. The current defaults are: 
+
+* dnorm(0, 0.05) : random effect means
+* dgamma(0.1, 0.1): random effect precision (tau)
 
 ## Data augmentation
 
@@ -917,7 +937,7 @@ DT::datatable(round(summary(out_ahm_jags_rich)$statistics, 3))
 
 ## Spatial predictions
 
-You can create spatial predictions based on the occupancy models created with `communityModel` and their model fits.
+You can create spatial predictions based on the occupancy models created with `communityModel`, their model fits and covariate raster stacks.
 
 This requires the raster package
 
@@ -1011,5 +1031,36 @@ gelman.plot(out_ahm_nimble2,  multivariate = FALSE)
 ## Single-species occupancy models
 
 The workflow above can be used for single-species models also. The code will be less streamlined and possibly slower than normal code for single-species models (due to the then unnecessary species loop), but it is possible. Simply pass a single detection history in the data_list$ylist of the input to `communityModel`. 
-Take care to only define fixed effects for all covariates and the intercepts, not random effects. 
 
+Take care to only define fixed effects for covariates and the intercepts, not random effects of species. It is possible however to specify random effects of categorical site covariates on continuous site covariates as in the example below. 
+
+
+In this example we use species 1 from the community created with simComm. 
+
+```{r}
+input_AHM_sp1 <- list(ylist = ylist[1],
+                      siteCovs = input_AHM$siteCovs,
+                      obsCovs = input_AHM$obsCovs)
+```
+
+```{r}
+modelFile_jags_sp1 <- tempfile(fileext = ".txt")
+
+model1_jags_ranef <- communityModel(
+  occuCovs = list(ranef = c("habitat|categ")),    # response to habitat differs between categ via random effect
+  detCovsObservation = list(fixed = "wind"),
+  intercepts = list(det = "fixed", occu = "fixed"),
+  data_list = input_AHM_sp1,
+  modelFile = modelFile_jags_sp1)
+```
+
+```{r}
+fit_jags_sp1 <- fit(model1_jags_ranef, n.iter = 1000, n.burnin = 500, thin = 5)
+```
+
+
+```{r}
+DT::datatable(round(summary(fit_jags_sp1)$statistics, 3))
+```
+
+The plot_effects() and plot_coef() functions currently don't work for this case, since single-species models are mostly a side-effect of the community occupancy workflow and not the main goal. There are other great options for Bayesian single-species occupancy models, e.g. in the packages ubms or wiqid, or unmarked for a frequentist implementation.
