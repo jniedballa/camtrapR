@@ -25,7 +25,7 @@ or you can install the latest development version from GitHub via:
 
 ``` r
 library(remotes)
-install_github("jniedballa/camtrapR", ref = "dev")
+install_github("jniedballa/camtrapR", ref = "dev", build_vignettes = TRUE)
 ```
 
 If no development branch exists at the time on GitHub, you can install
@@ -33,8 +33,11 @@ from the master branch via:
 
 ``` r
 library(remotes)
-install_github("jniedballa/camtrapR")
+install_github("jniedballa/camtrapR", build_vignettes = TRUE)
 ```
+
+`build_vignettes = TRUE` is necessary since v 2.1.1. due to the new
+static vignettes.
 
 You can also install a previous version (e.g. if a recent update broke
 the code you need to run urgently) via:
@@ -78,8 +81,8 @@ Alternatively, you can report bugs and problems as issues on GitHub
 
 See the [Article in Methods in Ecology and
 Evolution](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600)
-for an overview of the package. The four package vignettes provide
-examples for the entire workflow.
+for an overview of the package. The five vignettes provide examples for
+the entire workflow.
 
 ## Citation
 
