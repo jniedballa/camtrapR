@@ -45,6 +45,17 @@ reference:
       - '`detectionHistory`'
       - '`spatialDetectionHistory`'
       - '`surveyReport`'
+      - '`communityModel`'
+  - title: Community occupancy models
+    desc: 
+    contents: 
+      - '`communityModel`'
+      - '`commOccu-class`'
+      - '`fit,commOccu-method`'
+      - '`predict,commOccu-method`'
+      - '`summary,commOccu-method`'
+      - '`plot_coef`'
+      - '`plot_effects`'
   - title: Sample data
     desc: Sample data sets included in camtrapR
     contents:
