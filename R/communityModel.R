@@ -332,12 +332,13 @@ communityModel <- function(data_list,
                            submodel = c("det", "state"),
                            covariate_type = NA,
                            covariate = NA,
-                           cov_type = NA,         # categ / numeric
+                           data_type = NA,         # categ / numeric
                            is_quadratic = FALSE,
                            ranef = c(ifelse(intercepts$det == "ranef", T, F), 
                                      ifelse(intercepts$occu == "ranef", T, F)), # TRUE = hasRanef, FALSE = fixed
                            ranef_nested = FALSE,
-                           ranef_cov = NA)
+                           ranef_cov = NA, 
+                           coef = c("alpha0", "beta0"))
                            
   
   
@@ -354,7 +355,7 @@ communityModel <- function(data_list,
   
   
   if(!is.null(unlist(detCovsObservation))) {
-    covariate_info <- rbind(covariate_info, get_cov_info (detCovsObservation, keyword_nested, keyword_quadratic, data_list, type = "obs", submodel = "det"))
+    covariate_info <- rbind(covariate_info, get_cov_info (cov = detCovsObservation, keyword_nested, keyword_quadratic, data_list, type = "obs", submodel = "det"))
     }
   
   
@@ -381,7 +382,7 @@ communityModel <- function(data_list,
   
   if(!is.null(detCovsObservation$fixed)) {
     if(any(!detCovsObservation$fixed %in% obs_covariates_numeric)) {
-      if(!all(detCovsObservation$fixed [which(!detCovsObservation$fixed %in% obs_covariates_numeric)] %in% obs_covariates_categ)) stop("Detection covariate ", paste(detCovsObservation$fixed [which(!detCovsObservation$fixed %in% obs_covariates_numeric)], 
+      if(!all(detCovsObservation$fixed [which(!detCovsObservation$fixed %in% obs_covariates_numeric)] %in% obs_covariates_categ)) stop(paste("Detection covariate ", paste(detCovsObservation$fixed [which(!detCovsObservation$fixed %in% obs_covariates_numeric)], collapse = ", "), 
                                                                                                                                                                      "is not a factor"))
       if(nimble == TRUE) warning("Currently categorical observation-level covariates are only supported in JAGS.\nIn Nimble they can only be used in uncompiled models (even that is experimental). Change model structure or set 'nimble = FALSE'", call. = FALSE)
       
@@ -393,7 +394,7 @@ communityModel <- function(data_list,
   
   if(!is.null(detCovsObservation$ranef)) {
     if(any(!detCovsObservation$ranef %in% obs_covariates_numeric)) {
-      if(!all(detCovsObservation$ranef [which(!detCovsObservation$ranef %in% obs_covariates_numeric)] %in% obs_covariates_categ)) stop("Detection covariate ", paste(detCovsObservation$ranef [which(!detCovsObservation$ranef %in% obs_covariates_numeric)], 
+      if(!all(detCovsObservation$ranef [which(!detCovsObservation$ranef %in% obs_covariates_numeric)] %in% obs_covariates_categ)) stop(paste("Detection covariate ", paste(detCovsObservation$ranef [which(!detCovsObservation$ranef %in% obs_covariates_numeric)], collapse = ", "), 
                                                                                                                                                                      "is not a factor"))
       if(nimble == TRUE) warning("Currently categorical observation-level covariates are only supported in JAGS.\nIn Nimble they can only be used in uncompiled models (even that is experimental). Change model structure or set 'nimble = FALSE'", call. = FALSE)
       
@@ -442,7 +443,7 @@ communityModel <- function(data_list,
   }
   
   
-  # remove "+Species" which indicated nested random effects
+  # remove "+Species" which indicates nested random effects
   covariatenames_needed <- gsub(keyword_nested, "", covariatenames_needed, fixed = T)
   
   # subset covariates
@@ -495,7 +496,7 @@ communityModel <- function(data_list,
       stop(paste(occuCovs$fixed [!occuCovs$fixed %in% colnames(covariates)], collapse = ", "), " is not in covariates")
     }
     if(any(!occuCovs$fixed %in% covariates_numeric)) {
-      if(!all(occuCovs$fixed [which(!occuCovs$fixed %in% covariates_numeric)] %in% covariates_categ)) stop("Occupancy covariate ", paste(occuCovs$fixed [which(!occuCovs$fixed %in% covariates_numeric)], 
+      if(!all(occuCovs$fixed [which(!occuCovs$fixed %in% covariates_numeric)] %in% covariates_categ)) stop(paste("Occupancy covariate ", paste(occuCovs$fixed [which(!occuCovs$fixed %in% covariates_numeric)], collapse = ", "), 
                                                                                                                                          "is not a factor"))
       occuCovs_categ$fixed <- occuCovs$fixed[occuCovs$fixed %in% covariates_categ]
       occuCovs$fixed       <- occuCovs$fixed[occuCovs$fixed %in% covariates_numeric]
@@ -510,7 +511,7 @@ communityModel <- function(data_list,
       stop(paste(occuCovs$ranef [!occuCovs$ranef %in% c(covariates_numeric, covariates_numeric_categ)], collapse = ", "), " is not in covariates")
     }
     if(any(!occuCovs$ranef %in% covariates_numeric)) {  
-      if(!all(occuCovs$ranef [which(!occuCovs$ranef %in% c(covariates_numeric, covariates_numeric_categ))] %in% covariates_categ)) stop("Occupancy covariate ", paste(occuCovs$ranef [which(!occuCovs$ranef %in% covariates_numeric)], 
+      if(!all(occuCovs$ranef [which(!occuCovs$ranef %in% c(covariates_numeric, covariates_numeric_categ))] %in% covariates_categ)) stop(paste("Occupancy covariate ", paste(occuCovs$ranef [which(!occuCovs$ranef %in% covariates_numeric)], collapse = ", "), 
                                                                                                                                                                       "is not a factor"))
       occuCovs_categ$ranef <- c(occuCovs_categ$ranef, 
                                 occuCovs$ranef[occuCovs$ranef %in% c(covariates_categ, covariates_categ_categ)])
@@ -525,7 +526,7 @@ communityModel <- function(data_list,
       stop(paste(detCovs$fixed [!detCovs$fixed %in% colnames(covariates)], collapse = ", "), " is not in covariates")
     }
     if(any(!detCovs$fixed %in% covariates_numeric)) {
-      if(!all(detCovs$fixed [which(!detCovs$fixed %in% covariates_numeric)] %in% covariates_categ)) stop("Detection covariate ", paste(detCovs$fixed [which(!detCovs$fixed %in% covariates_numeric)], 
+      if(!all(detCovs$fixed [which(!detCovs$fixed %in% covariates_numeric)] %in% covariates_categ)) stop(paste("Detection covariate ", paste(detCovs$fixed [which(!detCovs$fixed %in% covariates_numeric)], collapse = ", "), 
                                                                                                                                        "is not a factor"))
       
       detCovs_categ$fixed <- detCovs$fixed[detCovs$fixed %in% covariates_categ]
@@ -543,7 +544,7 @@ communityModel <- function(data_list,
     }
     
     if(any(!detCovs$ranef %in% covariates_numeric)) {
-      if(!all(detCovs$ranef [which(!detCovs$ranef %in% c(covariates_numeric, covariates_numeric_categ))] %in% covariates_categ)) stop("Detection covariate ", paste(detCovs$ranef [which(!detCovs$ranef %in% c(covariates_numeric, covariates_numeric_categ))], 
+      if(!all(detCovs$ranef [which(!detCovs$ranef %in% c(covariates_numeric, covariates_numeric_categ))] %in% covariates_categ)) stop(paste("Detection covariate ", paste(detCovs$ranef [which(!detCovs$ranef %in% c(covariates_numeric, covariates_numeric_categ))], collapse = ", "), 
                                                                                                                                                                     "is not a factor"))
       detCovs_categ$ranef <- c(detCovs_categ$ranef, 
                                detCovs$ranef[detCovs$ranef %in% c(covariates_categ, covariates_categ_categ)])
@@ -1787,22 +1788,36 @@ get_cov_info <- function(cov,
   names(tmp)[grep("ranef", names(tmp))] <- "ranef"
   
   
-  tmp_cov1 <- sapply(strsplit(tmp, split = "|", fixed = T), FUN = function(x) x[1])
-  cov_type <- sapply(data_list[[item]][tmp_cov1], typeof)
+  tmp_cov1  <- sapply(strsplit(tmp, split = "|", fixed = T), FUN = function(x) x[1])
+  
+  if(type == "obs")  cov_type  <- sapply(data_list[[item]][tmp_cov1], typeof)
+  if(type == "site") cov_type <- sapply(data_list[[item]][,tmp_cov1], class)
+  
   cov_type2 <- ifelse(cov_type %in% c("numeric", "double", "integer"), "cont", 
                       ifelse(cov_type %in% c("character", "factor"), "categ", NA))
   
 
   tmp2 <- data.frame(param = rep("param", times = length(tmp)),
                      submodel = rep(submodel, times = length(tmp)),
-                     covariate_type = type,
+                     covariate_type = item,
                      covariate = tmp,
-                     cov_type = cov_type2,
+                     data_type = cov_type2,
                      is_quadratic = endsWith(tmp, keyword_quadratic),
                      ranef = ifelse(names(tmp) == "ranef", T, F), 
                      ranef_nested = grepl(keyword_nested, tmp, fixed = TRUE),
                      ranef_cov = sapply(strsplit(tmp, split = "|", fixed = TRUE), FUN = function(x) ifelse(length(x) == 2, x[2], NA))
   )
+  
+  
+
+  
+  tmp2$coef <- paste0(ifelse(tmp2$submodel == "det", "alpha", "beta"), ".",
+                 ifelse(tmp2$covariate_type == "obsCovs", "obs.", ""), 
+                 ifelse(tmp2$ranef, "ranef", "fixed"), ".",
+                 tmp2$data_type, ".",
+                 gsub("[|+]", "_", tmp)
+                 )
+  
   rownames(tmp2) <- NULL
   return(tmp2)
 }
