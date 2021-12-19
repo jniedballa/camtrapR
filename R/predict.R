@@ -379,7 +379,6 @@ predictionMapsCommunity <- function(object,
 #' @param speciesSubset  species to include in richness estimates. Can be index number or species names.
 #'
 #' @return A raster stack or data.frame, depending on x
-#' @details Categorical covariates in
 #' @importFrom  stats rbinom sd
 #' @importFrom utils object.size
 #' @export

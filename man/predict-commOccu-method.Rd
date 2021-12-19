@@ -12,8 +12,7 @@
   level = 0.95,
   interval = c("none", "confidence"),
   x,
-  speciesSubset,
-  categ_order = "species,factor"
+  speciesSubset
 )
 }
 \arguments{
@@ -27,16 +26,14 @@
 
 \item{level}{Probability mass to include in the uncertainty interval}
 
-\item{interval}{# Type of interval calculation. Can be "none" or "confidence". Can be slow for type = psi with many cells and posterior samples. Can be abbreviated.}
+\item{interval}{# Type of interval calculation. Can be "none" or "confidence". Can be slow for type = "psi" with many cells and posterior samples. Can be abbreviated.}
 
-\item{x}{raster stack. Must be scaled with same parameters as site covariates used in model, and have same names}
+\item{x}{raster stack or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names.}
 
 \item{speciesSubset}{species to include in richness estimates. Can be index number or species names.}
-
-\item{categ_order}{a temporary argument. Ignore}
 }
 \value{
-A raster stack
+A raster stack or data.frame, depending on x
 }
 \description{
 Create spatial predictions of species occupancy and species richness from community occupancy models and raster stacks.
