@@ -334,6 +334,7 @@ communityModel <- function(data_list,
                            covariate = NA,
                            data_type = NA,         # categ / numeric
                            is_quadratic = FALSE,
+                           has_quadratic = FALSE,
                            ranef = c(ifelse(intercepts$det == "ranef", T, F), 
                                      ifelse(intercepts$occu == "ranef", T, F)), # TRUE = hasRanef, FALSE = fixed
                            ranef_nested = FALSE,
@@ -1788,6 +1789,7 @@ get_cov_info <- function(cov,
   names(tmp)[grep("ranef", names(tmp))] <- "ranef"
   
   
+  
   tmp_cov1  <- sapply(strsplit(tmp, split = "|", fixed = T), FUN = function(x) x[1])
   
   if(type == "obs")  cov_type  <- sapply(data_list[[item]][tmp_cov1], typeof)
@@ -1803,6 +1805,7 @@ get_cov_info <- function(cov,
                      covariate = tmp,
                      data_type = cov_type2,
                      is_quadratic = endsWith(tmp, keyword_quadratic),
+                     has_quadratic = paste0(tmp, keyword_quadratic) %in% tmp,
                      ranef = ifelse(names(tmp) == "ranef", T, F), 
                      ranef_nested = grepl(keyword_nested, tmp, fixed = TRUE),
                      ranef_cov = sapply(strsplit(tmp, split = "|", fixed = TRUE), FUN = function(x) ifelse(length(x) == 2, x[2], NA))
