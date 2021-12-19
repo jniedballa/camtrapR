@@ -55,9 +55,12 @@ plot.effects.commOccu <- function(object,       # commOccu object
     
     
     is_squared <- cov_info_subset$is_quadratic[cov]
+    
     if(is_squared) {
+      attr(params_covariate, "include") [cov] <- FALSE
       if(gsub(keyword_squared, "", current_cov) %in% params_covariate) next
-    }
+    } 
+    attr(params_covariate, "include") [cov] <- TRUE
     
 
     if(!is.na(cov_info_subset$ranef_cov[cov])){
@@ -75,12 +78,14 @@ plot.effects.commOccu <- function(object,       # commOccu object
     
     
     # check if there is a squared version of the current covariate
+    
+    has_squared <- cov_info_subset$has_quadratic[cov]
     if(paste0(current_cov, keyword_squared) %in% params_covariate){
-      has_squared <- TRUE
+      #has_squared <- TRUE
       squared_cov <- paste0(current_cov, keyword_squared)
-    } else {
-      has_squared <- FALSE
-    }
+    } #else {
+      #has_squared <- FALSE
+    #}
     
     # determine data type of current covariate
     covariate_is_numeric <- cov_info_subset$data_type [cov] == "cont"
@@ -303,12 +308,7 @@ plot.effects.commOccu <- function(object,       # commOccu object
     list_responses [[cov]] <- p
     
     
-    attr(params_covariate, "include") [cov] <- TRUE
     
-    # reset has_squared
-    has_squared <- FALSE
-    has_squared_cov <- NULL
-    is_squared <- NULL
     
   }
   
