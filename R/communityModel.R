@@ -1791,7 +1791,7 @@ get_cov_info <- function(cov,
   tmp_cov1  <- sapply(strsplit(tmp, split = "|", fixed = T), FUN = function(x) x[1])
   
   if(type == "obs")  cov_type  <- sapply(data_list[[item]][tmp_cov1], typeof)
-  if(type == "site") cov_type <- sapply(data_list[[item]][,tmp_cov1], class)
+  if(type == "site") cov_type  <- sapply(data_list[[item]][,tmp_cov1, drop = FALSE], class)
   
   cov_type2 <- ifelse(cov_type %in% c("numeric", "double", "integer"), "cont", 
                       ifelse(cov_type %in% c("character", "factor"), "categ", NA))
