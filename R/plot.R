@@ -163,8 +163,8 @@ plot.effects.commOccu <- function(object,       # commOccu object
       
       if(covariate_is_factor) {
         
-        if(covariate_is_fixed) index_covariate <- grep(cov_info_subset$coef[cov], colnames(posterior_matrix))
-        if(covariate_is_ranef) index_covariate <- grep(paste0(cov_info_subset$coef[cov], "[", i, ","), colnames(posterior_matrix), fixed = T)
+        if(covariate_is_fixed) index_covariate <- grep(current_coef, colnames(posterior_matrix))
+        if(covariate_is_ranef) index_covariate <- grep(paste0(current_coef, "[", i, ","), colnames(posterior_matrix), fixed = T)
         
         
         for(j in 1:length(index_covariate)){
@@ -496,7 +496,7 @@ plot.coef.commOccu <- function(object,
     
     
     
-    type <- NULL   # just for CRAN checks
+    
     
     colnames(df_quantiles_i)[1:5] <- c("lower_outer", "lower_inner", "median", "upper_inner", "upper_outer")
     
@@ -587,6 +587,10 @@ plot.coef.commOccu <- function(object,
     
     
     # plot
+    
+    type <- NULL   # just for CRAN checks
+    covariate <- NULL
+    
     
     if(!combine){
       
