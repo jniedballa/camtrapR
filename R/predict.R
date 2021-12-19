@@ -2,9 +2,8 @@
 
 
 # not implemented:
-# - random intercepts optional
-# - fixed categorical covariates (not species-specific) - function thinks they are continuous and fails
-# - split methods by x = raster or x = data.frame 
+# - nested  / other random effects
+# - allow for alpha if it only has site covariates?
 
 
 setGeneric("predict", function(object, ...) {})
@@ -165,7 +164,7 @@ predictionMapsCommunity <- function(object,
         # since it uses the raster values to index the posterior matrix
         
         # for data.frames, it seems to work with the categorical column being integer (= factor level, as in as.data.frame(rasterStack)), or proper factor
-        out[[cov]][,i,] <- posterior_matrix[, index_covariate[values_to_predict_subset[, current_cov]]]
+        out[[cov]][,i,] <- t(posterior_matrix[, index_covariate[values_to_predict_subset[, current_cov]]])
         
       }
       suppressWarnings(rm(index_covariate))
@@ -173,10 +172,11 @@ predictionMapsCommunity <- function(object,
   }    # end covariate loop
   
   # sum up individual effects
+  #logit.psi <- Reduce('+', out[2]) #+ out_beta0
   logit.psi <- Reduce('+', out) + out_beta0
   psi <- exp(logit.psi) / (exp(logit.psi) + 1)
   
-  rm(array_NA, out_beta0, out, logit.psi)
+  #rm(array_NA, out_beta0, out, logit.psi)
   gc()
   
   
