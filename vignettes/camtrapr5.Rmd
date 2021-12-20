@@ -3,14 +3,12 @@ title: "5. Multi-species occupancy models"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output:
-    html_document:
+    rmarkdown::html_vignette:
     toc: true
-    toc_float:
-      collapsed: false
-      smooth_scroll: false
     toc_depth: 2
     df_print: kable
 vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{5. Multi-species occupancy models}
   %\VignetteDepends{raster}
   \usepackage[utf8]{inputenc}
@@ -393,8 +391,9 @@ We need to wrangle the data a little to convert output of simComm() to input for
 # get continuous site covariate "habitat"
 habitat <- com$habitat
 
-# create categorical covariate (2 levels)
-categ <- factor(rep(c("A", "B"), each = com$nsites / 2))
+# create (fake) categorical covariate (3 levels)
+# setting "medium" as reference level
+categ <- factor(ifelse(habitat < -0.5, "low", ifelse(habitat < 0.5, "medium", "high")), levels = c("medium", "low", "high"))
 
 # get observation covariate
 wind <- com$wind
@@ -671,7 +670,7 @@ plot_coef(object = model_jags_categ1,
 ```
 
 
-See the arguments `beta.ranef.categ.categ`. The species effects have two indices: [species, factorLevel]. Accordingly, there are two estimates for `mean` and `SD`, respectively. All estimates for the first factor level are 0, since the intercept refers to the first factor level. 
+In the table below, see the arguments `beta.ranef.categ.categ`. The species effects have two indices: [species, factorLevel]. Accordingly, there are three estimates for `mean` and `SD`, respectively. All estimates for the first factor level are 0, since the intercept refers to the first factor level (i.e. reference level, which we defined as "medium" above). 
 
 ```{r}
 DT::datatable(round(summary(out_ahm_jags_categ1)$statistics, 3))
@@ -845,7 +844,7 @@ model1_jags_quadratic <- communityModel(
   modelFile = modelFile_jags_quadratic)
 
 # short model run for demonstration
-out_ahm_jags_nested <- fit(model1_jags_quadratic, 
+out_ahm_jags_quadratic<- fit(model1_jags_quadratic, 
                          n.iter = 500, 
                          n.burnin = 250,
                          thin = 5,
@@ -861,7 +860,7 @@ Thanks to to keyword "_squared", `plot_effects` will combine the effects of "hab
 
 ```{r}
 plot_effects(model1_jags_quadratic, 
-             out_ahm_jags_nested)
+             out_ahm_jags_quadratic)
 ```
 
 The data have no quadratic relationship with covariates, hence the quadratic effects are rather weak 
@@ -945,20 +944,64 @@ This requires the raster package
   library(raster)
 ```
 
-In this example we will just create a raster with random numbers. 
-```{r}
-raster_test <- raster(x = matrix(rnorm(400), ncol = 20))
-  
-  # add raster to list
-  stack_prediction <- stack(list(habitat = raster_test))
+In this example we will use a model that has both a continuous and a categorical covariate. 
 
+```{r}
+modelFile_jags_categ3 <- tempfile(fileext = ".txt")
+
+model_jags_categ3 <- communityModel(
+  occuCovs = list(ranef = c("habitat", 
+                            "categ")),
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  modelFile = modelFile_jags_categ3)
+
+# short model run for demonstration
+out_ahm_jags_categ3 <- fit(model_jags_categ3, 
+                         n.iter = 500, 
+                         n.burnin = 250,
+                         thin = 5,
+                         chains = 3,
+                         cores = 1,
+                         quiet = T
+)
+```
+
+
+
+create a habitat raster (we'll use the volcano raster for demonstration). 
+```{r}
+data("volcano")
+r_volcano <- scale(raster(volcano))
+#raster_habitat <- raster(x = matrix(rnorm(900), ncol = 30))
+
+```
+
+create a categorical raster. Since it is not possible to have categorical raster (with data type "factor"), the raster must consist of integer numbers that refer to the factor levels (as defined in the model input). 
+
+```{r}
+levels(input_AHM$siteCovs$categ)    # the order of factor levels
+
+raster_categ <- raster(x = matrix(rep(c(1,2, 3), each = length(r_volcano) / 3), 
+                                  ncol = ncol(r_volcano),
+                                  nrow = nrow(r_volcano)))
+```
+
+
+
+```{r}
+# add raster to list
+  stack_prediction <- stack(list(habitat = r_volcano,
+                                 categ = raster_categ))
+plot(stack_prediction)
 ```
 
 Species occupancy maps:
 ```{r}
 # species occupancy estimates
-  predictions_psi <- predict(object    = model1_nimble, 
-                             mcmc.list = out_ahm_nimble2,
+  predictions_psi <- predict(object    = model_jags_categ3, 
+                             mcmc.list = out_ahm_jags_categ3,
                              x         = stack_prediction,
                              type      = "psi",
                              draws     = 1000)
@@ -970,8 +1013,8 @@ Species occupancy maps:
 Species richness maps:
 ```{r}
 # species richness estimates
-  predictions_rich <- predict(object   = model1_nimble, 
-                             mcmc.list = out_ahm_nimble2,
+  predictions_rich <- predict(object   = model_jags_categ3, 
+                             mcmc.list = out_ahm_jags_categ3,
                              x         = stack_prediction,
                              type      = "richness")
   
