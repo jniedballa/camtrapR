@@ -27,7 +27,7 @@ commOccu objects
 
 \item{\code{modelFile}}{Path of the text file containing the model code}
 
-\item{\code{covariate_info}}{Data frame containing information about covariates. Only used internally in plot_* methods}
+\item{\code{covariate_info}}{Data frame containing information about covariates. Only used internally in plot_* and predict methods}
 }}
 
 \note{
@@ -36,10 +36,12 @@ The \code{data} slot is a list of model input data. While the exact content depe
 \tabular{ll}{
 \code{y} \tab array of detection histories. Dimensions are: y[species, station, occasion] \cr
 \code{effort_binary} \tab matrix of binary (1/0) survey effort. Only used to ensure p = 0 when effort = 0. Dimensions are: effort_binary[station, occasion] \cr
-\code{site-occasion covariates} \tab The content of data_list$obsCovs as named matrices with dimensions [station, occasion] \cr
-\code{site covariates} \tab The columns of data_list$siteCovs as named vectors (length = number of stations) \cr
+\code{site-occasion covariates} \tab The required content of data_list$obsCovs as named matrices with dimensions [station, occasion] \cr
+\code{site covariates} \tab The required columns of data_list$siteCovs as named vectors (length = number of stations) \cr
 \code{M} \tab Number of species \cr
 \code{J} \tab Number of stations \cr
 \code{maxocc} \tab Number of occasions \cr
 }
+
+For categorical site-occasion covariates, an addition matrix containing an integer representation of the character matrix with suffix "_integer" is stored in the data slot.
 }

@@ -2,13 +2,16 @@
 #' Create a community (multi-species) occupancy model for JAGS or Nimble
 #' 
 #' @description 
-#' Flexibly creates complete code and input data for community occupancy models for in JAGS amd Nimble, and automatically sets initial values and parameters to monitor. Supports fixed and random effects of covariates on detection and occupancy probabilities, using both continuous and categorical covariates (both site and site-occasion covariates). 
+#' Flexibly creates complete code and input data for community occupancy models for in JAGS amd Nimble, and automatically sets initial values and parameters to monitor. 
+#' Supports fixed and random effects of covariates on detection and occupancy probabilities, using both continuous and categorical covariates (both site and site-occasion covariates). 
 #' 
-#' Optionally includes data augmentation (fully open community, or up to known maximum number of species, or no data augmentation). Allows combination of all these parameters for fast and flexible customization of community occupancy models.
+#' Optionally includes data augmentation (fully open community, or up to known maximum number of species, or no data augmentation). 
+#' Allows combination of all these parameters for fast and flexible customization of community occupancy models.
 #' 
-#' Incidentally, the function can also be used to create  model code and input for single-species single-season occupancy models (it is the special case with only one species). Model will run slower than proper single-species model JAGS code due to the additional species loop, but it is possible.
+#' Incidentally, the function can also be used to create  model code and input for single-species single-season occupancy models (it is the special case of the community model with only one species). 
+#' Such a model will run slower than proper single-species model JAGS code due to the additional species loop, but it is possible.
 #' 
-#' The function returns several derived quantities, e.g. species richness, Bayesian p-values (overall and by species), Freeman-Tukey residuals for actual and simulate data (by station and total). If doing data augmentation, metacommunity size and number of unseen species are returned also. 
+#' The function returns several derived quantities, e.g. species richness, Bayesian p-values (overall and by species), Freeman-Tukey residuals for actual and simulated data (by station and total). If doing data augmentation, metacommunity size and number of unseen species are returned also. 
 #'
 #' @importFrom generics fit
 #  @importFrom rjags jags.model coda.samples
@@ -19,12 +22,12 @@
 #' @importFrom ggplot2 ggplot ggsave xlim geom_line facet_wrap geom_ribbon theme_bw ggtitle xlab ylab aes
 #' @export
 #'
-#' @param data_list    list. Contains 3 slots: ylist, siteCovs, obsCovs. ylist ist a list of detection histories (can be named), e.g. from \code{\link{detectionHistory}}. siteCovs is a data.frame with site covariates (optional). obsCovs is a list of site-occasion level covariates (e.g. site-occasion-specific effort, which is also returned by \code{\link{detectionHistory}}.
+#' @param data_list    list. Contains 3 slots: ylist, siteCovs, obsCovs. ylist is a list of detection histories (can be named), e.g. from \code{\link{detectionHistory}}. siteCovs is a data.frame with site covariates (optional). obsCovs is a list of site-occasion level covariates (e.g. site-occasion-specific effort, which is also returned by \code{\link{detectionHistory}}.
 #' @param occuCovs  list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of covariates on occupancy probability (continuous or categorical covariates)
 #' @param detCovs   list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of covariates on detection probability (continuous or categorical covariates)
-#' @param detCovsObservation   list. Up to 2 items named "fixed" and/or "ranef". Specifies  fixed or random effects of observation-level covariates on detection probability  (continuous or categorical covariates - categorical must be coded as character matrix)
+#' @param detCovsObservation   list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of observation-level covariates on detection probability  (continuous or categorical covariates - categorical must be coded as character matrix)
 #' @param effortCov     character. Name of list item in \code{data_list$obsCovs} which contains effort. This does not include effort as a covariate on detection probability, but only uses NA / not NA information to create binary effort and ensure detection probabilities p are 0 when there was no effort (p will be 0 whereever \code{effortCov} is NA).
-#' @param intercepts     list. For detection and occupancy probability intercepts, are they "fixed" (= constant across species) or "ranef" (= random effect of species on intercept)?
+#' @param intercepts     list. Two items named "det" and "occu" for detection and occupancy probability intercepts. Values can be "fixed" (= constant across species) or "ranef" (= random effect of species on intercept).
 #' @param richnessCategories  character. Name of categorical covariate in \code{data_list$siteCovs} for which to calculate separate richness estimates (optional). Can be useful to obtain separate richness estimates for different areas.
 #' @param augmentation     If NULL, no data augmentation (only use species in \code{data_list$ylist}), otherwise named list or vector with total number of (potential) species. Names: "knownmax" or "full". Example: \code{augmentation = c(knownmax = 30)} or \code{augmentation = c(full = 30)}
 #' @param modelFile   character. Text file name to save model to
@@ -32,9 +35,9 @@
 #'
 #'
 #' @details
-#' For examples of implementation, see Vignette XXX.
+#' For examples of implementation, see Vignette 5: Multi-species occupancy models.
 #' 
-#' Fixed effects of covariates are constant across species, whereas random effect covariates differ between species. Fixed and random effects are allowd for station-level detection and occupancy covariates (a.k.a. site covariates), and also station-occasion level covariates (a.k.a. observation covariates). 
+#' Fixed effects of covariates are constant across species, whereas random effect covariates differ between species. Fixed and random effects are allowed for station-level detection and occupancy covariates (a.k.a. site covariates), and also station-occasion level covariates (a.k.a. observation covariates). 
 #' 
 #' By default, random effects will be by species. It is however possible to use categorical site covariates for grouping (continuous|categorical).
 #' Furthermore, is is possible to use use nested random effects of species and another categorical site covariate (so that there is a random effect of species and an additional random effect of a categorical covariate within each species).
@@ -67,17 +70,7 @@
 #' 
 #' @return
 #' 
-#' \code{commOccu} object. It is an S4 class with the following slots:
-#' 
-#'   \item{modelText}{JAGS model code as a character vector (made up of code chunks, use cat() to print)}
-#'   \item{params}{Parameters to monitor in the model runs}
-#'   \item{inits_fun}{Function to create start values for the MCMC chains. It being a function ensures different values in each chain}
-#'   \item{data}{List with data needed to run the model (detection & effort matrices, site covariates, number of species / stations / occasions)}
-#'   \item{input}{Input data_list (unchanged)}
-#'   \item{nimble}{logical indicator for whether it is a Nimble model}
-#'   \item{modelFile}{Path of the text file containing the model code}
-#'   
-#' See \code{\link{commOccu-class}}
+#' \code{commOccu} object. It is an S4 class containing all information required to run the models. See  \code{\link{commOccu-class}} for details.
 #'
 #' @encoding UTF-8 
 #' @references 
@@ -86,45 +79,45 @@
 #' @section Parameter naming convention: 
 #' The parameter names are assembled from building blocks. The nomenclature  is as follows:    
 #'   \tabular{lll}{
-#'     \bold{Type}     \tab \bold{Name}         \tab  \bold{Description}  \cr
-#'     Submodel        \tab \bold{\code{alpha}} \tab  detection submodel  \cr
-#'     Submodel        \tab \bold{\code{beta}}  \tab  occupancy submode \cr
-#'     Intercept       \tab \bold{\code{0}}     \tab  denotes the intercepts (alpha0, beta0)  \cr
-#'     Effect type     \tab \bold{\code{fixed}} \tab  fixed effects (constant across species)  \cr
-#'     Effect type     \tab \bold{\code{ranef}} \tab  random effects (of species and/or other categorical covariates)  \cr
-#'     Covariate type  \tab \bold{\code{cont}}  \tab  continuous covariates \cr
-#'     Covariate type  \tab \bold{\code{categ}} \tab  categorical covariates \cr
-#'     Hyperparameter  \tab \bold{\code{mean}}  \tab  mean of random effect \cr
-#'     Hyperparameter  \tab \bold{\code{sigma}} \tab  standard deviation of random effect \cr
-#'     Hyperparameter  \tab \bold{\code{tau}}   \tab  precision of random effect (used internally, not returned)
+#'     \bold{Name}           \tab \bold{Refers to}  \tab  \bold{Description}  \cr
+#'     \bold{\code{alpha}}   \tab Submodel          \tab detection submodel  \cr
+#'     \bold{\code{beta}}    \tab Submodel          \tab occupancy submode \cr
+#'     \bold{\code{0}}       \tab Intercept         \tab denotes the intercepts (alpha0, beta0)  \cr
+#'     \bold{\code{fixed}}   \tab Effect type       \tab fixed effects (constant across species)  \cr
+#'     \bold{\code{ranef}}   \tab Effect type       \tab random effects (of species and/or other categorical covariates)  \cr
+#'     \bold{\code{cont}}    \tab Covariate type    \tab continuous covariates \cr
+#'     \bold{\code{categ}}   \tab Covariate type    \tab categorical covariates \cr
+#'     \bold{\code{mean}}    \tab Hyperparameter    \tab  mean of random effect \cr
+#'     \bold{\code{sigma}}   \tab Hyperparameter    \tab standard deviation of random effect \cr
+#'     \bold{\code{tau}}     \tab Hyperparameter    \tab precision of random effect (used internally, not returned)
 #'   }
 #' 
 #' 
-#' For example, a fixed intercept of occupancy (constant across species) is \bold{\code{beta0}}.
+#' For example, a fixed intercept of occupancy (constant across species) is \bold{\code{beta0}}, and a fixed intercept of detection probability is \bold{\code{alpha0}}.
 #' 
 #' 
-#' An intercept with a random effect of species is: 
+#' An occupancy probability intercept with a random effect of species is: 
 #'   
-#' \bold{\code{beta0.mean}} community mean of the occupancy probability intercept (= logit(occupancy probability) at covariate values of 0).
+#' \bold{\code{beta0.mean}} community mean of the occupancy probability intercept
 #' 
-#' \bold{\code{beta0.sigma}} standard deviation of the estimated occupancy probability intercept.
+#' \bold{\code{beta0.sigma}} standard deviation of the community occupancy probability intercept.
 #' 
-#' \bold{\code{beta0[1]}} occupancy intercept of species 1 (cont. for other species). 
+#' \bold{\code{beta0[1]}} occupancy probability intercept of species 1 (likewise for other species). 
 #' 
 #' 
-#' For effects of site covariates, the patters is:
+#' For effects of site covariates, the pattern is:
 #'   
 #' \code{submodel.effectType.covariateType.CovariateName.hyperparameter}
 #' 
 #' For example:
 #'   
-#' \bold{\code{beta.ranef.cont.habitat.mean}} is the mean community effect of the continuous site covariate 'habitat' on occupancy probability
+#' \bold{\code{beta.ranef.cont.habitat.mean}} is the mean community effect of the continuous site covariate 'habitat' on occupancy probability.
 #' 
-#' \bold{\code{beta.ranef.cont.habitat[1]}} is the effect of continuous site covariate 'habitat' on occupancy probability of species 1
+#' \bold{\code{beta.ranef.cont.habitat[1]}} is the effect of continuous site covariate 'habitat' on occupancy probability of species 1.
 #' 
 #' Site-occasion covariates are denoted by ".obs" after the submodel, e.g.: 
 #'   
-#' \bold{\code{alpha.obs.fixed.cont.effort}} is the fixed effect (constant across species) of the continuous observation-level covariate 'effort' on detection probability
+#' \bold{\code{alpha.obs.fixed.cont.effort}} is the fixed effect of the continuous observation-level covariate 'effort' on detection probability
 #' 
 #' 
 #' @author Juergen Niedballa
@@ -136,7 +129,7 @@
 # models are fit both in JAGS and Nimble
 # The data set only contains 5 species and 3 stations, so the results will be nonsense. 
 # It is only a technical demonstration with the camtrapR workflow
-# for a more complete example, see vignette XXX
+# for more complete examples, see vignette 5
 #' 
 #' data("camtraps")
 #' 
@@ -151,7 +144,7 @@
 #' 
 #' data("recordTableSample")
 #' 
-#' # list of detection histories
+#' # make list of detection histories
 #' DetHist_list <- lapply(unique(recordTableSample$Species), FUN = function(x) {
 #'   detectionHistory(
 #'     recordTable         = recordTableSample,
@@ -169,14 +162,18 @@
 #'   )}
 #' )
 #' 
+#' # assign species names to list items
 #' names(DetHist_list) <- unique(recordTableSample$Species)
 #' 
+#' # extract detection histories (omit effort matrices)
 #' ylist <- lapply(DetHist_list, FUN = function(x) x$detection_history)
 #' 
-#' # some fake covariates for demonstration
+#' # create some fake covariates for demonstration
 #' sitecovs <- camtraps[, c(1:3)]
 #' sitecovs$elevation <- c(300, 500, 600)   
-#' sitecovs[, c(2:4)] <- scale(sitecovs[,-1])   # scale numeric covariates
+#' 
+#' # scale numeric covariates
+#' sitecovs[, c(2:4)] <- scale(sitecovs[,-1])
 #' 
 #' 
 #' # bundle input data for communityModel
@@ -255,7 +252,7 @@
 #'              fit.nimble.comp, 
 #'              submodel = "det")
 #' 
-#' #' # effect sizes plot
+#' # effect sizes plot
 #' plot_coef(mod.nimble, 
 #'           fit.nimble.comp, 
 #'           submodel = "state")
@@ -336,7 +333,7 @@ communityModel <- function(data_list,
                            is_quadratic = FALSE,
                            has_quadratic = FALSE,
                            ranef = c(ifelse(intercepts$det == "ranef", T, F), 
-                                     ifelse(intercepts$occu == "ranef", T, F)), # TRUE = hasRanef, FALSE = fixed
+                                     ifelse(intercepts$occu == "ranef", T, F)), 
                            ranef_nested = FALSE,
                            ranef_cov = NA, 
                            coef = c("alpha0", "beta0"))
@@ -1402,7 +1399,7 @@ communityModel <- function(data_list,
   
   # prepare model data  ####
   
-  # effort_binary = 1/0 indicator for whether station was active or  (to ensure p = 0 when no effort)
+  # effort_binary = 1/0 indicator for whether station was active or not (to ensure p = 0 when no effort)
   effort_binary <- as.matrix(!is.na(data_list$obsCovs[[effortCov]])) * 1   # replace NA with 0, other values with 1
   
   
@@ -1512,12 +1509,12 @@ communityModel <- function(data_list,
               input     = data_list,
               nimble    = nimble,
               modelFile = ifelse(!is.null(modelFile), modelFile, "undefined"),
-              #call      = as.list(sys.call())
               covariate_info = covariate_info
               )
   return(out2)
   
 }
+
 
 
 # Define commOccu class for output ####
@@ -1530,7 +1527,7 @@ communityModel <- function(data_list,
 #' @slot input Input data_list (unchanged)
 #' @slot nimble logical indicator for whether it is a Nimble model
 #' @slot modelFile Path of the text file containing the model code
-#' @slot covariate_info Data frame containing information about covariates. Only used internally in plot_* methods
+#' @slot covariate_info Data frame containing information about covariates. Only used internally in plot_* and predict methods
 #'
 #' @note 
 #' The \code{data} slot is a list of model input data. While the exact content depends on function input, it can be summarized as:
@@ -1538,12 +1535,15 @@ communityModel <- function(data_list,
 #' \tabular{ll}{
 #' \code{y} \tab array of detection histories. Dimensions are: y[species, station, occasion] \cr
 #' \code{effort_binary} \tab matrix of binary (1/0) survey effort. Only used to ensure p = 0 when effort = 0. Dimensions are: effort_binary[station, occasion] \cr
-#' \code{site-occasion covariates} \tab The content of data_list$obsCovs as named matrices with dimensions [station, occasion] \cr
-#' \code{site covariates} \tab The columns of data_list$siteCovs as named vectors (length = number of stations) \cr
+#' \code{site-occasion covariates} \tab The required content of data_list$obsCovs as named matrices with dimensions [station, occasion] \cr
+#' \code{site covariates} \tab The required columns of data_list$siteCovs as named vectors (length = number of stations) \cr
 #' \code{M} \tab Number of species \cr
 #' \code{J} \tab Number of stations \cr
 #' \code{maxocc} \tab Number of occasions \cr
 #' }
+#' 
+#' For categorical site-occasion covariates, an addition matrix containing an integer representation of the character matrix with suffix "_integer" is stored in the data slot.
+#' 
 #' @return \code{commOccu} object
 #' 
 #' @export
