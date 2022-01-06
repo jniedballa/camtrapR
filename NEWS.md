@@ -1,7 +1,13 @@
+# camtrapR 2.1.1
+
+## new functions
+* communityModel: create community occupancy models for JAGS and Nimble. Comes with summary(), fit(), and predict() methods
+* plot_effects(): for plotting marginal effect plots (response curves) from community models
+* plot_coef(): for plotting coefficient estimates from community models
+
 # camtrapR 2.1.0
 
 ## new functions
-* communityModel: create community occupancy models for JAGS and Nimble. Comes with summary(), fit(), and predict() methods, and two additional functions: plot_effects / plot_coef
 * OCRdataFields: allows automatic reading of text from data fields in images via optical character recognition (OCR), requires magick and tesseract packages
 * writeDateTimeOriginal: Write values to DateTimeOriginal tag to image metadata
 
