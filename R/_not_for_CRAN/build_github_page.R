@@ -7,6 +7,11 @@ build_home()
 
 build_news()       # NEWS section
 build_articles()   # all vignettes 
- build_article(name = "camtrapr1")   # is for individual vignettes
+build_article(name = "camtrapr5")   # is for individual vignettes
+build_articles_index(pkg = ".")
 # build_article(name = "camtrapr3")   # is for individual vignettes
 build_reference()  # function documentation
+build_reference_index(pkg = ".")
+
+build_manual()
+
