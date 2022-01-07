@@ -94,19 +94,20 @@ Before assigning metadata tags, users need to set up a hierarchical tag structur
     * Male2
 	  
 
+Previously, only one level of hierarchy was allowed in tags. Since v.2.1.1, it is possible to specify multiple levels of hierarchy, e.g. the following structure is now accepted:
 
-Be careful to use one level of hierarchy in your tags only. The following example will not work:
-
-* Individual
-    + Male
-         * 1
-         * 2
-    + Female
-         * 1
-         * 2
+* Species
+    + Cat
+         * Leopard Cat
+         * Tiger
+    + Civet
+         * Masked palm civet
+         * Large Indian civet
 
 
-The crucial point is to set up tag groups (e.g. "Species" for species identification) which then contain the desired tags (e.g. species tags such as "Leopard Cat", "Malay Civet" etc.). This is what is meant by hierarchical tag structure. For clarification, here is a screenshot of the digiKam tag tree in which an image was identified as showing a Leopard Cat.
+If multiple tags are assigned in the same image (e.g. "Cat" and "Leopard Cat"), the function will assign the "deepest" tag ("Leopard Cat" in this case). Theoretically one can even set up even more tag levels.
+
+The crucial point is to set up tag groups (e.g. "Species" for species identification) which then contain the desired tags (e.g. species tags such as "Leopard Cat", "Malay Civet" etc.) or further tag group (e.g. "Cat" or "Civet" in the example above). This is what is meant by hierarchical tag structure. For clarification, here is a screenshot of the digiKam tag tree in which an image was identified as showing a Leopard Cat.
 
 ![The desired tag structure shown in a digiKam screenshot](SpeciesID_digiKam.png)
 
