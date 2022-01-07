@@ -115,6 +115,7 @@ These plots are generated from the record table and the camera trap table.
 \href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html}{2. Identifying species and individuals}  \cr
 \href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr3.html}{3. Extracting Data from Camera Trapping Images and Videos}  \cr
 \href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr4.html}{4. Data exploration and visualisation}  \cr
+\href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr5.html}{5. Multi-species occupancy models}  \cr
 
 }
 }

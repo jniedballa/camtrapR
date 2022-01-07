@@ -22,7 +22,7 @@ library(DT)
 library(knitr)
 ```
 
-# Motivation
+# Overview
 
 Multi-species occupancy models are a powerful group of models that combine information from many species to estimate individual species' responses as well as community-level responses to environmental variables. 
 
@@ -59,6 +59,7 @@ The workflow provides methods for:
 The output of fit() is an mcmc.list from the coda package and can be uses as such, so the summary(), plot(), etc. methods are available as well as the functions from bayesplot.
 
 The main function `communityModel` does not support R formula syntax the way packages like unmarked or ubms do Instead, covariates and their effect types are specified via a few dedicated function arguments. This non-standard approach may change in the future to instead support formula syntax. On the other hand it might be less confusing than the lme4 syntax for random effects. 
+
 
 # Warning
 
@@ -246,7 +247,7 @@ There is a very basic summary method for commOccu objects:
 
 The model is fit with `fit()`.
 
-```{r message=FALSE}
+```{r results="hide"}
  fit.jags <- fit(mod.jags,
                  n.iter = 1000,
                  n.burnin = 500,
@@ -356,18 +357,18 @@ We can fit the same model in Nimble using the exact same functions as for the JA
 ```
 
 It is possible to fit uncompiled models, but it is usually extremely slow and should only be done for checking model structure and expected outputs, using very few iterations. 
-```{r}
+```{r results="hide", message = FALSE}
  fit.nimble.uncomp <- fit(mod.nimble,
                           n.iter = 10,
                           chains = 1)
 
-# the notes and the error message below are harmless
+# the notes and the error message above are harmless
 ```
 
 
 To fit a compiled model, set compile = TRUE:
 
-```{r}
+```{r results="hide", message = FALSE}
  fit.nimble.comp <- fit(mod.nimble,
                         n.iter = 10000,
                         n.burnin = 5000,
@@ -499,7 +500,7 @@ model1_jags <- communityModel(
 ```
 
 
-```{r}
+```{r results="hide"}
 out_ahm_jags <- fit(model1_jags, 
                     n.iter = 5000, 
                     n.burnin = 2500,
@@ -576,7 +577,7 @@ model1_nimble <- communityModel(
 
 We use some more iterations, since these Nimble models tend to require more iterations than equivalent JAGS models to achieve good estimates (numbers are still too low for publication quality though).
 
-```{r}
+```{r results="hide"}
 # compiled model run
 out_ahm_nimble2 <- fit(model1_nimble, 
                        n.iter = 5000,
@@ -951,7 +952,7 @@ The simulated data have no quadratic relationship with covariates, hence the qua
 Nimble models can return WAIC. Set argument `fit(..., WAIC = TRUE)`.
 
 
-```{r}
+```{r message=FALSE, warning=FALSE, results="hide"}
 out_ahm_nimble3 <- fit(model1_nimble, 
                        n.iter = 500,
                        n.burnin = 250,
