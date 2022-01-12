@@ -296,8 +296,8 @@ communityModel <- function(data_list,
   
   # define inits
   inits_list <- list(
-    inits_runif_mean_low = list("runif", list(1, -4.5, -1.5)),
-    inits_runif_mean_0 = list("runif", list(1, -1, 1)),
+    inits_runif_mean_low = list("runif", list(1, -4.5, -1.5)),   # n_draws, min, max
+    inits_runif_mean_0 = list("runif", list(1, -1, 1)), 
     inits_runif_tau  = list("runif", list(1, 0.01, 0.1)),
     inits_runif_omega = list("runif", list(1, 0, 1))
   )
@@ -305,8 +305,8 @@ communityModel <- function(data_list,
   stopifnot(is.list(intercepts))
   stopifnot(length(intercepts) == 2)
   stopifnot(names(intercepts) %in% c("det", "occu"))
-  stopifnot(intercepts$det %in% c("fixed", "ranef"))
-  stopifnot(intercepts$occu %in% c("fixed", "ranef"))
+  stopifnot(intercepts$det %in% c("fixed", "ranef", "independent"))
+  stopifnot(intercepts$occu %in% c("fixed", "ranef", "independent"))
   
   
   
@@ -604,7 +604,7 @@ communityModel <- function(data_list,
   
   # Priors  ####
   
-  start <- "model{\n### PRIORS \n"
+  model_start <- "model{\n### PRIORS \n"
   
   
   ## Intercept - occupancy - hyperpriors   ####
@@ -613,7 +613,9 @@ communityModel <- function(data_list,
                                     type = "occupancy", 
                                     prior_list = prior_list, 
                                     inits_list = inits_list, 
-                                    speciesIndex = speciesIndex)
+                                    speciesIndex = speciesIndex,
+                                    speciesMax = speciesMax,
+                                    speciesMax_value = speciesMax_value)
   
   priors_intercept_occu <- intercept_occu$prior
   beta0_formula         <- intercept_occu$formula
@@ -624,10 +626,12 @@ communityModel <- function(data_list,
                                    type = "detection", 
                                    prior_list = prior_list, 
                                    inits_list = inits_list, 
-                                   speciesIndex = speciesIndex)
+                                   speciesIndex = speciesIndex,
+                                   speciesMax = speciesMax,
+                                   speciesMax_value = speciesMax_value)
   
   priors_intercept_det <- intercept_det$prior
-  alpha0_formula         <- intercept_det$formula
+  alpha0_formula       <- intercept_det$formula
   
   
   ##  data augmentation priors ####
@@ -1285,7 +1289,7 @@ communityModel <- function(data_list,
   # Creating output ####
   
   ## combine model code ####
-  model_text <- list(start, 
+  model_text <- list(model_start, 
                      priors_intercept_occu,
                      priors_intercept_det,
                      
@@ -1833,7 +1837,9 @@ interceptPriors <- function(effect,
                             type,
                             prior_list,
                             inits_list, 
-                            speciesIndex){
+                            speciesIndex,
+                            speciesMax,
+                            speciesMax_value){
   
   
   if(type == "detection") param <- "alpha"
@@ -1841,11 +1847,6 @@ interceptPriors <- function(effect,
   
   
   if(effect == "ranef"){
-    
-    # comenclature 1: mean.alpha0
-    # param_names <- list(mean  = paste0("mean.",  param, "0"), 
-    #                     tau   = paste0("tau.",   param, "0"),
-    #                     sigma = paste0("sigma.", param, "0"))
     
     # comenclature 2: alpha0.mean
     param_names <- list(mean  = paste0(param, "0", ".mean"), 
@@ -1873,7 +1874,9 @@ interceptPriors <- function(effect,
     attr(priors_intercept, "inits") <- inits_tmp
     
     code_formula <- paste0(param, "0[", speciesIndex, "]")
-  } else {
+  } 
+  
+  if(effect == "fixed") {
     priors_intercept <- paste(
       paste("##", type, "intercept estimate of community (constant across species)"),
       paste0(param, "0 ~ ", prior_list$dnorm),
@@ -1885,9 +1888,34 @@ interceptPriors <- function(effect,
     code_formula <- paste0(param, "0")
   }
   
+  
+  if(effect == "independent") {
+    priors_intercept <- paste(
+      paste("##", type, "intercept estimate of community (independent between species)"),
+      paste0("for(", speciesIndex, " in 1:", speciesMax, ") {"),
+      paste0(param, "0[", speciesIndex, "] ~ ", prior_list$dnorm),
+      "}",
+      "\n", sep = "\n")
+    
+
+    # inits_tmp <- rep(list(inits_list$inits_runif_mean_0), times = speciesMax_value)
+    # names(inits_tmp) <- paste0(param, "0[", 1:speciesMax_value, "]")
+    
+    inits_tmp <- list(inits_list$inits_runif_mean_0)
+    names(inits_tmp) <- paste0(param, "0")
+    inits_tmp[[1]] [[2]] [[1]] <- speciesMax_value    # change number of random init values to create (not 1, but n_species)
+    
+    attr(priors_intercept, "inits") <- inits_tmp
+    
+    code_formula <- paste0(param, "0[", speciesIndex, "]")
+    
+  }
+  
   return(list(prior    = priors_intercept, 
               formula  = code_formula))
 }
+
+
 
 
 fixedEffectPriors <- function(effect_names, 
