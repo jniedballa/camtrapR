@@ -13,6 +13,7 @@
   combine = FALSE,
   outdir,
   level = c(outer = 0.95, inner = 0.75),
+  colorby = "significance",
   ...
 )
 }
@@ -30,6 +31,8 @@
 \item{outdir}{Directory to save plots to (optional)}
 
 \item{level}{Probability mass to include in the uncertainty interval (two values, second value - inner interval - will be plotted thicker)}
+
+\item{colorby}{Whether to color estimates by "significance" (of the effect estimates), or "Bayesian p-value" (of the species)}
 
 \item{...}{additional arguments for \code{\link[ggplot2]{ggsave}}}
 }

@@ -338,7 +338,7 @@ plot.effects.commOccu <- function(object,       # commOccu object
   #'
   #' @return list of ggplot objects
   #' @export
-  #' @importFrom ggplot2 geom_vline geom_linerange geom_pointrange element_blank theme 
+  #' @importFrom ggplot2 geom_vline geom_linerange geom_pointrange element_blank theme labs
   #' @importFrom ggplot2 scale_color_manual scale_y_discrete aes_string vars facet_grid facet_wrap ylim geom_col
   # @import coda
   #'
@@ -356,10 +356,12 @@ plot.coef.commOccu <- function(object,
                                combine = FALSE,
                                outdir,
                                level = c(outer = 0.95, inner = 0.75),
+                               colorby = "significance",
                                ...) {
   
   
   submodel <- match.arg(submodel, choices = c("det", "state"))
+  colorby  <- match.arg(colorby, choices = c("significance", "Bayesian p-value"))
   
   if(submodel == "state") {
     keyword_submodel <- "^beta"
@@ -406,9 +408,14 @@ plot.coef.commOccu <- function(object,
   p_list <- list()
   df_quantiles_list <- list()
   
+  
+  # get Bayesian p-values
+  df_statistics <- posteriorSummary$statistics
+  df_statistics_Bayes_pvals_overall <- as.data.frame(df_statistics[grep("Bpvalue$", rownames(df_statistics)), , drop = F])
+  df_statistics_Bayes_pvals_species <- df_statistics[grep("Bpvalue_species", rownames(df_statistics)), ]
+  
   # loop over covariates
   for(cov in 1:nrow(cov_info_subset)) {
-    
     
     current_cov  <- cov_info_subset$covariate[cov]
     current_coef <- cov_info_subset$coef[cov]
@@ -481,20 +488,14 @@ plot.coef.commOccu <- function(object,
     if(covariate_is_fixed) df_quantiles_i$type  <- c("mean")
     
     if(covariate_is_ranef) {
-      
       # add community mean
       index_covariate_mean_ranef <- grep(paste0(current_coef, ".mean"), rownames(df_quantiles), fixed = T)   # does this affect categ fixed effects?
       
-      
       df_quantiles_i  <- rbind(df_quantiles[index_covariate_mean_ranef, ], df_quantiles_i)
-      
       
       df_quantiles_i$type  <- c(rep("mean", times = length(index_covariate_mean_ranef)), rep("species", times = length(index_covariate)))
     }
     }
-    
-    
-    
     
     
     
@@ -508,8 +509,39 @@ plot.coef.commOccu <- function(object,
     significance[which(df_quantiles_i$lower_outer < 0 & df_quantiles_i$upper_outer < 0 | 
                          df_quantiles_i$lower_outer > 0 & df_quantiles_i$upper_outer > 0)] <- "outer"
     
-    
     df_quantiles_i$significance  <- significance
+    
+    # add Bayesian p-values
+    
+    # if colorby == "Bayesian p-value":
+    # slight inconsistency: values in "level" will still be used for error bar width
+    # but will affect colors only via Bayesian p-values of the species
+    # not via the actual parameter estimates. 
+    # So a parameter estimate can be highly significant but grey bc bayesian p-value of the the species is ok
+    # it's mostly for model checking, so I guess it's fine
+    if(colorby == "Bayesian p-value"){
+      if(covariate_is_numeric){
+        if(covariate_is_fixed) df_pval <- df_statistics_Bayes_pvals_overall
+        if(covariate_is_ranef) df_pval <- rbind(df_statistics_Bayes_pvals_overall, 
+                                                df_statistics_Bayes_pvals_species)
+      }
+      if(covariate_is_factor){
+        if(covariate_is_fixed) df_pval <- df_statistics_Bayes_pvals_overall [rep(1, times = nlev),]
+        if(covariate_is_ranef) df_pval <- rbind(df_statistics_Bayes_pvals_overall [rep(1, times = nlev),], 
+                                                df_statistics_Bayes_pvals_species [rep(1:nrow(df_statistics_Bayes_pvals_species), 
+                                                                                       times = nlev),])
+      }
+      
+      stopifnot(nrow(df_pval) == nrow(df_quantiles_i))
+      
+      
+      significance2 <- rep("no", times = nrow(df_pval))
+      significance2[which(df_pval$Mean < (1-level[2]) / 2 | df_pval$Mean > (1 - (1-level[2]) / 2))] <- "inner"
+      significance2[which(df_pval$Mean < (1-level[1]) / 2 | df_pval$Mean > (1 - (1-level[1]) / 2))] <- "outer"
+      
+      df_quantiles_i$significance2  <- significance2
+      
+    }
     
     # assign species names
     if(!is.null(dimnames(object@data$y)[[1]])) speciesnames <- dimnames(object@data$y)[[1]]
@@ -519,12 +551,7 @@ plot.coef.commOccu <- function(object,
     if(covariate_is_ranef)  {
       if(covariate_is_numeric) df_quantiles_i$species <- c("community", speciesnames)
       if(covariate_is_factor) {
-        #if(covariate_is_site_cov){
         df_quantiles_i$species <- c(rep("community", times = length(index_covariate_mean_ranef)), rep(speciesnames, times = nlev))
-          #df_quantiles_i$species <- c(rep("community", times = nlev), rep(speciesnames, times = nlev))
-        #} else {
-        #  df_quantiles_i$species <- c(rep("community", times = nlev - 1), rep(speciesnames, times = nlev - 1))
-        #}
       }
     }
     
@@ -539,14 +566,11 @@ plot.coef.commOccu <- function(object,
     
     if(covariate_is_factor){
       if(covariate_is_fixed){
-        
         if(covariate_is_site_cov)  df_quantiles_i$covariate  <- paste0(current_cov, "_", levels_tmp)
         if(!covariate_is_site_cov) df_quantiles_i$covariate  <- paste0(current_cov, "_",  levels_tmp)
-        
       }
       
       if(covariate_is_ranef){
-        
         if(covariate_is_site_cov)  df_quantiles_i$covariate  <- paste0(current_cov, "_", c(levels_tmp,
                                                                                            rep(levels_tmp, each = object@data$M)))
         if(!covariate_is_site_cov) df_quantiles_i$covariate  <- paste0(current_cov, "_", c(levels_tmp,
@@ -591,10 +615,12 @@ plot.coef.commOccu <- function(object,
     type <- NULL   # just for CRAN checks
     covariate <- NULL
     
+    if(colorby == "significance")      color_by <- "significance"
+    if(colorby == "Bayesian p-value")  color_by <- "significance2"
     
     if(!combine){
       
-      p_list[[cov]] <- ggplot (df_quantiles_i, aes_string(y = "species", x = "median", color = "significance")) +
+      p_list[[cov]] <- ggplot (df_quantiles_i, aes_string(y = "species", x = "median", color = color_by)) +
         geom_vline(xintercept = 0, alpha = 0.2) +
         geom_pointrange(aes_string(xmin = "lower_outer", xmax = "upper_outer")) + 
         geom_linerange( aes_string(xmin = "lower_inner", xmax = "upper_inner"), size = 1) +
@@ -612,15 +638,17 @@ plot.coef.commOccu <- function(object,
         scale_color_manual(breaks = c("outer", "inner", "no"),
                            values=c("firebrick", "black", "grey50"),
                            guide = "none") +
-        ggtitle(paste("Effect sizes:", current_cov))
+        ggtitle(paste("Effect sizes:", current_cov)) 
       
       
       if(!covariate_is_factor) {
         p_list[[cov]] <- p_list[[cov]] + theme(strip.background.x = element_blank(),
                                                strip.text.x = element_blank())
       }
-      
-      
+
+      if(color_by == "significance2"){
+        p_list[[cov]] <- p_list[[cov]] + labs(subtitle = "colors indicate Bayesian p-values of species")
+      }
       
       
       if(hasArg(outdir)) {
@@ -639,7 +667,7 @@ plot.coef.commOccu <- function(object,
     df_quantiles_all$species <- factor(df_quantiles_all$species, 
                                        levels = rev(sort(unique(as.character(df_quantiles_all$species)))))
     
-    p <- ggplot (df_quantiles_all, aes_string(y = "species", x = "median", color = "significance")) +
+    p <- ggplot (df_quantiles_all, aes_string(y = "species", x = "median", color = color_by)) +
       geom_vline(xintercept = 0, alpha = 0.2) +
       geom_pointrange(aes_string(xmin = "lower_outer", xmax = "upper_outer")) + 
       geom_linerange (aes_string(xmin = "lower_inner", xmax = "upper_inner"), size = 1) +
@@ -658,7 +686,8 @@ plot.coef.commOccu <- function(object,
                          guide = "none")
     
     if(hasArg(outdir)) {
-      ggsave(filename = file.path(outdir, paste0("effect_sizes_", submodel, "_", paste(cov_info_subset$covariate, collapse = "_"), "_", Sys.Date(),  ".png")),
+      ggsave(filename = file.path(outdir, paste0("effect_sizes_", submodel, "_", paste(cov_info_subset$covariate, collapse = "_"), "_", 
+                                                 ifelse(!colorby == "significance", "Bayesian_pval_", ""), Sys.Date(),  ".png")),
              plot = p,
              ...)
     }
@@ -692,6 +721,7 @@ plot.coef.commOccu <- function(object,
   #' @param combine logical. Combine multiple plots into one (via facets)?
   #' @param outdir Directory to save plots to (optional)
   #' @param level  Probability mass to include in the uncertainty interval (two values, second value - inner interval - will be plotted thicker)
+  #' @param colorby Whether to color estimates by "significance" (of the effect estimates), or "Bayesian p-value" (of the species)
   #' @param ...  additional arguments for \code{\link[ggplot2]{ggsave}}
   #'
   #' @return list of ggplot objects
