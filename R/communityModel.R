@@ -23,11 +23,11 @@
 #' @export
 #'
 #' @param data_list    list. Contains 3 slots: ylist, siteCovs, obsCovs. ylist is a list of detection histories (can be named), e.g. from \code{\link{detectionHistory}}. siteCovs is a data.frame with site covariates (optional). obsCovs is a list of site-occasion level covariates (e.g. site-occasion-specific effort, which is also returned by \code{\link{detectionHistory}}.
-#' @param occuCovs  list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of covariates on occupancy probability (continuous or categorical covariates)
-#' @param detCovs   list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of covariates on detection probability (continuous or categorical covariates)
+#' @param occuCovs  list. Up to 3 items named "fixed", "independent", and/or "ranef". Specifies fixed, independent or random effects of covariates on occupancy probability (continuous or categorical covariates). Independent effects are only supported for continuous covariates.
+#' @param detCovs   list. Up to 3 items named "fixed", "independent", and/or "ranef". Specifies fixed, independent or random effects of covariates on detection probability (continuous or categorical covariates). Independent effects are only supported for continuous covariates.
 #' @param detCovsObservation   list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of observation-level covariates on detection probability  (continuous or categorical covariates - categorical must be coded as character matrix)
 #' @param effortCov     character. Name of list item in \code{data_list$obsCovs} which contains effort. This does not include effort as a covariate on detection probability, but only uses NA / not NA information to create binary effort and ensure detection probabilities p are 0 when there was no effort (p will be 0 whereever \code{effortCov} is NA).
-#' @param intercepts     list. Two items named "det" and "occu" for detection and occupancy probability intercepts. Values can be "fixed" (= constant across species) or "ranef" (= random effect of species on intercept).
+#' @param intercepts     list. Two items named "det" and "occu" for detection and occupancy probability intercepts. Values can be "fixed" (= constant across species), "independent" (= independent estimates for each species), or "ranef" (= random effect of species on intercept).
 #' @param richnessCategories  character. Name of categorical covariate in \code{data_list$siteCovs} for which to calculate separate richness estimates (optional). Can be useful to obtain separate richness estimates for different areas.
 #' @param augmentation     If NULL, no data augmentation (only use species in \code{data_list$ylist}), otherwise named list or vector with total number of (potential) species. Names: "knownmax" or "full". Example: \code{augmentation = c(knownmax = 30)} or \code{augmentation = c(full = 30)}
 #' @param modelFile   character. Text file name to save model to
@@ -37,7 +37,9 @@
 #' @details
 #' For examples of implementation, see Vignette 5: Multi-species occupancy models.
 #' 
-#' Fixed effects of covariates are constant across species, whereas random effect covariates differ between species. Fixed and random effects are allowed for station-level detection and occupancy covariates (a.k.a. site covariates), and also station-occasion level covariates (a.k.a. observation covariates). 
+#' Fixed effects of covariates are constant across species, whereas random effect covariates differ between species. Independent effect differ between species and are independent (there is no underlying hyperdistribution).
+#' Fixed, independent and random effects are allowed for station-level detection and occupancy covariates (a.k.a. site covariates). Fixed and random effects are also allowed for station-occasion level covariates (a.k.a. observation covariates). 
+#' Currently independent effects are only supported for continuous site covariates, not categorical site covariates or observation-level covariates.
 #' 
 #' By default, random effects will be by species. It is however possible to use categorical site covariates for grouping (continuous|categorical).
 #' Furthermore, is is possible to use use nested random effects of species and another categorical site covariate (so that there is a random effect of species and an additional random effect of a categorical covariate within each species).
@@ -84,10 +86,11 @@
 #'     \bold{\code{beta}}    \tab Submodel          \tab occupancy submode \cr
 #'     \bold{\code{0}}       \tab Intercept         \tab denotes the intercepts (alpha0, beta0)  \cr
 #'     \bold{\code{fixed}}   \tab Effect type       \tab fixed effects (constant across species)  \cr
+#'     \bold{\code{indep}}   \tab Effect type       \tab independent effects (separate for each species)  \cr
 #'     \bold{\code{ranef}}   \tab Effect type       \tab random effects (of species and/or other categorical covariates)  \cr
 #'     \bold{\code{cont}}    \tab Covariate type    \tab continuous covariates \cr
 #'     \bold{\code{categ}}   \tab Covariate type    \tab categorical covariates \cr
-#'     \bold{\code{mean}}    \tab Hyperparameter    \tab  mean of random effect \cr
+#'     \bold{\code{mean}}    \tab Hyperparameter    \tab mean of random effect \cr
 #'     \bold{\code{sigma}}   \tab Hyperparameter    \tab standard deviation of random effect \cr
 #'     \bold{\code{tau}}     \tab Hyperparameter    \tab precision of random effect (used internally, not returned)
 #'   }
@@ -368,6 +371,7 @@ communityModel <- function(data_list,
   obs_covariates_numeric <- names(obs_covariates)[sapply(obs_covariates, is.numeric)]
   obs_covariates_categ   <- names(obs_covariates)[sapply(obs_covariates, is.character)]
   
+  if(!all(names(detCovsObservation) %in% c("fixed", "ranef"))) stop("detCovsObservation can currentlly only be 'fixed' or 'ranef'")
   
   if(!is.null(detCovsObservation$fixed)) {
     for(i in detCovsObservation$fixed) {
@@ -509,6 +513,24 @@ communityModel <- function(data_list,
     }
   }
   
+  if(!is.null(occuCovs$independent)) {
+    if(any(!occuCovs$independent %in% colnames(covariates))) {
+      stop(paste(occuCovs$independent [!occuCovs$independent %in% colnames(covariates)], collapse = ", "), " is not in covariates")
+    }
+    if(any(!occuCovs$independent %in% covariates_numeric)) {
+      if(!all(occuCovs$independent [which(!occuCovs$independent %in% covariates_numeric)] %in% covariates_categ)) stop(paste("Occupancy covariate ", paste(occuCovs$independent [which(!occuCovs$independent %in% covariates_numeric)], collapse = ", "), 
+                                                                                                                 "is not a factor"))
+      
+      # prohibit independent effects of categorical covariates
+      if(any(occuCovs$independent %in% covariates_categ)) stop("independent effects of categorical site covariates are currently not supported")
+      
+      # occuCovs_categ$independent <- occuCovs$independent[occuCovs$independent %in% covariates_categ]
+      # occuCovs$independent       <- occuCovs$independent[occuCovs$independent %in% covariates_numeric]
+      # if(length(occuCovs$independent) == 0) occuCovs <- modifyList(occuCovs, list(independent = NULL))
+    }
+  }
+  
+  
   if(!is.null(occuCovs$ranef)) {
     if(any(occuCovs$ranef %in% covariates_categ_categ)) stop("random effects of categorical site covariates on other categorical site covariates are not supported yet (except for random effect of species)")
     
@@ -539,6 +561,25 @@ communityModel <- function(data_list,
       if(length(detCovs$fixed) == 0) detCovs <- modifyList(detCovs, list(fixed = NULL))
     }
   }
+  
+  
+  if(!is.null(detCovs$independent)) {
+    if(any(!detCovs$independent %in% colnames(covariates))) {
+      stop(paste(detCovs$independent [!detCovs$independent %in% colnames(covariates)], collapse = ", "), " is not in covariates")
+    }
+    if(any(!detCovs$independent %in% covariates_numeric)) {
+      if(!all(detCovs$independent [which(!detCovs$independent %in% covariates_numeric)] %in% covariates_categ)) stop(paste("Detection covariate ", paste(detCovs$independent [which(!detCovs$independent %in% covariates_numeric)], collapse = ", "), 
+                                                                                                               "is not a factor"))
+
+      # prohibit independent effects of categorical covariates
+      if(any(detCovs$independent %in% covariates_categ)) stop("independent effects of categorical site covariates are currently not supported")
+      
+      # detCovs_categ$independent <- detCovs$independent[detCovs$independent %in% covariates_categ]
+      # detCovs$independent       <- detCovs$independent[detCovs$independent %in% covariates_numeric]
+      # if(length(detCovs$independent) == 0) detCovs <- modifyList(detCovs, list(independent = NULL))
+    }
+  }
+  
   
   if(!is.null(detCovs$ranef)) {
     
@@ -660,7 +701,7 @@ communityModel <- function(data_list,
   }
   
   
-  ## obsCov - cont - fixed effect priors ####
+  ## obs Cov - cont - fixed effect priors ####
   prior_obs_header_fixed <- paste("## Continuous observation-level covariates on detection - Fixed effects\n")
   
   if(!is.null(detCovsObservation$fixed)) {
@@ -690,7 +731,7 @@ communityModel <- function(data_list,
     attr(priors_obscovs_det_fixed, "params") <- NULL
   }
   
-  ## obsCov - cont - random effect priors ####
+  ## obs Cov - cont - random effect priors ####
   prior_obs_header_ranef <- paste("## Continuous observation-level covariates on detection - with random effects\n")
   
   if(!is.null(detCovsObservation$ranef)){
@@ -739,7 +780,7 @@ communityModel <- function(data_list,
   
   
   
-  ## obsCov - categ - fixed effect priors ####
+  ## obs Cov - categ - fixed effect priors ####
   prior_obs_categ_header_fixed <- paste("## Categorical observation-level covariates on detection - Fixed effect\n")
   
   if(!is.null(detCovsObservation_categ$fixed)){
@@ -783,7 +824,7 @@ communityModel <- function(data_list,
   }
   
   
-  ## obsCov - categ - random effect priors ####
+  ## obs Cov - categ - random effect priors ####
   
   prior_obs_categ_header_ranef <- paste("## Categorical observation-level covariates on detection - with random effects\n")
   if(!is.null(detCovsObservation_categ$ranef)){
@@ -857,7 +898,7 @@ communityModel <- function(data_list,
   
   
   
-  ## detCov - cont - fixed effect priors ####
+  ## det Cov - cont - fixed effect priors ####
   prior_det_header_fixed <- paste("## Continuous site covariates on detection - Fixed effects\n")
   
   priors_sitecovs_det_fixed <- fixedEffectPriors (effect_names = detCovs$fixed,
@@ -867,7 +908,7 @@ communityModel <- function(data_list,
   
   
   
-  ## occu Cov - cont - independent effect priors ####
+  ## det Cov - cont - independent effect priors ####
   prior_det_header_indep <- paste("## Continuous site covariates on detection - Independent effects\n")
   
   priors_sitecovs_det_indep <- independentEffectPriors (effect_names = detCovs$independent,

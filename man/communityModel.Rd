@@ -7,7 +7,7 @@
 \usage{
 communityModel(
   data_list,
-  occuCovs = list(fixed = NULL, ranef = NULL),
+  occuCovs = list(fixed = NULL, independent = NULL, ranef = NULL),
   detCovs = list(fixed = NULL, ranef = NULL),
   detCovsObservation = list(fixed = NULL, ranef = NULL),
   effortCov = "effort",
@@ -21,15 +21,15 @@ communityModel(
 \arguments{
 \item{data_list}{list. Contains 3 slots: ylist, siteCovs, obsCovs. ylist is a list of detection histories (can be named), e.g. from \code{\link{detectionHistory}}. siteCovs is a data.frame with site covariates (optional). obsCovs is a list of site-occasion level covariates (e.g. site-occasion-specific effort, which is also returned by \code{\link{detectionHistory}}.}
 
-\item{occuCovs}{list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of covariates on occupancy probability (continuous or categorical covariates)}
+\item{occuCovs}{list. Up to 3 items named "fixed", "independent", and/or "ranef". Specifies fixed, independent or random effects of covariates on occupancy probability (continuous or categorical covariates). Independent effects are only supported for continuous covariates.}
 
-\item{detCovs}{list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of covariates on detection probability (continuous or categorical covariates)}
+\item{detCovs}{list. Up to 3 items named "fixed", "independent", and/or "ranef". Specifies fixed, independent or random effects of covariates on detection probability (continuous or categorical covariates). Independent effects are only supported for continuous covariates.}
 
 \item{detCovsObservation}{list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of observation-level covariates on detection probability  (continuous or categorical covariates - categorical must be coded as character matrix)}
 
 \item{effortCov}{character. Name of list item in \code{data_list$obsCovs} which contains effort. This does not include effort as a covariate on detection probability, but only uses NA / not NA information to create binary effort and ensure detection probabilities p are 0 when there was no effort (p will be 0 whereever \code{effortCov} is NA).}
 
-\item{intercepts}{list. Two items named "det" and "occu" for detection and occupancy probability intercepts. Values can be "fixed" (= constant across species) or "ranef" (= random effect of species on intercept).}
+\item{intercepts}{list. Two items named "det" and "occu" for detection and occupancy probability intercepts. Values can be "fixed" (= constant across species), "independent" (= independent estimates for each species), or "ranef" (= random effect of species on intercept).}
 
 \item{richnessCategories}{character. Name of categorical covariate in \code{data_list$siteCovs} for which to calculate separate richness estimates (optional). Can be useful to obtain separate richness estimates for different areas.}
 
@@ -57,7 +57,9 @@ The function returns several derived quantities, e.g. species richness, Bayesian
 \details{
 For examples of implementation, see Vignette 5: Multi-species occupancy models.
 
-Fixed effects of covariates are constant across species, whereas random effect covariates differ between species. Fixed and random effects are allowed for station-level detection and occupancy covariates (a.k.a. site covariates), and also station-occasion level covariates (a.k.a. observation covariates). 
+Fixed effects of covariates are constant across species, whereas random effect covariates differ between species. Independent effect differ between species and are independent (there is no underlying hyperdistribution).
+Fixed, independent and random effects are allowed for station-level detection and occupancy covariates (a.k.a. site covariates). Fixed and random effects are also allowed for station-occasion level covariates (a.k.a. observation covariates). 
+Currently independent effects are only supported for continuous site covariates, not categorical site covariates or observation-level covariates.
 
 By default, random effects will be by species. It is however possible to use categorical site covariates for grouping (continuous|categorical).
 Furthermore, is is possible to use use nested random effects of species and another categorical site covariate (so that there is a random effect of species and an additional random effect of a categorical covariate within each species).
@@ -95,10 +97,11 @@ The parameter names are assembled from building blocks. The nomenclature  is as 
     \bold{\code{beta}}    \tab Submodel          \tab occupancy submode \cr
     \bold{\code{0}}       \tab Intercept         \tab denotes the intercepts (alpha0, beta0)  \cr
     \bold{\code{fixed}}   \tab Effect type       \tab fixed effects (constant across species)  \cr
+    \bold{\code{indep}}   \tab Effect type       \tab independent effects (separate for each species)  \cr
     \bold{\code{ranef}}   \tab Effect type       \tab random effects (of species and/or other categorical covariates)  \cr
     \bold{\code{cont}}    \tab Covariate type    \tab continuous covariates \cr
     \bold{\code{categ}}   \tab Covariate type    \tab categorical covariates \cr
-    \bold{\code{mean}}    \tab Hyperparameter    \tab  mean of random effect \cr
+    \bold{\code{mean}}    \tab Hyperparameter    \tab mean of random effect \cr
     \bold{\code{sigma}}   \tab Hyperparameter    \tab standard deviation of random effect \cr
     \bold{\code{tau}}     \tab Hyperparameter    \tab precision of random effect (used internally, not returned)
   }
