@@ -268,7 +268,7 @@
 #' 
 
 communityModel <- function(data_list,
-                           occuCovs = list(fixed = NULL, ranef = NULL),
+                           occuCovs = list(fixed = NULL, independent = NULL, ranef = NULL),
                            detCovs = list(fixed = NULL, ranef = NULL),
                            detCovsObservation = list(fixed = NULL, ranef = NULL),
                            effortCov = "effort",
@@ -336,6 +336,8 @@ communityModel <- function(data_list,
                                      ifelse(intercepts$occu == "ranef", T, F)), 
                            ranef_nested = FALSE,
                            ranef_cov = NA, 
+                           independent = c(ifelse(intercepts$det == "independent", T, F), 
+                                           ifelse(intercepts$occu == "independent", T, F)), 
                            coef = c("alpha0", "beta0"))
                            
   
@@ -353,7 +355,12 @@ communityModel <- function(data_list,
   
   
   if(!is.null(unlist(detCovsObservation))) {
-    covariate_info <- rbind(covariate_info, get_cov_info (cov = detCovsObservation, keyword_nested, keyword_quadratic, data_list, type = "obs", submodel = "det"))
+    covariate_info <- rbind(covariate_info, get_cov_info (cov = detCovsObservation, 
+                                                          keyword_nested, 
+                                                          keyword_quadratic, 
+                                                          data_list, 
+                                                          type = "obs", 
+                                                          submodel = "det"))
     }
   
   
@@ -905,6 +912,21 @@ communityModel <- function(data_list,
                                                    stationIndex = stationIndex)
   
   
+  ## occu Cov - cont - independent effect priors ####
+  prior_occu_header_indep <- paste("## Continuous site covariates on Occupancy - Independent effects\n")
+  
+  priors_sitecovs_occu_indep <- independentEffectPriors (effect_names = occuCovs$independent,
+                                                         type = "occupancy",
+                                                         inits_list = inits_list,
+                                                         prior_list = prior_list, 
+                                                         stationIndex = stationIndex,
+                                                         speciesIndex = speciesIndex,
+                                                         speciesMax = speciesMax,
+                                                         speciesMax_value = speciesMax_value)
+  
+  
+  
+  
   
   ## occu Cov - cont  - random effect priors ####
   prior_occu_header_ranef <- paste("## Continuous site covariates on occupancy - with random effects\n")
@@ -993,6 +1015,7 @@ communityModel <- function(data_list,
   ## construct formula for psi (ecological model - beta parameters)  ####
   
   beta_formula_occu_fixed <- attr(priors_sitecovs_occu_fixed, "formula")
+  beta_formula_occu_indep <- attr(priors_sitecovs_occu_indep, "formula")
   beta_formula_occu_ranef <- attr(priors_sitecovs_occu_ranef, "formula")
   beta_formula_occu_categ_fixed <- attr(priors_sitecovs_occu_categ_fixed, "formula")
   beta_formula_occu_categ_ranef <- attr(priors_sitecovs_occu_categ_ranef, "formula")
@@ -1005,11 +1028,11 @@ communityModel <- function(data_list,
                  paste0("for (", stationIndex ," in 1:", stationMax, "){"),
                  paste("\n# Occasion probability formula"),
                  if (nimble) {
-                   paste0("logit(psi[", speciesIndex, ",", stationIndex, "]) <- ", beta0_formula, beta_formula_occu_categ_fixed, beta_formula_occu_categ_ranef, beta_formula_occu_fixed, beta_formula_occu_ranef)
+                   paste0("logit(psi[", speciesIndex, ",", stationIndex, "]) <- ", beta0_formula, beta_formula_occu_categ_fixed, beta_formula_occu_categ_ranef, beta_formula_occu_fixed, beta_formula_occu_indep, beta_formula_occu_ranef)
                  },
                  
                  if (!nimble) {
-                   paste0("logit.psi[", speciesIndex, ",", stationIndex, "] <- ", beta0_formula, beta_formula_occu_categ_fixed, beta_formula_occu_categ_ranef, beta_formula_occu_fixed, beta_formula_occu_ranef)
+                   paste0("logit.psi[", speciesIndex, ",", stationIndex, "] <- ", beta0_formula, beta_formula_occu_categ_fixed, beta_formula_occu_categ_ranef, beta_formula_occu_fixed, beta_formula_occu_indep, beta_formula_occu_ranef)
                  },
                  if (!nimble) {
                    paste0("psi[", speciesIndex, ",", stationIndex, "] <- exp(logit.psi[", speciesIndex, ",", stationIndex, "]) / (exp(logit.psi[", speciesIndex, ",", stationIndex, "]) + 1)")
@@ -1032,6 +1055,7 @@ communityModel <- function(data_list,
   ## construct formula for p (detection model - alpha parameters)   ####
   
   alpha_formula_det_fixed <- attr(priors_sitecovs_det_fixed, "formula")
+  #alpha_formula_det_indep <- attr(priors_sitecovs_det_indep, "formula")
   alpha_formula_det_ranef <- attr(priors_sitecovs_det_ranef, "formula")
   alpha_formula_det_categ_fixed <- attr(priors_sitecovs_det_categ_fixed, "formula")
   alpha_formula_det_categ_ranef <- attr(priors_sitecovs_det_categ_ranef, "formula")
@@ -1325,6 +1349,9 @@ communityModel <- function(data_list,
                      prior_occu_header_fixed,
                      unlist(priors_sitecovs_occu_fixed),
                      
+                     prior_occu_header_indep,
+                     unlist(priors_sitecovs_occu_indep),
+                     
                      prior_occu_header_ranef,
                      unlist(priors_sitecovs_occu_ranef),
                      
@@ -1363,8 +1390,9 @@ communityModel <- function(data_list,
                   attr(priors_obscovs_det_ranef, "params"),
                   attr(priors_obscovs_det_categ_fixed, "params"),
                   attr(priors_obscovs_det_categ_ranef, "params"),
-                  attr(priors_sitecovs_occu_ranef, "params"),
                   attr(priors_sitecovs_occu_fixed, "params"),
+                  attr(priors_sitecovs_occu_indep, "params"),
+                  attr(priors_sitecovs_occu_ranef, "params"),
                   attr(priors_sitecovs_occu_categ_fixed, "params"),
                   attr(priors_sitecovs_occu_categ_ranef, "params"))
   
@@ -1380,13 +1408,14 @@ communityModel <- function(data_list,
                      attr(priors_obscovs_det_ranef, "inits"),
                      attr(priors_obscovs_det_categ_fixed, "inits"),
                      attr(priors_obscovs_det_categ_ranef, "inits"),
-                     attr(priors_sitecovs_occu_ranef, "inits"),
                      attr(priors_sitecovs_occu_fixed, "inits"),
+                     attr(priors_sitecovs_occu_indep, "inits"),
+                     attr(priors_sitecovs_occu_ranef, "inits"),
                      attr(priors_sitecovs_occu_categ_fixed, "inits"),
                      attr(priors_sitecovs_occu_categ_ranef, "inits"))
   
   
-  inits_list <- inits_out_tmp[sapply(inits_out_tmp, class) == "list"]
+  inits_list     <- inits_out_tmp[sapply(inits_out_tmp, class) == "list"]
   inits_not_list <- inits_out_tmp[sapply(inits_out_tmp, class) != "list"]
   
   
@@ -1792,6 +1821,10 @@ get_cov_info <- function(cov,
   names(tmp)[grep("fixed", names(tmp))] <- "fixed"
   names(tmp)[grep("ranef", names(tmp))] <- "ranef"
   
+  if(submodel == "occu"){
+    names(tmp)[grep("independent", names(tmp))] <- "independent"
+  }
+  
   
   
   tmp_cov1  <- sapply(strsplit(tmp, split = "|", fixed = T), FUN = function(x) x[1])
@@ -1812,15 +1845,18 @@ get_cov_info <- function(cov,
                      has_quadratic = paste0(tmp, keyword_quadratic) %in% tmp,
                      ranef = ifelse(names(tmp) == "ranef", T, F), 
                      ranef_nested = grepl(keyword_nested, tmp, fixed = TRUE),
-                     ranef_cov = sapply(strsplit(tmp, split = "|", fixed = TRUE), FUN = function(x) ifelse(length(x) == 2, x[2], NA))
+                     ranef_cov = sapply(strsplit(tmp, split = "|", fixed = TRUE), FUN = function(x) ifelse(length(x) == 2, x[2], NA)),
+                     independent = ifelse(names(tmp) == "independent", T, F)
   )
   
   
 
+  effect_type <- ifelse(tmp2$ranef, "ranef", ifelse(tmp2$independent, "indep", "fixed"))
   
   tmp2$coef <- paste0(ifelse(tmp2$submodel == "det", "alpha", "beta"), ".",
                  ifelse(tmp2$covariate_type == "obsCovs", "obs.", ""), 
-                 ifelse(tmp2$ranef, "ranef", "fixed"), ".",
+                 effect_type,     #ifelse(tmp2$ranef, "ranef", "fixed"), 
+                 ".",
                  tmp2$data_type, ".",
                  gsub("[|+]", "_", tmp)
                  )
@@ -1832,6 +1868,16 @@ get_cov_info <- function(cov,
 
 
 # helper functions to create priors (both detection and occupancy)  ####
+
+
+# change number of random numbers created (from default = 1)
+modifyInits <- function(inits, n) {
+  if(!is.na(n)) {
+    inits[[2]][[1]] <- as.numeric(n)
+  } 
+  return(inits)
+}
+
 
 interceptPriors <- function(effect, 
                             type,
@@ -1898,12 +1944,11 @@ interceptPriors <- function(effect,
       "\n", sep = "\n")
     
 
-    # inits_tmp <- rep(list(inits_list$inits_runif_mean_0), times = speciesMax_value)
-    # names(inits_tmp) <- paste0(param, "0[", 1:speciesMax_value, "]")
+    # change number of random init values to create (not 1, but n_species)
+    inits_tmp <- list(modifyInits(inits_list$inits_runif_mean_0, 
+                                  speciesMax_value))
     
-    inits_tmp <- list(inits_list$inits_runif_mean_0)
     names(inits_tmp) <- paste0(param, "0")
-    inits_tmp[[1]] [[2]] [[1]] <- speciesMax_value    # change number of random init values to create (not 1, but n_species)
     
     attr(priors_intercept, "inits") <- inits_tmp
     
@@ -1939,6 +1984,60 @@ fixedEffectPriors <- function(effect_names,
     attr(priors_list, "params") <- paste0(param, ".fixed.cont.", effect_names)
     
     attr(priors_list, "formula") <- paste0(" + ", param, ".fixed.cont.", effect_names, " * ", effect_names, "[", stationIndex, "]", collapse = "", sep = "")
+    
+  } else {
+    priors_list <- list("# < empty > \n\n")
+    attr(priors_list, "params") <- NULL
+    attr(priors_list, "formula") <- ""
+  }
+  
+  return(priors_list)
+}
+
+
+
+
+independentEffectPriors <- function(effect_names, 
+                                    type,
+                                    inits_list,
+                                    prior_list, 
+                                    stationIndex,
+                                    speciesIndex,
+                                    speciesMax,
+                                    speciesMax_value){
+  
+  if(type == "detection") param <- "alpha"
+  if(type == "occupancy") param <- "beta"
+  
+  if(!is.null(effect_names)){
+    priors_list <- list()
+    
+    for(effect_names_index in 1:length(effect_names)){
+      priors_list[[effect_names_index]] <- paste(
+        paste("# Covariate:", effect_names[effect_names_index]),
+        paste0("for(", speciesIndex, " in 1:", speciesMax, ") {"),
+        paste0(param, ".indep.cont.", effect_names[effect_names_index], "[", speciesIndex, "] ~ ", prior_list$dnorm), 
+        "}",
+        "\n", 
+        sep = "\n")
+    }
+    attr(priors_list, "params") <- paste0(param, ".indep.cont.", effect_names)
+    
+    attr(priors_list, "formula") <- paste0(" + ", param, ".indep.cont.", effect_names,"[", speciesIndex, "]",  " * ", effect_names, "[", stationIndex, "]", collapse = "", sep = "")
+    
+    
+    # make list of parameters
+    inits_tmp <- vector(mode = "list", length = length(effect_names))
+    names(inits_tmp) <- c(paste0(param, ".indep.cont.", effect_names))
+    
+    
+    for(i in 1:length(inits_tmp)){
+      inits_tmp[[i]] <- modifyInits(inits_list$inits_runif_mean_0, 
+                                    speciesMax_value)
+    }
+    
+    attr(priors_list, "inits") <- inits_tmp
+    
     
   } else {
     priors_list <- list("# < empty > \n\n")
@@ -2054,13 +2153,7 @@ randomEffectPriors <- function(effect_names,
     names(inits_tmp) <- c(paste0(param, ".ranef.cont.", effect_names2, ".mean"),
                           paste0(param, ".ranef.cont.", effect_names2, ".tau"))
     
-    modifyInits <- function(inits, n) {
-      if(!is.na(n)) {
-        inits[[2]][[1]] <- n
-      } 
-      return(inits)
-    }
-    
+
     
     for(i in 1:length(inits_tmp)){
       if(endsWith(names(inits_tmp)[i], "mean")) if(ranef_double_all[i]){
