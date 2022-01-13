@@ -141,15 +141,10 @@ plot.effects.commOccu <- function(object,       # commOccu object
     # species loop
     for(i in 1:dim(out)[2]){
       
-      # Problem here: doesn't work yet for independent
       if(cov_info_intercept$ranef == TRUE | cov_info_intercept$independent == TRUE){  # random or independent intercepts
         out_intercept[,i,] <- posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
       } else {
-        # if(cov_info_intercept$independent  == TRUE) {   # independent intercepts
-        #   out_intercept[,i,] <-   posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
-        # } else {   # fixed intercepts
-          out_intercept[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
-        # } 
+        out_intercept[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
       }
       
         
@@ -167,10 +162,11 @@ plot.effects.commOccu <- function(object,       # commOccu object
       
       if(covariate_is_numeric) {
         
-        if(effect_type == "fixed")        index_covariate <- grep(paste0(current_coef, "$"), colnames(posterior_matrix))
-        if(effect_type == "ranef")        index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
-        if(effect_type == "independent")  index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
-        
+        if(effect_type == "fixed") {
+          index_covariate <- grep(paste0(current_coef, "$"), colnames(posterior_matrix))
+        } else {    # ranef or independent
+          index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
+        }
         
         out[,i,] <-  sapply(posterior_matrix[, index_covariate], FUN = function(x){
           x * values_to_predict
