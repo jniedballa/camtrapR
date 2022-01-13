@@ -26,6 +26,8 @@ plot.effects.commOccu <- function(object,       # commOccu object
   
   if(nrow(cov_info_subset) == 0) stop(paste("No covariates in submodel", submodel), call. = F)
   
+  # get intercept information for submodel
+  cov_info_intercept <- object@covariate_info[object@covariate_info$submodel == submodel & object@covariate_info$param == "intercept",]
 
   # subset parameters of submodel
   stopifnot(all(cov_info_subset$coef %in% object@params))
@@ -92,14 +94,17 @@ plot.effects.commOccu <- function(object,       # commOccu object
     covariate_is_factor  <- cov_info_subset$data_type [cov] == "categ"
     
     
-    covariate_is_fixed <- !cov_info_subset$ranef[cov]
-    covariate_is_ranef <- cov_info_subset$ranef[cov]
+    # covariate_is_fixed <- !cov_info_subset$ranef[cov]
+    # covariate_is_ranef <- cov_info_subset$ranef[cov]
+    
+    effect_type <- ifelse(cov_info_subset$ranef[cov], "ranef",
+                          ifelse(cov_info_subset$independent[cov], "independent", "fixed"))
     
     covariate_is_site_cov <- ifelse(cov_info_subset$covariate_type [cov] == "siteCovs", T, F) 
     
     
     # create values to predict to
-    if(covariate_is_factor){
+    if(covariate_is_factor) {
       if(covariate_is_site_cov){
         values_to_predict <- seq(1,
                                  length(levels(object@data[[current_cov]])))
@@ -134,24 +139,37 @@ plot.effects.commOccu <- function(object,       # commOccu object
     
     
     # species loop
-    for(i in 1:dim(out)[2]){  
+    for(i in 1:dim(out)[2]){
       
-      # get intercepts
-      if(!paste0(keyword_submodel_short, "0.mean") %in%  object@params) {
-        
-        # fixed intercept
-        out_intercept[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
-      } else {
-        
-        # random intercept
+      # Problem here: doesn't work yet for independent
+      if(cov_info_intercept$ranef == TRUE | cov_info_intercept$independent == TRUE){  # random or independent intercepts
         out_intercept[,i,] <- posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
+      } else {
+        # if(cov_info_intercept$independent  == TRUE) {   # independent intercepts
+        #   out_intercept[,i,] <-   posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
+        # } else {   # fixed intercepts
+          out_intercept[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
+        # } 
       }
+      
+        
+        
+      # # get intercepts
+      # if(!paste0(keyword_submodel_short, "0.mean") %in%  object@params) {
+      #   # fixed intercept
+      #   out_intercept[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
+      # } else {
+      #   
+      #   # random intercept
+      #   out_intercept[,i,] <- posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
+      # }
       
       
       if(covariate_is_numeric) {
         
-        if(covariate_is_fixed)  index_covariate <- grep(paste0(current_coef, "$"), colnames(posterior_matrix))
-        if(covariate_is_ranef)  index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
+        if(effect_type == "fixed")        index_covariate <- grep(paste0(current_coef, "$"), colnames(posterior_matrix))
+        if(effect_type == "ranef")        index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
+        if(effect_type == "independent")  index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
         
         
         out[,i,] <-  sapply(posterior_matrix[, index_covariate], FUN = function(x){
@@ -168,8 +186,8 @@ plot.effects.commOccu <- function(object,       # commOccu object
       
       if(covariate_is_factor) {
         
-        if(covariate_is_fixed) index_covariate <- grep(current_coef, colnames(posterior_matrix))
-        if(covariate_is_ranef) index_covariate <- grep(paste0(current_coef, "[", i, ","), colnames(posterior_matrix), fixed = T)
+        if(effect_type == "fixed") index_covariate <- grep(current_coef, colnames(posterior_matrix))
+        if(effect_type == "ranef") index_covariate <- grep(paste0(current_coef, "[", i, ","), colnames(posterior_matrix), fixed = T)
         
         
         for(j in 1:length(index_covariate)){
@@ -228,7 +246,7 @@ plot.effects.commOccu <- function(object,       # commOccu object
     main <- paste0(ifelse(covariate_is_site_cov, "Site", "Observation"), " covariate: ", current_cov)
     
     
-    subtitle <- paste0(ifelse(covariate_is_ranef, "Random effect", "Fixed effect"),
+    subtitle <- paste0(ifelse(effect_type == "ranef", "Random effect", ifelse(effect_type == "independent", "Independent effects", "Fixed effect")),
                        ifelse(has_squared, " (with quadratic term)", ""),
                        ifelse(is_squared, " quadratic term (no linear term)", ""))
     
@@ -306,9 +324,6 @@ plot.effects.commOccu <- function(object,       # commOccu object
     }
     
     list_responses [[cov]] <- p
-    
-    
-    
     
   }
   
@@ -439,22 +454,64 @@ plot.coef.commOccu <- function(object,
     covariate_is_factor  <- cov_info_subset$data_type [cov] == "categ"
     
     
-    covariate_is_fixed <- !cov_info_subset$ranef[cov]
-    covariate_is_ranef <- cov_info_subset$ranef[cov]
+    # covariate_is_fixed <- !cov_info_subset$ranef[cov]
+    # covariate_is_indep <- cov_info_subset$independent[cov]
+    # covariate_is_ranef <- cov_info_subset$ranef[cov]
+    
+    
+    
+    effect_type <- ifelse(cov_info_subset$ranef[cov], "ranef",
+                          ifelse(cov_info_subset$independent[cov], "independent", "fixed"))
+    
     
     covariate_is_site_cov <- ifelse(cov_info_subset$covariate_type [cov] == "siteCovs", T, F) 
     
     
+    #if(covariate_is_indep) {
+      
+     # if(covariate_is_numeric){
+
+    
+       # index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
+        
+       #df_quantiles_i  <- df_quantiles[index_covariate, ]
+        
+        #if(covariate_is_fixed)   df_quantiles_i$type  <- c("mean")
+        # if(covariate_is_ranef) {
+        #   # get community mean
+        #   index_covariate_mean_ranef <- grep(paste0(current_coef, ".mean$"), rownames(df_quantiles))
+        #   
+        #   df_quantiles_i  <- rbind(df_quantiles[index_covariate_mean_ranef, ], df_quantiles_i)
+        #   
+        #   df_quantiles_i$type  <- c("mean", rep("species", times = length(index_covariate)))
+        # # }  
+        # if(covariate_is_indep) {
+        #   # get community mean
+        #   index_covariate_mean_indep <- grep(paste0(current_coef, ".mean$"), rownames(df_quantiles))
+        #   
+        #   df_quantiles_i  <- rbind(df_quantiles[index_covariate_mean_indep, ], df_quantiles_i)
+          
+         # df_quantiles_i$type  <- rep("species", times = length(index_covariate))
+        # }  
+   #   }
+      
+      
+  #  } else {
     
     if(covariate_is_numeric){
       
-      if(covariate_is_fixed)  index_covariate <- grep(paste0(current_coef, "$"), rownames(df_quantiles))
-      if(covariate_is_ranef)  index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
+      # if(covariate_is_fixed)  index_covariate <- grep(paste0(current_coef, "$"), rownames(df_quantiles))
+      # if(covariate_is_ranef)  index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
+      
+      if(effect_type == "fixed")       index_covariate <- grep(paste0(current_coef, "$"), rownames(df_quantiles))
+      if(effect_type == "ranef")       index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
+      if(effect_type == "independent") index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
+      
       
       df_quantiles_i  <- df_quantiles[index_covariate, ]
       
-      if(covariate_is_fixed)   df_quantiles_i$type  <- c("mean")
-      if(covariate_is_ranef) {
+      if(effect_type == "fixed")   df_quantiles_i$type  <- c("mean")
+      if(effect_type == "ranef") {
         # get community mean
         index_covariate_mean_ranef <- grep(paste0(current_coef, ".mean$"), rownames(df_quantiles))
         
@@ -462,8 +519,13 @@ plot.coef.commOccu <- function(object,
         
         df_quantiles_i$type  <- c("mean", rep("species", times = length(index_covariate)))
       }  
+      
+      if(effect_type == "independent"){
+        df_quantiles_i$type  <- c("species")
+      }
+      
     }
-    
+    #  }
     
     
     
@@ -477,24 +539,24 @@ plot.coef.commOccu <- function(object,
         levels_tmp <- attr(object@data[[paste0(current_cov, "_integer")]], "levels")
         nlev <- length(levels_tmp)
       }
-    
-    
-    if(covariate_is_fixed)  index_covariate <- grep(paste0(current_coef, "["),  rownames(df_quantiles), fixed = T)
-    if(covariate_is_ranef)  index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
-    
-    
-    df_quantiles_i  <- df_quantiles[index_covariate, ]  
-    
-    if(covariate_is_fixed) df_quantiles_i$type  <- c("mean")
-    
-    if(covariate_is_ranef) {
-      # add community mean
-      index_covariate_mean_ranef <- grep(paste0(current_coef, ".mean"), rownames(df_quantiles), fixed = T)   # does this affect categ fixed effects?
       
-      df_quantiles_i  <- rbind(df_quantiles[index_covariate_mean_ranef, ], df_quantiles_i)
       
-      df_quantiles_i$type  <- c(rep("mean", times = length(index_covariate_mean_ranef)), rep("species", times = length(index_covariate)))
-    }
+      if(effect_type == "fixed")  index_covariate <- grep(paste0(current_coef, "["),  rownames(df_quantiles), fixed = T)
+      if(effect_type == "ranef")  index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
+      
+      
+      df_quantiles_i  <- df_quantiles[index_covariate, ]  
+      
+      if(effect_type == "fixed") df_quantiles_i$type  <- c("mean")
+      
+      if(effect_type == "ranef") {
+        # add community mean
+        index_covariate_mean_ranef <- grep(paste0(current_coef, ".mean"), rownames(df_quantiles), fixed = T)   # does this affect categ fixed effects?
+        
+        df_quantiles_i  <- rbind(df_quantiles[index_covariate_mean_ranef, ], df_quantiles_i)
+        
+        df_quantiles_i$type  <- c(rep("mean", times = length(index_covariate_mean_ranef)), rep("species", times = length(index_covariate)))
+      }
     }
     
     
@@ -521,15 +583,15 @@ plot.coef.commOccu <- function(object,
     # it's mostly for model checking, so I guess it's fine
     if(colorby == "Bayesian p-value"){
       if(covariate_is_numeric){
-        if(covariate_is_fixed) df_pval <- df_statistics_Bayes_pvals_overall
-        if(covariate_is_ranef) df_pval <- rbind(df_statistics_Bayes_pvals_overall, 
-                                                df_statistics_Bayes_pvals_species)
+        if(effect_type == "fixed") df_pval <- df_statistics_Bayes_pvals_overall
+        if(effect_type == "ranef") df_pval <- rbind(df_statistics_Bayes_pvals_overall, 
+                                                    df_statistics_Bayes_pvals_species)
       }
       if(covariate_is_factor){
-        if(covariate_is_fixed) df_pval <- df_statistics_Bayes_pvals_overall [rep(1, times = nlev),]
-        if(covariate_is_ranef) df_pval <- rbind(df_statistics_Bayes_pvals_overall [rep(1, times = nlev),], 
-                                                df_statistics_Bayes_pvals_species [rep(1:nrow(df_statistics_Bayes_pvals_species), 
-                                                                                       times = nlev),])
+        if(effect_type == "fixed") df_pval <- df_statistics_Bayes_pvals_overall [rep(1, times = nlev),]
+        if(effect_type == "ranef") df_pval <- rbind(df_statistics_Bayes_pvals_overall [rep(1, times = nlev),], 
+                                                    df_statistics_Bayes_pvals_species [rep(1:nrow(df_statistics_Bayes_pvals_species), 
+                                                                                           times = nlev),])
       }
       
       stopifnot(nrow(df_pval) == nrow(df_quantiles_i))
@@ -548,14 +610,15 @@ plot.coef.commOccu <- function(object,
     if( is.null(dimnames(object@data$y)[[1]])) speciesnames <- seq_len(dim(object@data$y)[1])
     
     
-    if(covariate_is_ranef)  {
+    if(effect_type == "ranef")  {
       if(covariate_is_numeric) df_quantiles_i$species <- c("community", speciesnames)
       if(covariate_is_factor) {
         df_quantiles_i$species <- c(rep("community", times = length(index_covariate_mean_ranef)), rep(speciesnames, times = nlev))
       }
     }
     
-    if(covariate_is_fixed) df_quantiles_i$species  <- "community"
+    if(effect_type == "fixed")     df_quantiles_i$species  <- "community"
+    if(effect_type == "independent") df_quantiles_i$species  <- speciesnames
     
     
     
@@ -565,12 +628,12 @@ plot.coef.commOccu <- function(object,
     }
     
     if(covariate_is_factor){
-      if(covariate_is_fixed){
+      if(effect_type == "fixed"){
         if(covariate_is_site_cov)  df_quantiles_i$covariate  <- paste0(current_cov, "_", levels_tmp)
         if(!covariate_is_site_cov) df_quantiles_i$covariate  <- paste0(current_cov, "_",  levels_tmp)
       }
       
-      if(covariate_is_ranef){
+      if(effect_type == "ranef"){
         if(covariate_is_site_cov)  df_quantiles_i$covariate  <- paste0(current_cov, "_", c(levels_tmp,
                                                                                            rep(levels_tmp, each = object@data$M)))
         if(!covariate_is_site_cov) df_quantiles_i$covariate  <- paste0(current_cov, "_", c(levels_tmp,
@@ -589,18 +652,17 @@ plot.coef.commOccu <- function(object,
       }
       
       if(covariate_is_factor){
-        if(covariate_is_fixed) {
+        if(effect_type == "fixed") {
           df_quantiles_i$species <- factor(df_quantiles_i$species, 
                                            levels = unique(df_quantiles_i$species[order(df_quantiles_i$median)]))  
         }
         
-        if(covariate_is_ranef){
+        if(effect_type == "ranef"){
           subset_level2 <- df_quantiles_i[df_quantiles_i$covariate == paste0(current_cov, "_", levels_tmp[2]),]
           
           df_quantiles_i$species <- factor(df_quantiles_i$species, 
                                            levels = subset_level2$species[order(subset_level2$median)])
         }
-        
       }
       
     } else {
