@@ -866,6 +866,22 @@ communityModel <- function(data_list,
                                                   stationIndex = stationIndex)
   
   
+  
+  ## occu Cov - cont - independent effect priors ####
+  prior_det_header_indep <- paste("## Continuous site covariates on detection - Independent effects\n")
+  
+  priors_sitecovs_det_indep <- independentEffectPriors (effect_names = detCovs$independent,
+                                                        type = "detection",
+                                                        inits_list = inits_list,
+                                                        prior_list = prior_list, 
+                                                        stationIndex = stationIndex,
+                                                        speciesIndex = speciesIndex,
+                                                        speciesMax = speciesMax,
+                                                        speciesMax_value = speciesMax_value)
+  
+  
+  
+  
   ## det Cov - cont - random effect priors ####
   prior_det_header_ranef <- paste("## Continuous site covariates on detection - with random effects\n")
   
@@ -1055,7 +1071,7 @@ communityModel <- function(data_list,
   ## construct formula for p (detection model - alpha parameters)   ####
   
   alpha_formula_det_fixed <- attr(priors_sitecovs_det_fixed, "formula")
-  #alpha_formula_det_indep <- attr(priors_sitecovs_det_indep, "formula")
+  alpha_formula_det_indep <- attr(priors_sitecovs_det_indep, "formula")
   alpha_formula_det_ranef <- attr(priors_sitecovs_det_ranef, "formula")
   alpha_formula_det_categ_fixed <- attr(priors_sitecovs_det_categ_fixed, "formula")
   alpha_formula_det_categ_ranef <- attr(priors_sitecovs_det_categ_ranef, "formula")
@@ -1063,13 +1079,14 @@ communityModel <- function(data_list,
   
   if(!is.null(detCovsObservation$fixed)) {
     if(nimble) {
-      alpha_formula_obs_fixed <- paste(" + alpha.obs.fixed.cont.", detCovsObservation$fixed, " * ", detCovsObservation$fixed, "[", stationIndex, ", 1:", occasionMax, "]", collapse = "", sep = "")    #, " * effort_binary[", stationIndex, ", 1:", occasionMax, "]", collapse = "", sep = "")
+      alpha_formula_obs_fixed <- paste(" + alpha.obs.fixed.cont.", detCovsObservation$fixed, " * ", detCovsObservation$fixed, "[", stationIndex, ", 1:", occasionMax, "]", collapse = "", sep = "")
     } else {
       alpha_formula_obs_fixed <- paste(" + alpha.obs.fixed.cont.", detCovsObservation$fixed, " * ", detCovsObservation$fixed, "[", stationIndex, ", ", occasionIndex, "]", collapse = "", sep = "")
     }
   } else {
     alpha_formula_obs_fixed <- ""
   }
+  
   
   if(!is.null(detCovsObservation$ranef)) {
     if(nimble) {
@@ -1117,7 +1134,7 @@ communityModel <- function(data_list,
                    paste0("logit.p[", speciesIndex, ",", stationIndex, ",", occasionIndex, "] <- ", alpha0_formula, alpha_formula_obs_fixed, alpha_formula_obs_ranef, 
                           alpha_formula_obs_fixed_categ, alpha_formula_obs_ranef_categ,
                           alpha_formula_det_categ_fixed, alpha_formula_det_categ_ranef, 
-                          alpha_formula_det_fixed, alpha_formula_det_ranef),
+                          alpha_formula_det_fixed, alpha_formula_det_indep, alpha_formula_det_ranef),
                    
                    paste("\n# convert p to real scale"),
                    paste0("p[", speciesIndex, ",", stationIndex, ",", occasionIndex,"] <- exp(logit.p[", speciesIndex, ",", stationIndex, ",", occasionIndex,"]) / (1+exp(logit.p[", speciesIndex, ",", stationIndex, ",", occasionIndex,"]))"),
@@ -1146,8 +1163,9 @@ communityModel <- function(data_list,
                    paste0("logit(p[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "]) <- ", alpha0_formula, alpha_formula_obs_fixed, alpha_formula_obs_ranef, 
                           alpha_formula_obs_fixed_categ, alpha_formula_obs_ranef_categ,
                           alpha_formula_det_categ_fixed, alpha_formula_det_categ_ranef, 
-                          alpha_formula_det_fixed, alpha_formula_det_ranef,
+                          alpha_formula_det_fixed, alpha_formula_det_indep, alpha_formula_det_ranef,
                           paste0(" * all1row[1:", occasionMax, "]")),              # this is only to ensure that dimensions match if alpha is a single value
+                   
                    paste("\n# Ensure occasions without effort have p = 0"),
                    paste0("p.eff[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "] <- p[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "]", 
                           " * effort_binary[", stationIndex, ", 1:", occasionMax, "]"),
@@ -1323,6 +1341,9 @@ communityModel <- function(data_list,
                      prior_det_header_fixed,
                      unlist(priors_sitecovs_det_fixed),
                      
+                     prior_det_header_indep,
+                     unlist(priors_sitecovs_det_indep),
+                     
                      prior_det_header_ranef,
                      unlist(priors_sitecovs_det_ranef),
                      
@@ -1382,8 +1403,9 @@ communityModel <- function(data_list,
   
   ## combine parameters to monitor  ####
   out$params <- c(unlist(sapply(model_text, attr, "params")), 
-                  attr(priors_sitecovs_det_ranef, "params"),
                   attr(priors_sitecovs_det_fixed, "params"),
+                  attr(priors_sitecovs_det_indep, "params"),
+                  attr(priors_sitecovs_det_ranef, "params"),
                   attr(priors_sitecovs_det_categ_fixed, "params"),
                   attr(priors_sitecovs_det_categ_ranef, "params"),
                   attr(priors_obscovs_det_fixed, "params"),
@@ -1400,8 +1422,9 @@ communityModel <- function(data_list,
   inits_out_tmp <- c(do.call(c, lapply(model_text[sapply(model_text, 
                                                          FUN = function(x) !is.null(attr(x, "inits")))], 
                                        attr, "inits")),
-                     attr(priors_sitecovs_det_ranef, "inits"),
                      attr(priors_sitecovs_det_fixed, "inits"),
+                     attr(priors_sitecovs_det_indep, "inits"),
+                     attr(priors_sitecovs_det_ranef, "inits"),
                      attr(priors_sitecovs_det_categ_fixed, "inits"),
                      attr(priors_sitecovs_det_categ_ranef, "inits"),
                      attr(priors_obscovs_det_fixed, "inits"),
