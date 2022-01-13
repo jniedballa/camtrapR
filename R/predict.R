@@ -43,6 +43,8 @@ predictionMapsCommunity <- function(object,
   
   if(nrow(cov_info_subset) == 0) stop(paste("No covariates in submodel", submodel), call. = F)
   
+  # get intercept information for submodel
+  cov_info_intercept <- object@covariate_info[object@covariate_info$submodel == submodel & object@covariate_info$param == "intercept",]
   
   # subset parameters of submodel
   stopifnot(all(cov_info_subset$coef %in% object@params))
@@ -92,21 +94,19 @@ predictionMapsCommunity <- function(object,
   
   
   # # get intercepts
-  out_beta0 <- array_NA
+  out_intercept <- array_NA
   
   for(i in 1:dim(array_NA)[2]){    # species loop
-    if(!paste0(keyword_submodel_short, "0.mean") %in% object@params) {
-      # fixed intercept
-      out_beta0[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
+    if(cov_info_intercept$ranef == TRUE | cov_info_intercept$independent == TRUE){  # random or independent intercepts
+      out_intercept[,i,] <- posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
     } else {
-      # random intercept
-      out_beta0[,i,] <- posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
+      out_intercept[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
     }
   }
   gc()
   
   # check if this works
-  if(object.size(out_beta0) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ) message("Watch RAM usage. At least 4Gb will be required")
+  if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ) message("Watch RAM usage. At least 4Gb will be required")
   
   
   out <- list()
@@ -135,8 +135,8 @@ predictionMapsCommunity <- function(object,
     covariate_is_factor  <- cov_info_subset$data_type [cov] == "categ"
     
     
-    covariate_is_fixed <- !cov_info_subset$ranef[cov]
-    covariate_is_ranef <- cov_info_subset$ranef[cov]
+    effect_type <- ifelse(cov_info_subset$ranef[cov], "ranef",
+                          ifelse(cov_info_subset$independent[cov], "independent", "fixed"))
     
     covariate_is_site_cov <- ifelse(cov_info_subset$covariate_type [cov] == "siteCovs", T, F) 
     
@@ -146,9 +146,11 @@ predictionMapsCommunity <- function(object,
       
       if(covariate_is_numeric) {
         
-        if(covariate_is_fixed)  index_covariate <- grep(paste0(current_coef, "$"), colnames(posterior_matrix))
-        if(covariate_is_ranef)  index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
-        
+        if(effect_type == "fixed") {
+          index_covariate <- grep(paste0(current_coef, "$"), colnames(posterior_matrix))
+        } else {    # ranef or independent
+          index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
+        }        
         
         out[[cov]][,i,] <-  sapply(posterior_matrix[, index_covariate], FUN = function(x){
           x * values_to_predict_subset[, current_cov]
@@ -157,8 +159,8 @@ predictionMapsCommunity <- function(object,
       
       if(covariate_is_factor) {
 
-        if(covariate_is_fixed) index_covariate <- grep(current_coef, colnames(posterior_matrix))
-        if(covariate_is_ranef) index_covariate <- grep(paste0(current_coef, "[", i, ","), colnames(posterior_matrix), fixed = T)
+        if(effect_type == "fixed") index_covariate <- grep(current_coef, colnames(posterior_matrix))
+        if(effect_type == "ranef") index_covariate <- grep(paste0(current_coef, "[", i, ","), colnames(posterior_matrix), fixed = T)
 
         # this assumes that the numeric values in the raster correspond to the factor levels in the covariate
         # since it uses the raster values to index the posterior matrix
@@ -172,11 +174,9 @@ predictionMapsCommunity <- function(object,
   }    # end covariate loop
   
   # sum up individual effects
-  #logit.psi <- Reduce('+', out[2]) #+ out_beta0
-  logit.psi <- Reduce('+', out) + out_beta0
+  logit.psi <- Reduce('+', out) + out_intercept
   psi <- exp(logit.psi) / (exp(logit.psi) + 1)
   
-  #rm(array_NA, out_beta0, out, logit.psi)
   gc()
   
   
@@ -209,7 +209,7 @@ predictionMapsCommunity <- function(object,
       r_pred_species[[i]]    <- raster_template
       r_pred_sd_species[[i]] <- raster_template
       
-      raster::values(r_pred_species[[i]]) [index_not_na]    <- psi.mean.melt$mean[psi.mean.melt$Species == unique(psi.mean.melt$Species)[i]]
+      raster::values(r_pred_species[[i]])    [index_not_na] <- psi.mean.melt$mean[psi.mean.melt$Species == unique(psi.mean.melt$Species)[i]]
       raster::values(r_pred_sd_species[[i]]) [index_not_na] <- psi.sd.melt$sd[psi.sd.melt$Species == unique(psi.sd.melt$Species)[i]]
     }
     names(r_pred_species) <- names(r_pred_sd_species) <- unique(psi.mean.melt$Species)
@@ -267,7 +267,7 @@ predictionMapsCommunity <- function(object,
     if(interval == "none"){
       if(class(x) == "RasterStack"){
         return(list(mean = stack_out_mean,
-                    sd = psi.sd.melt))
+                    sd   = stack_out_sd))
       } else {
         return(data.frame(psi.mean.melt, 
                           sd = psi.sd.melt$sd))
@@ -325,7 +325,7 @@ predictionMapsCommunity <- function(object,
       
       if(interval == "none"){
         stack_out <- raster::stack(list(mean = r.psi.bin.sum.mean,
-                                        sd = r.psi.bin.sum.sd))
+                                        sd   = r.psi.bin.sum.sd))
       }
       
       if(interval == "confidence"){
@@ -343,14 +343,12 @@ predictionMapsCommunity <- function(object,
       
     } else {
       if(interval == "none"){
-        df_out <- data.frame(#x,
-                             mean = psi.bin.sum.mean,
+        df_out <- data.frame(mean = psi.bin.sum.mean,
                              sd   = psi.bin.sum.sd)
       }
       
       if(interval == "confidence"){
-        df_out <- data.frame(#x, 
-                             mean  = psi.bin.sum.mean,
+        df_out <- data.frame(mean  = psi.bin.sum.mean,
                              sd    = psi.bin.sum.sd, 
                              lower = psi.bin.sum.lower,
                              upper = psi.bin.sum.upper)
