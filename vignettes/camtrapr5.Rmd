@@ -31,15 +31,15 @@ They are normally fit in Bayesian frameworks, e.g. BUGS, JAGS or Nimble. Creatin
 A new extension of camtrapR aims to simplify this process by automatically and flexibly creating custom community occupancy models that are ready for analysis in JAGS or Nimble. The workflow supports:
 
 * continuous and categorical site covariates on detection and occupancy probability
-* fixed and random effects of these covariates
 * continuous and categorical observation-level covariates on detection probability
-* fixed or random intercepts of detection and occupancy probability
+* fixed and random effects of all these covariates
+* independent effects of continuous site covariates between the different species
 * nested random effects
-* random effects of categorical site covariates
+* fixed, independent or random intercepts of detection and occupancy probability
 * data augmentation (fully open community or known maximum species richness)
 * species richness estimates
 * models in JAGS and Nimble
-* Bayesian p-values (overall and by species)
+* derived quantities, e.g. Bayesian p-values (overall and by species) and species richness estimates
 
 The main function is `communityModel()`. It automates:
 
@@ -48,10 +48,10 @@ The main function is `communityModel()`. It automates:
 * setting initial values
 * bundling input data
 
-The workflow provides methods for: 
+The output is a `commOccu` object. The workflow then provides methods for: 
 
 * fitting models
-* plottingmarginal effects (response curves)
+* plotting marginal effects (response curves)
 * plotting effect sizes
 * spatial predictions of species occupancy probabilities
 * spatial predictions of species richness
@@ -71,23 +71,26 @@ The workflow is still rather experimental, so please remain critical of the resu
 
 There are currently a few limitations in the workflow: 
 
-* priors can not be customized yet.
+* priors can not be customized 
 * models with categorical observation-level covariates cannot be compiled in Nimble and must be fit in JAGS instead
 * nested random effects and random effects of site covariates are still experimental, and the plot_* methods don't work on these yet
 * likewise, the output of `predict` may not be correct for these
 * input checks are a bit limited and may not always lead to meaningful error messages. This will improve over time with user feedback.
+* Nimble does not yet seem to have an advantage in processing speed. That might require further customization
+* independent effects are only supported in continuous site covariates
 
+Over time these will likely be worked on. 
 
 # Parameter naming convention
 
 The parameter names are assembled from standardized building blocks. The nomenclature is as follows:
 
 ```{r include=FALSE}
-df_params = data.frame(Name = c("alpha", "beta", "0", "fixed", "ranef", "cont", "categ", "mean", "sigma", "tau"),
-col2 = c("Submodel", "Submodel", "Intercept", "Effect type", "Effect type", "Covariate type", "Covariate type",
+df_params = data.frame(Name = c("alpha", "beta", "0", "fixed", "indep", "ranef", "cont", "categ", "mean", "sigma", "tau"),
+col2 = c("Submodel", "Submodel", "Intercept", "Effect type","Effect type", "Effect type", "Covariate type", "Covariate type",
          "Hyperparameter", "Hyperparameter", "Hyperparameter"),
 col3 = c("detection submodel", "occupancy submodel", "denotes the intercepts (alpha0, beta0)",
-         "fixed effects (constant across species)", "random effects (of species and/or other categorical covariates)",
+         "fixed effects (constant across species)", "independent effects (separate for each species)", "random effects (of species and/or other categorical covariates)",
          "continuous covariates", "categorical covariates",
          "mean of random effect", "standard deviation of random effect", "precision of random effect (used internally, not returned)"))
 
@@ -96,6 +99,7 @@ names(df_params) <- c("Name", "Refers to", "Description")
 
 ```{r echo=FALSE}
 library(knitr)
+kable(df_params)
 ```
 
 
