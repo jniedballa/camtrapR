@@ -561,7 +561,7 @@ assessTemporalIndependence <- function(intable,
       which_records_to_group <- which(intable[, columnOfInterest]     == intable[current_row, columnOfInterest] &   # same species
                                       intable[, stationCol]           == intable[current_row, stationCol]  &        # same station
                                       intable$DateTimeOriginal        >= intable$DateTimeOriginal[current_row] &
-                                      !isTRUE(intable$independent))                                        # not independent
+                                      !isTRUE(intable$independent))                                                 # not independent
     }
     
     # subset to records before the next independent record
@@ -592,7 +592,15 @@ assessTemporalIndependence <- function(intable,
       }    # end for(eventSummaryIndex in 1:length(eventSummaryColumn)
     }      # end if(hasArg(eventSummaryColumn))
     
-    intable[ current_row, n_imagesColumn] <- length(which_records_to_group)
+    
+    # quick and dirty solution to prevent n_images = 0 when lenght(which_records_to_group) = 0 (can happen if only 1 image in a directory)
+    
+    if(length(which_records_to_group) == 0) {
+      intable[ current_row, n_imagesColumn] <- 1
+    } else {
+      intable[ current_row, n_imagesColumn] <- length(which_records_to_group)
+    }
+    
     rm(which_records_to_group, current_row)
     
   }        # end for(xy in 1:length(which_independent))
