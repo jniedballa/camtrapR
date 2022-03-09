@@ -1818,9 +1818,20 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   
   # add drive letter (only relevant on Windows, and can potentially be wrong if there's Album roots on different drives)
   # also not sure if this works on Mac / Linux due to missing drive letters
-  Albums$albumPath_full2 <- paste(substr(stationDir, 1,2),   # the Drive letter, digiKam doesn't return it
-                                  Albums$albumPath_full,
-                                  sep = "")
+  if(.Platform$OS.type == "windows"){
+    Albums$albumPath_full2 <- paste(substr(stationDir, 1,2),   # the Drive letter, digiKam doesn't return it
+                                    Albums$albumPath_full,
+                                    sep = "")
+  }
+  
+  # Linux/Mac solution?
+  if(.Platform$OS.type == "unix"){
+    Albums$albumPath_full2 <- Albums$albumPath_full#paste(substr(stationDir, 1,2),
+                                    #Albums$albumPath_full,
+                                    #sep = "")
+  }
+  
+  
   
   # add "/" to ensure Station1 doesn't include Station10 also. Also ensure all folders end with one / only
   Albums$albumPath_full2 <- ifelse(endsWith(Albums$albumPath_full2, .Platform$file.sep),
@@ -1833,6 +1844,8 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   if(!stationDir %in% Albums[, pathColumn]){
     stop(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE)
     # try to handle with a warning instead
+    # warning(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE, immediate. = T)
+    # next
   }
   
   # find current station in albums
