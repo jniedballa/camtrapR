@@ -5,6 +5,9 @@
 * plot_effects(): for plotting marginal effect plots (response curves) from community models
 * plot_coef(): for plotting coefficient estimates from community models
 
+## bugfixes
+* reading digiKam database now works for Mac + Linux systems
+
 # camtrapR 2.1.0
 
 ## new functions
