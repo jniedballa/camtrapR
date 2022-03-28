@@ -21,7 +21,7 @@ predictionMapsCommunity <- function(object,
                                     speciesSubset) 
 {
   
-  type <- match.arg(type, choices = c("psi", "richness"))
+  type <- match.arg(type, choices = c("psi_array", "psi", "richness"))
   interval <- match.arg(interval, choices = c("none", "confidence"))
 
   # subset occupancy (beta) parameters
@@ -178,6 +178,10 @@ predictionMapsCommunity <- function(object,
   psi <- exp(logit.psi) / (exp(logit.psi) + 1)
   
   gc()
+  
+  if(type == "psi_array") {
+    return(psi)
+  }
   
   
   if(type == "psi") {
