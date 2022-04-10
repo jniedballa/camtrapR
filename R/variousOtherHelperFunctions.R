@@ -1513,6 +1513,7 @@ parseDateObject <- function(inputColumn,
                             dateFormat,   
                             checkNA,      # throw error if there are NAs in input (only setup / retrieval, not problems)
                             checkEmpty,    # throw error if there are blank values in input  (only setup / retrieval, not problems)
+                            allowEmptyOutput = FALSE,
                             returndatetime = FALSE
 ){
   
@@ -1520,6 +1521,8 @@ parseDateObject <- function(inputColumn,
   
   if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
   if(checkEmpty & any(inputColumn == "")) stop(paste("there are blank values in", deparse(substitute(inputColumn))), call. = FALSE)
+  
+  if(all(inputColumn == "") & allowEmptyOutput) return(NA)
   
   inputColumn.char <- as.character(inputColumn)
   
@@ -1550,8 +1553,9 @@ parseDateTimeObject <- function(inputColumn,
                                 dateTimeFormat,
                                 timeZone,
                                 checkNA = TRUE,      # throw error if there are NAs in input (only setup / retrieval, not problems)
-                                checkEmpty = TRUE,    # throw error if there are blank values in input  (only setup / retrieval, not problems)
+                                checkEmpty = TRUE,   # throw error if there are blank values in input  (only setup / retrieval, not problems)
                                 checkNA_out = TRUE,  # throw error when there is NAs in output (FALSE so reporting is done by detectionHistory, which returns correct row numbers)
+                                allowEmptyOutput = FALSE,  
                                 quiet = FALSE
 ){
   
@@ -1565,6 +1569,9 @@ parseDateTimeObject <- function(inputColumn,
   
   if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
   if(checkEmpty & any(inputColumn == "")) stop(paste("there are blank values in", deparse(substitute(inputColumn))), call. = FALSE)
+  
+  if(all(inputColumn == "") & allowEmptyOutput) return(NA)
+  
   
   inputColumn.char <- as.character(inputColumn)
   
