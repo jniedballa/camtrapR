@@ -395,24 +395,31 @@ cameraOperation <- function(CTtable,
     if(effortAsFraction) {
       for(problemFromColumn in cols.prob.from){
         CTtable[, problemFromColumn] <- parseDateTimeObject(inputColumn = CTtable[, problemFromColumn], dateFormat, quiet = TRUE,
-                                                            checkNA = FALSE, checkEmpty = FALSE, checkNA_out = FALSE, timeZone = "UTC")
+                                                            checkNA = FALSE, checkEmpty = FALSE, checkNA_out = FALSE, timeZone = "UTC",
+                                                            allowEmptyOutput = T)
       }
       for(problemToColumn in cols.prob.to){
         CTtable[, problemToColumn]   <- parseDateTimeObject(inputColumn = CTtable[, problemToColumn],   dateFormat, quiet = TRUE,
-                                                            checkNA = FALSE, checkEmpty = FALSE, checkNA_out = FALSE, timeZone = "UTC")
+                                                            checkNA = FALSE, checkEmpty = FALSE, checkNA_out = FALSE, timeZone = "UTC",
+                                                            allowEmptyOutput = T)
       }
     } else {
       for(problemFromColumn in cols.prob.from){
-        CTtable[, problemFromColumn] <- parseDateObject(inputColumn = CTtable[, problemFromColumn], dateFormat, checkNA = FALSE, checkEmpty = FALSE, returndatetime = TRUE)
+        CTtable[, problemFromColumn] <- parseDateObject(inputColumn = CTtable[, problemFromColumn], dateFormat, 
+                                                        checkNA = FALSE, checkEmpty = FALSE, returndatetime = TRUE,
+                                                        allowEmptyOutput = TRUE)
       }
       for(problemToColumn in cols.prob.to){
-        CTtable[, problemToColumn] <- parseDateObject(inputColumn = CTtable[, problemToColumn], dateFormat, checkNA = FALSE, checkEmpty = FALSE, returndatetime = TRUE)
+        CTtable[, problemToColumn] <- parseDateObject(inputColumn = CTtable[, problemToColumn], dateFormat, 
+                                                      checkNA = FALSE, checkEmpty = FALSE, returndatetime = TRUE,
+                                                      allowEmptyOutput = TRUE)
       }
     }
     
+
     # check that there are some problems at all (since hasProblems = TRUE)
-    if(all(is.na(CTtable[, problemFromColumn]))) stop("in problemFromColumn column(s), all values are NA", call. = FALSE)
-    if(all(is.na(CTtable[, problemToColumn])))   stop("in Problem_to column(s), all values are NA", call. = FALSE)
+    if(all(is.na(CTtable[, problemFromColumn]))) warning("in problemFromColumn column(s), all values are NA", call. = FALSE)
+    if(all(is.na(CTtable[, problemToColumn])))   warning("in Problem_to column(s), all values are NA", call. = FALSE)
     
     # if problems begin on setup day, make sure it's the same time as setup (if only dates are specified)
     if(isFALSE(effortAsFraction)){
