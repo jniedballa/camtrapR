@@ -26,8 +26,9 @@
 #' @param occuCovs  list. Up to 3 items named "fixed", "independent", and/or "ranef". Specifies fixed, independent or random effects of covariates on occupancy probability (continuous or categorical covariates). Independent effects are only supported for continuous covariates.
 #' @param detCovs   list. Up to 3 items named "fixed", "independent", and/or "ranef". Specifies fixed, independent or random effects of covariates on detection probability (continuous or categorical covariates). Independent effects are only supported for continuous covariates.
 #' @param detCovsObservation   list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of observation-level covariates on detection probability  (continuous or categorical covariates - categorical must be coded as character matrix)
-#' @param effortCov     character. Name of list item in \code{data_list$obsCovs} which contains effort. This does not include effort as a covariate on detection probability, but only uses NA / not NA information to create binary effort and ensure detection probabilities p are 0 when there was no effort (p will be 0 whereever \code{effortCov} is NA).
+#' @param speciesSiteRandomEffect list. Two items named "det" and "occu". If TRUE, adds a random effect of species and station. Only implemented for detection probability. 
 #' @param intercepts     list. Two items named "det" and "occu" for detection and occupancy probability intercepts. Values can be "fixed" (= constant across species), "independent" (= independent estimates for each species), or "ranef" (= random effect of species on intercept).
+#' @param effortCov     character. Name of list item in \code{data_list$obsCovs} which contains effort. This does not include effort as a covariate on detection probability, but only uses NA / not NA information to create binary effort and ensure detection probabilities p are 0 when there was no effort (p will be 0 whereever \code{effortCov} is NA).
 #' @param richnessCategories  character. Name of categorical covariate in \code{data_list$siteCovs} for which to calculate separate richness estimates (optional). Can be useful to obtain separate richness estimates for different areas.
 #' @param augmentation     If NULL, no data augmentation (only use species in \code{data_list$ylist}), otherwise named list or vector with total number of (potential) species. Names: "knownmax" or "full". Example: \code{augmentation = c(knownmax = 30)} or \code{augmentation = c(full = 30)}
 #' @param modelFile   character. Text file name to save model to
@@ -274,8 +275,9 @@ communityModel <- function(data_list,
                            occuCovs = list(fixed = NULL, independent = NULL, ranef = NULL),
                            detCovs = list(fixed = NULL, ranef = NULL),
                            detCovsObservation = list(fixed = NULL, ranef = NULL),
-                           effortCov = "effort",
+                           speciesSiteRandomEffect = list(det = FALSE, occu = FALSE),
                            intercepts = list(det = "fixed", occu = "fixed"),
+                           effortCov = "effort",
                            richnessCategories = NULL,
                            augmentation = NULL,
                            modelFile = NULL,
@@ -310,7 +312,13 @@ communityModel <- function(data_list,
   stopifnot(names(intercepts) %in% c("det", "occu"))
   stopifnot(intercepts$det %in% c("fixed", "ranef", "independent"))
   stopifnot(intercepts$occu %in% c("fixed", "ranef", "independent"))
+  stopifnot(is.list(speciesSiteRandomEffect))
+  stopifnot(is.logical(speciesSiteRandomEffect$det))
   
+  if(exists("occu", speciesSiteRandomEffect)) {
+    stopifnot(is.logical(speciesSiteRandomEffect$occu))
+    if(speciesSiteRandomEffect$occu) stop("speciesSiteRandomEffect$occu must be FALSE")
+  }
   
   
   if(class(data_list) != "list") stop("data_list must be a list")
@@ -960,6 +968,8 @@ communityModel <- function(data_list,
   
   
   
+  
+  
   ## occu Cov - cont - fixed effect priors ####
   prior_occu_header_fixed <- paste("## Continuous site covariates on Occupancy - Fixed effects\n")
   
@@ -987,9 +997,15 @@ communityModel <- function(data_list,
   
   ## occu Cov - cont  - random effect priors ####
   prior_occu_header_ranef <- paste("## Continuous site covariates on occupancy - with random effects\n")
-  tmp <- randomEffectPriors(effect_names = occuCovs$ranef, type = "occupancy", covariates = covariates,
-                            prior_list = prior_list, inits_list = inits_list, speciesIndex = speciesIndex, stationIndex = stationIndex, 
-                            speciesMaxNumber = speciesMax_value, speciesMax = speciesMax)
+  tmp <- randomEffectPriors(effect_names = occuCovs$ranef,
+                            type = "occupancy",
+                            covariates = covariates,
+                            prior_list = prior_list, 
+                            inits_list = inits_list, 
+                            speciesIndex = speciesIndex, 
+                            stationIndex = stationIndex, 
+                            speciesMaxNumber = speciesMax_value, 
+                            speciesMax = speciesMax)
   priors_sitecovs_occu_ranef <- tmp[[1]]
   beta_draws_ranef_occu_cont <- tmp[[2]]
   rm(tmp)
@@ -1020,6 +1036,23 @@ communityModel <- function(data_list,
   priors_sitecovs_occu_categ_ranef <- tmp[[1]]
   beta_draws_ranef_occu_categ <- tmp[[2]]
   rm(tmp)
+  
+  
+  
+  
+  
+  
+  # random effect of species and station on detection probability  ####
+  prior_det_species_station_ranef <- "# Species-station random effect on detection probability\n"
+  tmp <-  randomSpeciesStationEffectPriors(doit = speciesSiteRandomEffect$det,
+                                           prior_list = prior_list, 
+                                           inits_list = inits_list, 
+                                           speciesIndex = speciesIndex, 
+                                           stationIndex = stationIndex)
+  priors_SpeciesStation_det_ranef <- tmp[[1]]
+  alpha_draws_SpeciesStation_det_ranef <- tmp[[2]]
+  rm(tmp)
+  
   
   
   
@@ -1083,7 +1116,7 @@ communityModel <- function(data_list,
   
   loop2 <- paste("# station loop", 
                  paste0("for (", stationIndex ," in 1:", stationMax, "){"),
-                 paste("\n# Occasion probability formula"),
+                 paste("\n# Occupancy probability formula"),
                  if (nimble) {
                    paste0("logit(psi[", speciesIndex, ",", stationIndex, "]) <- ", beta0_formula, beta_formula_occu_categ_fixed, beta_formula_occu_categ_ranef, beta_formula_occu_fixed, beta_formula_occu_indep, beta_formula_occu_ranef)
                  },
@@ -1116,6 +1149,9 @@ communityModel <- function(data_list,
   alpha_formula_det_ranef <- attr(priors_sitecovs_det_ranef, "formula")
   alpha_formula_det_categ_fixed <- attr(priors_sitecovs_det_categ_fixed, "formula")
   alpha_formula_det_categ_ranef <- attr(priors_sitecovs_det_categ_ranef, "formula")
+  
+  alpha_formula_det_SpeciesStation <- attr(priors_SpeciesStation_det_ranef, "formula")
+  
   
   
   if(!is.null(detCovsObservation$fixed)) {
@@ -1161,11 +1197,20 @@ communityModel <- function(data_list,
   }
   
   
+  if(speciesSiteRandomEffect$det) {
+    priors_species_station_det_ranef <- paste("ran", "[", speciesIndex, ", ", stationIndex, "] ~ dnorm(0, alpha.speciesstation.ranef.tau)", collapse = "", sep = "")
+    
+    alpha_species_station_ranef <- paste("ran", "[", speciesIndex, ", ", stationIndex, "]", collapse = "", sep = "")
+  } else {
+    alpha_species_station_ranef <- ""
+  }
+  
   
   ### occasion loop  ####
   
   if(!nimble){
-    loop3 <- paste("# occasion loop", 
+    loop3 <- paste( alpha_draws_SpeciesStation_det_ranef,
+                    "# occasion loop", 
                    paste0("for (", occasionIndex, " in 1:", occasionMax, "){"), 
                    
                    paste("# Detection probability formula"),
@@ -1175,7 +1220,9 @@ communityModel <- function(data_list,
                    paste0("logit.p[", speciesIndex, ",", stationIndex, ",", occasionIndex, "] <- ", alpha0_formula, alpha_formula_obs_fixed, alpha_formula_obs_ranef, 
                           alpha_formula_obs_fixed_categ, alpha_formula_obs_ranef_categ,
                           alpha_formula_det_categ_fixed, alpha_formula_det_categ_ranef, 
-                          alpha_formula_det_fixed, alpha_formula_det_indep, alpha_formula_det_ranef),
+                          alpha_formula_det_fixed, alpha_formula_det_indep, alpha_formula_det_ranef,
+                          alpha_formula_det_SpeciesStation
+                          ),
                    
                    paste("\n# convert p to real scale"),
                    paste0("p[", speciesIndex, ",", stationIndex, ",", occasionIndex,"] <- exp(logit.p[", speciesIndex, ",", stationIndex, ",", occasionIndex,"]) / (1+exp(logit.p[", speciesIndex, ",", stationIndex, ",", occasionIndex,"]))"),
@@ -1423,6 +1470,9 @@ communityModel <- function(data_list,
                      prior_occu_categ_header_ranef,
                      unlist(priors_sitecovs_occu_categ_ranef),
                      
+                     prior_det_species_station_ranef,
+                     unlist(priors_SpeciesStation_det_ranef),
+                     
                      before_species_loop,
                      
                      # model
@@ -1457,7 +1507,8 @@ communityModel <- function(data_list,
                   attr(priors_sitecovs_occu_indep, "params"),
                   attr(priors_sitecovs_occu_ranef, "params"),
                   attr(priors_sitecovs_occu_categ_fixed, "params"),
-                  attr(priors_sitecovs_occu_categ_ranef, "params"))
+                  attr(priors_sitecovs_occu_categ_ranef, "params"),
+                  attr(priors_SpeciesStation_det_ranef, "params"))
   
   ## combine inits  ####
   inits_out_tmp <- c(do.call(c, lapply(model_text[sapply(model_text, 
@@ -1476,7 +1527,8 @@ communityModel <- function(data_list,
                      attr(priors_sitecovs_occu_indep, "inits"),
                      attr(priors_sitecovs_occu_ranef, "inits"),
                      attr(priors_sitecovs_occu_categ_fixed, "inits"),
-                     attr(priors_sitecovs_occu_categ_ranef, "inits"))
+                     attr(priors_sitecovs_occu_categ_ranef, "inits"),
+                     attr(priors_SpeciesStation_det_ranef, "inits"))
   
   
   inits_list     <- inits_out_tmp[sapply(inits_out_tmp, class) == "list"]
@@ -2254,6 +2306,73 @@ randomEffectPriors <- function(effect_names,
   return(list(priors_list, 
               species_draws)) 
 }
+
+
+
+randomSpeciesStationEffectPriors <- function(doit,
+                                             prior_list, 
+                                             inits_list,
+                                             speciesIndex,
+                                             stationIndex) {
+  
+  if(doit) {
+  param <- "alpha"
+    
+  # mean.tmp  <- 0
+  tau.tmp   <- "alpha.speciesstation.ranef.tau" #paste0(param, ".ranef.cont.", current_cov, ".tau", ifelse(ranef_double, paste0("[", speciesIndex, "]"), ""))
+  sigma.tmp <- "alpha.speciesstation.ranef.sigma" #paste0(param, ".ranef.cont.", current_cov, ".sigma", ifelse(ranef_double, paste0("[", speciesIndex, "]"), ""))
+  
+  
+  priors_list <- list()
+  
+  priors_list[[1]] <- paste(
+    #paste("# Random Species-station effect"),
+    # if(ranef_double) paste0("for(", speciesIndex, " in 1:", speciesMax, "){"),
+    
+    
+    
+    # paste0(mean.tmp, " <- ", 0#prior_list$dnorm),
+    paste0(tau.tmp, " ~ ", prior_list$dgamma),
+    paste0(sigma.tmp, " <- sqrt(1 / ", tau.tmp, ")"),
+    # if(ranef_double) "}",
+    "\n", 
+    sep = "\n")
+  
+
+  attr(priors_list, "params") <- sigma.tmp
+  
+  
+  inits_tmp <- vector(mode = "list", length = 1)
+  names(inits_tmp) <- "alpha.speciesstation.ranef.tau"
+  inits_tmp[[1]] <- inits_list$inits_runif_tau
+    
+  attr(priors_list, "inits") <- inits_tmp
+  
+  attr(priors_list, "formula") <- #paste(" + ",  "[", ranef_index, "] * ", current_cov2, "[", stationIndex, "]", collapse = "", sep = "")
+    paste(" + ",  "ran", "[", speciesIndex, ", ", stationIndex, "]", collapse = "", sep = "")
+  
+  
+  species_draws <- paste("# Random effect of species and station on detection probability:" ,
+                         paste("ran", "[", speciesIndex, ", ", stationIndex, "] ~ dnorm(0, alpha.speciesstation.ranef.tau)", collapse = "", sep = ""),
+                         "\n", 
+                         sep = "\n")
+# beta.ranef.cont.habitat[i] ~ dnorm(beta.ranef.cont.habitat.mean, beta.ranef.cont.habitat.tau)")
+  
+  } 
+  
+  
+  if(!doit) {
+    priors_list <- list("# < empty > \n\n")
+    attr(priors_list, "params") <- NULL
+    attr(priors_list, "formula") <- ""
+    species_draws <- paste("# No random effect of species and station on detection probability")
+  }
+  
+  return(list(priors_list,
+              species_draws))
+  }
+
+
 
 
 fixedEffectPriorsCateg <- function(effect_names, 

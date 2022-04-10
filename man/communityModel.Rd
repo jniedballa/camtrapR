@@ -10,8 +10,9 @@ communityModel(
   occuCovs = list(fixed = NULL, independent = NULL, ranef = NULL),
   detCovs = list(fixed = NULL, ranef = NULL),
   detCovsObservation = list(fixed = NULL, ranef = NULL),
-  effortCov = "effort",
+  speciesSiteRandomEffect = list(det = FALSE, occu = FALSE),
   intercepts = list(det = "fixed", occu = "fixed"),
+  effortCov = "effort",
   richnessCategories = NULL,
   augmentation = NULL,
   modelFile = NULL,
@@ -27,9 +28,11 @@ communityModel(
 
 \item{detCovsObservation}{list. Up to 2 items named "fixed" and/or "ranef". Specifies fixed or random effects of observation-level covariates on detection probability  (continuous or categorical covariates - categorical must be coded as character matrix)}
 
-\item{effortCov}{character. Name of list item in \code{data_list$obsCovs} which contains effort. This does not include effort as a covariate on detection probability, but only uses NA / not NA information to create binary effort and ensure detection probabilities p are 0 when there was no effort (p will be 0 whereever \code{effortCov} is NA).}
+\item{speciesSiteRandomEffect}{list. Two items named "det" and "occu". If TRUE, adds a random effect of species and station. Only implemented for detection probability.}
 
 \item{intercepts}{list. Two items named "det" and "occu" for detection and occupancy probability intercepts. Values can be "fixed" (= constant across species), "independent" (= independent estimates for each species), or "ranef" (= random effect of species on intercept).}
+
+\item{effortCov}{character. Name of list item in \code{data_list$obsCovs} which contains effort. This does not include effort as a covariate on detection probability, but only uses NA / not NA information to create binary effort and ensure detection probabilities p are 0 when there was no effort (p will be 0 whereever \code{effortCov} is NA).}
 
 \item{richnessCategories}{character. Name of categorical covariate in \code{data_list$siteCovs} for which to calculate separate richness estimates (optional). Can be useful to obtain separate richness estimates for different areas.}
 
