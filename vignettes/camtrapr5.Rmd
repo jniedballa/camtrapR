@@ -515,7 +515,7 @@ out_ahm_jags <- fit(model1_jags,
 )
 ```
 
-Summary statistics of model parameters
+Summary statistics of model parameters:
 ```{r}
 DT::datatable(round(summary(out_ahm_jags)$statistics, 3))
 ```
@@ -523,6 +523,8 @@ DT::datatable(round(summary(out_ahm_jags)$statistics, 3))
 Since we used simulated data we can compare model estimates with the truth. For example, the  true effect of habitat on occupancy was mean = 0.5 (SD = 0.5). See `beta.ranef.cont.habitat.mean` and `beta.ranef.cont.habitat.sigma` in the table above for estimates.
 
 The mean effect of wind on detection probability was -0.5 (SD = 1). See `alpha.obs.ranef.cont.wind.mean` and `alpha.obs.ranef.cont.wind.sigma` in the table above for estimates. 
+
+Bayesian p-values can be inspected to check for lack of fit (overall or by species). Lack of fit at significance level = 0.05 is indicated by Bayesian p-values below 0.025 or greater than 0.975. In the example above, the overall Bayesian p-value (Bpvalue) indicates no problems with lack of fit. Likewise, species-level Bayesian p-values (Bpvalue_species) indicate no lack of fit for any species. This is not surprising because the model uses simulated data.
 
 
 
@@ -898,6 +900,52 @@ DT::datatable(round(summary(out_ahm_jags_nested)$statistics, 3))
 ```
 
 Currently nested random effects can not be plotted with `plot_effects` and `plot_coef`.
+
+
+##  Species and site random effect on detection
+
+Species and site random effect on detection probability can be helpful if Bayesian p-values indicate lack of fit (overall and / or for individual species). Such an effect can be added via argument `speciesSiteRandomEffect`. Setting it to TRUE adds a random effect "ran" to detection probability in the form:
+
+logit.p[i,j,k] <- alpha0[i] + ... + **ran[i, j]**
+
+where i,j are species and station and occasion indices. `ran` is defined as: 
+
+ran[i,j] ~ dnorm(0, tau.ran)
+
+with `tau.ran` being the precision of the normal distribution (precision = 1 / standard deviation).
+
+Site is defined as the sampling location (e.g. camera trap station) in this context. 
+
+Below is an example model:
+
+```{r message=FALSE, warning=FALSE, results="hide"}
+modelFile_jags_species_station_ran <- tempfile(fileext = ".txt")
+
+model1_jags_species_station_ran <- communityModel(
+  occuCovs = list(ranef = c("habitat")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  speciesSiteRandomEffect = list(det = TRUE),
+  data_list = input_AHM,
+  modelFile = modelFile_jags_species_station_ran)
+
+# short model run for demonstration
+out_ahm_jags_species_station_ran <- fit(model1_jags_species_station_ran, 
+                                        n.iter = 500, 
+                                        n.burnin = 250,
+                                        thin = 5,
+                                        chains = 3,
+                                        cores = 1,
+                                        quiet = T
+)
+```
+
+
+The model returns the standard deviation of this random effect as `alpha.speciesstation.ranef.sigma`, which can be found in the table below.
+
+```{r}
+DT::datatable(round(summary(out_ahm_jags_species_station_ran)$statistics, 3))
+```
 
 
 
