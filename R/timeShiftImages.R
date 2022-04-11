@@ -5,7 +5,7 @@
 #' batch mode for further analyses. Please, always make a backup of your data
 #' before using this function to avoid data loss or damage. This is because
 #' ExifTool will make a copy of your images and applies the time shifts to the
-#' copies. The file extentsion of the original images (.JPG) will be renamed to
+#' copies. The file extension of the original images (.JPG) will be renamed to
 #' ".JPG_original".
 #' 
 #' 
