@@ -49,7 +49,7 @@
 #' \code{ignoreMinorErrors} is useful if image timestamps are not updated
 #' correctly (entries in column "n_images" of the output are "... files weren't
 #' updated due to errors"). This can be caused by bad MakerNotes and so far was
-#' only observed in Panthera V4 cameras. In that case, set
+#' only observed in Panthera V4 and V6 cameras. In that case, set
 #' \code{ignoreMinorErrors} to \code{TRUE}. This will add the "-m" option to
 #' the Exiftool call, thereby ignoring minor errors and warnings and applying
 #' the time shift nevertheless.
