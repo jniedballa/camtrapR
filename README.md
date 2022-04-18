@@ -21,15 +21,15 @@ You can install the release version of camtrapR from CRAN:
 install.packages("camtrapR")
 ```
 
-or from GitHub via:
+or the latest GitHub version (containing recent changes and new
+features) via:
 
 ``` r
 library(remotes)
 install_github("jniedballa/camtrapR", build_vignettes = TRUE)
 ```
 
-The GitHub version may contain recent changes and new features.
-
+For installation from GitHub make sure package `R.rsp` is available.
 `build_vignettes = TRUE` is necessary since v 2.1.1. due to the new
 static vignettes.
 
@@ -38,7 +38,7 @@ the code you need to run urgently) via:
 
 ``` r
 library(remotes)
-install_version(package = "camtrapR", version = "1.2.3")
+install_version(package = "camtrapR", version = "2.0.3")
 ```
 
 ## Exiftool
