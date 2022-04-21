@@ -33,8 +33,9 @@ install.packages("camtrapR")
 or the latest GitHub version (containing recent changes and new features) via: 
 
 ```{r, eval = FALSE}
-library(remotes)
-install_github("jniedballa/camtrapR", build_vignettes = TRUE)
+# install.packages("remotes")
+# install.packages("R.rsp")
+remotes::install_github("jniedballa/camtrapR", build_vignettes = TRUE)
 ```
 
 For installation from GitHub make sure package `R.rsp` is available. `build_vignettes = TRUE` is necessary since v 2.1.1. due to the new static vignettes.
@@ -42,8 +43,7 @@ For installation from GitHub make sure package `R.rsp` is available. `build_vign
 You can also install a previous version (e.g. if a recent update broke the code you need to run urgently) via:
 
 ```{r, eval = FALSE}
-library(remotes)
-install_version(package = "camtrapR", version = "2.0.3")
+remotes::install_version(package = "camtrapR", version = "2.0.3")
 ```
 
 ## Exiftool
