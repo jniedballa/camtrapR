@@ -2322,6 +2322,7 @@ randomSpeciesStationEffectPriors <- function(doit,
   tau.tmp   <- "alpha.speciesstation.ranef.tau" #paste0(param, ".ranef.cont.", current_cov, ".tau", ifelse(ranef_double, paste0("[", speciesIndex, "]"), ""))
   sigma.tmp <- "alpha.speciesstation.ranef.sigma" #paste0(param, ".ranef.cont.", current_cov, ".sigma", ifelse(ranef_double, paste0("[", speciesIndex, "]"), ""))
   
+  param_name_site_species <- "alpha.speciesstation.ranef"
   
   priors_list <- list()
   
@@ -2339,7 +2340,7 @@ randomSpeciesStationEffectPriors <- function(doit,
     sep = "\n")
   
 
-  attr(priors_list, "params") <- sigma.tmp
+  attr(priors_list, "params") <- c(sigma.tmp, param_name_site_species)
   
   
   inits_tmp <- vector(mode = "list", length = 1)
@@ -2349,11 +2350,11 @@ randomSpeciesStationEffectPriors <- function(doit,
   attr(priors_list, "inits") <- inits_tmp
   
   attr(priors_list, "formula") <- #paste(" + ",  "[", ranef_index, "] * ", current_cov2, "[", stationIndex, "]", collapse = "", sep = "")
-    paste(" + ",  "ran", "[", speciesIndex, ", ", stationIndex, "]", collapse = "", sep = "")
+    paste(" + ",  param_name_site_species, "[", speciesIndex, ", ", stationIndex, "]", collapse = "", sep = "")
   
   
   species_draws <- paste("# Random effect of species and station on detection probability:" ,
-                         paste("ran", "[", speciesIndex, ", ", stationIndex, "] ~ dnorm(0, alpha.speciesstation.ranef.tau)", collapse = "", sep = ""),
+                         paste(param_name_site_species, "[", speciesIndex, ", ", stationIndex, "] ~ dnorm(0, alpha.speciesstation.ranef.tau)", collapse = "", sep = ""),
                          "\n", 
                          sep = "\n")
 # beta.ranef.cont.habitat[i] ~ dnorm(beta.ranef.cont.habitat.mean, beta.ranef.cont.habitat.tau)")
