@@ -8,6 +8,9 @@
 ## bugfixes
 * reading digiKam database now works for Mac + Linux systems
 
+## other changes
+* cameraOperation: warning instead of error if problem columns are empty and hasProblems = TRUE
+
 # camtrapR 2.1.0
 
 ## new functions
