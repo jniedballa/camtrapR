@@ -14,24 +14,26 @@ Sample single-species record table with individual IDs from the tagged sample im
 
 The variables are as follows:
 
-\itemize{
- \item Station.   Camera trap station ID
- \item Species.   Species ID
- \item Individual.   Individual ID
- \item DateTimeOriginal.   Date and time as extracted from image
- \item Date.   record date
- \item Time.   record time of day
- \item delta.time.secs.   time difference to first species record at a station (seconds)
- \item delta.time.mins.   time difference to first species record at a station (minutes)
- \item delta.time.hours.   time difference to first species record at a station (hours)
- \item delta.time.days.   time difference to first species record at a station (days)
- \item Directory.   Image directory
- \item FileName.   image filename
- \item HierarchicalSubject.   content of the HierarchicalSubject image metadata tag
- \item Model.   camera model extracted from image metadata
- \item Make.   camera make extracted from image metadata
- \item metadata_Species.   content of custom image metadata tag "Species" (see HierarchicalSubject)
- \item metadata_individual.   content of custom image metadata tag "individual" (see HierarchicalSubject)
- }
+\tabular{ll}{
+\code{Station} \tab Camera trap station ID \cr
+\code{Species} \tab Species ID \cr
+\code{Individual} \tab Individual ID \cr
+\code{DateTimeOriginal} \tab Date and time as extracted from image \cr
+\code{Date} \tab record date \cr
+\code{Time} \tab record time of day \cr
+\code{delta.time.secs} \tab time difference to first species record at a station (seconds) \cr
+\code{delta.time.mins} \tab time difference to first species record at a station (minutes) \cr
+\code{delta.time.hours} \tab time difference to first species record at a station (hours) \cr
+\code{delta.time.days} \tab time difference to first species record at a station (days) \cr
+\code{Directory} \tab Image directory \cr
+\code{FileName} \tab image filename \cr
+\code{HierarchicalSubject} \tab content of the HierarchicalSubject image metadata tag \cr
+\code{Model} \tab camera model extracted from image metadata \cr
+\code{Make} \tab camera make extracted from image metadata \cr
+\code{metadata_Species} \tab content of custom image metadata tag "Species" (see HierarchicalSubject) \cr
+\code{metadata_individual} \tab content of custom image metadata tag "individual" (see HierarchicalSubject) \cr
+}
+ 
+ 
 }
 \keyword{datasets}

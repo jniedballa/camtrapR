@@ -17,16 +17,17 @@ Note that season 2010 has an additional station (StationD). This is to simulate 
 
 The variables are as follows:
 
-\itemize{
- \item Station.   Camera trap station ID
- \item utm_y.   y coordinate of station (northing)
- \item utm_x.   x coordinate of station (easting)
- \item Setup_date.   camera trap setup date
- \item Retrieval_date.   camera trap retrieval date
- \item Problem1_from.   first day of camera malfunction
- \item Problem1_to.   last day of camera malfunction
- \item session.		Identified for trapping session / season
- }
+\tabular{ll}{
+\code{Station} \tab Camera trap station ID \cr
+\code{utm_y} \tab y coordinate of station (northing) \cr
+\code{utm_x} \tab x coordinate of station (easting) \cr
+\code{Setup_date} \tab camera trap setup date \cr
+\code{Retrieval_date} \tab camera trap retrieval date \cr
+\code{Problem1_from} \tab first day of camera malfunction \cr
+\code{Problem1_to} \tab  last day of camera malfunction \cr
+\code{session} \tab  Identified for trapping session / season \cr
+}
+
 }
 
 \note{

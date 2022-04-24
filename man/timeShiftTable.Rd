@@ -14,12 +14,11 @@ If image Exif metadata timestamps are wrong systematically (e.g. because camera 
 
 The variables are as follows:
 
-\itemize{
- \item Station.   Camera trap station ID
- \item camera.   Camera trap ID (optional)
- \item timeshift.   time shift amount to be applied
- \item sign.   direction of time shift
-
- }
+\tabular{ll}{
+\code{Station} \tab Camera trap station ID \cr
+\code{camera} \tab Camera trap ID (optional) \cr
+\code{timeshift} \tab time shift amount to be applied \cr
+\code{sign} \tab direction of time shift \cr
+}
 }
 \keyword{datasets}
