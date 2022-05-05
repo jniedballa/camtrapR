@@ -395,7 +395,7 @@ recordTableIndividual <- function(inDir,
     metadata.tmp <- runExiftool(command.tmp = command.tmp[i], colnames.tmp = colnames.tmp)
 
 
-    if(class(metadata.tmp) == "NULL"){            # omit station if no images found
+    if(is.null(class(metadata.tmp))){            # omit station if no images found
 
       length.tmp <- length(list.files(dirs[i], pattern = paste(".", file_formats, "$", collapse = "|", sep = ""), 
                                       ignore.case = TRUE, recursive = TRUE))

@@ -677,7 +677,7 @@ checkCamOpColumnNames <- function(cameraOperationMatrix){
     camopTest <- try(as.Date(colnames(cameraOperationMatrix)), silent = TRUE)
   }
   
-  if(class(camopTest) == "try-error") stop(paste('Could not interpret column names in camOp as Dates. Desired format is YYYY-MM-DD (e.g. "2016-12-31") YYYY-MM-DD+Xh (X being a number, e.g. "2016-12-31+12h"). First column name in your camera operation matrix is "', colnames(cameraOperationMatrix)[1], '"', sep = '' ), call. = FALSE)
+  if("try-error" %in% class(camopTest)) stop(paste('Could not interpret column names in camOp as Dates. Desired format is YYYY-MM-DD (e.g. "2016-12-31") YYYY-MM-DD+Xh (X being a number, e.g. "2016-12-31+12h"). First column name in your camera operation matrix is "', colnames(cameraOperationMatrix)[1], '"', sep = '' ), call. = FALSE)
   
   
   colnames(cameraOperationMatrix) <- as.character(camopTest)

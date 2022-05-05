@@ -70,7 +70,7 @@ predictionMapsCommunity <- function(object,
   
   
   # convert raster to covariate data frame
-  if(class(x) == "RasterStack") {
+  if("RasterStack" %in% class(x)) {
     values_to_predict_all <- as.data.frame(raster::values(x))
   } else {
     if(is.data.frame(x)) {
@@ -205,7 +205,7 @@ predictionMapsCommunity <- function(object,
     }
     
     # fill rasters with predicted values
-    if(class(x) == "RasterStack") {
+    if("RasterStack" %in% class(x)) {
     raster_template <- raster::raster(x)
     r_pred_species <- r_pred_sd_species <- list()
     
@@ -238,7 +238,7 @@ predictionMapsCommunity <- function(object,
         psi.upper2$Species <- dimnames(object@data$y)[[1]][psi.upper2$Species]
       }
       
-      if(class(x) == "RasterStack") {
+      if("RasterStack" %in% class(x)) {
       raster_template <- raster::raster(x)
       r_pred_lower_species <- r_pred_upper_species <- list()
       
@@ -269,7 +269,7 @@ predictionMapsCommunity <- function(object,
     }
     
     if(interval == "none"){
-      if(class(x) == "RasterStack"){
+      if("RasterStack" %in% class(x)){
         return(list(mean = stack_out_mean,
                     sd   = stack_out_sd))
       } else {
@@ -320,7 +320,7 @@ predictionMapsCommunity <- function(object,
       psi.bin.sum.upper <- apply(psi.bin.sum, 1, quantile, (1 - (1-level) / 2))
     }
     
-    if(class(x) == "RasterStack") {
+    if("RasterStack" %in% class(x)) {
       raster_template <- raster::raster(x)
       
       r.psi.bin.sum.mean <- r.psi.bin.sum.sd <- r.psi.bin.sum.lower <- r.psi.bin.sum.upper <- raster_template
