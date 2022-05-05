@@ -46,7 +46,7 @@ fixDateTimeOriginal(inDir     = wd_images_hyperfire,
 \references{
 This function uses the code from: \cr Tobler, Mathias (2015).
 Camera Base Version 1.7 User Guide
-\url{http://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf}
+\url{https://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf}
 }
 \author{
 Juergen Niedballa
