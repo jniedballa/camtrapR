@@ -1,4 +1,4 @@
-# camtrapR 2.1.1
+# camtrapR 2.2.0
 
 ## new functions
 * communityModel: create community occupancy models for JAGS and Nimble. Comes with summary(), fit(), and predict() methods
