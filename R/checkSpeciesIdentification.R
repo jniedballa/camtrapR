@@ -335,7 +335,7 @@ checkSpeciesIdentification <- function(inDir,
         suppressWarnings(rm(metadata.tmp, check_table_tmp))
 
       }  # end  if(length(unique(metadata.tmp$species)) >= 2){
-    }    # end if(class(metadata.tmp) == "data.frame"){
+    }    # end  if(inherits(metadata.tmp, "data.frame")){
   }      # end for (i ...)
 
   if(writecsv == TRUE){

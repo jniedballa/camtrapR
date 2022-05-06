@@ -128,8 +128,8 @@ OCRdataFields <- function(inDir,
     stop("Please install the package tesseract to run this function")
   }
   
-  if(class(inDir) !=  "character") stop("inDir must be a character string")
-  if(class(geometries) !=  "list") stop("geometries must be a list")
+  if(!is.character(inDir)) stop("inDir must be a character string")
+  if(!is.list(geometries)) stop("geometries must be a list")
   if(!is.logical(invert)) stop("invert must be logical (TRUE/FALSE)")
   
   lf_full  <- list.files(inDir, recursive = TRUE, full.names = TRUE, pattern = ".JPG$|.jpg$|jpeg$")

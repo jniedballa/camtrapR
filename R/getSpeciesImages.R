@@ -261,7 +261,7 @@ getSpeciesImages <- function(species,
             copy.table <- rbind(copy.table, copy.table.tmp)
           }
 
-        } # end if(class(metadata.tmp) == "data.frame"){
+        } # end if(is.data.frame(metadata.tmp)){
       }   # end for(i in 1:length(dirs_short)){
     }     # end else (IDfrom)
 

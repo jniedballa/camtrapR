@@ -321,7 +321,7 @@ communityModel <- function(data_list,
   }
   
   
-  if(class(data_list) != "list") stop("data_list must be a list")
+  if(!is.list(data_list)) stop("data_list must be a list")
   
   if(exists("ylist", where = data_list)) {
     if(!inherits(data_list$ylist, "list")) stop("data_list$ylist must be a list")

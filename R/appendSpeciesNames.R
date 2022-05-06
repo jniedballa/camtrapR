@@ -234,7 +234,7 @@ multiple_tag_separator = "__"
         }
         rownames(renaming.table) <- NULL
 
-      } # end if(class(metadata.tmp) == "data.frame"){
+      } # end if(is.data.frame(metadata.tmp)){
     }   # end ID via metadata
   }     # end for (i...)
 
