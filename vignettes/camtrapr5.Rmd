@@ -3,7 +3,7 @@ title: "5. Multi-species occupancy models"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output:
-    rmarkdown::html_document:
+    rmarkdown::html_vignette:
       toc: true
       toc_depth: 2
       toc_float: true
@@ -941,7 +941,7 @@ out_ahm_jags_species_station_ran <- fit(model1_jags_species_station_ran,
 ```
 
 
-The model returns the standard deviation of this random effect as `alpha.speciesstation.ranef.sigma`, which can be found in the table below.
+The model returns the standard deviation of this random effect as `alpha.speciessite.ranef.sigma`, which can be found in the table below.
 
 ```{r}
 DT::datatable(round(summary(out_ahm_jags_species_station_ran)$statistics, 3))
@@ -1137,7 +1137,9 @@ Species occupancy maps:
                              type      = "psi",
                              draws     = 1000)
   
-  plot(predictions_psi$mean, zlim = c(0,1), col = hcl.colors(100))
+
+  plot(predictions_psi$mean, zlim = c(0,1), col = hcl.colors(100), 
+       maxnl = 9)   # plotting only the first 9 species for space reasons
 
 ```
 
