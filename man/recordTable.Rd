@@ -132,7 +132,7 @@ taken less than \code{minDeltaTime} minutes after the last record
 
 \code{removeDuplicateRecords} determines whether duplicate records
 (identical station, species, date/time, (and camera if applicable)) are are
-all returned (TRUE) or collapsed into a single unique record (FALSE).
+all returned (FALSE) or collapsed into a single unique record (TRUE).
 
 \code{camerasIndependent} defines if the cameras at a station are to be
 considered independent. If \code{TRUE}, records of the same species taken by
