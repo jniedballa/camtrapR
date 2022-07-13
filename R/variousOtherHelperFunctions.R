@@ -1559,9 +1559,14 @@ parseDateTimeObject <- function(inputColumn,
                                 quiet = FALSE
 ){
   
-  
-  if("POSIXct" %in% class(inputColumn)){
-    message(paste("datetime column is in POSIXct format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
+  if(any(c("POSIXct", "POSIXlt") %in% class(inputColumn))){
+    if(inherits(inputColumn, "POSIXlt")) {
+      warning(paste("datetime column is in POSIXlt format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
+    }
+    
+    if(inherits(inputColumn, "POSIXct")){
+      message(paste("datetime column is in POSIXct format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
+    } 
     inputColumn <- as.character(inputColumn)
   } else {
     if(!class(inputColumn) %in% c("factor", "character")) stop(paste("datetime column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
