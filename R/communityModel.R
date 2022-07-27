@@ -440,14 +440,26 @@ communityModel <- function(data_list,
   if(exists("siteCovs", where = data_list)) {
     if(!inherits(data_list$siteCovs, "data.frame")) stop("data_list$siteCovs must be a data.frame")
   } else {
-    warning("data_list$siteCovs does not exist. No site covariates available.", call. = FALSE)
+    warning("data_list$siteCovs does not exist. No site covariates available.\n", call. = FALSE)
   }
   
   
   # get covariate information
-  if(!is.null(unlist(detCovs)))     covariate_info <- rbind(covariate_info, get_cov_info (detCovs, keyword_nested, keyword_quadratic, data_list, type = "site", submodel = "det"))
-  if(!is.null(unlist(occuCovs)))    covariate_info <- rbind(covariate_info, get_cov_info (occuCovs, keyword_nested, keyword_quadratic, data_list, type = "site", submodel = "state"))
+  if(!is.null(unlist(detCovs))) {
+    if(! c("obsCovs", "siteCovs") %in% names(data_list)) {
+      stop("detCovs is defined, but data_list does not contain siteCovs or obsCovs.", call. = F)
+    } else {
+      covariate_info <- rbind(covariate_info, get_cov_info (detCovs, keyword_nested, keyword_quadratic, data_list, type = "site", submodel = "det"))
+    }
+  }
   
+  if(!is.null(unlist(occuCovs))) {
+    if(! "siteCovs" %in% names(data_list)) {
+      stop("occuCovs is defined, but data_list does not contain siteCovs.", call. = F)
+    } else {
+      covariate_info <- rbind(covariate_info, get_cov_info (occuCovs, keyword_nested, keyword_quadratic, data_list, type = "site", submodel = "state")) 
+    }
+  }
   
   covariates_original <- data_list$siteCovs
 
