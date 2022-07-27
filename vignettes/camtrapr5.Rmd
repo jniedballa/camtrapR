@@ -258,7 +258,7 @@ The model is fit with `fit()`.
                  chains = 3)
 ```
 
-The output of the `fit()` method is an` mcmc.list` from the coda package. 
+The output of the `fit()` method is an ` mcmc.list` from the coda package. 
 
 Summarize posterior estimates:
 ```{r}
@@ -275,7 +275,7 @@ DT::datatable(round(fit_summary$statistics, 3))
 
 Quantiles of parameter estimates:
 ```{r}
-DT::datatable(round(fit_summary$statistics, 3))
+DT::datatable(round(fit_summary$quantiles, 3))
 ```
 
 
@@ -422,14 +422,13 @@ The estimates and marginal effects are not very pretty, and the model would like
 
 # More complete example
 
-The example above was very small and unrealistic. We can't provide a large camera trapping data set, but we can simulate one using the `simComm` function from the `AHMbook` package. 
+The example above was very small and unrealistic. We can't provide a large camera trapping data set in camtrapR, but we can simulate one using the `simComm` function from the `AHMbook` package. Using a simulated data set also means we can compare model estimates to the "true" parameters (which were used to create the simulated data).
 
 ## Prepare data
 
-First, install GitHub version of the AHMbook package:
+First, install the AHMbook package if necessary:
 ```{r eval = FALSE}
-library(remotes)
-install_github("mikemeredith/AHMbook")
+install.packages("AHMbook")
 ```
 
 
@@ -486,6 +485,26 @@ input_AHM <- list(ylist = ylist,
                   obsCovs = list(effort = effort,
                                  wind = wind))
 ```
+
+
+## Missing values in detection histories
+
+In contrast to single-species occupancy models in unmarked and ubms, this community occupancy workflow does not allow NAs in the detection histories due to technical differences in the implementation. The detection histories may only contain 1 and 0 for community occupancy models.
+
+Information about occasions without effort is provided via the mandatory observation covariate effort. Use the `$effort` part of the output of `detectionHistory()`. All occasions with NA in the effort matrix will be set to detection probability = 0. This ensures that those occasions have detection probability = 0 and do not information to the model fit. 
+
+Code for converting NAs in the detection history to 0:
+
+```{r}
+# replace NAs with 0 in the ylist component of input_AHM (for all species at once)
+input_AHM$ylist <- lapply(input_AHM$ylist, FUN = function(x) {
+  x[is.na(x)] <- 0
+  x
+})
+```
+
+
+It is not relevant in this example because the detection histories contain no NAs, but it is a common issue in real data. 
 
 
 ## JAGS Model
