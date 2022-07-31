@@ -311,8 +311,13 @@ surveyReport <- function(recordTable,
   recordTable$Date2 <- as.Date(recordTable$DateTime2, tz = "UTC")
   
   
-  if(all(as.character(unique(recordTable[,stationCol])) %in% CTtable[,stationCol]) == FALSE){
-    (stop("Not all values of stationCol in recordTable are matched by values of stationCol in CTtable"))
+  # if(all(as.character(unique(recordTable[,stationCol])) %in% CTtable[,stationCol]) == FALSE){
+  #   (stop("Not all values of stationCol in recordTable are matched by values of stationCol in CTtable"))
+  # }
+  if(!all(as.character(unique(recordTable[,stationCol])) %in% CTtable[,stationCol])){
+    stop(paste("Not all values of stationCol in recordTable are matched by values of stationCol in CTtable:\n",
+               paste(as.character(unique(recordTable[,stationCol])) [!as.character(unique(recordTable[,stationCol])) %in% CTtable[,stationCol]], collapse = ", ")
+    ))
   }
   
   
