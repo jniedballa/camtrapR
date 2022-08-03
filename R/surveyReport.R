@@ -417,6 +417,11 @@ surveyReport <- function(recordTable,
   
   if(isTRUE(CTHasProblems)){    # camera problem columns
     
+    # convert problem column entries to character
+    for(problem_col_index in c(cols.prob.from, cols.prob.to)){
+      CTtable[, problem_col_index] <- as.character(CTtable[, problem_col_index])
+    }
+    
     n_days_inactive_legacy <- data.frame(matrix(NA,
                                          ncol = length(cols.prob.from),
                                          nrow = nrow(CTtable)))
