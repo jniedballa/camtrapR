@@ -18,10 +18,11 @@ predictionMapsCommunity <- function(object,
                                     level = 0.95,
                                     interval = c("none", "confidence"),
                                     x,
+                                    aoi = NULL,
                                     speciesSubset) 
 {
   
-  type <- match.arg(type, choices = c("psi_array", "psi", "richness"))
+  type <- match.arg(type, choices = c("psi_array", "psi", "richness", "pao"))
   interval <- match.arg(interval, choices = c("none", "confidence"))
 
   # subset occupancy (beta) parameters
@@ -54,7 +55,11 @@ predictionMapsCommunity <- function(object,
   # subset posterior matrix to number of draws
   posterior_matrix <- as.matrix(mcmc.list)
   if(hasArg(draws)) {
-    if(nrow(posterior_matrix) > draws)     posterior_matrix <- posterior_matrix[sample(1:nrow(posterior_matrix), draws),]
+    if(nrow(posterior_matrix) > draws){
+      posterior_matrix <- posterior_matrix[sample(1:nrow(posterior_matrix), draws),]
+    } else {
+      message(paste0("draws (", draws, ") is greater than the number of available samples (", nrow(posterior_matrix), ")."))
+    }
   } 
   
   # subset posterior matrix to current submodel
@@ -84,6 +89,22 @@ predictionMapsCommunity <- function(object,
   # identify cells with values
   index_not_na <- which(apply(values_to_predict_all, 1, FUN = function(x) all(!is.na(x))))
   
+  if(hasArg(aoi)) {
+    if(inherits(x, "data.frame")) stop("aoi can only be defined if x is a RasterStack (not a data.frame).")
+    if(inherits(aoi, "RasterLayer")) {
+      
+      which_not_na_aoi    <- which(!is.na(raster::values(aoi))) #[index_not_na])
+      index_not_na <- intersect(index_not_na, which_not_na_aoi)
+      
+      aoi2 <- raster::raster(aoi)
+      raster::values(aoi2) <- NA
+      raster::values(aoi2) [index_not_na]  <- 1
+      
+    } else {
+      stop("aoi must be a RasterLayer")
+    }
+  }
+  
   values_to_predict_subset <- values_to_predict_all[index_not_na, , drop = F]
   
   
@@ -105,8 +126,11 @@ predictionMapsCommunity <- function(object,
   }
   gc()
   
-  # check if this works
-  if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ) message("Watch RAM usage. At least 4Gb will be required")
+  # memory warning (if applicable)
+  if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ){
+    ram_usage_estimate <- round(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) / 1e3) # in Gb
+    message(paste("Watch RAM usage. At leas", ram_usage_estimate, "Gb will be required"))
+  } 
   
   
   out <- list()
@@ -177,12 +201,59 @@ predictionMapsCommunity <- function(object,
   logit.psi <- Reduce('+', out) + out_intercept
   psi <- exp(logit.psi) / (exp(logit.psi) + 1)
   
+  rm(out)
   gc()
   
+  # return raw probabilities [cell, species, posterior_draw]
   if(type == "psi_array") {
     return(psi)
   }
   
+  # percentage of area occupied (by species)
+  if(type == "pao") {
+    
+    # random binomial trail for each probability
+    z <- array(rbinom(length(psi),prob=psi,size=1), dim = dim(psi))
+    pao1 <- apply(z, MARGIN = c(2, 3), mean)  # aggregated spatially: [species, draw]
+    dimnames(pao1)[1] <- list(names(object@input$ylist))
+
+    
+    # summary table
+    pao_summary_table <- as.data.frame(t(apply(pao1, MARGIN = 1, summary)))
+    
+    
+    pao.lower <- as.data.frame(t(apply(pao1, MARGIN = 1, quantile, ((1-level) / 2))))
+    pao.upper <- as.data.frame(t(apply(pao1, MARGIN = 1, quantile,  (1 - (1-level) / 2))))
+    
+    pao.lower2 <- reshape2::melt(pao.lower)
+    pao.upper2 <- reshape2::melt(pao.upper)
+    
+    names(pao.lower2) <- c("Species", paste0("lower.ci.", ((1-level) / 2)))
+    names(pao.upper2) <- c("Species", paste0("upper.ci.", (1 - (1-level) / 2)))
+    
+
+    pao_summary_table <- cbind(pao_summary_table [, "Min.", drop = F],
+                               pao.lower2[,2, drop = F],
+                               pao_summary_table [, c("1st Qu.", "Median", "Mean", "3rd Qu.")],
+                               pao.upper2[,2, drop = F],
+                               pao_summary_table [, "Max.", drop = F])
+    
+    pao_summary_table <- round(pao_summary_table, 3)
+    
+    # table with all posterior draws for all species (e.g. for ggplot2)
+    pao_melt <- reshape2::melt(pao1)
+    colnames(pao_melt) <- c("Species", "draw", "PAO")
+    pao_melt <- pao_melt[order(pao_melt$Species, pao_melt$draw),]
+    pao_melt$Species <- factor(pao_melt$Species, labels = names(object@input$ylist))
+    rownames(pao_melt) <- NULL
+
+    
+    return(list(pao_summary = pao_summary_table, 
+                pao_matrix  = pao1,
+                pao_df      = pao_melt,
+                aoi         = aoi2))
+
+  }
   
   if(type == "psi") {
     
@@ -373,14 +444,15 @@ predictionMapsCommunity <- function(object,
 #'
 #' @param object \code{commOccu} object
 #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
-#' @param type character. "psi" for species occupancy estimates, "richness" for species richness estimates
+#' @param type character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array.
 #' @param draws  Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used
 #' @param level  Probability mass to include in the uncertainty interval
-#' @param interval    # Type of interval calculation. Can be "none" or "confidence". Can be slow for type = "psi" with many cells and posterior samples. Can be abbreviated.
-#' @param x   raster stack or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names. 
+#' @param interval    Type of interval calculation. Can be "none" or "confidence" (can be abbreviated). Calculation can be slow for type = "psi" with many cells and posterior samples.
+#' @param x   RasterStack or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names. 
+#' @param aoi RasterLayer with same dimensions as x, indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.
 #' @param speciesSubset  species to include in richness estimates. Can be index number or species names.
 #'
-#' @return A raster stack or data.frame, depending on x
+#' @return A raster stack or data.frame, depending on x. If type = "pao", a list. If type = "psi_array", a 3D-array [cell, species, draw].
 #' @importFrom  stats rbinom sd
 #' @importFrom utils object.size
 #' @export
@@ -388,3 +460,4 @@ predictionMapsCommunity <- function(object,
 
 setMethod("predict", signature = c(object = "commOccu"),
           predictionMapsCommunity)
+
