@@ -1,8 +1,8 @@
 Package: camtrapR
 Type: Package
 Title: Camera Trap Data Management and Preparation of Occupancy and Spatial Capture-Recapture Analyses
-Version: 2.2.0.2
-Date: 2022-07-13
+Version: 2.2.0.3
+Date: 2022-08-06
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
                 comment = c(ORCID = "0000-0002-9187-2116")),
@@ -67,4 +67,4 @@ URL: https://github.com/jniedballa/camtrapR, https://jniedballa.github.io/camtra
 BugReports: https://groups.google.com/forum/#!forum/camtrapr
 Encoding: UTF-8
 License: GPL (>= 2)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
