@@ -1,3 +1,11 @@
+# camtrapR 2.2.1
+
+## new features
+* predict(): now accepts type = "pao" (for percentage of area occupied, by species) and "psi_array" (raw occupancy probabilities)
+
+## other changes
+* improved error messages in several functions
+
 # camtrapR 2.2.0
 
 ## new functions
