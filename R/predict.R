@@ -129,7 +129,7 @@ predictionMapsCommunity <- function(object,
   # memory warning (if applicable)
   if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ){
     ram_usage_estimate <- round(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) / 1e3) # in Gb
-    message(paste("Watch RAM usage. At leas", ram_usage_estimate, "Gb will be required"))
+    message(paste("Watch RAM usage. At least", ram_usage_estimate, "Gb will be required"))
   } 
   
   
@@ -248,10 +248,16 @@ predictionMapsCommunity <- function(object,
     rownames(pao_melt) <- NULL
 
     
-    return(list(pao_summary = pao_summary_table, 
-                pao_matrix  = pao1,
-                pao_df      = pao_melt,
-                aoi         = aoi2))
+    if(hasArg(aoi)) {
+      return(list(pao_summary = pao_summary_table, 
+                  pao_matrix  = pao1,
+                  pao_df      = pao_melt,
+                  aoi         = aoi2))
+    } else {
+      return(list(pao_summary = pao_summary_table, 
+                  pao_matrix  = pao1,
+                  pao_df      = pao_melt))
+    }
 
   }
   
