@@ -20,6 +20,7 @@ library(camtrapR)
 library(purrr)
 library(DT)
 library(knitr)
+library(ggplot2)
 ```
 
 # Overview
@@ -90,7 +91,7 @@ df_params = data.frame(Name = c("alpha", "beta", "0", "fixed", "indep", "ranef",
 col2 = c("Submodel", "Submodel", "Intercept", "Effect type","Effect type", "Effect type", "Covariate type", "Covariate type",
          "Hyperparameter", "Hyperparameter", "Hyperparameter"),
 col3 = c("detection submodel", "occupancy submodel", "denotes the intercepts (alpha0, beta0)",
-         "fixed effects (constant across species)", "independent effects (separate for each species)", "random effects (of species and/or other categorical covariates)",
+         "fixed effects (constant across species)", "independent effects (separate and independent between species)", "random effects (of species and/or other categorical covariates)",
          "continuous covariates", "categorical covariates",
          "mean of random effect", "standard deviation of random effect", "precision of random effect (used internally, not returned)"))
 
@@ -168,7 +169,7 @@ Now we load the record table and create a list of detection histories. Here we i
      day1                 = "station",
      datesAsOccasionNames = FALSE,
      includeEffort        = TRUE,
-     scaleEffort          = TRUE,
+     scaleEffort          = FALSE,
      timeZone             = "Asia/Kuala_Lumpur"
    )}
  )
@@ -361,6 +362,7 @@ We can fit the same model in Nimble using the exact same functions as for the JA
 ```
 
 It is possible to fit uncompiled models, but it is usually extremely slow and should only be done for checking model structure and expected outputs, using very few iterations. 
+
 ```{r results="hide", message = FALSE}
  fit.nimble.uncomp <- fit(mod.nimble,
                           n.iter = 10,
@@ -381,14 +383,14 @@ To fit a compiled model, set compile = TRUE:
 )
 ```
 
-The output as an `mcmc.list`, just like for the JAGS model above, and can be treated just the same:
+The output as an `mcmc.list`, just like for the JAGS model above, and can be worked with just the same:
 
 ```{r eval = FALSE}
  # parameter summary statistics (not shown)
  summary(fit.nimble.comp)
 ```
 
-Response curves (= marginal effect plots)
+Response curves (= marginal effect plots):
 ```{r}
  plot_effects(mod.nimble,
               fit.nimble.comp,
@@ -487,24 +489,6 @@ input_AHM <- list(ylist = ylist,
 ```
 
 
-## Missing values in detection histories
-
-In contrast to single-species occupancy models in unmarked and ubms, this community occupancy workflow does not allow NAs in the detection histories due to technical differences in the implementation. The detection histories may only contain 1 and 0 for community occupancy models.
-
-Information about occasions without effort is provided via the mandatory observation covariate effort. Use the `$effort` part of the output of `detectionHistory()`. All occasions with NA in the effort matrix will be set to detection probability = 0. This ensures that those occasions have detection probability = 0 and do not information to the model fit. 
-
-Code for converting NAs in the detection history to 0:
-
-```{r}
-# replace NAs with 0 in the ylist component of input_AHM (for all species at once)
-input_AHM$ylist <- lapply(input_AHM$ylist, FUN = function(x) {
-  x[is.na(x)] <- 0
-  x
-})
-```
-
-
-It is not relevant in this example because the detection histories contain no NAs, but it is a common issue in real data. 
 
 
 ## JAGS Model
@@ -560,7 +544,7 @@ plot_resp_jags_det <- plot_effects(model1_jags,
 plot_resp_jags_det
 ```
 
-Plot coefficient estimates
+Plot coefficient estimates:
 ```{r}
 plot_eff_jags_occu <- plot_coef(model1_jags, 
                                 out_ahm_jags)
@@ -582,6 +566,7 @@ plot_eff_jags_occu2 <- plot_coef(model1_jags,
                                 ordered = FALSE)
 plot_eff_jags_occu2
 ```
+
 
 
 ## Nimble Model
@@ -648,6 +633,122 @@ plot_eff_nimble_det
 
 
 
+
+## Missing values in detection histories
+
+
+The examples so far did not have any missing data in the detection histories. Real-world data commonly have missing data though, e.g. due to camera malfunction or specific study designs. In single-species occupancy models (e.g. in unmarked or ubms) this is handled automatically, but requires a little more attention in these multi-species models (at least when fitting with Nimble). Let's modify the above data set and introduce some NAs in the detection history and the effort matrix:
+
+```{r}
+# introduce a few missing values in detection history of all species
+index_na <-  sample(1:length(ylist[[1]]), 10) #
+ylist_with_na <- lapply(ylist, FUN = function(x) {x[index_na] <- NA; x})
+
+
+# set the cells with NA in detection history to NA in effort too
+effort_with_na <- effort
+effort_with_na[index_na] <- NA
+
+# bundle model input
+input_AHM_with_NA <- list(ylist = ylist_with_na, 
+                          siteCovs = data.frame(habitat = habitat,
+                                                categ   = categ),
+                          obsCovs = list(effort = effort_with_na,
+                                         wind = wind))
+
+```
+
+And fit models in JAGS and Nimble:
+
+
+
+```{r}
+modelFile_jags_na <- tempfile(fileext = ".txt")
+
+model1_jags_na <- communityModel(
+  occuCovs = list(ranef = c("habitat")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM_with_NA,
+  modelFile = modelFile_jags_na)
+```
+
+
+```{r results="hide"}
+out_ahm_jags_na <- fit(model1_jags_na, 
+                    n.iter = 5000, 
+                    n.burnin = 2500,
+                    thin = 5,
+                    chains = 3,
+                    cores = 1,
+                    quiet = T
+)
+```
+
+Summary statistics of model parameters:
+```{r}
+DT::datatable(round(summary(out_ahm_jags_na)$statistics, 3))
+```
+
+
+As can be seen, the JAGS model handles NAs well and parameter estimates are very similar to the model without missing data above.
+
+
+Nimble models can technically also be fit with NAs present, but there will be numerous warnings and residuals as well as Bayesian p-values cannot be computed. 
+
+
+```{r}
+modelFile_nimble_na <- tempfile(fileext = ".txt")
+
+model1_nimble_na <- communityModel(
+  occuCovs = list(ranef = c("habitat")), 
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM_with_NA,
+  modelFile = modelFile_nimble_na,
+  nimble = T)
+```
+
+When fitting the model there will be numerous warnings about values of data nodes y[,,] and determinisitc nodes res[,], R2[] and R3 being NA (not shown here).
+
+```{r results="hide"}
+out_ahm_nimble_na <- fit(model1_nimble_na, 
+                    n.iter = 5000, 
+                    n.burnin = 2500,
+                    thin = 5,
+                    chains = 3,
+                    cores = 1,
+                    quiet = T
+)
+```
+
+Parameter summaries cannot be computed and will return an error (not shown here).
+
+```{r eval = FALSE}
+DT::datatable(round(summary(out_ahm_nimble2)$statistics, 3))
+```
+
+
+
+
+To alleviate this, it is necessary (for Nimble models) to convert NAs in the detection history to 0, e.g. with:
+
+```{r}
+# replace NAs with 0 in the ylist component of input_AHM (for all species at once)
+input_AHM_with_NA$ylist <- lapply(input_AHM_with_NA$ylist, FUN = function(x) {
+  x[is.na(x)] <- 0
+  x
+})
+```
+
+After converting NAs to 0, Nimble models can be run without warnings and summaries can be calculated.
+
+
+To prevent the additional 0s from affecting the estimation of detection probabilities, information about occasions without effort is provided via the mandatory argument `effortCov` in the `communityModel` function. Use the `$effort` part of the output of `detectionHistory()` to provide the necessary information, and of course ensure that `detectionHistory` is run with `includeEffort = T`. All occasions with NA in the effort matrix will have their detection probabilities fixed at 0. This ensures that those occasions do not affect the model fit. Be aware that this does not include effort as a covariate on detection. Including effort as a covariate on detection would need to be done via `detCovsObservation`.
+
+
+
+
 # Further possibilies
 
 
@@ -658,6 +759,8 @@ This section demonstrates additional possibilities. The models here are (mostly)
 One can define fixed effects of covariates if the responses are thought to be constant across all species. This might make sense for the effect of sampling effort in camera trapping studies. 
 
 
+
+
 ## Priors
 
 It is not yet possible to customize priors. The current defaults are: 
@@ -665,7 +768,7 @@ It is not yet possible to customize priors. The current defaults are:
 * dnorm(0, 0.05) : random effect means
 * dgamma(0.1, 0.1): random effect precision (tau)
 
-Future versions may allow more flexibility. In the meantime feel free to adjust the model code in the txt file as needed.
+Future versions may allow more flexibility. Please contact me if this is relevant for you. In the meantime feel free to adjust the model code in the txt file as needed. 
 
 
 ## Data augmentation
@@ -933,7 +1036,7 @@ ran[i,j] ~ dnorm(0, tau.ran)
 
 with `tau.ran` being the precision of the normal distribution (precision = 1 / standard deviation).
 
-Site is defined as the sampling location (e.g. camera trap station) in this context. 
+Site is defined as the sampling location (e.g. camera trap station in this context). 
 
 Below is an example model:
 
@@ -1121,7 +1224,7 @@ out_ahm_jags_categ3 <- fit(model_jags_categ3,
 
 
 
-create a habitat raster (we'll use the volcano raster for demonstration). 
+Create a habitat raster. We'll use the volcano raster for demonstration. The coordinates are not geographic though since this is only for demonstration. 
 ```{r}
 data("volcano")
 r_volcano <- scale(raster(volcano))
@@ -1173,13 +1276,80 @@ Species richness maps:
   plot(predictions_rich)
   # mean = mean species richness estimate
   # sd = standard deviation of richness estimate
-
-
 ```
 
-In these examples we did not return confidence intervals. Doing so would be easy by setting intervals =  "confidence".
+In these examples we did not return confidence intervals. Doing so would be easy by setting `intervals =  "confidence"`.
 
 Computation can take long on larger rasters and can require lots of RAM. Check RAM usage during computations. 
+
+
+
+## Percentage of area occupied (by species)
+
+
+The `predict` function can be used to calculate Percentage of Area Occupied (PAO) for all species, optionally for a given area of interest (AOI). 
+
+For demonstration, let's create a AOI as a SpatialPolygonsDataFrame. Normally you'd just load a shapefile or other spatial vector data set.
+
+```{r}
+Sr1 = Polygon(cbind(c(0.2,0.2, 0.6,0.6, 0.2),c(0.4,0.7, 0.8,0.4,0.4)))
+Srs1 = Polygons(list(Sr1), "1")
+SpP = SpatialPolygons(list(Srs1))
+aoi = SpatialPolygonsDataFrame(SpP, data = data.frame(name = "My AOI"))
+```
+
+```{r}
+plot(r_volcano)
+plot(aoi, add = T)
+```
+
+
+To use the SpatialPolygonsDataFrame as an AOI, we need to rasterize it. PAO will refer to all cells in the AOI raster that are not NA. 
+
+```{r}
+r_aoi <- rasterize(aoi, r_volcano)
+plot(r_aoi)
+```
+
+
+Now the prediction of PAO:
+
+```{r}
+  predictions_pao <- predict(object    = model_jags_categ3, 
+                             mcmc.list = out_ahm_jags_categ3,
+                             x         = stack_prediction,
+                             type      = "pao", 
+                             aoi       = r_aoi)
+  
+```
+Output is a list with several components: 
+
+$pao_summary is a summary table with quantiles of predicted PAO for all species. 
+
+```{r}
+predictions_pao$pao_summary
+```
+
+
+$pao_matrix contains the PAO estimates for all species from all posterior draws (not shown here)
+```{r eval = FALSE}
+predictions_pao$pao_matrix
+```
+
+$pao_df is similar to $pao_matrix, but in a data frame in long format, ready for use in ggplot2.
+
+```{r}
+  ggplot2::ggplot(predictions_pao$pao_df, aes(x = Species , y = PAO)) +
+  geom_boxplot(outlier.shape = NA) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+$aoi is a RasterLayer showing the AOI (now with cells removed that are NA in the prediction rasters)
+
+```{r}
+plot(predictions_pao$aoi)
+```
+
 
 
 ## bayesplot
@@ -1230,7 +1400,7 @@ Incidentally, the workflow above can be used for single-species models too. The 
 Take care to only define fixed effects for covariates and the intercepts, not random effects of species. It is possible however to specify random effects of categorical site covariates on continuous site covariates as in the example below. 
 
 
-In this example we use species 1 from the community created with simComm. 
+In this example we use species 1 from the community created with `AHMbook::simComm`. 
 
 ```{r}
 input_AHM_sp1 <- list(ylist = ylist[1],    # ylist[1] is still a list, with 1 element
@@ -1250,16 +1420,14 @@ model_sp1_jags_ranef <- communityModel(
   modelFile = modelFile_jags_sp1)
 ```
 
-Fit model
+Fit model:
 ```{r message=FALSE, warning=FALSE, results="hide"}
 fit_jags_sp1 <- fit(model_sp1_jags_ranef, n.iter = 1000, n.burnin = 500, thin = 5)
 ```
 
-Print summary statistics
+Print summary statistics:
 ```{r}
 DT::datatable(round(summary(fit_jags_sp1)$statistics, 3))
 ```
 
 The `plot_effects()` and `plot_coef()` functions currently don't work for this case, since single-species models are mostly a side-effect of the intended community occupancy workflow and not the main goal. There are other great options for Bayesian single-species occupancy models, e.g. in the packages ubms or wiqid, or unmarked for a frequentist implementation.
-
-
