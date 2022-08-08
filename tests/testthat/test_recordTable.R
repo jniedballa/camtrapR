@@ -10,19 +10,19 @@ rec_table0 <- recordTable(inDir               = wd_images_ID_species,
                           timeZone = "UTC")
 
 
-  rec_table1 <- recordTable(inDir               = wd_images_ID_species,
-                            IDfrom                 = "directory",
-                            minDeltaTime           = 60,
-                            deltaTimeComparedTo    = "lastRecord",
-                            writecsv               = FALSE,
-                            additionalMetadataTags = c("EXIF:Model", "EXIF:Make"),
-                            timeZone               = "Asia/Kuala_Lumpur"
-  )
+rec_table1 <- recordTable(inDir               = wd_images_ID_species,
+                          IDfrom                 = "directory",
+                          minDeltaTime           = 60,
+                          deltaTimeComparedTo    = "lastRecord",
+                          writecsv               = FALSE,
+                          additionalMetadataTags = c("EXIF:Model", "EXIF:Make"),
+                          timeZone               = "Asia/Kuala_Lumpur"
+)
 
-  
-  # with additionalMetadataTags, event Summary and exclude
-  
-  rec_table2_1 <- recordTable(inDir               = wd_images_ID_species,
+
+# with additionalMetadataTags, event Summary and exclude
+
+rec_table2_1 <- recordTable(inDir               = wd_images_ID_species,
                             IDfrom                 = "directory",
                             minDeltaTime           = 60,
                             deltaTimeComparedTo    = "lastRecord",
@@ -32,11 +32,11 @@ rec_table0 <- recordTable(inDir               = wd_images_ID_species,
                             additionalMetadataTags = c("EXIF:Model", "EXIF:Make"),
                             eventSummaryColumn     = "EXIF:Make",
                             eventSummaryFunction   = "unique"
-  )
-  
-  # with additionalMetadataTags and multiple event summaries
-  
-  rec_table2_2 <- recordTable(inDir               = wd_images_ID_species,
+)
+
+# with additionalMetadataTags and multiple event summaries
+
+rec_table2_2 <- recordTable(inDir               = wd_images_ID_species,
                             IDfrom                 = "directory",
                             minDeltaTime           = 60,
                             deltaTimeComparedTo    = "lastRecord",
@@ -46,29 +46,29 @@ rec_table0 <- recordTable(inDir               = wd_images_ID_species,
                             additionalMetadataTags = c("EXIF:Model", "EXIF:Make"),
                             eventSummaryColumn     = c("EXIF:Make", "EXIF:Model"),
                             eventSummaryFunction   = c("unique", "unique")
-  )
-  
-  
-  # with removeDuplicateRecords
-  
-   rec_table3a <- recordTable(inDir              = wd_images_ID_species,
-                             IDfrom                 = "directory",
-                             minDeltaTime           = 0,
-                             exclude                = "UNID",
-                             timeZone               = "Asia/Kuala_Lumpur",
-                             removeDuplicateRecords = FALSE
-  )
-  
-  rec_table3b <- recordTable(inDir              = wd_images_ID_species,
-                             IDfrom                 = "directory",
-                             minDeltaTime           = 0,
-                             exclude                = "UNID",
-                             timeZone               = "Asia/Kuala_Lumpur",
-                             removeDuplicateRecords = TRUE
-  )
-  
-  
-  
+)
+
+
+# with removeDuplicateRecords
+
+rec_table3a <- recordTable(inDir              = wd_images_ID_species,
+                           IDfrom                 = "directory",
+                           minDeltaTime           = 0,
+                           exclude                = "UNID",
+                           timeZone               = "Asia/Kuala_Lumpur",
+                           removeDuplicateRecords = FALSE
+)
+
+rec_table3b <- recordTable(inDir              = wd_images_ID_species,
+                           IDfrom                 = "directory",
+                           minDeltaTime           = 0,
+                           exclude                = "UNID",
+                           timeZone               = "Asia/Kuala_Lumpur",
+                           removeDuplicateRecords = TRUE
+)
+
+
+
 # Test section
   
 test_that("recordTable output has correct class", {
