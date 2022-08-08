@@ -333,6 +333,16 @@ addStationCameraID <- function(intable,
 # check if date/time information is present and was readable    ####
 
 checkDateTimeOriginal <- function (intable, dirs_short, i){
+  
+  if(any(is.na(intable$DateTimeOriginal))){
+    which_na_time <- which(is.na(intable$DateTimeOriginal))
+    warning(paste0(dirs_short[i], ": Removing ", length(which_na_time), " out of ",
+                   nrow(intable)," images because date/time is NA:\n",
+                   paste("  ", file.path(intable$Directory, intable$FileName)[which_na_time], collapse = "\n")), call. = FALSE,  immediate. = TRUE)
+    intable <- intable[-which_na_time,]
+  }
+    
+    
   # if all date/time information is missing, go to next station
   if(all(intable$DateTimeOriginal == "-")){
     warning(paste(dirs_short[i], ": no readable date/time information. Skipping"), call. = FALSE,  immediate. = TRUE)
@@ -563,7 +573,7 @@ assessTemporalIndependence <- function(intable,
                                       intable$DateTimeOriginal        >= intable$DateTimeOriginal[current_row] &
                                       !isTRUE(intable$independent))                                                 # not independent
     }
-    
+
     # subset to records before the next independent record
     if(xy < length(which_independent)){
       which_records_to_group <- which_records_to_group[which_records_to_group < which_independent[xy + 1]] #which_records_to_group[which_records_to_group %in% seq(current_row, (which_independent[xy + 1] - 1))]
@@ -593,7 +603,7 @@ assessTemporalIndependence <- function(intable,
     }      # end if(hasArg(eventSummaryColumn))
     
     
-    # quick and dirty solution to prevent n_images = 0 when lenght(which_records_to_group) = 0 (can happen if only 1 image in a directory)
+    # quick and dirty solution to prevent n_images = 0 when length(which_records_to_group) = 0 (can happen if only 1 image in a directory)
     
     if(length(which_records_to_group) == 0) {
       intable[ current_row, n_imagesColumn] <- 1
