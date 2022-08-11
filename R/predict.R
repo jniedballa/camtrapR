@@ -215,7 +215,7 @@ predictionMapsCommunity <- function(object,
     # random binomial trail for each probability
     z <- array(rbinom(length(psi),prob=psi,size=1), dim = dim(psi))
     pao1 <- apply(z, MARGIN = c(2, 3), mean)  # aggregated spatially: [species, draw]
-    dimnames(pao1)[1] <- list(names(object@input$ylist))
+    dimnames(pao1)[1] <- dimnames(object@data$y)[1] #list(names(object@input$ylist))
 
     
     # summary table
@@ -244,7 +244,8 @@ predictionMapsCommunity <- function(object,
     pao_melt <- reshape2::melt(pao1)
     colnames(pao_melt) <- c("Species", "draw", "PAO")
     pao_melt <- pao_melt[order(pao_melt$Species, pao_melt$draw),]
-    pao_melt$Species <- factor(pao_melt$Species, labels = names(object@input$ylist))
+    pao_melt$Species <- factor(pao_melt$Species, labels = #names(object@input$ylist))
+                                 dimnames(object@data$y)[[1]])
     rownames(pao_melt) <- NULL
 
     
