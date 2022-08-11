@@ -30,7 +30,7 @@
 #' @param intercepts     list. Two items named "det" and "occu" for detection and occupancy probability intercepts. Values can be "fixed" (= constant across species), "independent" (= independent estimates for each species), or "ranef" (= random effect of species on intercept).
 #' @param effortCov     character. Name of list item in \code{data_list$obsCovs} which contains effort. This does not include effort as a covariate on detection probability, but only uses NA / not NA information to create binary effort and ensure detection probabilities p are 0 when there was no effort (p will be 0 whereever \code{effortCov} is NA).
 #' @param richnessCategories  character. Name of categorical covariate in \code{data_list$siteCovs} for which to calculate separate richness estimates (optional). Can be useful to obtain separate richness estimates for different areas.
-#' @param augmentation     If NULL, no data augmentation (only use species in \code{data_list$ylist}), otherwise named list or vector with total number of (potential) species. Names: "knownmax" or "full". Example: \code{augmentation = c(knownmax = 30)} or \code{augmentation = c(full = 30)}
+#' @param augmentation     If NULL, no data augmentation (only use species in \code{data_list$ylist}), otherwise named list or vector with total number of (potential) species. Names: "maxknown" or "full". Example: \code{augmentation = c(maxknown = 30)} or \code{augmentation = c(full = 30)}
 #' @param modelFile   character. Text file name to save model to
 #' @param nimble  logical. If TRUE, model code will be for Nimble (incompatible with JAGS). If FALSE, model code is for JAGS.
 #'

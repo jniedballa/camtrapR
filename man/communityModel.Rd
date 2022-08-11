@@ -36,7 +36,7 @@ communityModel(
 
 \item{richnessCategories}{character. Name of categorical covariate in \code{data_list$siteCovs} for which to calculate separate richness estimates (optional). Can be useful to obtain separate richness estimates for different areas.}
 
-\item{augmentation}{If NULL, no data augmentation (only use species in \code{data_list$ylist}), otherwise named list or vector with total number of (potential) species. Names: "knownmax" or "full". Example: \code{augmentation = c(knownmax = 30)} or \code{augmentation = c(full = 30)}}
+\item{augmentation}{If NULL, no data augmentation (only use species in \code{data_list$ylist}), otherwise named list or vector with total number of (potential) species. Names: "maxknown" or "full". Example: \code{augmentation = c(maxknown = 30)} or \code{augmentation = c(full = 30)}}
 
 \item{modelFile}{character. Text file name to save model to}
 
