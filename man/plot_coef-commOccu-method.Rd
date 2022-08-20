@@ -14,6 +14,7 @@
   outdir,
   level = c(outer = 0.95, inner = 0.75),
   colorby = "significance",
+  scales = "free_y",
   ...
 )
 }
@@ -33,6 +34,8 @@
 \item{level}{Probability mass to include in the uncertainty interval (two values, second value - inner interval - will be plotted thicker)}
 
 \item{colorby}{Whether to color estimates by "significance" (of the effect estimates), or "Bayesian p-value" (of the species)}
+
+\item{scales}{Passed to \code{\link[ggplot2]{facet_grid}}. Can be "free" to scale x axes of effect estimates independently, or "free_y" to scale all x axes identically.}
 
 \item{...}{additional arguments for \code{\link[ggplot2]{ggsave}}}
 }

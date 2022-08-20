@@ -368,11 +368,14 @@ plot.coef.commOccu <- function(object,
                                outdir,
                                level = c(outer = 0.95, inner = 0.75),
                                colorby = "significance",
+                               scales = "free_y",
                                ...) {
   
   
   submodel <- match.arg(submodel, choices = c("det", "state"))
   colorby  <- match.arg(colorby, choices = c("significance", "Bayesian p-value"))
+  
+  scales <- match.arg(scales, choices = c("free", "free_y"))
   
   if(submodel == "state") {
     keyword_submodel <- "^beta"
@@ -684,7 +687,7 @@ plot.coef.commOccu <- function(object,
         geom_linerange( aes_string(xmin = "lower_inner", xmax = "upper_inner"), size = 1) +
         facet_grid(rows = vars(type), 
                    cols = vars(covariate),
-                   scales = "free_y", 
+                   scales = scales, 
                    space = "free_y"
         ) +
         xlab ("Effect size") +  ylab(element_blank()) +
@@ -731,7 +734,7 @@ plot.coef.commOccu <- function(object,
       geom_linerange (aes_string(xmin = "lower_inner", xmax = "upper_inner"), size = 1) +
       facet_grid(rows = vars(type), 
                  cols = vars(covariate),
-                 scales = "free_y", 
+                 scales = scales, 
                  space = "free_y") +
       xlab ("Effect size") +  ylab(element_blank()) +
       theme_bw() +
@@ -780,6 +783,7 @@ plot.coef.commOccu <- function(object,
   #' @param outdir Directory to save plots to (optional)
   #' @param level  Probability mass to include in the uncertainty interval (two values, second value - inner interval - will be plotted thicker)
   #' @param colorby Whether to color estimates by "significance" (of the effect estimates), or "Bayesian p-value" (of the species)
+  #' @param scales Passed to \code{\link[ggplot2]{facet_grid}}. Can be "free" to scale x axes of effect estimates independently, or "free_y" to scale all x axes identically.
   #' @param ...  additional arguments for \code{\link[ggplot2]{ggsave}}
   #'
   #' @return list of ggplot objects
