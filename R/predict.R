@@ -142,13 +142,13 @@ predictionMapsCommunity <- function(object,
     
     if(!is.na(cov_info_subset$ranef_cov[cov])){
       stop(paste(current_cov, 
-                    " has a random effect other than species. This is currently not supported. Predictions would be wrong", call. = F))
+                    " has a random effect other than species. This is currently not supported.", call. = F))
       next
     }
     
     if(cov_info_subset$ranef_nested[cov])  {
       stop(paste(current_cov, 
-                    " has a nested random effect. This is currently not supported. Predictions would be wrong", call. = F))
+                    " has a nested random effect. This is currently not supported.", call. = F))
       next
     }
     
