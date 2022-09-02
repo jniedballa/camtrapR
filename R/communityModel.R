@@ -446,7 +446,7 @@ communityModel <- function(data_list,
   
   # get covariate information
   if(!is.null(unlist(detCovs))) {
-    if(! c("obsCovs", "siteCovs") %in% names(data_list)) {
+    if(!all(c("obsCovs", "siteCovs") %in% names(data_list))) {
       stop("detCovs is defined, but data_list does not contain siteCovs or obsCovs.", call. = F)
     } else {
       covariate_info <- rbind(covariate_info, get_cov_info (detCovs, keyword_nested, keyword_quadratic, data_list, type = "site", submodel = "det"))
@@ -2534,7 +2534,7 @@ randomEffectPriorsCateg <- function(effect_names,
   } else {
     priors_list <- list("# < empty > \n\n")
     attr(priors_list, "params") <- NULL
-    species_draws <- "# categorical occupancy covariates: no random effect of species"
+    species_draws <- paste("# categorical", type, "covariates: no random effect of species")
     attr(priors_list, "formula") <- ""
   }
   
