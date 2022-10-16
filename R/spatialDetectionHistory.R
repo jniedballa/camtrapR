@@ -686,6 +686,8 @@ spatialDetectionHistory <- function(recordTableIndividual,
   coord.ct <- CTtable[,c(Xcol, Ycol)]
   colnames(coord.ct) <- c("x", "y")
   
+  if(any(duplicated(CTtable[,stationCol]))) stop("Duplicate values in stationCol of CTtable are not allowed", call. = F)
+  
   rownames(coord.ct) <- CTtable[,stationCol]
 
   if(!all(rownames(coord.ct) == rownames(cam.op.worked))) stop("Error assigning rownames to traps data frame. Please report this bug")
