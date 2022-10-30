@@ -202,11 +202,14 @@ multiple_tag_separator = "__"
                                          returnFileNamesMissingTags = FALSE)
 
       # if images in station contain not metadata species tags, skip that station
-      if(metadata.tmp == "found no species tag") {
-        warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
+      if(!is.data.frame(metadata.tmp)){
+        if(metadata.tmp == "found no species tag") {
+          # warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
+        } else {
+          warning(paste(dirs_short[i], ":   error in species tag extraction. Skipping. Please report this bug", sep = ""), call. = FALSE, immediate. = TRUE)
+        }
         next
       }
-
         # assign camera ID
         if(hasCameraFolders == TRUE){
           if(IDfrom == "directory"){
