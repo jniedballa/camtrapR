@@ -451,7 +451,7 @@ recordTableIndividual <- function(inDir,
       # if images in station contain no metadata individual ID tag or are not tagged, skip that station
       if(!is.data.frame(metadata.tmp)){
         if(metadata.tmp == "found no species tag") {
-          warning(paste(dirs_short[i], ":   metadataIDTag '", metadataIDTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
+          # warning(paste(dirs_short[i], ":   metadataIDTag '", metadataIDTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
         } else {
           warning(paste(dirs_short[i], ":   error in individual tag extraction. Skipping. Please report", sep = ""), call. = FALSE, immediate. = TRUE)
         }

@@ -494,19 +494,19 @@ recordTable <- function(inDir,
                                             multiple_tag_separator     = multiple_tag_separator)
 
       # add species names to metadata table (from folders or metadata, otherwise NA)
-      metadata.tmp <- assignSpeciesID(intable                = metadata.tmp,
-                                      IDfrom                 = IDfrom,
-                                      metadataSpeciesTag     = metadataSpeciesTag,
-                                      speciesCol             = speciesCol,
-                                      dirs_short             = dirs_short,
-                                      i_tmp                  = i,
-                                      multiple_tag_separator = multiple_tag_separator,
+      metadata.tmp <- assignSpeciesID(intable                    = metadata.tmp,
+                                      IDfrom                     = IDfrom,
+                                      metadataSpeciesTag         = metadataSpeciesTag,
+                                      speciesCol                 = speciesCol,
+                                      dirs_short                 = dirs_short,
+                                      i_tmp                      = i,
+                                      multiple_tag_separator     = multiple_tag_separator,
                                       returnFileNamesMissingTags = returnFileNamesMissingTags)
       
       # if images in station contain no metadata species tags, skip that station
       if(!is.data.frame(metadata.tmp)){
         if(metadata.tmp == "found no species tag") {
-          warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
+          # warning(paste(dirs_short[i], ":   metadataSpeciesTag '", metadataSpeciesTag, "' not found in image metadata tag 'HierarchicalSubject'. Skipping", sep = ""), call. = FALSE, immediate. = TRUE)
         } else {
           warning(paste(dirs_short[i], ":   error in species tag extraction. Skipping. Please report this bug", sep = ""), call. = FALSE, immediate. = TRUE)
         }
