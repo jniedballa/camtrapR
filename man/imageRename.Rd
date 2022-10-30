@@ -29,7 +29,7 @@ as subdirectories of \code{outDir} (e.g. "outDir/StationA/CameraA1")?}
 
 \item{createEmptyDirectories}{logical. If station or camera directories are
 empty, should they be copied nevertheless (causing empty directories in
-\code{inDir}, but preserving the whole directory structure)?}
+\code{outDir}, but preserving the whole directory structure)?}
 
 \item{copyImages}{logical. Copy images to \code{outDir}?}
 
