@@ -208,14 +208,15 @@ assignSpeciesID <- function(intable,
     if(hasArg(metadataSpeciesTag)){
       metadataSpeciesTag2 <- paste("metadata", metadataSpeciesTag, sep = "_")
       
-      # if the metadata_Species tag is found in metadata.tmp1
+      # if the metadata_Species tag is found in metadata.tmp
       if(metadataSpeciesTag2 %in% colnames(intable)){
         
         # copy to species column proper
         intable[,speciesCol] <- intable[,metadataSpeciesTag2]
         
-        # find records without proper species tag, to be removes
-        species_records_to_remove <- which(is.na(intable[,speciesCol]))
+        # find records without proper species tag, to be removed
+        species_records_to_remove <- c(which(is.na(intable[,speciesCol])),
+                                       which(intable[,speciesCol] == "NA"))
         
         # if there's records to remove
         if(length(species_records_to_remove) >= 1){    
@@ -1303,7 +1304,7 @@ makeSurveyZip <- function(output,
   
   if(isFALSE(usePackageZip)) {
   zip(zipfile = file.path(sinkpath,
-                                           paste(dir.zip.short, ".zip", sep = "")),
+                          paste(dir.zip.short, ".zip", sep = "")),
                        files   = files2zip,
                        flags   = "")
   }
