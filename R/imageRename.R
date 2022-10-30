@@ -56,7 +56,7 @@
 #' as subdirectories of \code{outDir} (e.g. "outDir/StationA/CameraA1")?
 #' @param createEmptyDirectories logical. If station or camera directories are
 #' empty, should they be copied nevertheless (causing empty directories in
-#' \code{inDir}, but preserving the whole directory structure)?
+#' \code{outDir}, but preserving the whole directory structure)?
 #' @param copyImages logical. Copy images to \code{outDir}?
 #' @param writecsv logical. Save a data frame with a summary as a .csv? The csv
 #' will be saved in \code{outDir}.
