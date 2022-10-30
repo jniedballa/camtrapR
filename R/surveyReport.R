@@ -414,6 +414,7 @@ surveyReport <- function(recordTable,
   if(!all(order(colnames(CTtable)[cols.prob.from]) == seq(1:length(cols.prob.from)))) CTHasProblems <- FALSE 
   if(!all(order(colnames(CTtable)[cols.prob.to])   == seq(1:length(cols.prob.to)))) CTHasProblems <- FALSE 
   if(length(cols.prob.from) != length(cols.prob.to)) CTHasProblems <- FALSE 
+  if(all(is.na(CTtable[,cols.prob.from])) | all(is.na(CTtable[,cols.prob.to]))) CTHasProblems <- FALSE 
   
   if(isTRUE(CTHasProblems)){    # camera problem columns
     
@@ -461,9 +462,14 @@ surveyReport <- function(recordTable,
 
   n_nights_total_legacy      <- as.integer(CTtable[,retrievalCol] - CTtable[,setupCol])
   n_nights_total_agg_legacy  <- aggregate(n_nights_total_legacy,
-                                   by  = list(CTtable[,stationCol]),
-                                   FUN = sum)
-  n_nights_active_legacy     <- n_nights_total_agg_legacy[,2] - n_days_inactive_rowsum_legacy[,2]
+                                          by  = list(CTtable[,stationCol]),
+                                          FUN = sum)
+  # order properly
+  n_nights_total_agg_legacy <- n_nights_total_agg_legacy[match(camop.info.df$Station, n_nights_total_agg_legacy$Group.1),]
+  n_days_inactive_rowsum_legacy <- n_days_inactive_rowsum_legacy[match(camop.info.df$Station, n_days_inactive_rowsum_legacy$Group.1),]
+  
+  
+  n_nights_active_legacy    <- n_nights_total_agg_legacy[,2] - n_days_inactive_rowsum_legacy[,2]
 
   
   ############################
@@ -481,7 +487,9 @@ surveyReport <- function(recordTable,
   
   
   
-  station.info.combined <- merge(station_dates, camop.info.df2, by = stationCol)
+  station.info.combined <- merge(station_dates, 
+                                 camop.info.df2, 
+                                 by = stationCol)
   
   # adjust options for printing results
   options.tmp <- options()
