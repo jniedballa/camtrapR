@@ -2500,3 +2500,39 @@ surveyReport_legacy <- function(recordTable,
   
   return(invisible(output))
 }
+
+
+# split file names (created by imageRename) into their components
+
+deparseFilename <- function(x, cameras) {
+  x2 <- strsplit(x, split = "__")
+  
+  if(isTRUE(cameras)) {
+    out <- data.frame(Station = sapply(x2, FUN = function(x) x[[1]]),
+                      Camera = sapply(x2, FUN = function(x) x[[2]]),
+                      Date = as.Date(sapply(x2, FUN = function(x) x[[3]])),
+                      Time = sapply(x2, FUN = function(x) x[[4]]))
+  }
+  
+  if(isFALSE(cameras)) {
+    out <- data.frame(Station = sapply(x2, FUN = function(x) x[[1]]),
+                      Camera = NA,
+                      Date = as.Date(sapply(x2, FUN = function(x) x[[2]])),
+                      Time = sapply(x2, FUN = function(x) x[[3]]))
+  }
+  
+  time_split <- strsplit(out$Time, split = "(", fixed = T)
+  out$Time <- sapply(time_split, FUN = function(y) y[1])
+  
+  
+  
+  # out$DateTimeOriginal <- ymd_hms(paste(out$Date, out$Time))
+  out$DateTimeOriginal <- paste(out$Date, out$Time)
+  
+  out$number <- as.numeric(sapply(strsplit(sapply(time_split, FUN = function(y) y[2]), 
+                                           split = ")", fixed = T), 
+                                  FUN = function(y) y[1]))
+  
+  out
+}
+
