@@ -235,7 +235,7 @@ surveyReport <- function(recordTable,
   if(hasArg(CTHasProblems))        message("Since version 2.1, argument CTHasProblems is deprecated. It was replaced with the new argument camOp. Periods when cameras malfunctioned are now assinged via camOp.")
   if(!hasArg(camOp))               stop("'camOp' is not defined", call. = FALSE)
   if(!inherits(camOp, "matrix"))   stop("camOp must be a matrix", call. = FALSE)
-  if(any(camOp < 0, na.rm = TRUE)) stop("camOp may only contain positive values (set scaleEffort = FALSE in cameraOperation().")
+  if(any(camOp < 0, na.rm = TRUE)) stop("camOp may only contain positive values")
   
   camop.info.df <- deparseCamOpRownames(camOp)   # only works if camOp is station-specific
   if("camera" %in% colnames(camop.info.df))  stop("camera operation matrix is camera-specific. Please provide a camera operation matrix that is by station (byCamera = FALSE).\nThis is necessary for correctly calculating the number of active days (taking into account whether cameras were independent or not).", call. = FALSE)
