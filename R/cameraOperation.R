@@ -585,8 +585,9 @@ cameraOperation <- function(CTtable,
     # intersect daily intervals with interval from setup to retrieval
     
     interval.tmp <- sapply(camop_daily_intervals[run_these], intersect.Interval.fast, start_to_end[i])
+
     # assign values to camera operation matrix
-    camOp_empty[i,run_these] <- time_length(interval.tmp, unit = "days")
+    camOp_empty[i, run_these] <- time_length(interval.tmp, unit = "days")
     
     
     # if problems are defined, subtract those from the camera operation values
@@ -607,6 +608,10 @@ cameraOperation <- function(CTtable,
         camOp_empty[i,run_these] <- camOp_empty[i,run_these] - fraction_to_remove
       }
     }
+    
+    if(any(camOp_empty[i, run_these] < 0)) stop(paste("Negative effort calculated in", rownames(camOp_empty)[i], "on:",
+                                                      paste(names(which(camOp_empty[i, run_these] < 0)), collapse = ", "), "\n",
+                                                      "Check for overlapping dates in Problem columns"))
   }
   
   #camOp_filled <- camOp_empty #
