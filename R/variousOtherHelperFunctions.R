@@ -333,10 +333,10 @@ addStationCameraID <- function(intable,
 
 # check if date/time information is present and was readable    ####
 
-checkDateTimeOriginal <- function (intable, dirs_short, i){
+checkDateTimeOriginal <- function (intable, dirs_short, i, stationCol, recordDateTimeCol = "DateTimeOriginal"){
   
-  if(any(is.na(intable$DateTimeOriginal))){
-    which_na_time <- which(is.na(intable$DateTimeOriginal))
+  if(any(is.na(intable[, recordDateTimeCol]))){
+    which_na_time <- which(is.na(intable[, recordDateTimeCol]))
     warning(paste0(dirs_short[i], ": Removing ", length(which_na_time), " out of ",
                    nrow(intable)," images because date/time is NA:\n",
                    paste("  ", file.path(intable$Directory, intable$FileName)[which_na_time], collapse = "\n")), call. = FALSE,  immediate. = TRUE)
@@ -345,15 +345,30 @@ checkDateTimeOriginal <- function (intable, dirs_short, i){
     
     
   # if all date/time information is missing, go to next station
-  if(all(intable$DateTimeOriginal == "-")){
-    warning(paste(dirs_short[i], ": no readable date/time information. Skipping"), call. = FALSE,  immediate. = TRUE)
+  if(all(intable[, recordDateTimeCol] == "-")){
+    if(hasArg(dirs_short)) {
+      warning(paste(dirs_short[i], ": no readable date/time information. Skipping"), call. = FALSE,  immediate. = TRUE)
+    } 
+    
+    if(hasArg(stationCol)) {
+      warning(paste(unique(intable[, stationCol]), ": no readable date/time information. Skipping"), call. = FALSE,  immediate. = TRUE)
+    }
     intable <- NULL
   } else {
     
     # if date/time information is missing for some records only
-    if(any(intable$DateTimeOriginal == "-")){
-      which_no_time <- which(intable$DateTimeOriginal == "-")
-      warning(paste(dirs_short[i], ": omitting", length(which_no_time), "images because of missing/unreadable date/time information."), call. = FALSE,  immediate. = FALSE)
+    if(any(intable[, recordDateTimeCol] == "-")){
+      which_no_time <- which(intable[, recordDateTimeCol] == "-")
+      if(hasArg(dirs_short)) {
+        warning(paste(dirs_short[i], ": omitting", length(which_no_time), "images because of missing/unreadable date/time information."), 
+                call. = FALSE,  immediate. = FALSE)
+      }
+      
+      if(hasArg(stationCol)) {
+        warning(paste(unique(intable[, stationCol]), ": omitting", length(which_no_time), "images because of missing/unreadable date/time information."), 
+                call. = FALSE,  immediate. = FALSE)
+      }
+      
       intable <-  intable[-which_no_time,]    # removing rows with missing date/time information
     }
   }
@@ -370,26 +385,33 @@ removeDuplicatesOfRecords <- function(metadata.tmp,
                                       stationCol, 
                                       speciesCol, 
                                       cameraCol, 
+                                      recordDateTimeCol = "DateTimeOriginal",
                                       current, 
                                       total,
                                       max_nchar_station){
   metadata.tmp0 <- metadata.tmp
   
-  pb <- makeProgressbar(current = current, total = total)
+  # if(hasArg(current)) {
+    pb <- makeProgressbar(current = current, total = total)
+    printmessages <- TRUE
+  # } else {
+  #   printmessages <- TRUE   # ok?
+  # }
   
   if(isTRUE(removeDuplicateRecords)){
     if(isTRUE(camerasIndependent)){
-      remove.tmp <- which(duplicated(metadata.tmp[,c("DateTimeOriginal", stationCol, speciesCol, cameraCol)]))
+      remove.tmp <- which(duplicated(metadata.tmp[,c(recordDateTimeCol, stationCol, speciesCol, cameraCol)]))
       if(length(remove.tmp >= 1)){
         metadata.tmp <- metadata.tmp[-remove.tmp,]
       }
     } else {
-      remove.tmp <- which(duplicated(metadata.tmp[,c("DateTimeOriginal", stationCol, speciesCol)]))
+      remove.tmp <- which(duplicated(metadata.tmp[,c(recordDateTimeCol, stationCol, speciesCol)]))
       if(length(remove.tmp >= 1)) {
         metadata.tmp <- metadata.tmp[-remove.tmp,]
       }
     }
     
+    # if(printmessages){
     if(length(unique(metadata.tmp[,stationCol])) == 1) {                  # 1 station per exiftool call
       message(formatC(as.character(unique(metadata.tmp[,stationCol])), 
                       width = max_nchar_station, 
@@ -403,7 +425,10 @@ removeDuplicatesOfRecords <- function(metadata.tmp,
               formatC(length(remove.tmp),  width = 4), " duplicates removed",
               pb)
     }
-  } else {
+  } 
+  
+  
+  if(isFALSE(removeDuplicateRecords)){
     if(length(unique(metadata.tmp[,stationCol])) == 1) {                  # 1 station per exiftool call
       message(formatC(as.character(unique(metadata.tmp[,stationCol])), 
                       width = max_nchar_station, 
@@ -425,6 +450,7 @@ removeDuplicatesOfRecords <- function(metadata.tmp,
 assessTemporalIndependence <- function(intable,
                                        deltaTimeComparedTo,
                                        columnOfInterest,     # species/individual column
+                                       recordDateTimeCol = "DateTimeOriginal",
                                        cameraCol,
                                        camerasIndependent,
                                        stationCol,
@@ -433,8 +459,8 @@ assessTemporalIndependence <- function(intable,
                                        eventSummaryFunction)
 {
   # check if all Exif DateTimeOriginal tags were read correctly
-  if(any(is.na(intable$DateTimeOriginal))){
-    which.tmp <- which(is.na(intable$DateTimeOriginal))
+  if(any(is.na(intable[, recordDateTimeCol]))){
+    which.tmp <- which(is.na(intable[, recordDateTimeCol]))
     if(length(which.tmp) == nrow(intable)) stop("Could not read any Exif DateTimeOriginal tag at station: ", paste(unique(intable[which.tmp, stationCol])), " Consider checking for corrupted Exif metadata.")
     warning(paste("Could not read Exif DateTimeOriginal tag of", length(which.tmp),"image(s) at station", paste(unique(intable[which.tmp, stationCol]), collapse = ", "), ". Will omit them.\nConsider checking for corrupted Exif metadata. Or does your selected time zone have daylight saving time and the image(s) fall in the misisng hour at spring formward (cameras don't usually record DST)?. \n",
                   paste(file.path(intable[which.tmp, "Directory"],
@@ -454,7 +480,7 @@ assessTemporalIndependence <- function(intable,
                         check.names      = FALSE)        # to prevent ":" being converted to ".", e.g. in EXIF:Make
   
   # sort records by station, species, then time
-  intable <- intable[order(intable[, stationCol], intable[, columnOfInterest], intable$DateTimeOriginal),]
+  intable <- intable[order(intable[, stationCol], intable[, columnOfInterest], intable[, recordDateTimeCol]),]
   
   for(xy in 1:nrow(intable)){     # for every record
     
@@ -462,7 +488,7 @@ assessTemporalIndependence <- function(intable,
     which.columnOfInterest <- which(intable[, columnOfInterest]  == intable[xy, columnOfInterest])          # same species/individual
     which.stationCol       <- which(intable[, stationCol]        == intable[xy, stationCol])                # at same station
     which.independent      <- which(intable$independent          == TRUE)                                   # independent (first or only record of a species at a station)
-    which.earlier          <- which(intable$DateTimeOriginal     <  intable$DateTimeOriginal[xy])          # earlier than record xy (takes long)
+    which.earlier          <- which(intable[, recordDateTimeCol]     <  intable[xy, recordDateTimeCol])          # earlier than record xy (takes long)
     #which.earlier          <- 1: (xy-1)                                                                  # earlier than record xy  (fast alternative, relies on table being sorted by date/time before anything else)
     if(camerasIndependent) {
       which.cameraCol      <- which(intable[, cameraCol]  == intable[xy, cameraCol])                        # at same camera
@@ -474,14 +500,14 @@ assessTemporalIndependence <- function(intable,
       which.tmp <- Reduce(intersect, list(which.columnOfInterest, 
                                           which.stationCol, 
                                           which.cameraCol))
-      if(intable$DateTimeOriginal[xy]  == min(intable$DateTimeOriginal[which.tmp])){    # cameras at same station assessed independently
+      if(intable[xy, recordDateTimeCol]  == min(intable[which.tmp, recordDateTimeCol])){    # cameras at same station assessed independently
         intable$independent[xy]       <- TRUE
         intable$delta.time.secs[xy]   <- 0
       }
     } else {
       which.tmp <- Reduce(intersect, list(which.columnOfInterest, 
                                           which.stationCol))
-      if(intable$DateTimeOriginal[xy]  == min(intable$DateTimeOriginal[which.tmp])){
+      if(intable[xy, recordDateTimeCol]  == min(intable[which.tmp, recordDateTimeCol])){
         intable$independent[xy]       <- TRUE
         intable$delta.time.secs[xy]   <- 0
       }
@@ -519,8 +545,8 @@ assessTemporalIndependence <- function(intable,
       }
       
       # time difference to last (independent) record
-      diff_tmp <- min(na.omit(difftime(time1 = intable$DateTimeOriginal[xy],            # delta time to last independent record
-                                       time2 = intable$DateTimeOriginal[which_time2],
+      diff_tmp <- min(na.omit(difftime(time1 = intable[xy, recordDateTimeCol],            # delta time to last independent record
+                                       time2 = intable[which_time2, recordDateTimeCol],
                                        units = "secs")))
       
       # save delta time in seconds
@@ -565,13 +591,13 @@ assessTemporalIndependence <- function(intable,
       which_records_to_group <- which(intable[, columnOfInterest]     == intable[current_row, columnOfInterest] &   # same species
                                       intable[, stationCol]           == intable[current_row, stationCol]  &        # same station
                                       intable[, cameraCol]            == intable[current_row, cameraCol]   &        # same camera
-                                      intable$DateTimeOriginal        >= intable$DateTimeOriginal[current_row] &    # later than current record
+                                      intable[, recordDateTimeCol]    >= intable[current_row, recordDateTimeCol] &    # later than current record
                                       !isTRUE(intable$independent))                                        # not independent
       
     } else {
       which_records_to_group <- which(intable[, columnOfInterest]     == intable[current_row, columnOfInterest] &   # same species
                                       intable[, stationCol]           == intable[current_row, stationCol]  &        # same station
-                                      intable$DateTimeOriginal        >= intable$DateTimeOriginal[current_row] &
+                                      intable[, recordDateTimeCol]    >= intable[current_row, recordDateTimeCol] &
                                       !isTRUE(intable$independent))                                                 # not independent
     }
 
