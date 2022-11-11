@@ -143,8 +143,8 @@ activityDensity <- function(recordTable,
   
   if(allSpecies == FALSE){
     
-    subset_species <- subset(recordTable, recordTable[,speciesCol] == species)
-    
+    subset_species <- recordTable[recordTable[,speciesCol] == species,]
+
     if(nrow(subset_species) == 1)  stop(paste(species, "had only 1 record. Cannot estimate density."), call. = FALSE)
     
     try_error_tmp <- try({

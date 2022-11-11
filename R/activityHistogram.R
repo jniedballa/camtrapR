@@ -126,7 +126,8 @@ activityHistogram <- function(recordTable,
   }
 
   if(allSpecies == FALSE){
-    subset_species <- subset(recordTable, recordTable[,speciesCol] == species)
+    subset_species <- recordTable[recordTable[,speciesCol] == species,]
+    
     subset_species$Hour <- subset_species$Hour + 0.1   # otherwise both 0 and 1 will be in histogram class 0
 
     if(isTRUE(writePNG)){

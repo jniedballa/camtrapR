@@ -158,8 +158,8 @@ activityOverlap <- function(recordTable,
   recordTable$Time.rad <- (as.numeric(as.POSIXct(strptime(recordTable$Time2, format = "%H:%M:%S", tz = timeZone))) -
                              as.numeric(as.POSIXct(strptime("0", format = "%S", tz = timeZone)))) / 3600 * (pi/12)
 
-  subset_speciesA <- subset(recordTable, recordTable[,speciesCol] == speciesA)
-  subset_speciesB <- subset(recordTable, recordTable[,speciesCol] == speciesB)
+  subset_speciesA <- recordTable[recordTable[,speciesCol] == speciesA,]
+  subset_speciesB <- recordTable[recordTable[,speciesCol] == speciesB,]
   
   if(nrow(subset_speciesA) == 1) stop("speciesA has only 1 record. Cannot estimate density.")
   if(nrow(subset_speciesB) == 1) stop("speciesB has only 1 record. Cannot estimate density.")

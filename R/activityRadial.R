@@ -156,7 +156,7 @@ activityRadial <- function(recordTable,
 
   if(allSpecies == FALSE){
 
-    subset_species <- subset(recordTable, recordTable[,speciesCol] == species)
+    subset_species <- recordTable[recordTable[,speciesCol] == species,]
     lengths.tmp <- table(subset_species$Time2)
 
     seq.tmp <- data.frame(hour = seq(0,23, length.out = 24),
