@@ -204,6 +204,9 @@ detectionMaps <- function(CTtable,
                     FUN = mean)    # get coordinates
   colnames(dat2)[1] <- stationCol
 
+  # ensure that stations without records are not dropped (resulting in NAs)
+  recordTable[, stationCol] <- factor(recordTable[, stationCol], levels = unique(CTtable[,stationCol]))
+  
   # number of records of each species at each station
   t3 <- data.frame(rbind(table(recordTable[, stationCol], 
                                  recordTable[, speciesCol])), 
@@ -220,10 +223,15 @@ detectionMaps <- function(CTtable,
   
   # number of species detected per station
   t4 <- as.data.frame(tapply(X = recordTable[, speciesCol],
-                               INDEX = list(recordTable[, stationCol]),
-                               FUN = function(x) length(unique(x))))
+                             INDEX = list(recordTable[, stationCol]),
+                             FUN = function(x) length(unique(x))))
+  
   colnames(t4) <- "n_species"
   t4[,stationCol] <- rownames(t4)
+  
+  # replace NA (no species at station) with 0
+  t4$n_species [is.na(t4$n_species)] <- 0
+  
   t4 <- t4[,c(2,1)]
   t4 <- t4[match(toupper(as.character(dat2[,stationCol])), 
                  toupper(as.character(t4[,stationCol]))),]
