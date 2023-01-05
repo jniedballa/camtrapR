@@ -1,5 +1,8 @@
 # camtrapR 2.2.1
 
+## new functions
+* filterRecordTable: filter existing record table for temporal indepence between records
+
 ## new features
 * predict(): now accepts type = "pao" (for percentage of area occupied, by species) and "psi_array" (raw occupancy probabilities)
 

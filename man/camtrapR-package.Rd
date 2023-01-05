@@ -61,6 +61,7 @@ These function use the directory structure built above (Section 'Image managemen
 \code{\link{recordTableIndividual}} \tab Create a single-species record table from camera trap images and videos with individual IDs \cr
 \code{\link{exifTagNames}}          \tab Return Exif metadata tags and tag names from JPEG images \cr
 \code{\link{exiftoolPath}}          \tab Add the directory containing exiftool.exe to PATH temporarily (Windows only) \cr
+\code{\link{filterRecordTable}}     \tab Filter existing record table for temporal independence. \cr 
 --------------------------- \tab ---------------------------------------------------------------------------------------------- \cr
 
 }
