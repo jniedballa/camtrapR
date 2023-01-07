@@ -2,7 +2,7 @@
 % Please edit documentation in R/cameraOperation.R
 \name{cameraOperation}
 \alias{cameraOperation}
-\title{Create a camera trap station operability matrix}
+\title{Create a camera trap station operation matrix}
 \usage{
 cameraOperation(
   CTtable,
@@ -46,7 +46,7 @@ retrieval dates in \code{CTtable}}
 specifying malfunction periods in \code{CTtable} (naming convention:
 \code{ProblemX_from} and \code{ProblemX_to}, where X is a number)}
 
-\item{byCamera}{logical. If TRUE, camera operability matrix is computed by
+\item{byCamera}{logical. If TRUE, camera operation matrix is computed by
 camera, not by station (requires \code{cameraCol})}
 
 \item{allCamsOn}{logical. Takes effect only if \code{cameraCol} is defined
@@ -74,7 +74,7 @@ or (since version 2.1) a date-time.}
 begin occasions. Replaces \code{occasionStartTime} from
 \code{\link{detectionHistory}} and \code{\link{spatialDetectionHistory}}.}
 
-\item{writecsv}{logical. Should the camera operability matrix be saved as a
+\item{writecsv}{logical. Should the camera operation matrix be saved as a
 .csv?}
 
 \item{outDir}{character. Directory into which csv is saved}
@@ -89,7 +89,7 @@ for whether the station was operational (depending on
 \code{camerasIndependent} and \code{allCamsOn})
 }
 \description{
-Construct a matrix of daily camera trap station operability for use in
+Construct a matrix of daily camera trap station operation for use in
 \code{\link{detectionHistory}} and \code{\link{spatialDetectionHistory}},
 where it is needed for calculating trapping effort per occasion. It is also
 used in \code{\link{surveyReport}} to calculate the number of trap nights
