@@ -206,38 +206,47 @@ plot.effects.commOccu <- function(object,       # commOccu object
       out_comb <- out_intercept + out + out_sq
     }
     
-    prob <- exp(out_comb) / (exp(out_comb) + 1)    # prediction for each species / habitat value (from mean estimates)
+    if(!.hasSlot(object, "model")) {
+      val <- exp(out_comb) / (exp(out_comb) + 1)    # prediction for each species / habitat value (from mean estimates)
+    } else {
+      if(object@model == "RN" & submodel == "state"){
+        val <- exp(out_comb)    # val is lambda. out_comb is log(lambda)
+      } else {
+        val <- exp(out_comb) / (exp(out_comb) + 1) 
+      }
+      }
     
     # summarize estimates (across posterior samples)
-    prob.mean  <- apply(prob, MARGIN = c(1,2), mean)
-    prob.lower <- apply(prob, MARGIN = c(1,2), quantile, (1-level) / 2)
-    prob.upper <- apply(prob, MARGIN = c(1,2), quantile, (1 - (1-level) / 2))
+    val.mean  <- apply(val, MARGIN = c(1,2), mean)
+    val.lower <- apply(val, MARGIN = c(1,2), quantile, (1-level) / 2)
+    val.upper <- apply(val, MARGIN = c(1,2), quantile, (1 - (1-level) / 2))
     
     # make data frame for ggplot
-    prob.mean2  <- reshape2::melt(prob.mean)
-    prob.lower2 <- reshape2::melt(prob.lower)
-    prob.upper2 <- reshape2::melt(prob.upper)
+    val.mean2  <- reshape2::melt(val.mean)
+    val.lower2 <- reshape2::melt(val.lower)
+    val.upper2 <- reshape2::melt(val.upper)
     
-    names(prob.mean2)  <- c("Index", "Species", "mean")
-    names(prob.lower2) <- c("Index", "Species", "lower")
-    names(prob.upper2) <- c("Index", "Species", "upper")
+    names(val.mean2)  <- c("Index", "Species", "mean")
+    names(val.lower2) <- c("Index", "Species", "lower")
+    names(val.upper2) <- c("Index", "Species", "upper")
     
-    probs <- cbind(prob.mean2, lower = prob.lower2$lower, upper = prob.upper2$upper)
-    probs <- cbind(cov = values_to_predict,
-                   probs)
-    colnames(probs) [1] <- current_cov
+    vals <- cbind(val.mean2, lower = val.lower2$lower, upper = val.upper2$upper)
+    vals <- cbind(cov = values_to_predict,
+                   vals)
+    colnames(vals) [1] <- current_cov
     
     
     # assign species names (if available)
     if(!is.null(dimnames(object@data$y)[[1]])) {
-      probs$Species <- dimnames(object@data$y)[[1]][probs$Species]
+      vals$Species <- dimnames(object@data$y)[[1]][vals$Species]
     }
     
-    probs <- probs[order(probs$Species, probs[, 1]),]
+    vals <- vals[order(vals$Species, vals[, 1]),]
     
     
     if(submodel == "det")   ylabel <- "Detection probability p"
-    if(submodel == "state") ylabel <- expression(paste("Occupancy probability  ", psi))
+    if(submodel == "state" & object@model == "Occupancy") ylabel <- expression(paste("Occupancy probability  ", psi))
+    if(submodel == "state" & object@model == "RN") ylabel <- expression(paste("Abundance"))
     
     main <- paste0(ifelse(covariate_is_site_cov, "Site", "Observation"), " covariate: ", current_cov)
     
@@ -253,11 +262,11 @@ plot.effects.commOccu <- function(object,       # commOccu object
     
     # for squared covariates which have no unsquared version, sqrt-transform covariate and add expand covariate range to negative values (by mirr)
     if(is_squared & !has_squared) {
-      probs[,1] <- sqrt(probs[,1])
+      vals[,1] <- sqrt(vals[,1])
       
-      probs2 <- probs
-      probs2[,1] <- -probs2[,1]
-      probs <- rbind(probs, probs2)
+      vals2 <- vals
+      vals2[,1] <- -vals2[,1]
+      vals <- rbind(vals, vals2)
       
     }
     
@@ -269,17 +278,18 @@ plot.effects.commOccu <- function(object,       # commOccu object
     
     if(covariate_is_numeric){
       
-      p <- ggplot(probs, aes_string(x = params_covariate[[cov]], y = "mean", group = "Species")) + 
+      p <- ggplot(vals, aes_string(x = params_covariate[[cov]], y = "mean", group = "Species")) + 
         geom_line() +
         theme_bw() +
         ggtitle(label = main,
                 subtitle = subtitle) +
         xlab (ifelse(is_squared, gsub(keyword_squared, "", current_cov), current_cov)) +
         ylab(ylabel) +
-        xlim(range(probs[, 1])) +
-        ylim(0, 1) +
+        xlim(range(vals[, 1])) +
         theme(panel.grid.minor = element_blank())
       
+      if(.hasSlot(object, "model")) if(object@model == "Occupancy") p <- p + ylim(0, 1) 
+      if(!.hasSlot(object, "model")) p <- p + ylim(0, 1) 
       
       # note for later, can optionally plot all species in  one plot if combine = TRUE (= ggplot code to this point)
       if(!combine){
@@ -293,10 +303,10 @@ plot.effects.commOccu <- function(object,       # commOccu object
       
       # create x axis labels for factors
       if(covariate_is_site_cov){
-        probs[,1] <- levels(object@data[[current_cov]]) [probs[,1]]
+        vals[,1] <- levels(object@data[[current_cov]]) [vals[,1]]
       } 
       
-      p <- ggplot(probs, aes_string(x = params_covariate[[cov]], y = "mean", group = "Species")) + 
+      p <- ggplot(vals, aes_string(x = params_covariate[[cov]], y = "mean", group = "Species")) + 
         geom_col() +
         facet_wrap(~Species) +
         geom_linerange(aes_string(ymin = "lower", ymax = "upper")) +
@@ -305,8 +315,10 @@ plot.effects.commOccu <- function(object,       # commOccu object
                 subtitle = subtitle) +
         xlab (current_cov) +
         ylab(ylabel) +
-        ylim(0, 1) +
         theme(panel.grid.minor = element_blank())
+      
+      if(.hasSlot(object, "model")) if(object@model == "Occupancy") p <- p + ylim(0, 1) 
+      if(!.hasSlot(object, "model")) p <- p + ylim(0, 1) 
       
       # don't know yet how to combine species on one plot. 
       

@@ -22,9 +22,16 @@ predictionMapsCommunity <- function(object,
                                     speciesSubset) 
 {
   
-  type <- match.arg(type, choices = c("psi_array", "psi", "richness", "pao"))
+  # type <- match.arg(type, choices = c("psi_array", "psi", "richness", "pao"))
+  type <- match.arg(type, choices = c("psi_array", "psi", "richness", "pao", "abundance", "lambda_array"))
   interval <- match.arg(interval, choices = c("none", "confidence"))
 
+  
+  if(.hasSlot(object, "model")) {
+    if(object@model != "RN"){
+      if(type %in% c("abundance", "lambda_array")) stop(paste0("type = '", type, "' is only implemented in Royle-Nichols models. The current model is a standard occupancy model"))
+    }
+  }
   # subset occupancy (beta) parameters
   submodel <- "state"
   
@@ -198,16 +205,45 @@ predictionMapsCommunity <- function(object,
   }    # end covariate loop
   
   # sum up individual effects
-  logit.psi <- Reduce('+', out) + out_intercept
-  psi <- exp(logit.psi) / (exp(logit.psi) + 1)
-  
-  rm(out)
+  if(!.hasSlot(object, "model")) {
+    logit.psi <- Reduce('+', out) + out_intercept
+    psi <- exp(logit.psi) / (exp(logit.psi) + 1)
+    
+  } else {
+    
+    # sum up individual effects
+    if(object@model == "Occupancy") {
+      logit.psi <- Reduce('+', out) + out_intercept
+      psi <- nimble::ilogit(logit.psi)
+      rm(logit.psi, out)
+    }
+    # psi <- exp(logit.psi) / (exp(logit.psi) + 1)   # leads to NaN when numbers are very large
+    if(object@model == "RN"){
+      log.lambda <- Reduce('+', out) + out_intercept
+      lambda <- exp(log.lambda)   # lambda is expected abundance   (Poisson intensity / rate parameter)
+      rm(log.lambda)
+      if(!type %in% c("abundance", "lambda_array")){   # convert to occupancy probability
+        psi <- 1-dpois(0, lambda)
+      }
+    }
+  }
   gc()
   
   # return raw probabilities [cell, species, posterior_draw]
   if(type == "psi_array") {
+    dimnames(psi) <- list(index_not_na,
+                          rownames(object@data$y))
     return(psi)
   }
+  
+  
+  # return raw expected abunance [cell, species, posterior_draw]
+  if(type == "lambda_array") {
+    dimnames(lambda) <- list(index_not_na,
+                             rownames(object@data$y))
+    return(lambda)
+  }
+  
   
   # percentage of area occupied (by species)
   if(type == "pao") {
@@ -440,6 +476,102 @@ predictionMapsCommunity <- function(object,
       
     }
   }
+  
+  if(type == "abundance") {
+    
+    if(hasArg(speciesSubset)) warning("speciesSubset is defined, but has no effect when type = 'abundance'")
+    
+    # summarize estimates (across posterior samples)
+    lambda.mean <- apply(lambda, MARGIN = c(1,2), mean)
+    lambda.sd   <- apply(lambda, MARGIN = c(1,2), sd)
+    
+    # make data frame for ggplot
+    lambda.mean.melt <- reshape2::melt(lambda.mean)
+    lambda.sd.melt   <- reshape2::melt(lambda.sd)
+    
+    names(lambda.mean.melt) <- c("cell_nr", "Species", "mean")
+    names(lambda.sd.melt)   <- c("cell_nr", "Species", "sd")
+    
+    if(!is.null(dimnames(object@data$y)[[1]])) {
+      lambda.mean.melt$Species <- dimnames(object@data$y)[[1]][lambda.mean.melt$Species]
+      lambda.sd.melt$Species   <- dimnames(object@data$y)[[1]][lambda.sd.melt$Species]
+    }
+    
+    # fill rasters with predicted values
+    if("RasterStack" %in% class(x)) {
+      raster_template <- raster::raster(x)
+      r_pred_species <- r_pred_sd_species <- list()
+      
+      for(i in 1:length(unique(lambda.mean.melt$Species))) {
+        r_pred_species[[i]]    <- raster_template
+        r_pred_sd_species[[i]] <- raster_template
+        
+        raster::values(r_pred_species[[i]])    [index_not_na] <- lambda.mean.melt$mean[lambda.mean.melt$Species == unique(lambda.mean.melt$Species)[i]]
+        raster::values(r_pred_sd_species[[i]]) [index_not_na] <- lambda.sd.melt$sd[lambda.sd.melt$Species == unique(lambda.sd.melt$Species)[i]]
+      }
+      names(r_pred_species) <- names(r_pred_sd_species) <- unique(lambda.mean.melt$Species)
+      
+      stack_out_mean <- raster::stack(r_pred_species)
+      stack_out_sd   <- raster::stack(r_pred_sd_species)
+    }
+    
+    
+    if(interval == "confidence"){
+      lambda.lower <- apply(lambda, MARGIN = c(1,2), quantile, ((1-level) / 2))                        # SLOW!!!
+      lambda.upper <- apply(lambda, MARGIN = c(1,2), quantile, (1 - (1-level) / 2))
+      
+      lambda.lower2 <- reshape2::melt(lambda.lower)
+      lambda.upper2 <- reshape2::melt(lambda.upper)
+      
+      names(lambda.lower2) <- c("cell_nr", "Species", paste0("lower.ci.", level))
+      names(lambda.upper2) <- c("cell_nr", "Species", paste0("upper.ci.", level))
+      
+      if(!is.null(dimnames(object@data$y)[[1]])) {
+        lambda.lower2$Species <- dimnames(object@data$y)[[1]][lambda.lower2$Species]
+        lambda.upper2$Species <- dimnames(object@data$y)[[1]][lambda.upper2$Species]
+      }
+      
+      if("RasterStack" %in% class(x)) {
+        raster_template <- raster::raster(x)
+        r_pred_lower_species <- r_pred_upper_species <- list()
+        
+        for(i in 1:length(unique(lambda.mean.melt$Species))) {
+          r_pred_lower_species[[i]] <- raster_template
+          r_pred_upper_species[[i]] <- raster_template
+          
+          raster::values(r_pred_lower_species[[i]]) [index_not_na] <- lambda.lower2[lambda.lower2$Species == unique(lambda.lower2$Species)[i], paste0("lower.ci.", level)]
+          raster::values(r_pred_upper_species[[i]]) [index_not_na] <- lambda.upper2[lambda.upper2$Species == unique(lambda.upper2$Species)[i], paste0("upper.ci.", level)]
+        }
+        names(r_pred_lower_species) <- names(r_pred_upper_species) <- unique(lambda.mean.melt$Species)
+        
+        stack_out_lower   <- raster::stack(r_pred_lower_species)
+        stack_out_upper   <- raster::stack(r_pred_upper_species)
+        
+        return(list(mean  = stack_out_mean,
+                    sd    = stack_out_sd,
+                    lower = stack_out_lower,
+                    upper = stack_out_upper))
+      } else {
+        
+        return(data.frame(lambda.mean.melt, 
+                          sd = lambda.sd.melt$sd, 
+                          lower = lambda.lower2[, 3], 
+                          upper = lambda.upper2 [,3]))
+        
+      }
+    }
+    
+    if(interval == "none"){
+      if("RasterStack" %in% class(x)){
+        return(list(mean = stack_out_mean,
+                    sd   = stack_out_sd))
+      } else {
+        return(data.frame(lambda.mean.melt, 
+                          sd = lambda.sd.melt$sd))
+      }
+    }
+  }
+  
 }
 
 
@@ -451,17 +583,18 @@ predictionMapsCommunity <- function(object,
 #'
 #' @param object \code{commOccu} object
 #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
-#' @param type character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array.
+#' @param type character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array. For Royle-Nichols models, "abundance" for species abundance, or "lambda_array" for raw species abundance estimates in an array.
 #' @param draws  Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used
 #' @param level  Probability mass to include in the uncertainty interval
-#' @param interval    Type of interval calculation. Can be "none" or "confidence" (can be abbreviated). Calculation can be slow for type = "psi" with many cells and posterior samples.
+#' @param interval  Type of interval calculation. Can be "none" or "confidence" (can be abbreviated). Calculation can be slow for type = "psi" with many cells and posterior samples.
 #' @param x   RasterStack or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names. 
 #' @param aoi RasterLayer with same dimensions as x, indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.
 #' @param speciesSubset  species to include in richness estimates. Can be index number or species names.
 #'
 #' @return A raster stack or data.frame, depending on x. If type = "pao", a list. If type = "psi_array", a 3D-array [cell, species, draw].
-#' @importFrom  stats rbinom sd
+#' @importFrom  stats rbinom dpois sd
 #' @importFrom utils object.size
+#' @importFrom methods .hasSlot
 #' @export
 #'
 

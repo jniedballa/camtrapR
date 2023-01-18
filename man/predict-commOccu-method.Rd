@@ -21,7 +21,7 @@
 
 \item{mcmc.list}{mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object}
 
-\item{type}{character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array.}
+\item{type}{character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array. For Royle-Nichols models, "abundance" for species abundance, or "lambda_array" for raw species abundance estimates in an array.}
 
 \item{draws}{Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used}
 

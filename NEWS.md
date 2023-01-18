@@ -1,10 +1,12 @@
 # camtrapR 2.2.1
 
 ## new functions
-* filterRecordTable: filter existing record table for temporal indepence between records
+* filterRecordTable: filter existing record table for temporal independence between records
 
 ## new features
-* predict(): now accepts type = "pao" (for percentage of area occupied, by species) and "psi_array" (raw occupancy probabilities)
+* communityModel(): new argument "model" allows Royle-Nichols models
+* predict(), plot_effects(), plot_coef() also support Royle-Nichols model
+* predict(): now accepts type = "pao" (for percentage of area occupied, by species) and "psi_array" (raw occupancy probabilities), "abundance" ( abundance statistics, for Royle-Nichols model) and "lambda_array" (raw abundances from Royle-Nichols model)
 
 ## bugfixes
 * cameraOperation: last occasions is 0 (not NA) when occasionStartTime = 12 and retrieval time is 12 noon (to prevent dropping of records on last day)

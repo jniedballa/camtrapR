@@ -28,6 +28,8 @@ commOccu objects
 \item{\code{modelFile}}{Path of the text file containing the model code}
 
 \item{\code{covariate_info}}{Data frame containing information about covariates. Only used internally in plot_* and predict methods}
+
+\item{\code{model}}{character indicating whether it is a standard "Occupancy" model or Royle-Nichols ("RN") occupancy model}
 }}
 
 \note{

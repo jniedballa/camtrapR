@@ -7,6 +7,7 @@
 \usage{
 communityModel(
   data_list,
+  model = c("Occupancy", "RN"),
   occuCovs = list(fixed = NULL, independent = NULL, ranef = NULL),
   detCovs = list(fixed = NULL, ranef = NULL),
   detCovsObservation = list(fixed = NULL, ranef = NULL),
@@ -21,6 +22,8 @@ communityModel(
 }
 \arguments{
 \item{data_list}{list. Contains 3 slots: ylist, siteCovs, obsCovs. ylist is a list of detection histories (can be named), e.g. from \code{\link{detectionHistory}}. siteCovs is a data.frame with site covariates (optional). obsCovs is a list of site-occasion level covariates (e.g. site-occasion-specific effort, which is also returned by \code{\link{detectionHistory}}.}
+
+\item{model}{character. "Occupancy" for standard occupancy model,  or "RN" for the occupancy model of Royle and Nichols (2003), which relates probability of detection of the species to the number of individuals available for detection at each station}
 
 \item{occuCovs}{list. Up to 3 items named "fixed", "independent", and/or "ranef". Specifies fixed, independent or random effects of covariates on occupancy probability (continuous or categorical covariates). Independent effects are only supported for continuous covariates.}
 
@@ -46,13 +49,13 @@ communityModel(
 \code{commOccu} object. It is an S4 class containing all information required to run the models. See  \code{\link{commOccu-class}} for details.
 }
 \description{
-Flexibly creates complete code and input data for community occupancy models for in JAGS amd Nimble, and automatically sets initial values and parameters to monitor. 
+Flexibly creates complete code and input data for community occupancy models for JAGS amd Nimble (both standard occupancy models and Royle-Nichols occupancy models), and automatically sets initial values and parameters to monitor. 
 Supports fixed and random effects of covariates on detection and occupancy probabilities, using both continuous and categorical covariates (both site and site-occasion covariates). 
 
 Optionally includes data augmentation (fully open community, or up to known maximum number of species, or no data augmentation). 
 Allows combination of all these parameters for fast and flexible customization of community occupancy models.
 
-Incidentally, the function can also be used to create  model code and input for single-species single-season occupancy models (it is the special case of the community model with only one species). 
+Incidentally, the function can also be used to create model code and input for single-species single-season occupancy models (it is the special case of the community model with only one species). 
 Such a model will run slower than proper single-species model JAGS code due to the additional species loop, but it is possible.
 
 The function returns several derived quantities, e.g. species richness, Bayesian p-values (overall and by species), Freeman-Tukey residuals for actual and simulated data (by station and total). If doing data augmentation, metacommunity size and number of unseen species are returned also.

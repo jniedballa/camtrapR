@@ -8,10 +8,10 @@
   object,
   n.iter = 100,
   thin = 1,
-  n.burnin = 0,
+  n.burnin = n.iter/2,
   n.adapt = 0,
-  cores = 1,
   chains = 3,
+  inits = NULL,
   compile = TRUE,
   WAIC = FALSE,
   quiet = FALSE,
@@ -25,13 +25,13 @@
 
 \item{thin}{thinning interval for monitors}
 
-\item{n.burnin}{burnin length}
+\item{n.burnin}{burnin length. Defaults to half of n.iter.}
 
 \item{n.adapt}{Length of adaptive phase}
 
-\item{cores}{number of cores to utilize}
-
 \item{chains}{number of MCMC chains to run}
+
+\item{inits}{named list. Initial values to use. If NULL (default), the values from the inits function in \code{object} are used.}
 
 \item{compile}{logical. If Nimble model, compile model with \code{\link[nimble]{compileNimble}} before running model?}
 
@@ -52,5 +52,5 @@ Models will be fit either in JAGS or Nimble, depending on the decision made in t
 
 For Nimble, compilation is strongly recommended for long model runs. Uncompiled models can run extremely slow. Compilation itself can take a while also, and requires that Rtools is available on the system.
 
-It is a convenience function only which hides some of the configuration options. If you require more control over model fitting, you can run all steps individually. See vignette 5 for details.
+This is a convenience function only which hides some of the configuration options. If you require more control over model fitting, you can run all steps individually. See vignette 5 for details.
 }
