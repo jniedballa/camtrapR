@@ -78,8 +78,9 @@ Derived quantities returned by the model are:
     \code{Bpvalue_species} \tab Bayesian p-value (by species) \cr
     
     
-    \code{Nspecies} \tab Species richness (only in JAGS model)\cr
-    \code{Nspecies_Covariate} \tab Species richness by categorical covariate (when using \code{richnessCategories}, only in JAGS model) \cr
+    \code{Nspecies} \tab Species richness (only in JAGS models)\cr
+    \code{Nspecies_station} \tab Species richness at each sampling locations (only in JAGS models) \cr
+    \code{Nspecies_Covariate} \tab Species richness by categorical covariate (when using \code{richnessCategories}, only in JAGS models) \cr
     
     
     \code{R2} \tab sum of Freeman-Tukey residuals of observed data within each species \cr
