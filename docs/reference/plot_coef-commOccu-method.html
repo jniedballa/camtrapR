@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.7</span>
       </span>
     </div>
 
@@ -85,6 +85,7 @@
 <span>  <span class="va">outdir</span>,</span>
 <span>  level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>outer <span class="op">=</span> <span class="fl">0.95</span>, inner <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span>,</span>
 <span>  colorby <span class="op">=</span> <span class="st">"significance"</span>,</span>
+<span>  scales <span class="op">=</span> <span class="st">"free_y"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -123,6 +124,10 @@
 <dd><p>Whether to color estimates by "significance" (of the effect estimates), or "Bayesian p-value" (of the species)</p></dd>
 
 
+<dt>scales</dt>
+<dd><p>Passed to <code><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></code>. Can be "free" to scale x axes of effect estimates independently, or "free_y" to scale all x axes identically.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>additional arguments for <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></code></p></dd>
 
@@ -146,7 +151,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

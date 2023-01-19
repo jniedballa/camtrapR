@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.7</span>
       </span>
     </div>
 
@@ -80,10 +80,10 @@
 <span>  <span class="va">object</span>,</span>
 <span>  n.iter <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  thin <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  n.burnin <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  n.burnin <span class="op">=</span> <span class="va">n.iter</span><span class="op">/</span><span class="fl">2</span>,</span>
 <span>  n.adapt <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  cores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  chains <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  inits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  compile <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  WAIC <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -106,19 +106,19 @@
 
 
 <dt>n.burnin</dt>
-<dd><p>burnin length</p></dd>
+<dd><p>burnin length. Defaults to half of n.iter.</p></dd>
 
 
 <dt>n.adapt</dt>
 <dd><p>Length of adaptive phase</p></dd>
 
 
-<dt>cores</dt>
-<dd><p>number of cores to utilize</p></dd>
-
-
 <dt>chains</dt>
 <dd><p>number of MCMC chains to run</p></dd>
+
+
+<dt>inits</dt>
+<dd><p>named list. Initial values to use. If NULL (default), the values from the inits function in <code>object</code> are used.</p></dd>
 
 
 <dt>compile</dt>
@@ -147,7 +147,7 @@
     <h2>Details</h2>
     <p>Models will be fit either in JAGS or Nimble, depending on the decision made in the <code>nimble</code> argument in <code><a href="communityModel.html">communityModel</a></code>.</p>
 <p>For Nimble, compilation is strongly recommended for long model runs. Uncompiled models can run extremely slow. Compilation itself can take a while also, and requires that Rtools is available on the system.</p>
-<p>It is a convenience function only which hides some of the configuration options. If you require more control over model fitting, you can run all steps individually. See vignette 5 for details.</p>
+<p>This is a convenience function only which hides some of the configuration options. If you require more control over model fitting, you can run all steps individually. See vignette 5 for details.</p>
     </div>
 
   </div>
@@ -162,7 +162,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
