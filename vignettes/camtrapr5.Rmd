@@ -254,8 +254,8 @@ The model is fit with `fit()`.
 
 ```{r results="hide"}
  fit.jags <- fit(mod.jags,
-                 n.iter = 1000,
-                 n.burnin = 500,
+                 n.iter = 5000,
+                 n.burnin = 2500,
                  chains = 3)
 ```
 
@@ -377,7 +377,7 @@ To fit a compiled model, set compile = TRUE:
 ```{r results="hide", message = FALSE}
  fit.nimble.comp <- fit(mod.nimble,
                         n.iter = 20000,
-                        n.burnin = 1000,
+                        n.burnin = 10000,
                         chains = 3,
                         compile = TRUE, 
 )
@@ -509,8 +509,8 @@ model1_jags <- communityModel(
 
 ```{r results="hide"}
 out_ahm_jags <- fit(model1_jags, 
-                    n.iter = 5000, 
-                    n.burnin = 2500,
+                    n.iter = 10000, 
+                    n.burnin = 5000,
                     thin = 5,
                     chains = 3,
                     quiet = T
@@ -589,8 +589,8 @@ We use some more iterations, since these Nimble models tend to require more iter
 ```{r results="hide"}
 # compiled model run
 out_ahm_nimble2 <- fit(model1_nimble, 
-                       n.iter = 5000,
-                       n.burnin = 2500,
+                       n.iter =20000,
+                       n.burnin = 10000,
                        thin = 5,
                        chains = 3,
                        compile = TRUE,
@@ -1090,8 +1090,8 @@ model1_jags_quadratic <- communityModel(
 
 # short model run for demonstration
 out_ahm_jags_quadratic<- fit(model1_jags_quadratic, 
-                         n.iter = 5000, 
-                         n.burnin = 2500,
+                         n.iter = 10000, 
+                         n.burnin = 5000,
                          thin = 5,
                          chains = 3,
                          quiet = T
