@@ -1433,7 +1433,7 @@ communityModel <- function(data_list,
       "}    # close species loop",
       "\n", sep = "\n")
   } else {
-    close_loop1c <- paste("}    # close species loop\n")
+    close_loop1c <- paste("}    # close species loop\n\n")
   }
   
   finish_residuals <- paste("###sum residuals over observed species", 
@@ -1486,13 +1486,18 @@ communityModel <- function(data_list,
   }
   
   # species richness at each camera trap station
-  species_richness <- paste(paste0("### Species richness at every location"),
-                            paste0("for (", stationIndex, " in 1:", stationMax, "){"),
-                            paste0("richness[", stationIndex, "] <- sum(z[1:", speciesMax, ",", stationIndex, "])"),
-                            "}",
-                            "",
-                            "", sep = "\n")
-  attr(species_richness, "params") <- "richness"
+  if(nimble)  species_richness <-  paste(paste0("### Species richness at every location"),
+                                         "# not returned if nimble = TRUE",
+                                         "", sep = "\n")
+  
+  if(!nimble){ species_richness <- paste(paste0("### Species richness at every location"),
+                                        paste0("for (", stationIndex, " in 1:", stationMax, "){"),
+                                        paste0("Nspecies_station[", stationIndex, "] <- sum(z[1:", speciesMax, ",", stationIndex, "])"),
+                                        "}",
+                                        "",
+                                        "", sep = "\n")
+    attr(species_richness, "params") <- "Nspecies_station"
+  }
   
   close_model <- paste("}",
                        "", sep = "\n")
@@ -1596,8 +1601,7 @@ communityModel <- function(data_list,
                   attr(priors_sitecovs_occu_ranef, "params"),
                   attr(priors_sitecovs_occu_categ_fixed, "params"),
                   attr(priors_sitecovs_occu_categ_ranef, "params"),
-                  attr(priors_SpeciesStation_det_ranef, "params"),
-                  attr(species_richness, "params"))
+                  attr(priors_SpeciesStation_det_ranef, "params"))
   
   ## combine inits  ####
   inits_out_tmp <- c(do.call(c, lapply(model_text[sapply(model_text, 

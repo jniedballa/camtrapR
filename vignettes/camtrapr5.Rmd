@@ -513,7 +513,6 @@ out_ahm_jags <- fit(model1_jags,
                     n.burnin = 2500,
                     thin = 5,
                     chains = 3,
-                    cores = 1,      # simple models may be faster with cores = 1
                     quiet = T
 )
 ```
@@ -680,7 +679,6 @@ out_ahm_jags_na <- fit(model1_jags_na,
                     n.burnin = 2500,
                     thin = 5,
                     chains = 3,
-                    cores = 1,
                     quiet = T
 )
 ```
@@ -717,7 +715,6 @@ out_ahm_nimble_na <- fit(model1_nimble_na,
                     n.burnin = 2500,
                     thin = 5,
                     chains = 3,
-                    cores = 1,
                     quiet = T
 )
 ```
@@ -795,7 +792,6 @@ out_ahm_jags_aug1 <- fit(model1_jags_aug1,
                          n.burnin = 250,
                          thin = 5,
                          chains = 3,
-                         cores = 1 ,
                          quiet = T
 )
 
@@ -820,7 +816,6 @@ out_ahm_jags_aug2 <- fit(model1_jags_aug2,
                          n.burnin = 250,
                          thin = 5,
                          chains = 3,
-                         cores = 1,
                          quiet = T
 )
 ```
@@ -859,7 +854,6 @@ out_ahm_jags_categ1 <- fit(model_jags_categ1,
                          n.burnin = 250,
                          thin = 5,
                          chains = 3,
-                         cores = 1,
                          quiet = T
 )
 ```
@@ -911,7 +905,6 @@ out_ahm_jags_categ2 <- fit(model_jags_categ2,
                          n.burnin = 250,
                          thin = 5,
                          chains = 3,
-                         cores = 1,
                          quiet = T,
                          compile = FALSE
 )
@@ -968,7 +961,6 @@ out_ahm_jags_ranef <- fit(model1_jags_ranef,
                          n.burnin = 250,
                          thin = 5,
                          chains = 3,
-                         cores = 1,
                          quiet = T
 )
 ```
@@ -1010,7 +1002,6 @@ out_ahm_jags_nested <- fit(model1_jags_nested,
                          n.burnin = 250,
                          thin = 5,
                          chains = 3,
-                         cores = 1,
                          quiet = T
 )
 ```
@@ -1057,7 +1048,6 @@ out_ahm_jags_species_station_ran <- fit(model1_jags_species_station_ran,
                                         n.burnin = 250,
                                         thin = 5,
                                         chains = 3,
-                                        cores = 1,
                                         quiet = T
 )
 ```
@@ -1100,11 +1090,10 @@ model1_jags_quadratic <- communityModel(
 
 # short model run for demonstration
 out_ahm_jags_quadratic<- fit(model1_jags_quadratic, 
-                         n.iter = 500, 
-                         n.burnin = 250,
+                         n.iter = 5000, 
+                         n.burnin = 2500,
                          thin = 5,
                          chains = 3,
-                         cores = 1,
                          quiet = T
 )
 
@@ -1176,7 +1165,6 @@ out_ahm_jags_rich <- fit(model1_jags_richness,
                          n.burnin = 250,
                          thin = 5,
                          chains = 3,
-                         cores = 1,
                          quiet = T
 )
 ```
@@ -1217,7 +1205,6 @@ out_ahm_jags_categ3 <- fit(model_jags_categ3,
                          n.burnin = 250,
                          thin = 5,
                          chains = 3,
-                         cores = 1,
                          quiet = T
 )
 ```
@@ -1260,7 +1247,8 @@ Species occupancy maps:
                              draws     = 1000)
   
 
-  plot(predictions_psi$mean, zlim = c(0,1), col = hcl.colors(100), 
+  plot(predictions_psi$mean, zlim = c(0,1), 
+       col = hcl.colors(100), 
        maxnl = 9)   # plotting only the first 9 species for space reasons
 
 ```
@@ -1273,7 +1261,7 @@ Species richness maps:
                              x         = stack_prediction,
                              type      = "richness")
   
-  plot(predictions_rich)
+  plot(predictions_rich, col = hcl.colors(100))
   # mean = mean species richness estimate
   # sd = standard deviation of richness estimate
 ```
@@ -1391,6 +1379,117 @@ One can also use `gelman.plot` to create Gelman-Rubin-Brooks plots (evolution of
 gelman.plot(out_ahm_nimble2,  multivariate = FALSE)
 ```
 
+
+## Royle-Nichols model
+
+
+Instead of a standard occupancy model one can fit the occupancy model of Royle and Nichols (2003), which relates probability of detection of the species to the number of individuals available for detection at each site (instead of their occupancy status alone). Probability of occupancy is a derived parameter: the probability that at least one individual is available for detection at the site. It is achieve by setting the parameter "model" to "RN":
+
+
+```{r results="hide"}
+modelFile_jags_RN <- tempfile(fileext = ".txt")
+
+model1_jags_RN <- communityModel(
+  model = "RN",
+  occuCovs = list(ranef = c("habitat")),
+  detCovsObservation = list(ranef = "wind"),
+  intercepts = list(det = "ranef", occu = "ranef"),
+  data_list = input_AHM,
+  modelFile = modelFile_jags_RN)
+
+
+out_ahm_jags_RN <- fit(model1_jags_RN, 
+                    n.iter = 5000, 
+                    n.burnin = 2500,
+                    thin = 5,
+                    chains = 3,
+                    quiet = T
+)
+```
+
+The models can be processed as shown before, e.g.: 
+
+Summary statistics of model parameters:
+```{r}
+DT::datatable(round(summary(out_ahm_jags_RN)$statistics, 3))
+```
+
+Response curves (marginal effect plots):
+
+```{r}
+plot_effects(model1_jags_RN, 
+             out_ahm_jags_RN)
+
+
+
+plot_effects(model1_jags_RN, 
+             out_ahm_jags_RN,
+             submodel = "det")
+```
+
+Coefficient plots:
+
+```{r}
+plot_coef(model1_jags_RN,
+          out_ahm_jags_RN,
+          ordered = FALSE)
+
+plot_coef(model1_jags_RN,
+          out_ahm_jags_RN,
+          ordered = FALSE,
+          submodel = "det")
+```
+
+
+Predictions work as before, but a Royle-Nichols model allows for returning expected species abundance (lambda) via `r paste('type = "abundance"')` and `r paste('type = "lambda_array"')`. Occupancy predictions internally convert abundance to occupancy.
+
+Occupancy predictions (`r paste('type = "psi"')`)
+```{r}
+predictions_psi_RN <- predict(object    = model1_jags_RN, 
+                             mcmc.list = out_ahm_jags_RN,
+                             x         = stack_prediction,
+                             type      = "psi",
+                             draws     = 200)
+plot(predictions_psi_RN$mean, 
+     col = hcl.colors(100),
+       maxnl = 9)  # first 9 species only
+
+```
+
+
+Abundance predictions (`r paste('type = "abundance"')`):
+```{r}
+
+predictions_abundance_RN <- predict(object    = model1_jags_RN, 
+                             mcmc.list = out_ahm_jags_RN,
+                             x         = stack_prediction,
+                             type      = "abundance",
+                             draws     = 200)
+plot(predictions_abundance_RN$mean, 
+     col = hcl.colors(100),
+     maxnl = 9)   # first 9 species only
+```
+
+Richness predictions (`r paste('type = "richness"')`)
+```{r}
+  predictions_richness_RN <- predict(object    = model1_jags_RN, 
+                             mcmc.list = out_ahm_jags_RN,
+                             x         = stack_prediction,
+                             type      = "richness",
+                             draws     = 200)
+plot(predictions_richness_RN$mean, col = hcl.colors(100))
+```
+
+PAO predictions (`r paste('type = "pao"')`):
+```{r}
+  predictions_pao_RN <- predict(object    = model1_jags_RN, 
+                             mcmc.list = out_ahm_jags_RN,
+                             x         = stack_prediction,
+                             type      = "pao",
+                             draws     = 200)
+DT::datatable(predictions_pao_RN$pao_summary)
+
+```
 
 
 ## Single-species occupancy models
