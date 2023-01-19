@@ -35,8 +35,6 @@ The functions in this section set up a directory structure for storing camera tr
 \code{\link{addCopyrightTag}}      \tab Write a copyright tag into JPEG image metadata \cr
 \code{\link{appendSpeciesNames}}   \tab Add or remove species names from image filenames \cr
 
---------------------------- \tab ---------------------------------------------------------------------------------------------- \cr
-
 }
 }
 
@@ -48,7 +46,6 @@ These functions assist in species identification and prepare individual identifi
 \code{\link{createSpeciesFolders}}       \tab Create directories for species identification\cr
 \code{\link{checkSpeciesIdentification}} \tab Consistency check on species image identification \cr
 \code{\link{getSpeciesImages}}           \tab Gather all images of a species in a new directory \cr
---------------------------- \tab ---------------------------------------------------------------------------------------------- \cr
 }
 }
 
@@ -62,8 +59,6 @@ These function use the directory structure built above (Section 'Image managemen
 \code{\link{exifTagNames}}          \tab Return Exif metadata tags and tag names from JPEG images \cr
 \code{\link{exiftoolPath}}          \tab Add the directory containing exiftool.exe to PATH temporarily (Windows only) \cr
 \code{\link{filterRecordTable}}     \tab Filter existing record table for temporal independence. \cr 
---------------------------- \tab ---------------------------------------------------------------------------------------------- \cr
-
 }
 }
 
@@ -76,7 +71,21 @@ These plots are generated from the record table and the camera trap table.
 \code{\link{activityDensity}}   \tab Single-species diel activity kernel density estimation plots \cr
 \code{\link{activityRadial}}    \tab Single-species diel activity radial plot \cr
 \code{\link{activityOverlap}}   \tab Two-species diel activity overlap plots and estimates \cr
---------------------------- \tab ---------------------------------------------------------------------------------------------- \cr
+
+}
+}
+
+\section{Community (multi-species) occupancy models}{
+
+These plots are generated from the record table and the camera trap table.
+\tabular{ll}{
+\code{\link{communityModel}}     \tab Create a community (multi-species) occupancy model for JAGS or Nimble \cr
+\code{\link{commOccu-class}} \tab commOccu objects \cr
+\code{\link{fit,commOccu-method}}   \tab Fit a community (multi-species) occupancy model \cr
+\code{\link{predict,commOccu-method}}    \tab Predictions from community occupancy models \cr
+\code{\link{summary,commOccu-method}}   \tab Summarize community occupancy model \cr
+\code{\link{plot_coef}}   \tab Plot effect sizes of covariates in community occupancy model \cr
+\code{\link{plot_effects}}   \tab Plot Marginal Effects of Covariates \cr
 
 }
 }
@@ -88,7 +97,6 @@ These plots are generated from the record table and the camera trap table.
 \code{\link{detectionHistory}}        \tab Species detection histories for occupancy analyses (single and multi-season) \cr
 \code{\link{spatialDetectionHistory}} \tab Detection histories of individuals for spatial capture-recapture analyses  \cr
 \code{\link{surveyReport}}            \tab Create a report about camera trap surveys and species detections \cr
---------------------------- \tab ---------------------------------------------------------------------------------------------- \cr
 
 }
 }
@@ -103,7 +111,6 @@ These plots are generated from the record table and the camera trap table.
 \code{\link{recordTableSampleMultiSeason}} \tab Sample  multi season species record table \cr
 \code{\link{recordTableIndividualSampleMultiSeason}}  \tab Single-species multi season record table with individual IDs\cr
 \code{\link{timeShiftTable}}    \tab Sample camera trap time shift information \cr
---------------------------- \tab ---------------------------------------------------------------------------------------------- \cr
 
 }
 }
