@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict.R
 \name{predict,commOccu-method}
 \alias{predict,commOccu-method}
-\title{Spatial predictions from community occupancy models}
+\title{Predictions from community occupancy models}
 \usage{
 \S4method{predict}{commOccu}(
   object,
@@ -39,5 +39,5 @@
 A raster stack or data.frame, depending on x. If type = "pao", a list. If type = "psi_array", a 3D-array [cell, species, draw].
 }
 \description{
-Create spatial predictions of species occupancy and species richness from community occupancy models and raster stacks.
+Create (spatial) predictions of species occupancy and species richness from community occupancy models and raster stacks.
 }

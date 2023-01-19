@@ -577,9 +577,9 @@ predictionMapsCommunity <- function(object,
 
 
 
-#' Spatial predictions from community occupancy models
+#' Predictions from community occupancy models
 #' 
-#' Create spatial predictions of species occupancy and species richness from community occupancy models and raster stacks.
+#' Create (spatial) predictions of species occupancy and species richness from community occupancy models and raster stacks.
 #'
 #' @param object \code{commOccu} object
 #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
