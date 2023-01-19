@@ -1368,10 +1368,10 @@ communityModel <- function(data_list,
   attr(close_loop1a1, "params") <- c("R2", "new.R2", "Bpvalue_species")
   
   if(!nimble){
-    close_loop1a2 <- paste("\n### total number of occupied stations for each species",
-                           paste0("Ntot[", speciesIndex, "] <- sum(z[", speciesIndex, ", 1:", stationMax, "])"),
+    close_loop1a2 <- paste("\n### Number of occupied stations for each species",
+                           paste0("NStationsOccupied[", speciesIndex, "] <- sum(z[", speciesIndex, ", 1:", stationMax, "])"),
                            "\n### species is part of community?",
-                           paste0("occt[", speciesIndex ,"] <- 1 - equals(Ntot[", speciesIndex ,"],0)"),
+                           paste0("speciesInCommunity[", speciesIndex ,"] <- 1 - equals(NStationsOccupied[", speciesIndex ,"],0)"),
                            "\n", sep = "\n")
   } else {
     close_loop1a2 <- "# Total number of occupied and community membership indicator are not returned if nimble = TRUE"
@@ -1382,7 +1382,7 @@ communityModel <- function(data_list,
   
   
   
-  Nstations <- list()
+  fractionStationsOccupied <- list()
   
   if(!is.null(occuIntercept_categ$fixed)) {
     
@@ -1398,22 +1398,22 @@ communityModel <- function(data_list,
       current_s3  <- paste0(stationMax, s_occu)
       
       
-      if(s_occu == 1) Nstations[[s_occu]] <- paste(paste0("### Number of stations occupied (in each level of '", richnessCategories, "')"),
-                                                   paste0("Nstations[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", 1:", current_s1, "])/", current_s1), 
+      if(s_occu == 1) fractionStationsOccupied[[s_occu]] <- paste(paste0("### Number of stations occupied (in each level of '", richnessCategories, "')"),
+                                                   paste0("fractionStationsOccupied[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", 1:", current_s1, "])/", current_s1), 
                                                    sep = "\n")
       
-      if(s_occu > 1 & s_occu != length(unique(covariates[,occuIntercept_categ$fixed]))) Nstations[[s_occu]] <- paste0("Nstations[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", (", current_s2a, " + 1):(", current_s2b ,")]) / ", current_s3)
+      if(s_occu > 1 & s_occu != length(unique(covariates[,occuIntercept_categ$fixed]))) fractionStationsOccupied[[s_occu]] <- paste0("fractionStationsOccupied[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", (", current_s2a, " + 1):(", current_s2b ,")]) / ", current_s3)
       
-      if(s_occu == length(unique(covariates[,occuIntercept_categ$fixed]))) Nstations[[s_occu]] <- paste0("Nstations[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", (", current_s2a, " + 1):", stationMax, "]) / (", stationMax, " - (", current_s2a, "))")      
+      if(s_occu == length(unique(covariates[,occuIntercept_categ$fixed]))) fractionStationsOccupied[[s_occu]] <- paste0("fractionStationsOccupied[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", (", current_s2a, " + 1):", stationMax, "]) / (", stationMax, " - (", current_s2a, "))")      
     }
   } else {
-    Nstations[[1]] <- paste("### Number of stations occupied",
-                            paste0("Nstations[", speciesIndex ,"] <- sum(z[", speciesIndex ,", 1:", stationMax,"])/", stationMax), sep = "\n")
+    fractionStationsOccupied[[1]] <- paste("### Fraction of stations occupied",
+                            paste0("fractionStationsOccupied[", speciesIndex ,"] <- NStationsOccupied[", speciesIndex ,"] /", stationMax), sep = "\n")
   }
   
   if(!nimble) {
     close_loop1b <- paste(
-      paste(unlist(Nstations), collapse = "\n"),
+      paste(unlist(fractionStationsOccupied), collapse = "\n"),
       "\n", sep = "\n")
   } else {
     close_loop1b <- "# Number of stations occupied is not returned when nimble = TRUE\n"
@@ -1421,14 +1421,14 @@ communityModel <- function(data_list,
   
   
   if(!is.null(occuIntercept_categ$fixed)) {
-    occ <- paste0("occ[", speciesIndex, ", ", 1:length(unique(covariates[,occuIntercept_categ$fixed])), "]<- 1 - equals(Nstations[i,", 1:length(unique(covariates[,occuIntercept_categ$fixed])), "], 0)")
+    occ <- paste0("occ[", speciesIndex, ", ", 1:length(unique(covariates[,occuIntercept_categ$fixed])), "]<- 1 - equals(fractionStationsOccupied[i,", 1:length(unique(covariates[,occuIntercept_categ$fixed])), "], 0)")
   } else {
-    occ <- paste0("occ[", speciesIndex ,"] <- 1 - equals(Nstations[", speciesIndex ,"], 0)")
+    occ <- paste0("occ[", speciesIndex ,"] <- 1 - equals(fractionStationsOccupied[", speciesIndex ,"], 0)")
   }
   
   if(!nimble){
     close_loop1c <- paste(    
-      paste0("### Does species occur at all or not at each station", ifelse(!is.null(richnessCategories), paste0("(within each level of '", richnessCategories, "')"), "")),
+      paste0("### Does species occur at all (at any station)", ifelse(!is.null(richnessCategories), paste0("(within each level of '", richnessCategories, "')"), "")),
       paste(occ, collapse = "\n"),
       "}    # close species loop",
       "\n", sep = "\n")
@@ -1449,7 +1449,7 @@ communityModel <- function(data_list,
     finish_nspecies <- paste("### total number of species", 
                              ifelse(nimble, 
                                     "# not returned if nimble = TRUE", 
-                                    paste0("Nspecies <- sum(occt[1:", speciesMax , "])")),
+                                    paste0("Nspecies <- sum(speciesInCommunity[1:", speciesMax , "])")),
                              "",
                              "### Total number of unobserved species",
                              paste0("n0 <- sum(w[(nspec+1):(nspec+nz)])"),
@@ -1466,13 +1466,11 @@ communityModel <- function(data_list,
     finish_nspecies <- paste("### total number of species", 
                              ifelse(nimble, 
                                     "# not returned if nimble = TRUE", 
-                                    paste0("Nspecies <- sum(occt[1:", speciesMax , "])")),
+                                    paste0("Nspecies <- sum(speciesInCommunity[1:", speciesMax , "])")),
                              "\n", sep = "\n")
     if(!nimble) attr(finish_nspecies, "params") <- "Nspecies"
     if(nimble)  attr(finish_nspecies, "params") <- NULL
   } 
-  
-  
   
   
   if(!is.null(occuIntercept_categ$fixed) & !nimble) {
@@ -1480,13 +1478,27 @@ communityModel <- function(data_list,
                                    paste0("for(s_occu in 1:", length(unique(covariates[,occuIntercept_categ$fixed])), "){"), 
                                    paste0("Nspecies_", richnessCategories, "[s_occu] <- sum(occ[1:", speciesMax , ", s_occu])"),
                                    "}",
-                                   "",
-                                   "}",
-                                   "", sep = "\n")
+                                   "", 
+                                   sep = "\n")
     attr(finish_nspecies_categ, "params") <- paste0("Nspecies_", richnessCategories)
   } else {
-    finish_nspecies_categ <- paste("}", "", sep = "\n")
+    finish_nspecies_categ <- paste("", sep = "\n")
   }
+  
+  # species richness at each camera trap station
+  species_richness <- paste(paste0("### Species richness at every location"),
+                            paste0("for (", stationIndex, " in 1:", stationMax, "){"),
+                            paste0("richness[", stationIndex, "] <- sum(z[1:", speciesMax, ",", stationIndex, "])"),
+                            "}",
+                            "",
+                            "", sep = "\n")
+  attr(species_richness, "params") <- "richness"
+  
+  close_model <- paste("}",
+                       "", sep = "\n")
+    
+
+  
   
   
   
@@ -1560,7 +1572,9 @@ communityModel <- function(data_list,
                      close_loop1c,
                      finish_residuals, 
                      finish_nspecies,
-                     finish_nspecies_categ)
+                     finish_nspecies_categ,
+                     species_richness,
+                     close_model)
   
   out <- list()
   out$model <- unlist(model_text)
@@ -1582,7 +1596,8 @@ communityModel <- function(data_list,
                   attr(priors_sitecovs_occu_ranef, "params"),
                   attr(priors_sitecovs_occu_categ_fixed, "params"),
                   attr(priors_sitecovs_occu_categ_ranef, "params"),
-                  attr(priors_SpeciesStation_det_ranef, "params"))
+                  attr(priors_SpeciesStation_det_ranef, "params"),
+                  attr(species_richness, "params"))
   
   ## combine inits  ####
   inits_out_tmp <- c(do.call(c, lapply(model_text[sapply(model_text, 
