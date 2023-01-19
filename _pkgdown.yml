@@ -30,6 +30,7 @@ reference:
       - '`recordTableIndividual`'
       - '`exifTagNames`'
       - '`exiftoolPath`'
+      - '`filterRecordTable`'
   - title: Data exploration and visualisation
     desc: Functions for plotting species activity, detection maps and exporting shapefiles
     contents:
