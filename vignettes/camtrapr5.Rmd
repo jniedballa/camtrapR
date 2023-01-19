@@ -376,8 +376,8 @@ To fit a compiled model, set compile = TRUE:
 
 ```{r results="hide", message = FALSE}
  fit.nimble.comp <- fit(mod.nimble,
-                        n.iter = 10000,
-                        n.burnin = 5000,
+                        n.iter = 20000,
+                        n.burnin = 1000,
                         chains = 3,
                         compile = TRUE, 
 )
@@ -419,7 +419,7 @@ Traceplots (not shown)
 ```
 
 
-The estimates and marginal effects are not very pretty, and the model would likely require more iterations to achieve smooth estimates.
+The estimates and marginal effects are not very pretty, and the model likely requires more iterations to achieve smooth estimates.
 
 
 # More complete example
@@ -1144,9 +1144,21 @@ WAIC:
 out_ahm_nimble3$WAIC
 ```
 
-## Species richness estimates for categorical covariates
 
-This is only possible in JAGS models. Argument "richnessCategories" can be used to calculate separate species richness estimates for different levels of categorical site covariates. If it is not defined, there will only be a global species richness estimate. 
+
+## Species richness 
+
+### Global
+
+Global species richness estimates is returned in parameter "Nspecies" (see below). 
+
+### By station
+
+Species richness by station is returned in parameter "Nspecies_station" (see below).
+
+### Richness estimates for categorical covariates
+
+This is only possible in JAGS models. Argument "richnessCategories" can be used to calculate separate species richness estimates for different levels of categorical site covariates. If it is not defined, there will only be global and by-station species richness estimates. 
 
 ```{r message=FALSE, warning=FALSE, results="hide"}
 modelFile_jags_richness <- tempfile(fileext = ".txt")
@@ -1169,7 +1181,12 @@ out_ahm_jags_rich <- fit(model1_jags_richness,
 )
 ```
 
-Now search for "Nspecies" in the table below. You will see 3 entries. "Nspecies" is overall, Nspecies_by_category[1] and ...[2] are for the stations in category "A" and "B", respectively.
+Now search for "Nspecies" in the table below. You will see entries for three different parameters. 
+
+* "Nspecies" is overall species richness, 
+* "Nspecies_by_category[1]", "...[2]" and "...[3]" are for the stations in category "medium" and "low", "high" respectively.
+* "Nspecies_by_station[1]" to "...[30]" are species richness estimates for each sampling station.
+
 
 ```{r}
 DT::datatable(round(summary(out_ahm_jags_rich)$statistics, 3))
@@ -1368,7 +1385,7 @@ plot(out_ahm_nimble2)
 The Gelman-Rubin convergence statistic (potential scale reduction factor) can be calculated with `gelman.diag()` from `coda`:
 
 ```{r}
-gd <- gelman.diag(out_ahm_nimble2,  multivariate = FALSE)
+gd <- coda::gelman.diag(out_ahm_nimble2,  multivariate = FALSE)
 gd
 ```
 
@@ -1376,7 +1393,7 @@ One can also use `gelman.plot` to create Gelman-Rubin-Brooks plots (evolution of
 
 ```{r eval = FALSE}
 # not shown here due to space reasons
-gelman.plot(out_ahm_nimble2,  multivariate = FALSE)
+coda::gelman.plot(out_ahm_nimble2,  multivariate = FALSE)
 ```
 
 
