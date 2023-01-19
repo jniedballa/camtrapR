@@ -49,6 +49,9 @@ plot.effects.commOccu <- function(object,       # commOccu object
   
   list_responses <- list()
   
+  
+  
+  
   # loop over covariates
   for(cov in 1:nrow(cov_info_subset)) {
     
@@ -214,7 +217,7 @@ plot.effects.commOccu <- function(object,       # commOccu object
       } else {
         val <- exp(out_comb) / (exp(out_comb) + 1) 
       }
-      }
+    }
     
     # summarize estimates (across posterior samples)
     val.mean  <- apply(val, MARGIN = c(1,2), mean)
@@ -303,7 +306,8 @@ plot.effects.commOccu <- function(object,       # commOccu object
       
       # create x axis labels for factors
       if(covariate_is_site_cov){
-        vals[,1] <- levels(object@data[[current_cov]]) [vals[,1]]
+        vals[,1] <- factor(levels(object@data[[current_cov]]) [vals[,1]],
+                           levels = levels(object@data[[current_cov]]))
       } 
       
       p <- ggplot(vals, aes_string(x = params_covariate[[cov]], y = "mean", group = "Species")) + 
@@ -640,15 +644,23 @@ plot.coef.commOccu <- function(object,
     
     if(covariate_is_factor){
       if(effect_type == "fixed"){
-        if(covariate_is_site_cov)  df_quantiles_i$covariate  <- paste0(current_cov, "_", levels_tmp)
-        if(!covariate_is_site_cov) df_quantiles_i$covariate  <- paste0(current_cov, "_",  levels_tmp)
+        if(covariate_is_site_cov)  df_quantiles_i$covariate  <- factor(paste0(current_cov, "_", levels_tmp),
+                                                                       labels = levels_tmp)
+        if(!covariate_is_site_cov) df_quantiles_i$covariate  <- factor(paste0(current_cov, "_",  levels_tmp),
+                                                                       labels = levels_tmp)
       }
       
       if(effect_type == "ranef"){
-        if(covariate_is_site_cov)  df_quantiles_i$covariate  <- paste0(current_cov, "_", c(levels_tmp,
-                                                                                           rep(levels_tmp, each = object@data$M)))
-        if(!covariate_is_site_cov) df_quantiles_i$covariate  <- paste0(current_cov, "_", c(levels_tmp,
-                                                                                           rep(levels_tmp, each = object@data$M)))
+        if(covariate_is_site_cov)  df_quantiles_i$covariate  <- factor(paste0(current_cov, "_", c(levels_tmp,
+                                                                                                  rep(levels_tmp, each = object@data$M))),
+                                                                       levels = paste0(current_cov, "_", levels_tmp),
+                                                                       labels = levels_tmp)
+        
+        if(!covariate_is_site_cov) df_quantiles_i$covariate  <- factor(paste0(current_cov, "_", c(levels_tmp,
+                                                                                                  rep(levels_tmp, each = object@data$M))),
+                                                                       levels = paste0(current_cov, "_", levels_tmp),
+                                                                       labels = levels_tmp)
+        
       }
     }
     
@@ -669,7 +681,9 @@ plot.coef.commOccu <- function(object,
         }
         
         if(effect_type == "ranef"){
-          subset_level2 <- df_quantiles_i[df_quantiles_i$covariate == paste0(current_cov, "_", levels_tmp[2]),]
+          subset_level2 <- df_quantiles_i[df_quantiles_i$covariate == #paste0(current_cov, "_", 
+                                            levels_tmp[2]#)
+                                          ,]
           
           df_quantiles_i$species <- factor(df_quantiles_i$species, 
                                            levels = subset_level2$species[order(subset_level2$median)])
@@ -691,15 +705,32 @@ plot.coef.commOccu <- function(object,
     if(colorby == "significance")      color_by <- "significance"
     if(colorby == "Bayesian p-value")  color_by <- "significance2"
     
+    alpha_community <- ifelse(effect_type == "ranef", 0.3, 0)
+    alpha_zero <- 0.3
+    color_community <- "blue"
+    
     if(!combine){
       
+      
       p_list[[cov]] <- ggplot (df_quantiles_i, aes_string(y = "species", x = "median", color = color_by)) +
-        geom_vline(xintercept = 0, alpha = 0.2) +
+        
+        
+        # community effect
+        geom_vline(data = df_quantiles_i[df_quantiles_i$type == "mean", -which(colnames(df_quantiles_i) == "type")],    
+                   aes(xintercept = median), col = color_community, linetype = 1, alpha = alpha_community) +
+        geom_vline(data = df_quantiles_i[df_quantiles_i$type == "mean", -which(colnames(df_quantiles_i) == "type")],
+                   aes(xintercept = lower_outer), col = color_community, linetype = 2, alpha = alpha_community) +
+        geom_vline(data = df_quantiles_i[df_quantiles_i$type == "mean", -which(colnames(df_quantiles_i) == "type")],
+                   aes(xintercept = upper_outer), col = color_community, linetype = 2, alpha = alpha_community) +
+        
+        geom_vline(xintercept = 0, alpha = alpha_zero) +
+        
+        # species effects
         geom_pointrange(aes_string(xmin = "lower_outer", xmax = "upper_outer")) + 
         geom_linerange( aes_string(xmin = "lower_inner", xmax = "upper_inner"), size = 1) +
-        facet_grid(rows = vars(type), 
+        facet_grid(rows = vars(type),
                    cols = vars(covariate),
-                   scales = scales, 
+                   scales = scales,
                    space = "free_y"
         ) +
         xlab ("Effect size") +  ylab(element_blank()) +
@@ -711,7 +742,7 @@ plot.coef.commOccu <- function(object,
         scale_color_manual(breaks = c("outer", "inner", "no"),
                            values=c("firebrick", "black", "grey50"),
                            guide = "none") +
-        ggtitle(paste("Effect sizes:", current_cov)) 
+        ggtitle(paste("Effect sizes:", current_cov))
       
       
       if(!covariate_is_factor) {
@@ -741,7 +772,17 @@ plot.coef.commOccu <- function(object,
                                        levels = rev(sort(unique(as.character(df_quantiles_all$species)))))
     
     p <- ggplot (df_quantiles_all, aes_string(y = "species", x = "median", color = color_by)) +
-      geom_vline(xintercept = 0, alpha = 0.2) +
+      
+      # community effect
+      geom_vline(data = df_quantiles_all[df_quantiles_all$type == "mean", -which(colnames(df_quantiles_all) == "type")],    
+                 aes(xintercept = median), col = color_community, linetype = 1, alpha = alpha_community) +
+      geom_vline(data = df_quantiles_all[df_quantiles_all$type == "mean", -which(colnames(df_quantiles_all) == "type")],
+                 aes(xintercept = lower_outer), col = color_community, linetype = 2, alpha = alpha_community) +
+      geom_vline(data = df_quantiles_all[df_quantiles_all$type == "mean", -which(colnames(df_quantiles_all) == "type")],
+                 aes(xintercept = upper_outer), col = color_community, linetype = 2, alpha = alpha_community) +
+      
+      geom_vline(xintercept = 0, alpha = alpha_zero) +
+      # species effects
       geom_pointrange(aes_string(xmin = "lower_outer", xmax = "upper_outer")) + 
       geom_linerange (aes_string(xmin = "lower_inner", xmax = "upper_inner"), size = 1) +
       facet_grid(rows = vars(type), 
