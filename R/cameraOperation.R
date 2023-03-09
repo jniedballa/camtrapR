@@ -386,8 +386,8 @@ cameraOperation <- function(CTtable,
   if(isTRUE(hasProblems)){
     
     # find problem columns
-    cols.prob.from <- grep(colnames(CTtable), pattern = "Problem\\d\\Sfrom")
-    cols.prob.to   <- grep(colnames(CTtable), pattern = "Problem\\d\\Sto")
+    cols.prob.from <- grep(colnames(CTtable), pattern = "Problem[0-9]+\\Sfrom")
+    cols.prob.to   <- grep(colnames(CTtable), pattern = "Problem[0-9]+\\Sto")
     
     # convert problem column entries to character
     for(problem_col_index in c(cols.prob.from, cols.prob.to)){
