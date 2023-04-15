@@ -2,6 +2,7 @@
 % Please edit documentation in R/predict.R
 \name{predict,commOccu-method}
 \alias{predict,commOccu-method}
+\alias{predict}
 \title{Predictions from community occupancy models}
 \usage{
 \S4method{predict}{commOccu}(

@@ -51,6 +51,7 @@ predictionMapsCommunity <- function(object,
   
   if(nrow(cov_info_subset) == 0) stop(paste("No covariates in submodel", submodel), call. = F)
   
+  
   # get intercept information for submodel
   cov_info_intercept <- object@covariate_info[object@covariate_info$submodel == submodel & object@covariate_info$param == "intercept",]
   
@@ -126,9 +127,11 @@ predictionMapsCommunity <- function(object,
   
   for(i in 1:dim(array_NA)[2]){    # species loop
     if(cov_info_intercept$ranef == TRUE | cov_info_intercept$independent == TRUE){  # random or independent intercepts
-      out_intercept[,i,] <- posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
+      out_intercept[,i,] <- matrix(posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] , 
+               nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
     } else {
-      out_intercept[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
+      out_intercept[,i,] <- matrix(posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] , 
+               nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
     }
   }
   gc()
@@ -147,6 +150,9 @@ predictionMapsCommunity <- function(object,
     current_cov  <- cov_info_subset$covariate[cov]
     current_coef <- cov_info_subset$coef[cov]
     
+    if(!current_cov %in% colnames(values_to_predict_subset)) {
+      stop(paste("Covariate", current_cov, "not found in data for prediction (x)."), call. = FALSE)
+    }
     if(!is.na(cov_info_subset$ranef_cov[cov])){
       stop(paste(current_cov, 
                     " has a random effect other than species. This is currently not supported.", call. = F))
@@ -181,7 +187,11 @@ predictionMapsCommunity <- function(object,
           index_covariate <- grep(paste0(current_coef, "$"), colnames(posterior_matrix))
         } else {    # ranef or independent
           index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
-        }        
+        }
+        
+        if(length(index_covariate) == 0) stop(paste("Covariate", current_coef, "not found in posterior matrix"), call. = FALSE)
+        if(length(index_covariate) >= 2) stop(paste("Covariate", current_coef, "has more than 2 matches in posterior matrix"), call. = FALSE)
+        
         
         out[[cov]][,i,] <-  sapply(posterior_matrix[, index_covariate], FUN = function(x){
           x * values_to_predict_subset[, current_cov]
@@ -592,11 +602,14 @@ predictionMapsCommunity <- function(object,
 #' @param speciesSubset  species to include in richness estimates. Can be index number or species names.
 #'
 #' @return A raster stack or data.frame, depending on x. If type = "pao", a list. If type = "psi_array", a 3D-array [cell, species, draw].
+#' 
+#' @aliases predict
+#' @method predict commOccu
 #' @importFrom  stats rbinom dpois sd
 #' @importFrom utils object.size
 #' @importFrom methods .hasSlot
 #' @export
-#'
+
 
 setMethod("predict", signature = c(object = "commOccu"),
           predictionMapsCommunity)

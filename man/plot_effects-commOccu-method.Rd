@@ -9,10 +9,11 @@
   object,
   mcmc.list,
   submodel = "state",
+  response = "occupancy",
   draws = 1000,
   outdir,
   level = 0.95,
-  keyword_squared = "_squared",
+  keyword_quadratic = "_squared",
   ...
 )
 }
@@ -23,13 +24,15 @@
 
 \item{submodel}{Submodel to get plots for. Can be "det" or "state"}
 
+\item{response}{response type on y axis. Only relevant for submodel = "state". Default is "occupancy", can be set to "abundance" for Royle-Nichols models}
+
 \item{draws}{Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used}
 
 \item{outdir}{Directory to save plots to (optional)}
 
 \item{level}{Probability mass to include in the uncertainty interval}
 
-\item{keyword_squared}{character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name.}
+\item{keyword_quadratic}{character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name (e.g. if the covariate is "elevation", the quadratic covariate would be "elevation_squared").}
 
 \item{...}{additional arguments for \code{\link[ggplot2]{ggsave}}}
 }
