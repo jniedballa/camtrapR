@@ -2,10 +2,11 @@
 plot.effects.commOccu <- function(object,       # commOccu object
                                    mcmc.list,    # mcmc.list (output of fit())
                                    submodel = "state",      # "det" or "state"
+                                  response = "occupancy",
                                    draws = 1000,    # number of posterior samples to use (will draw random sample from posterior distribution if defined). 
                                    outdir,       # directory to save plots in (optional)
                                    level = 0.95,   # confidence level for CIs in plot
-                                   keyword_squared = "_squared",   # the suffix of a covariate that indicates a quadratic effect  (e.g. "elevation" and "elevation_squared" -> will be combined in plot)
+                                   keyword_quadratic = "_squared",   # the suffix of a covariate that indicates a quadratic effect  (e.g. "elevation" and "elevation_squared" -> will be combined in plot)
                                    ...)                            # additional arguments for ggsave()
 {
   
@@ -20,6 +21,10 @@ plot.effects.commOccu <- function(object,       # commOccu object
     keyword_submodel <- "^alpha"
     keyword_submodel_short <- "alpha"
   } 
+  
+  response <- match.arg(response, choices = c("occupancy", "abundance"))
+  if(response == "abundance" & object@model != "RN") stop("response = 'abundance' is only available for Royle-Nichols models.")
+  if(response == "abundance" & submodel == "det") warning("response = 'abundance' is not available for the detection submodel.")
   
   # get covariate information for submodel
   cov_info_subset <- object@covariate_info[object@covariate_info$submodel == submodel & object@covariate_info$param == "param",]
@@ -63,7 +68,7 @@ plot.effects.commOccu <- function(object,       # commOccu object
     
     if(is_squared) {
       attr(params_covariate, "include") [cov] <- FALSE
-      if(gsub(keyword_squared, "", current_cov) %in% params_covariate) next
+      if(gsub(keyword_quadratic, "", current_cov) %in% params_covariate) next
     } 
     attr(params_covariate, "include") [cov] <- TRUE
     
@@ -85,9 +90,9 @@ plot.effects.commOccu <- function(object,       # commOccu object
     # check if there is a squared version of the current covariate
     
     has_squared <- cov_info_subset$has_quadratic[cov]
-    if(paste0(current_cov, keyword_squared) %in% params_covariate){
+    if(paste0(current_cov, keyword_quadratic) %in% params_covariate){
       #has_squared <- TRUE
-      squared_cov <- paste0(current_cov, keyword_squared)
+      squared_cov <- paste0(current_cov, keyword_quadratic)
     } #else {
       #has_squared <- FALSE
     #}
@@ -145,9 +150,11 @@ plot.effects.commOccu <- function(object,       # commOccu object
     for(i in 1:dim(out)[2]){
       
       if(cov_info_intercept$ranef == TRUE | cov_info_intercept$independent == TRUE){  # random or independent intercepts
-        out_intercept[,i,] <- posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
+        out_intercept[,i,] <- matrix(posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] , 
+                 nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
       } else {
-        out_intercept[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
+        out_intercept[,i,] <- matrix(posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] , 
+                 nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
       }
       
         
@@ -170,6 +177,9 @@ plot.effects.commOccu <- function(object,       # commOccu object
         } else {    # ranef or independent
           index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
         }
+        if(length(index_covariate) == 0) stop(paste("Covariate", current_coef, "not found in posterior matrix"), call. = FALSE)
+        if(length(index_covariate) >= 2) stop(paste("Covariate", current_coef, "has more than 2 matches in posterior matrix"), call. = FALSE)
+        
         
         out[,i,] <-  sapply(posterior_matrix[, index_covariate], FUN = function(x){
           x * values_to_predict
@@ -209,11 +219,16 @@ plot.effects.commOccu <- function(object,       # commOccu object
       out_comb <- out_intercept + out + out_sq
     }
     
-    if(!.hasSlot(object, "model")) {
+    if(!.hasSlot(object, "model")) {  # legacy support (when no RN model available)
       val <- exp(out_comb) / (exp(out_comb) + 1)    # prediction for each species / habitat value (from mean estimates)
     } else {
       if(object@model == "RN" & submodel == "state"){
-        val <- exp(out_comb)    # val is lambda. out_comb is log(lambda)
+        lambda <- exp(out_comb)    # val is lambda. out_comb is log(lambda)
+        psi <- 1 - dpois(0, lambda)  
+        
+        if(response == "abundance") val <- lambda
+        if(response == "occupancy") val <- psi
+        
       } else {
         val <- exp(out_comb) / (exp(out_comb) + 1) 
       }
@@ -221,8 +236,8 @@ plot.effects.commOccu <- function(object,       # commOccu object
     
     # summarize estimates (across posterior samples)
     val.mean  <- apply(val, MARGIN = c(1,2), mean)
-    val.lower <- apply(val, MARGIN = c(1,2), quantile, (1-level) / 2)
-    val.upper <- apply(val, MARGIN = c(1,2), quantile, (1 - (1-level) / 2))
+    val.lower <- apply(val, MARGIN = c(1,2), quantile, (1-level) / 2, na.rm = FALSE)
+    val.upper <- apply(val, MARGIN = c(1,2), quantile, (1 - (1-level) / 2), na.rm = FALSE)
     
     # make data frame for ggplot
     val.mean2  <- reshape2::melt(val.mean)
@@ -248,8 +263,11 @@ plot.effects.commOccu <- function(object,       # commOccu object
     
     
     if(submodel == "det")   ylabel <- "Detection probability p"
-    if(submodel == "state" & object@model == "Occupancy") ylabel <- expression(paste("Occupancy probability  ", psi))
-    if(submodel == "state" & object@model == "RN") ylabel <- expression(paste("Abundance"))
+    if(submodel == "state" & object@model == "Occupancy") ylabel <- expr(paste("Occupancy probability  ", psi))# expression("Occupancy probability  ", psi))
+    if(submodel == "state" & object@model == "RN")  {
+      if(response == "occupancy")  ylabel <- expr(paste("Occupancy probability  ", psi))
+      if(response == "abundance")  ylabel <- expr(paste("Local abundance"))
+    } 
     
     main <- paste0(ifelse(covariate_is_site_cov, "Site", "Observation"), " covariate: ", current_cov)
     
@@ -286,7 +304,7 @@ plot.effects.commOccu <- function(object,       # commOccu object
         theme_bw() +
         ggtitle(label = main,
                 subtitle = subtitle) +
-        xlab (ifelse(is_squared, gsub(keyword_squared, "", current_cov), current_cov)) +
+        xlab (ifelse(is_squared, gsub(keyword_quadratic, "", current_cov), current_cov)) +
         ylab(ylabel) +
         xlim(range(vals[, 1])) +
         theme(panel.grid.minor = element_blank())
@@ -356,16 +374,17 @@ plot.effects.commOccu <- function(object,       # commOccu object
   #' @param object \code{commOccu} object
   #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
   #' @param submodel  Submodel to get plots for. Can be "det" or "state"
+  #' @param response response type on y axis. Only relevant for submodel = "state". Default is "occupancy", can be set to "abundance" for Royle-Nichols models
   #' @param draws  Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used
   #' @param outdir Directory to save plots to (optional)
   #' @param level  Probability mass to include in the uncertainty interval
-  #' @param keyword_squared  character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name.
+  #' @param keyword_quadratic  character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name (e.g. if the covariate is "elevation", the quadratic covariate would be "elevation_squared").
   #' @param ...  additional arguments for \code{\link[ggplot2]{ggsave}}
   #'
   #'
   #' @return list of ggplot objects
   #' @export
-  #' @importFrom ggplot2 geom_vline geom_linerange geom_pointrange element_blank theme labs
+  #' @importFrom ggplot2 geom_vline geom_linerange geom_pointrange element_blank theme labs expr
   #' @importFrom ggplot2 scale_color_manual scale_y_discrete aes_string vars facet_grid facet_wrap ylim geom_col
   # @import coda
   #'
@@ -701,6 +720,9 @@ plot.coef.commOccu <- function(object,
     
     type <- NULL   # just for CRAN checks
     covariate <- NULL
+    lower_outer <- NULL
+    upper_outer <- NULL
+    median <- NULL
     
     if(colorby == "significance")      color_by <- "significance"
     if(colorby == "Bayesian p-value")  color_by <- "significance2"
