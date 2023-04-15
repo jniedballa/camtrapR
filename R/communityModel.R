@@ -34,6 +34,7 @@
 #' @param augmentation     If NULL, no data augmentation (only use species in \code{data_list$ylist}), otherwise named list or vector with total number of (potential) species. Names: "maxknown" or "full". Example: \code{augmentation = c(maxknown = 30)} or \code{augmentation = c(full = 30)}
 #' @param modelFile   character. Text file name to save model to
 #' @param nimble  logical. If TRUE, model code will be for Nimble (incompatible with JAGS). If FALSE, model code is for JAGS.
+#' @param keyword_quadratic  character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name (e.g. if the covariate is "elevation", the quadratic covariate would be "elevation_squared").
 #'
 #'
 #' @details
@@ -284,7 +285,8 @@ communityModel <- function(data_list,
                            richnessCategories = NULL,
                            augmentation = NULL,
                            modelFile = NULL,
-                           nimble = FALSE)
+                           nimble = FALSE,
+                           keyword_quadratic = "_squared")
 {   
   
   
@@ -365,7 +367,7 @@ communityModel <- function(data_list,
   keyword_nested <- "+Species"
   
   # keyword for quadratic covariate effect
-  keyword_quadratic <- "_squared"
+  # keyword_quadratic <- "_squared"
   
   # parse covariates ####
   
