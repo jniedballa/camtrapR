@@ -142,10 +142,6 @@ Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016): camtrapR: an R pa
 
 camtrapR Google Group \url{https://groups.google.com/forum/#!forum/camtrapr} \cr
 
-Lemon, J. (2006) Plotrix: a package in the red light district of R. R-News, 6(4): 8-12. \cr
-
-Mike Meredith and Martin Ridout (2018). overlap: Estimates of coefficient of overlapping for animal activity patterns. R package version 0.3.2. \url{https://CRAN.R-project.org/package=overlap} \cr
-
 Phil Harvey's ExifTool \url{https://exiftool.org/} \cr
 }
 
