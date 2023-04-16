@@ -14,7 +14,8 @@
   interval = c("none", "confidence"),
   x,
   aoi = NULL,
-  speciesSubset
+  speciesSubset,
+  batch = FALSE
 )
 }
 \arguments{
@@ -35,10 +36,15 @@
 \item{aoi}{RasterLayer with same dimensions as x, indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.}
 
 \item{speciesSubset}{species to include in richness estimates. Can be index number or species names.}
+
+\item{batch}{logical or numeric. If FALSE, all raster cells / data frame rows will be processed at once (can be memory intensive). If TRUE, computation is conducted in batches of 1000. If numeric, it is the desired batch size.}
 }
 \value{
-A raster stack or data.frame, depending on x. If type = "pao", a list. If type = "psi_array", a 3D-array [cell, species, draw].
+A raster stack or data.frame, depending on \code{x}. If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [cell, species, draw].
 }
 \description{
-Create (spatial) predictions of species occupancy and species richness from community occupancy models and raster stacks.
+Create (spatial) predictions of species occupancy and species richness from community occupancy models and raster stacks or covariate data frames.
+}
+\details{
+Processing can be very memory-intensive. If memory is insufficient, use the  \code{batch} parameter. This can enable processing for higher numbers of \code{draws} or very large rasters / data frames.
 }
