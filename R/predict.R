@@ -20,7 +20,8 @@ predictionMapsCommunity <- function(object,
                                     x,
                                     aoi = NULL,
                                     speciesSubset,
-                                    batch = FALSE) 
+                                    batch = FALSE,
+                                    seed) 
 {
   
   # type <- match.arg(type, choices = c("psi_array", "psi", "richness", "pao"))
@@ -60,6 +61,11 @@ predictionMapsCommunity <- function(object,
   stopifnot(all(cov_info_subset$coef %in% object@params))
   params_submodel <- object@params[grep(keyword_submodel, object@params)]
   
+  
+  if(hasArg(seed)){
+    stopifnot(is.numeric(seed))
+    set.seed(seed)
+  }
   
   # subset posterior matrix to number of draws
   posterior_matrix <- as.matrix(mcmc.list)
@@ -773,6 +779,7 @@ predictionMapsCommunity <- function(object,
 #' @param aoi RasterLayer with same dimensions as x, indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.
 #' @param speciesSubset  species to include in richness estimates. Can be index number or species names.
 #' @param batch logical or numeric. If FALSE, all raster cells / data frame rows will be processed at once (can be memory intensive). If TRUE, computation is conducted in batches of 1000. If numeric, it is the desired batch size.
+#' @param seed numeric. Seed to use in \code{set.seed} for reproducible results (ensures that \code{draws} are identical).
 #'
 #' @details Processing can be very memory-intensive. If memory is insufficient, use the  \code{batch} parameter. This can enable processing for higher numbers of \code{draws} or very large rasters / data frames. 
 #' 

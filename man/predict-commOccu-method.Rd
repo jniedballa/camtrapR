@@ -15,7 +15,8 @@
   x,
   aoi = NULL,
   speciesSubset,
-  batch = FALSE
+  batch = FALSE,
+  seed
 )
 }
 \arguments{
@@ -38,6 +39,8 @@
 \item{speciesSubset}{species to include in richness estimates. Can be index number or species names.}
 
 \item{batch}{logical or numeric. If FALSE, all raster cells / data frame rows will be processed at once (can be memory intensive). If TRUE, computation is conducted in batches of 1000. If numeric, it is the desired batch size.}
+
+\item{seed}{numeric. Seed to use in \code{set.seed} for reproducible results (ensures that \code{draws} are identical).}
 }
 \value{
 A raster stack or data.frame, depending on \code{x}. If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [cell, species, draw].
