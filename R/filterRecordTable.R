@@ -49,11 +49,12 @@
 #'
 #' @examples
 #' 
+#' if (Sys.which("exiftool") != ""){        # only run example if ExifTool is available
 #' 
 #' # set directory with camera trap images in station directories
 #' wd_images_ID_species <- system.file("pictures/sample_images_species_dir", 
 #'                                     package = "camtrapR")
-
+#'                                     
 #' # create record table without temporal filtering
 #'rec_table <- recordTable(inDir                  = wd_images_ID_species,
 #'                         IDfrom                 = "directory",
@@ -70,6 +71,9 @@
 #'                                     deltaTimeComparedTo = "lastIndependentRecord")
 #'  nrow(rec_table)
 #'  nrow(rec_table_filt)
+#'  
+#'  }
+
 
 
 filterRecordTable <- function(#inDir,
