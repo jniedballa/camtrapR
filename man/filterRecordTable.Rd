@@ -20,7 +20,8 @@ filterRecordTable(
   writecsv = FALSE,
   outDir,
   eventSummaryColumn,
-  eventSummaryFunction
+  eventSummaryFunction,
+  quiet = FALSE
 )
 }
 \arguments{
@@ -76,6 +77,8 @@ a metadata tag) by to summarise non-independent records (those within
 \item{eventSummaryFunction}{character. The function by which to summarise
 \code{eventSummaryColumn} of non-independent records, e.g. "sum", "max"
 (optional)}
+
+\item{quiet}{logical. If TRUE, suppress printing of progress.}
 }
 \value{
 A data frame containing species records and additional information

@@ -38,6 +38,7 @@
 #' @param eventSummaryFunction character. The function by which to summarise
 #' \code{eventSummaryColumn} of non-independent records, e.g. "sum", "max"
 #' (optional)
+#' @param quiet logical. If TRUE, suppress printing of progress.
 #'
 #' @return A data frame containing species records and additional information
 #' about stations, date, time, filtered for temporal independence.
@@ -104,8 +105,9 @@ filterRecordTable <- function(#inDir,
                         
                         #returnFileNamesMissingTags = FALSE,
                         eventSummaryColumn,
-                        eventSummaryFunction#,
+                        eventSummaryFunction,
                         #video
+                        quiet = FALSE
 )
 {
   
@@ -398,7 +400,8 @@ filterRecordTable <- function(#inDir,
                                                    recordDateTimeCol      = recordDateTimeCol,
                                                    current                = i, 
                                                    total                  = length(record.table.list),
-                                                   max_nchar_station      = max_nchar_station)
+                                                   max_nchar_station      = max_nchar_station,
+                                                   quiet                  = quiet)
         
         
         # assess independence between records and calculate time differences
