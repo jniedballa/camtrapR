@@ -1,13 +1,13 @@
 
 plot.effects.commOccu <- function(object,       # commOccu object
-                                   mcmc.list,    # mcmc.list (output of fit())
-                                   submodel = "state",      # "det" or "state"
+                                  mcmc.list,    # mcmc.list (output of fit())
+                                  submodel = "state",      # "det" or "state"
                                   response = "occupancy",
-                                   draws = 1000,    # number of posterior samples to use (will draw random sample from posterior distribution if defined). 
-                                   outdir,       # directory to save plots in (optional)
-                                   level = 0.95,   # confidence level for CIs in plot
-                                   keyword_quadratic = "_squared",   # the suffix of a covariate that indicates a quadratic effect  (e.g. "elevation" and "elevation_squared" -> will be combined in plot)
-                                   ...)                            # additional arguments for ggsave()
+                                  draws = 1000,    # number of posterior samples to use (will draw random sample from posterior distribution if defined). 
+                                  outdir,       # directory to save plots in (optional)
+                                  level = 0.95,   # confidence level for CIs in plot
+                                  keyword_quadratic = "_squared",   # the suffix of a covariate that indicates a quadratic effect  (e.g. "elevation" and "elevation_squared" -> will be combined in plot)
+                                  ...)                            # additional arguments for ggsave()
 {
   
   
@@ -262,11 +262,24 @@ plot.effects.commOccu <- function(object,       # commOccu object
     vals <- vals[order(vals$Species, vals[, 1]),]
     
     
-    if(submodel == "det")   ylabel <- "Detection probability p"
-    if(submodel == "state" & object@model == "Occupancy") ylabel <- expr(paste("Occupancy probability  ", psi))# expression("Occupancy probability  ", psi))
+    if(submodel == "det")  {
+      label_filename <- "detection"
+      ylabel <- "Detection probability p"
+    }
+    if(submodel == "state" & object@model == "Occupancy"){
+      label_filename <- "occupancy"
+      ylabel <- expr(paste("Occupancy probability  ", psi))
+    }
     if(submodel == "state" & object@model == "RN")  {
-      if(response == "occupancy")  ylabel <- expr(paste("Occupancy probability  ", psi))
-      if(response == "abundance")  ylabel <- expr(paste("Local abundance"))
+      if(response == "occupancy"){
+        label_filename <- "occupancy"
+        ylabel <- expr(paste("Occupancy probability  ", psi))
+      }
+      
+      if(response == "abundance"){
+        label_filename <- "abundance"
+        ylabel <- expr(paste("Local abundance"))
+      }
     } 
     
     main <- paste0(ifelse(covariate_is_site_cov, "Site", "Observation"), " covariate: ", current_cov)
@@ -348,7 +361,7 @@ plot.effects.commOccu <- function(object,       # commOccu object
     
     
     if(hasArg(outdir)) {
-      ggsave(filename = file.path(outdir, paste0("response_curves_", current_cov, "_", Sys.Date(),  ".png")),
+      ggsave(filename = file.path(outdir, paste0("response_curves_", label_filename, "_", current_cov, "_", Sys.Date(),  ".png")),
              plot = p,
              ...)
     }
@@ -375,7 +388,7 @@ plot.effects.commOccu <- function(object,       # commOccu object
   #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
   #' @param submodel  Submodel to get plots for. Can be "det" or "state"
   #' @param response response type on y axis. Only relevant for submodel = "state". Default is "occupancy", can be set to "abundance" for Royle-Nichols models
-  #' @param draws  Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used
+  #' @param draws  Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in \code{draws} are available, all posterior samples are used.
   #' @param outdir Directory to save plots to (optional)
   #' @param level  Probability mass to include in the uncertainty interval
   #' @param keyword_quadratic  character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name (e.g. if the covariate is "elevation", the quadratic covariate would be "elevation_squared").

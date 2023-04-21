@@ -26,7 +26,7 @@
 
 \item{response}{response type on y axis. Only relevant for submodel = "state". Default is "occupancy", can be set to "abundance" for Royle-Nichols models}
 
-\item{draws}{Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used}
+\item{draws}{Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in \code{draws} are available, all posterior samples are used.}
 
 \item{outdir}{Directory to save plots to (optional)}
 
