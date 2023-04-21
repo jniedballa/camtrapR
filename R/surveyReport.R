@@ -486,7 +486,7 @@ surveyReport <- function(recordTable,
   
   cat("\n-------------------------------------------------------\n")
   print(paste("Trap nights (number of active 24 hour cycles completed by independent cameras): ",
-              sum(station.info.combined$n_trap_nights_active)
+              round(sum(station.info.combined$n_trap_nights_active), 1)
   ))
   
   # cat("\n-------------------------------------------------------\n")
