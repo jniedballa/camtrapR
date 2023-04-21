@@ -388,15 +388,12 @@ removeDuplicatesOfRecords <- function(metadata.tmp,
                                       recordDateTimeCol = "DateTimeOriginal",
                                       current, 
                                       total,
-                                      max_nchar_station){
+                                      max_nchar_station,
+                                      quiet = FALSE){
+  
   metadata.tmp0 <- metadata.tmp
   
-  # if(hasArg(current)) {
-    pb <- makeProgressbar(current = current, total = total)
-    printmessages <- TRUE
-  # } else {
-  #   printmessages <- TRUE   # ok?
-  # }
+
   
   if(isTRUE(removeDuplicateRecords)){
     if(isTRUE(camerasIndependent)){
@@ -411,34 +408,37 @@ removeDuplicatesOfRecords <- function(metadata.tmp,
       }
     }
     
-    # if(printmessages){
-    if(length(unique(metadata.tmp[,stationCol])) == 1) {                  # 1 station per exiftool call
-      message(formatC(as.character(unique(metadata.tmp[,stationCol])), 
-                      width = max_nchar_station, 
-                      flag = "-"), ":  ",
-              formatC(nrow(metadata.tmp0), width = 5), " images ", 
-              formatC(length(remove.tmp),  width = 4), " duplicates removed",
-              pb)
-    } else {                                                               # > 1 station per exiftool call (recordTableIndividual)
-      message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ",
-              formatC(nrow(metadata.tmp0), width = 5), " images ", 
-              formatC(length(remove.tmp),  width = 4), " duplicates removed",
-              pb)
-    }
-  } 
-  
-  
-  if(isFALSE(removeDuplicateRecords)){
-    if(length(unique(metadata.tmp[,stationCol])) == 1) {                  # 1 station per exiftool call
-      message(formatC(as.character(unique(metadata.tmp[,stationCol])), 
-                      width = max_nchar_station, 
-                      flag = "-"), ":  ",
-              formatC(nrow(metadata.tmp0), width = 5), " images", 
-              pb)
-    } else {                                                               # > 1 station per exiftool call (recordTableIndividual)
-      message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ", 
-              formatC(nrow(metadata.tmp0), width = 5), " images", 
-              pb)
+    if(!quiet) {
+      pb <- makeProgressbar(current = current, total = total)
+      
+      if(length(unique(metadata.tmp[,stationCol])) == 1) {                  # 1 station per exiftool call
+        message(formatC(as.character(unique(metadata.tmp[,stationCol])), 
+                        width = max_nchar_station, 
+                        flag = "-"), ":  ",
+                formatC(nrow(metadata.tmp0), width = 5), " images ", 
+                formatC(length(remove.tmp),  width = 4), " duplicates removed",
+                pb)
+      } else {                                                               # > 1 station per exiftool call (recordTableIndividual)
+        message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ",
+                formatC(nrow(metadata.tmp0), width = 5), " images ", 
+                formatC(length(remove.tmp),  width = 4), " duplicates removed",
+                pb)
+      }
+    } 
+    
+    
+    if(isFALSE(removeDuplicateRecords)){
+      if(length(unique(metadata.tmp[,stationCol])) == 1) {                  # 1 station per exiftool call
+        message(formatC(as.character(unique(metadata.tmp[,stationCol])), 
+                        width = max_nchar_station, 
+                        flag = "-"), ":  ",
+                formatC(nrow(metadata.tmp0), width = 5), " images", 
+                pb)
+      } else {                                                               # > 1 station per exiftool call (recordTableIndividual)
+        message(paste(unique(metadata.tmp[,stationCol]), collapse = ", "), ":  ", 
+                formatC(nrow(metadata.tmp0), width = 5), " images", 
+                pb)
+      }
     }
   }
   return(metadata.tmp)
