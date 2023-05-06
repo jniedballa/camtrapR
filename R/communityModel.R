@@ -1952,10 +1952,10 @@ setMethod("fit", signature(object = "commOccu"),
 
 summary.commOccu <- function(object, ...) {
   
-  if(mod.jags@model == "RN")        model_type <- "Royle-Nichols community occupancy model"
-  if(mod.jags@model == "Occupancy") model_type <- "community occupancy model"
+  if(object@model == "RN")        model_type <- "Royle-Nichols community occupancy model"
+  if(object@model == "Occupancy") model_type <- "community occupancy model"
   
-  cat(paste0("commOccu object for ", model_type, " in ", ifelse(object@nimble, "Nimble", "JAGS"), ")\n\n"))
+  cat(paste0("commOccu object for ", model_type, " (in ", ifelse(object@nimble, "Nimble", "JAGS"), ")\n\n"))
   dims <- dim(object@data$y)
   cat(paste(dims[1], "species, ",
             dims[2], "stations, ", 
