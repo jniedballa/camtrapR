@@ -272,14 +272,22 @@ predictionMapsCommunity <- function(object,
         }
       }
       
-    })   # end lapply 
+      if(!type %in% c("abundance", "lambda_array")) {
+        return(psi) 
+      } else {
+        return(lambda)
+      }
     
+      
+    })   # end lapply 
     
     if(type %in% c("abundance", "lambda_array")) {
       lambda <- abind::abind(array_list, along = 1)
     } else {
       psi <- abind::abind(array_list, along = 1)
     } 
+    
+    rm(array_list)
     
   }
   
