@@ -459,7 +459,8 @@ communityModel <- function(data_list,
     if(!all(c("obsCovs", "siteCovs") %in% names(data_list))) {
       stop("detCovs is defined, but data_list does not contain siteCovs or obsCovs.", call. = F)
     } else {
-      covariate_info <- rbind(covariate_info, get_cov_info (detCovs, keyword_nested, keyword_quadratic, data_list, type = "site", submodel = "det"))
+      covariate_info <- rbind(covariate_info, 
+                              get_cov_info (detCovs, keyword_nested, keyword_quadratic, data_list, type = "site", submodel = "det"))
     }
   }
   
@@ -467,7 +468,8 @@ communityModel <- function(data_list,
     if(! "siteCovs" %in% names(data_list)) {
       stop("occuCovs is defined, but data_list does not contain siteCovs.", call. = F)
     } else {
-      covariate_info <- rbind(covariate_info, get_cov_info (occuCovs, keyword_nested, keyword_quadratic, data_list, type = "site", submodel = "state")) 
+      covariate_info <- rbind(covariate_info, 
+                              get_cov_info (occuCovs, keyword_nested, keyword_quadratic, data_list, type = "site", submodel = "state")) 
     }
   }
   
@@ -630,6 +632,13 @@ communityModel <- function(data_list,
     }
   }
   
+  
+  # check is covariates are scaled
+  if(length(covariates_numeric) >= 1) {
+    if(any(abs(sapply(data_list$siteCovs[, covariates_numeric], mean)) > 1)){
+      message("Site covariates may not be scaled. Scaling is strongly recommended for numeric covariates.")
+    }
+  }
   
                        
   
