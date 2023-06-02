@@ -177,7 +177,7 @@ activityRadial <- function(recordTable,
                    clockwise = TRUE,
                    start = (pi/2),
                    labels = paste(formatC(seq.tmp$hour, width = 2,  flag = 0), "00", sep = ""),
-                   main = paste("Activity of", species),
+                   main = species,
                    boxed.radial = FALSE,
                    ...)
       #title(main = paste("Activity of", species), line = 3)
@@ -189,7 +189,7 @@ activityRadial <- function(recordTable,
                    clockwise = TRUE,
                    start = (pi/2),
                    labels = paste(formatC(seq.tmp$hour, width = 2,  flag = 0), "00", sep = ""),
-                   main = paste("Activity of", species),
+                   main = species,
                    boxed.radial = FALSE,
                    ...)
       #title(main = paste("Activity of", species), line = 3)
@@ -225,7 +225,7 @@ activityRadial <- function(recordTable,
                      clockwise = TRUE,
                      start = (pi/2),
                      labels = paste(formatC(seq.tmp$hour, width = 2,  flag = 0), "00", sep = ""),
-                     main = paste("Activity of", spec.tmp),
+                     main = spec.tmp,
                      boxed.radial = FALSE,
                      ...)
         #title(main = paste("Activity of", spec.tmp), line = 3)             
@@ -238,7 +238,7 @@ activityRadial <- function(recordTable,
                      clockwise = TRUE,
                      start = (pi/2),
                      labels = paste(formatC(seq.tmp$hour, width = 2,  flag = 0), "00", sep = ""),
-                     main = paste("Activity of", spec.tmp),
+                     main = spec.tmp,
                      boxed.radial = FALSE,
                      ...)
         #title(main = paste("Activity of", spec.tmp), line = 3)             
