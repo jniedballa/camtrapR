@@ -1,4 +1,6 @@
-#' Add a directory to PATH temporarily
+#' Add a directory to PATH temporarily (Deprecated)
+#' 
+#' This function is deprecated and was replaced by \code{\link{addToPath}}.
 #' 
 #' Temporarily adds a directory to the environmental variable PATH for system
 #' calls from within R. This allows Windows users to store exiftool.exe
@@ -30,8 +32,10 @@
 #' @export exiftoolPath
 #' 
 exiftoolPath <- function(exiftoolDir){
-  WPATH <- Sys.getenv("PATH")
-  WPATH1 <- paste(exiftoolDir, WPATH, sep=";")
-  Sys.setenv(PATH=WPATH1)
-  return(invisible(grepl(exiftoolDir,  Sys.getenv("PATH"))))
+  warning("The 'exiftoolPath' function is deprecated. Please use 'addToPath' instead.")
+  addToPath(exiftoolDir)
+  # WPATH <- Sys.getenv("PATH")
+  # WPATH1 <- paste(exiftoolDir, WPATH, sep=";")
+  # Sys.setenv(PATH=WPATH1)
+  # return(invisible(grepl(exiftoolDir,  Sys.getenv("PATH"))))
 }

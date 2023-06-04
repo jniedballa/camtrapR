@@ -2,7 +2,7 @@
 % Please edit documentation in R/exiftoolPath.R
 \name{exiftoolPath}
 \alias{exiftoolPath}
-\title{Add a directory to PATH temporarily}
+\title{Add a directory to PATH temporarily (Deprecated)}
 \usage{
 exiftoolPath(exiftoolDir)
 }
@@ -15,11 +15,13 @@ invisible logical indicating whether \code{exiftoolDir} was added to
 PATH successfully (in the running R process).
 }
 \description{
+This function is deprecated and was replaced by \code{\link{addToPath}}.
+}
+\details{
 Temporarily adds a directory to the environmental variable PATH for system
 calls from within R. This allows Windows users to store exiftool.exe
 anywhere on their hard drive. It is not needed on Linux or MacOS machines.
-}
-\details{
+
 Several functions within this package depend on ExifTool. Under Windows,
 exiftool.exe cannot be used if it is not in a directory path specified in
 PATH. This can be solved by adding the directory containing exiftool.exe for
