@@ -704,6 +704,8 @@ checkCamOpColumnNames <- function(cameraOperationMatrix){
   
   if(any(is.na(colnames(cameraOperationMatrix)))) stop("There are NAs in the column names of camOp", call. = FALSE)
   
+  if(!all(diff(as.Date(colnames(camop))) == 1)) stop("Column names in camop must be a continuous sequence of dates without gaps", call. = FALSE)
+  
   # check if camera operration matrix has time shift
   if(all(grepl(pattern = "+", colnames(cameraOperationMatrix), fixed = TRUE))){
     colnames_as_dates <- sapply(strsplit(colnames(cameraOperationMatrix), split = "+", fixed = TRUE), FUN = function(x)x[1])
