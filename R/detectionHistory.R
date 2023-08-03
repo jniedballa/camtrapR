@@ -576,10 +576,15 @@ detectionHistory <- function(recordTable,
       } 
     }
     
+
+   # ensure that occasions with NA or 0 effort are NA in detectionHistory
   if(occasionLength == 1){
     record.hist[is.na(cam.op.worked)] <- NA   # remove the records that were taken when cams were NA (redundant with above:   # remove records taken after day1 + maxNumberDays)
+    if(isFALSE(scaleEffort)) record.hist[cam.op.worked == 0] <- NA
+    
   } else {
     record.hist[is.na(effort)] <- NA     # just to make sure NA stays NA
+    if(isFALSE(scaleEffort)) record.hist[effort == 0] <- NA
   }
     
    # rm(occasions.by.station, xyz)
