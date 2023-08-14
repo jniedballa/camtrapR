@@ -1606,7 +1606,8 @@ parseDateTimeObject <- function(inputColumn,
     if(inherits(inputColumn, "POSIXct")){
       message(paste("datetime column is in POSIXct format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
     } 
-    inputColumn <- as.character(inputColumn)
+    # inputColumn <- as.character(inputColumn)  # converts date-time to date if time = 00:00:00
+    inputColumn <- format(inputColumn, format = "%Y-%m-%d %H:%M:%S")
   } else {
     if(!class(inputColumn) %in% c("factor", "character")) stop(paste("datetime column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
   }
