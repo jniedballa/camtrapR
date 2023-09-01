@@ -1,11 +1,12 @@
 # camtrapR 2.2.1
 
 ## new functions
+* surveyDashboard: Shiny dashboard for summarizing and analyzing camera trap survey data
 * filterRecordTable: filter existing record table for temporal independence between records
 * addToPath: replacement for exiftoolPath with identical functionality
 
 ## new features
-* communityModel: new argument "model" allows Royle-Nichols models 
+* communityModel: new argument "model" allows Royle-Nichols models
 * fit(), predict(), plot_effects(), plot_coef() also support Royle-Nichols models
 * predict: now accepts type = "pao" (for percentage of area occupied, by species) and "psi_array" (raw occupancy probabilities), "abundance" ( abundance statistics, for Royle-Nichols model) and "lambda_array" (raw abundances from Royle-Nichols model)
 * predict: new argument "batch" to allow memory-friendly processing in batches
