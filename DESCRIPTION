@@ -1,8 +1,8 @@
 Package: camtrapR
 Type: Package
 Title: Camera Trap Data Management and Preparation of Occupancy and Spatial Capture-Recapture Analyses
-Version: 2.2.0.8
-Date: 2023-04-14
+Version: 2.2.0.9
+Date: 2023-08-28
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
                 comment = c(ORCID = "0000-0002-9187-2116")),
@@ -28,39 +28,46 @@ Authors@R: c(
 Depends: 
         R (>= 3.1.0)
 Imports: 
-        methods,
-        generics,
-        sf, 
-        sp,
-        overlap, 
-        secr, 
         data.table,
+        generics,
+        ggplot2,
         lubridate,
-        ggplot2
+        methods,
+        overlap,
+        secr,
+        sf,
+        sp
 Suggests: 
-        knitr, 
-        raster,  
-        rgdal,
-        ritis, 
-        rmarkdown, 
-        taxize, 
-        testthat, 
-        tibble, 
-        unmarked, 
-        zip,
-        RSQLite,
+        abind,
+        coda,
+        DT,
+        knitr,
         lattice,
+        leaflet,
         magick,
-        tesseract,
-        snow,
+        mapview,
         nimble,
         nimbleEcology,
-        coda,
-        rjags,
-        snowfall,
+        plotly,
+        raster,
         reshape2,
+        rgdal,
+        rjags,
         R.rsp,
-        abind
+        RSQLite,
+        ritis,
+        rmarkdown,
+        shiny,
+        shinydashboard,
+        snow,
+        snowfall,
+        tesseract,
+        taxize,
+        testthat,
+        tibble,
+        units,
+        unmarked,
+        zip
 VignetteBuilder: R.rsp
 SystemRequirements: ExifTool (https://exiftool.org/)
 Description: Management of and data extraction from camera trap data in wildlife studies. The package provides a workflow for storing and sorting camera trap photos (and videos), tabulates records of species and individuals, and creates detection/non-detection matrices for occupancy and spatial capture-recapture analyses with great flexibility. In addition, it can visualise species activity data and provides simple mapping functions with GIS export.
