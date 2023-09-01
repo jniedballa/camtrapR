@@ -1508,7 +1508,8 @@ assignSessionIDtoRecordTable <- function(recordTable_tmp,
 
 dataFrameTibbleCheck <- function(df, 
                                  tibble_allowed = TRUE, 
-                                 data_table_allowed = TRUE){
+                                 data_table_allowed = TRUE,
+                                 message = FALSE){
   
   # check if it is a data.frame at all
   if(!is.data.frame(df)) stop(paste(substitute(df), "must be a data.frame"), call. = FALSE)
@@ -1518,7 +1519,7 @@ dataFrameTibbleCheck <- function(df,
     
     if(tibble::is_tibble(df)) {
       if(tibble_allowed) {
-        message (paste(substitute(df), "was converted from tibble to data.frame"))
+        if(message) message (paste(substitute(df), "was converted from tibble to data.frame"))
         df <- as.data.frame(df)
       } else {
         stop (paste(substitute(df), "is a tibble. Please provide a data.frame instead (use read.csv() or as.data.frame())"), call. = FALSE)
@@ -1586,7 +1587,7 @@ parseDateObject <- function(inputColumn,
 }
 
 
-# check and convert date - time (character) to datetime objects (POSIXlt), either with base functions or lubridate    ####
+# check and convert date - time (character) to datetime objects (POSIXct), either with base functions or lubridate    ####
 
 parseDateTimeObject <- function(inputColumn,   
                                 dateTimeFormat,
@@ -1600,16 +1601,16 @@ parseDateTimeObject <- function(inputColumn,
   
   if(any(c("POSIXct", "POSIXlt") %in% class(inputColumn))){
     if(inherits(inputColumn, "POSIXlt")) {
-      warning(paste("datetime column is in POSIXlt format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
+      # warning(paste("datetime column is in POSIXlt format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
     }
     
     if(inherits(inputColumn, "POSIXct")){
-      message(paste("datetime column is in POSIXct format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
-    } 
+      # message(paste("datetime column is in POSIXct format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
+    }
     # inputColumn <- as.character(inputColumn)  # converts date-time to date if time = 00:00:00
     inputColumn <- format(inputColumn, format = "%Y-%m-%d %H:%M:%S")
   } else {
-    if(!class(inputColumn) %in% c("factor", "character")) stop(paste("datetime column must be a factor or character:", deparse(substitute(inputColumn))), call. = FALSE)
+    if(!class(inputColumn) %in% c("character")) stop(paste("datetime column must be a character:", deparse(substitute(inputColumn))), call. = FALSE)
   }
   
   if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
@@ -1622,7 +1623,7 @@ parseDateTimeObject <- function(inputColumn,
   
   # option 1: base functions for dates as per strptime (identified by "%")
   if(grepl(pattern = "%", x = dateTimeFormat, fixed = TRUE)){
-    out <- as.POSIXlt(inputColumn.char, tz = timeZone, format = dateTimeFormat)
+    out <- as.POSIXct(inputColumn.char, tz = timeZone, format = dateTimeFormat)
   } else {
     # option 2: lubridate functions (identified by absence of "%")
     if(!requireNamespace("lubridate", quietly = TRUE)) stop(paste("package 'lubridate' is required for the specified dateTimeFormat", dateTimeFormat))
