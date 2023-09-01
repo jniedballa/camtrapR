@@ -7,6 +7,7 @@ library(lubridate)
 data(camtraps)
 
 # create camera operation matrix
+# dates are specified as character
 camop_no_problem <- cameraOperation(CTtable      = camtraps,
                                     stationCol   = "Station",
                                     setupCol     = "Setup_date",
@@ -42,6 +43,7 @@ camtraps_date$Problem1_from   <- dmy(camtraps$Problem1_from )
 camtraps_date$Problem1_to     <- dmy(camtraps$Problem1_to )
 
 
+# dates are specified as Date class
 camop_dates <- cameraOperation(CTtable      = camtraps_date,
                                stationCol   = "Station",
                                setupCol     = "Setup_date",
@@ -51,24 +53,113 @@ camop_dates <- cameraOperation(CTtable      = camtraps_date,
                                dateFormat   = "ymd"
 )
 
+
+
+# Date-time 
+
 # add time of day to setup / retrieval / problem
+# date-time is provided as POXIXct
+
 camtraps_date_time <- camtraps
 camtraps_date_time$Setup_date      <- dmy_h(paste(camtraps$Setup_date, "12"))
 camtraps_date_time$Retrieval_date  <- dmy_h(paste(camtraps$Retrieval_date, "15" ))
 camtraps_date_time$Problem1_from   <- dmy_h(paste(camtraps$Problem1_from, "06" ), quiet = TRUE)
 camtraps_date_time$Problem1_to     <- dmy_h(paste(camtraps$Problem1_to, "15" ), quiet = TRUE)
 
-
 camop_dates_time <- cameraOperation(CTtable      = camtraps_date_time,
                                     stationCol   = "Station",
                                     setupCol     = "Setup_date",
                                     retrievalCol = "Retrieval_date",
-                                    #writecsv     = FALSE,
                                     hasProblems  = TRUE,
                                     dateFormat   = "ymd HMS"
 )
 
+
+# date-time is provided as character
+camtraps_date_time_char <- camtraps_date_time
+camtraps_date_time_char$Setup_date      <- as.character(camtraps_date_time$Setup_date)
+camtraps_date_time_char$Retrieval_date  <- as.character(camtraps_date_time$Retrieval_date)
+camtraps_date_time_char$Problem1_from   <- as.character(camtraps_date_time$Problem1_from)
+camtraps_date_time_char$Problem1_to     <- as.character(camtraps_date_time$Problem1_to)
+
+camop_dates_time_char <- cameraOperation(CTtable      = camtraps_date_time_char,
+                                    stationCol   = "Station",
+                                    setupCol     = "Setup_date",
+                                    retrievalCol = "Retrieval_date",
+                                    hasProblems  = TRUE,
+                                    dateFormat   = "ymd HMS"
+)
+
+
+# set one time to midnight. It should still work.
+# issue is that as.character(POSIXct) removes the time if it's exactly midnight
+# input is character
+camtraps_date_time_char_midnight <- camtraps_date_time_char
+camtraps_date_time_char_midnight$Setup_date[1] <- "2009-04-02 00:00:00"
+
+camop_dates_time_char_midnight <- cameraOperation(CTtable      = camtraps_date_time_char_midnight,
+                                    stationCol   = "Station",
+                                    setupCol     = "Setup_date",
+                                    retrievalCol = "Retrieval_date",
+                                    hasProblems  = TRUE,
+                                    dateFormat   = "ymd HMS"
+)
+
+# input is POSIXct
+# camtraps_date_time_char <- camtraps_date_time
+# camtraps_date_time_char$Setup_date <- format(camtraps_date_time_char$Setup_date, 
+#                                         format = "%Y-%m-%d %H:%M:%S")
+
+camtraps_date_time_midnight <- camtraps_date_time_char_midnight
+camtraps_date_time_midnight$Setup_date <- ymd_hms(camtraps_date_time_midnight$Setup_date)
+camtraps_date_time_midnight$Retrieval_date <- ymd_hms(camtraps_date_time_midnight$Retrieval_date)
+camtraps_date_time_midnight$Problem1_from <- ymd_hms(camtraps_date_time_midnight$Problem1_from)
+camtraps_date_time_midnight$Problem1_to <- ymd_hms(camtraps_date_time_midnight$Problem1_to)
+
+
+
+camop_dates_time_midnight <- cameraOperation(CTtable      = camtraps_date_time_midnight,
+                                     stationCol   = "Station",
+                                     setupCol     = "Setup_date",
+                                     retrievalCol = "Retrieval_date",
+                                     hasProblems  = TRUE,
+                                     dateFormat   = "ymd HMS"
+)
+
+
+# change datetime format
+camtraps_date_time_format <- camtraps_date_time
+stupid_date_format <- "%H:%M:%S %d/%m/%Y"    #"%d/%m/%Y %H:%M:%S"
+camtraps_date_time_format$Setup_date <- format(camtraps_date_time_format$Setup_date, 
+                                        format = stupid_date_format)
+camtraps_date_time_format$Retrieval_date <- format(camtraps_date_time_format$Retrieval_date, 
+                                        format = stupid_date_format)
+camtraps_date_time_format$Problem1_from <- format(camtraps_date_time_format$Problem1_from, 
+                                        format = stupid_date_format)
+camtraps_date_time_format$Problem1_to <- format(camtraps_date_time_format$Problem1_to, 
+                                            format = stupid_date_format)
+
+camop_dates_time_format <- cameraOperation(CTtable      = camtraps_date_time_format,
+                                     stationCol   = "Station",
+                                     setupCol     = "Setup_date",
+                                     retrievalCol = "Retrieval_date",
+                                     hasProblems  = TRUE,
+                                     dateFormat   = "HMS dmy"
+)
+
+
 # Test section
+test_that("POSIX and character give same output", {
+  expect_equal(camop_dates_time, camop_dates_time_char)
+  expect_equal(camop_dates_time_char_midnight, camop_dates_time_midnight)
+})
+
+test_that("Different date formats work", {
+  expect_equal(camop_dates_time_format, camop_dates_time)
+})
+
+camop_dates_time_format
+
 
 test_that("duplicate row error messages work", {
   expect_error(cameraOperation(CTtable      = camtraps_duplicate,
@@ -150,7 +241,7 @@ test_that("Input columns with hours (POSIXct) work", {
 }
 )
 
-test_that("Error when Prolem ends after retrieval", {
+test_that("Error when Problem ends after retrieval", {
   
   # Date-time as POSIX
   camtraps_date_time$Problem1_to[3] <- camtraps_date_time$Problem1_to[3] + 1
@@ -176,3 +267,12 @@ test_that("Error when Prolem ends after retrieval", {
   )
 }
 )
+
+test_that("setting time to 00:00:00 works", {
+  
+  expect_true(camop_dates_time_midnight[1,1] == 1)
+  expect_true(camop_dates_time_char_midnight[1,1] == 1)
+  expect_true(!identical(camop_dates_time_midnight, camop_dates))
+}
+)
+
