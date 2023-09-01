@@ -215,15 +215,26 @@ cameraOperation <- function(CTtable,
   if(!retrievalCol %in% colnames(CTtable))  stop(paste('retrievalCol = "', retrievalCol,   '" is not a column name in CTtable', sep = ''), call. = FALSE)
   
   
+  # flag for whether to use fraction of days (if hours are provided in dateFormat).
+  # If not setup and retrieval are assumed to be at 12 noon
+  effortAsFraction <- grepl("H", dateFormat)
+  
   stopifnot(length(stationCol) == 1)
   CTtable[,stationCol] <- as.character(CTtable[,stationCol])
   
   stopifnot(length(setupCol) == 1)
-  CTtable[,setupCol] <- as.character(CTtable[,setupCol])   # parse_date_time gives error if in Date format
-  
   stopifnot(length(retrievalCol) == 1)
-  CTtable[,retrievalCol] <- as.character(CTtable[,retrievalCol])
   
+  # if(effortAsFraction) {
+  #   CTtable[,setupCol] <- format(CTtable[, setupCol], format = "%Y-%m-%d %H:%M:%S")
+  #   CTtable[,retrievalCol] <- format(CTtable[, retrievalCol], format = "%Y-%m-%d %H:%M:%S")
+  #   dateFormat <- "ymd HMS"
+  # } else {
+  #   CTtable[,setupCol] <- as.character(CTtable[,setupCol])   # parse_date_time gives error if in Date format
+  #   CTtable[,retrievalCol] <- as.character(CTtable[,retrievalCol])
+  # }
+  
+
   stopifnot(is.logical(writecsv))
   stopifnot(is.logical(hasProblems))
   
@@ -322,18 +333,50 @@ cameraOperation <- function(CTtable,
     if(file.exists(outDir) == FALSE) stop("outDir does not exist")
   }
   
-  # check date columns and format
+  # Convert Date columns to character
+  date_columns <- which(sapply(CTtable, is.Date))
+  if(length(date_columns) >= 1) {
+    CTtable[date_columns] <- lapply(CTtable[date_columns], 
+                                    as.character
+                                    # FUN = function(col) format(col, format = "%Y-%m-%d")
+                                    )
+    # dateFormat <- "%Y-%m-%d %H:%M:%S"
+    dateFormat <- "%Y-%m-%d"
+  }
   
-  # flag for whether to use fraction of days (if hours are provided in dateFormat), otherwise daily effort (integer)
-  effortAsFraction <- grepl("H", dateFormat)
+  # Convert POSIX columns to character
+  posix_columns <- which(sapply(CTtable, is.POSIXt))
+  if(length(posix_columns) >= 1) {
+    CTtable[posix_columns] <- lapply(CTtable[posix_columns], 
+                                     # as.character
+                                     FUN = function(col) format(col, format = "%Y-%m-%d %H:%M:%S")
+                                     )
+    dateFormat <- "%Y-%m-%d %H:%M:%S"
+  }
+  
+  # if(exists("dateFormat_new")) dateFormat <- dateFormat_new
   
   # if dateFormat contains H (hour), use parseDateTimeObject, otherwise parseDateObject
   if(effortAsFraction) {
-    CTtable[,setupCol]     <- parseDateTimeObject(inputColumn = CTtable[,setupCol],     dateTimeFormat = dateFormat, checkNA = TRUE, checkEmpty = TRUE, timeZone = "UTC")
-    CTtable[,retrievalCol] <- parseDateTimeObject(inputColumn = CTtable[,retrievalCol], dateTimeFormat = dateFormat, checkNA = TRUE, checkEmpty = TRUE, timeZone = "UTC")
+    CTtable[,setupCol]     <- parseDateTimeObject(inputColumn = CTtable[,setupCol],     
+                                                  dateTimeFormat = dateFormat, 
+                                                  checkNA = TRUE, 
+                                                  checkEmpty = TRUE, 
+                                                  timeZone = "UTC")
+    CTtable[,retrievalCol] <- parseDateTimeObject(inputColumn = CTtable[,retrievalCol], 
+                                                  dateTimeFormat = dateFormat, 
+                                                  checkNA = TRUE, 
+                                                  checkEmpty = TRUE, 
+                                                  timeZone = "UTC")
   } else {
-    CTtable[,setupCol]     <- parseDateObject(inputColumn = CTtable[,setupCol],     dateFormat = dateFormat, checkNA = TRUE, checkEmpty = TRUE)
-    CTtable[,retrievalCol] <- parseDateObject(inputColumn = CTtable[,retrievalCol], dateFormat = dateFormat, checkNA = TRUE, checkEmpty = TRUE)
+    CTtable[,setupCol]     <- parseDateObject(inputColumn = CTtable[,setupCol],     
+                                              dateFormat = dateFormat, 
+                                              checkNA = TRUE, 
+                                              checkEmpty = TRUE)
+    CTtable[,retrievalCol] <- parseDateObject(inputColumn = CTtable[,retrievalCol], 
+                                              dateFormat = dateFormat, 
+                                              checkNA = TRUE, 
+                                              checkEmpty = TRUE)
   }
   
   # if setup time was not defined, assume 12 noon (so effort on setup/retrieval day = 0.5)
