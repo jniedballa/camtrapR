@@ -1,8 +1,8 @@
 Package: camtrapR
 Type: Package
 Title: Camera Trap Data Management and Preparation of Occupancy and Spatial Capture-Recapture Analyses
-Version: 2.2.0.9
-Date: 2023-08-28
+Version: 2.2.0.10
+Date: 2023-11-18
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
                 comment = c(ORCID = "0000-0002-9187-2116")),
@@ -35,8 +35,7 @@ Imports:
         methods,
         overlap,
         secr,
-        sf,
-        sp
+        sf
 Suggests: 
         abind,
         coda,
@@ -49,9 +48,7 @@ Suggests:
         nimble,
         nimbleEcology,
         plotly,
-        raster,
         reshape2,
-        rgdal,
         rjags,
         R.rsp,
         RSQLite,
@@ -63,6 +60,7 @@ Suggests:
         snowfall,
         tesseract,
         taxize,
+        terra,
         testthat,
         tibble,
         units,
