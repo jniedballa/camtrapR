@@ -18,8 +18,10 @@
 * predict / plot_effects: fixed wrong assignment of intercept estimates to posterior draws
 
 ## Other
+* migrated function from raster/sp to terra/sf, removed rgdal
 * deprecated exiftoolPath()
 * modified plot titles in activityRadial().
+
 
 
 # camtrapR 2.2.0
