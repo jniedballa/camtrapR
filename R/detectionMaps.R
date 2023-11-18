@@ -89,16 +89,19 @@
 #' # with a polygon in the background, and for one species only
 #' 
 #' # make a dummy polygon for the background
-#' library(sp)
-#' poly1 <- Polygon(cbind(c(521500,526500,527000, 521500),c(607500, 608000, 603500, 603500)))
-#' poly2 <- Polygons(list(poly1), "s1")
-#' poly3 <- SpatialPolygons(list(poly2))
+#' library(sf)
+#' 
+#' Sr1 = st_polygon(list(cbind(c(521500,526500,527000, 521500, 521500),
+#'                             c(607500, 608000, 603500, 603500, 607500))))
+#' aoi <- data.frame(name = "My AOI")
+#' st_geometry(aoi) <- st_geometry(Sr1)
+#' st_crs(aoi) <- 32650  # assign CRS: UTM50N
 #' 
 #' Mapstest2 <- detectionMaps(CTtable           = camtraps,
 #'                            recordTable       = recordTableSample,
 #'                            Xcol              = "utm_x",
 #'                            Ycol              = "utm_y",
-#'                            backgroundPolygon = poly3,             # this was added
+#'                            backgroundPolygon = aoi,               # this was added
 #'                            speciesToShow     = c("PBE", "VTA"),   # this was added
 #'                            stationCol        = "Station",
 #'                            speciesCol        = "Species",
@@ -112,8 +115,7 @@
 #' 
 #' 
 #' 
-#' @importFrom sf st_as_sf st_set_crs st_write
-#' @importFrom sp coordinates
+#' @importFrom sf st_as_sf st_set_crs st_write st_coordinates
 #' @importFrom grDevices col2rgb dev.off extendrange heat.colors png rgb
 #' @importFrom graphics abline axis box grconvertX grconvertY hist image legend lines mtext par plot plot.default  points polygon rect segments strheight strwidth text
 #' @export detectionMaps
@@ -178,9 +180,8 @@ detectionMaps <- function(CTtable,
   if(any(is.na(CTtable[,stationCol])))stop("there are NAs in stationCol")
 
   if(writeShapefile == TRUE) {
-    
-    if (!requireNamespace("rgdal", quietly = TRUE)) {
-      stop("the package 'rgdal' is needed for writing shapefiles,  you can install it via: install.packages('rgdal')")
+    if (!requireNamespace("sf", quietly = TRUE)) {
+      stop("the package 'sf' is needed for writing shapefiles.")
     } 
     
     stopifnot(hasArg(shapefileDirectory))
@@ -188,8 +189,8 @@ detectionMaps <- function(CTtable,
   }
 
   if(hasArg(backgroundPolygon)){
-    if (!requireNamespace("sp", quietly = TRUE)) stop("package 'sp' is required to plot backgroundPolygon")
-    stopifnot(class(backgroundPolygon) %in% c("SpatialPolygons", "SpatialPolygonsDataFrame"))
+    if (!requireNamespace("sf", quietly = TRUE)) stop("package 'sf' is required to plot backgroundPolygon")
+    stopifnot(any(class(backgroundPolygon) %in% c("sf", "sfg")))
   }
 
   if(hasArg(speciesToShow)){
@@ -265,11 +266,20 @@ detectionMaps <- function(CTtable,
   range.expand.factor <- 0.04
 
   if(hasArg(backgroundPolygon)){
-    x.range <- extendrange(r = range(c(coordinates(backgroundPolygon@bbox)[1,], dat2[,Xcol])), f = range.expand.factor)
-    y.range <- extendrange(r = range(c(coordinates(backgroundPolygon@bbox)[2,], dat2[,Ycol])), f = range.expand.factor)
+    
+    # for sp
+    # x.range.orig <- range(c(coordinates(backgroundPolygon@bbox)[1,], dat2[,Xcol]))
+    # y.range.orig <- range(c(coordinates(backgroundPolygon@bbox)[2,], dat2[,Ycol]))
+    
+    # for sf
+    x.range.orig <- range(c(st_coordinates(backgroundPolygon )[,1], dat2[,Xcol]))
+    y.range.orig <- range(c(st_coordinates(backgroundPolygon )[,2], dat2[,Ycol]))
+    
+    x.range <- extendrange(r = x.range.orig, f = range.expand.factor)
+    y.range <- extendrange(r = y.range.orig, f = range.expand.factor)
 
-    X.tmp <- pngMaxPix / diff(range(c(coordinates(backgroundPolygon@bbox)[1,], dat2[,Xcol])))
-    Y.tmp <- pngMaxPix / diff(range(c(coordinates(backgroundPolygon@bbox)[2,], dat2[,Ycol])))
+    X.tmp <- pngMaxPix / diff(x.range.orig)
+    Y.tmp <- pngMaxPix / diff(y.range.orig)
 
   } else {
 
@@ -329,7 +339,9 @@ detectionMaps <- function(CTtable,
            asp = 1,
            xaxs = "i", yaxs = "i")
 
-      if(hasArg(backgroundPolygon)){sp::plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
+      if(hasArg(backgroundPolygon)){plot(backgroundPolygon, add = TRUE, 
+                                         border = col_polygon_border,
+                                         lty = lty_polygon_border, lwd = lwd_polygon_border)}
 
       # station points
       points(y = dat2[, Ycol], x = dat2[, Xcol], pch = pch1,  bg  = col_pt1_fill, col = col_pt1_border,
@@ -387,7 +399,7 @@ detectionMaps <- function(CTtable,
            asp = 1,
            xaxs = "i", yaxs = "i")
 
-      if(hasArg(backgroundPolygon)){sp::plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
+      if(hasArg(backgroundPolygon)){plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
 
       # station points
       points(y = dat2[, Ycol], x = dat2[, Xcol], pch = pch1,  bg  = col_pt1_fill, col = col_pt1_border,
@@ -437,7 +449,7 @@ detectionMaps <- function(CTtable,
              asp = 1,
              xaxs = "i", yaxs = "i")
 
-        if(hasArg(backgroundPolygon)){sp::plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
+        if(hasArg(backgroundPolygon)){plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
 
         # station points
         points(y = dat2[, Ycol], x = dat2[, Xcol], pch = pch1,  bg  = col_pt1_fill, col = col_pt1_border,
@@ -446,18 +458,6 @@ detectionMaps <- function(CTtable,
         points(y = dat2[, Ycol], x = dat2[, Xcol],  pch = pch2,
                col = col_pt2,
                cex = cex.t3[,i]^(1/2) * (cex_pt2.max))
-
-
-
-
-        # plot(y = dat2[, Ycol], x = dat2[, Xcol],  pch = pch1,  bg  = col_pt1_fill, col = col_pt1_border,
-        #      cex = cex_pt1, main = i2a, ylab = Ycol, xlab = Xcol,
-        #      xlim = x.range, ylim = y.range,
-        #      asp = 1,
-        #      xaxs = "i", yaxs = "i")
-        # points(y = dat2[, Ycol], x = dat2[, Xcol],  pch = pch2,
-        #        col = col_pt2,
-        #        cex = cex.t3[,i]^(1/2) * (cex_pt2.max))
 
         if(isTRUE(printLabels)){
           text(y = dat2[, Ycol], x = dat2[, Xcol], labels = dat2[,stationCol], cex = cex.labels, pos = 1, col = "red")
@@ -484,7 +484,7 @@ detectionMaps <- function(CTtable,
              asp = 1,
              xaxs = "i", yaxs = "i")
 
-        if(hasArg(backgroundPolygon)){sp::plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
+        if(hasArg(backgroundPolygon)){plot(backgroundPolygon, add = TRUE, border = col_polygon_border, lty = lty_polygon_border, lwd = lwd_polygon_border)}
 
         # station points
         points(y = dat2[, Ycol], x = dat2[, Xcol], pch = pch1,  bg  = col_pt1_fill, col = col_pt1_border,
@@ -528,15 +528,7 @@ detectionMaps <- function(CTtable,
     } else {
       layer.tmp <- paste("species_detection_", Sys.Date(), sep = "")
     }
-    
-    # spdf <- SpatialPointsDataFrame(coords = outtable[,c(Xcol, Ycol)],
-    #                                    data = outtable,
-    #                                    proj4string = CRS(as.character(proj.tmp)))
-    # 
-    # rgdal::writeOGR(obj = spdf,
-    #                 dsn = shapefileDirectory,
-    #                 layer = layer.tmp,
-    #                 driver = "ESRI Shapefile")
+
     
     outtable_sf <- st_as_sf(outtable, 
                             coords = c(Xcol, Ycol))
