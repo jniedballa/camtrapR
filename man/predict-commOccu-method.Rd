@@ -32,9 +32,9 @@
 
 \item{interval}{Type of interval calculation. Can be "none" or "confidence" (can be abbreviated). Calculation can be slow for type = "psi" with many cells and posterior samples.}
 
-\item{x}{RasterStack or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names.}
+\item{x}{SpatRaster or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names.}
 
-\item{aoi}{RasterLayer with same dimensions as x, indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.}
+\item{aoi}{SpatRaster with same dimensions as x (if x is a SpatRaster), indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.}
 
 \item{speciesSubset}{species to include in richness estimates. Can be index number or species names.}
 
@@ -43,10 +43,10 @@
 \item{seed}{numeric. Seed to use in \code{set.seed} for reproducible results (ensures that \code{draws} are identical).}
 }
 \value{
-A raster stack or data.frame, depending on \code{x}. If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [cell, species, draw].
+A SpatRaster or data.frame, depending on \code{x}. If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [cell, species, draw].
 }
 \description{
-Create (spatial) predictions of species occupancy and species richness from community occupancy models and raster stacks or covariate data frames.
+Create (spatial) predictions of species occupancy and species richness from community occupancy models and spatial rasters or covariate data frames.
 }
 \details{
 Processing can be very memory-intensive. If memory is insufficient, use the  \code{batch} parameter. This can enable processing for higher numbers of \code{draws} or very large rasters / data frames.

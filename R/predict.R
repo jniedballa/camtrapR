@@ -90,8 +90,14 @@ predictionMapsCommunity <- function(object,
   
   
   # convert raster to covariate data frame
-  if("RasterStack" %in% class(x)) {
-    values_to_predict_all <- as.data.frame(raster::values(x))
+  if(class(x) %in% c("SpatRaster", "RasterStack")) {
+    if(class(x) == "RasterStack"){
+    warning("x is a RasterStack. Please use SpatRaster (from the terra package) in the future. Convert via: 
+rast(YourRaster)")
+      x <- terra::rast(x)
+      raster_template <- terra::rast(x, nlyrs = 1, vals = NA)
+    }
+    values_to_predict_all <- as.data.frame(terra::values(x))
   } else {
     if(is.data.frame(x)) {
       values_to_predict_all <- x
@@ -105,18 +111,18 @@ predictionMapsCommunity <- function(object,
   index_not_na <- which(apply(values_to_predict_all, 1, FUN = function(x) all(!is.na(x))))
   
   if(hasArg(aoi)) {
-    if(inherits(x, "data.frame")) stop("aoi can only be defined if x is a RasterStack (not a data.frame).")
-    if(inherits(aoi, "RasterLayer")) {
+    if(inherits(x, "data.frame")) stop("aoi can only be defined if x is a SpatRaster (not a data.frame).")
+    if(inherits(aoi, "SpatRaster")) {
       
-      which_not_na_aoi    <- which(!is.na(raster::values(aoi))) #[index_not_na])
+      which_not_na_aoi    <- which(!is.na(terra::values(aoi)))
       index_not_na <- intersect(index_not_na, which_not_na_aoi)
       
-      aoi2 <- raster::raster(aoi)
-      raster::values(aoi2) <- NA
-      raster::values(aoi2) [index_not_na]  <- 1
+      aoi2 <- terra::rast(aoi)
+      terra::values(aoi2) <- NA
+      terra::values(aoi2) [index_not_na]  <- 1
       
     } else {
-      stop("aoi must be a RasterLayer")
+      stop("aoi must be a SpatRaster")
     }
   }
   
@@ -515,21 +521,21 @@ predictionMapsCommunity <- function(object,
     }
     
     # fill rasters with predicted values
-    if("RasterStack" %in% class(x)) {
-    raster_template <- raster::raster(x)
+    if("SpatRaster" %in% class(x)) {
+    
     r_pred_species <- r_pred_sd_species <- list()
     
     for(i in 1:length(unique(psi.mean.melt$Species))) {
       r_pred_species[[i]]    <- raster_template
       r_pred_sd_species[[i]] <- raster_template
       
-      raster::values(r_pred_species[[i]])    [index_not_na] <- psi.mean.melt$mean[psi.mean.melt$Species == unique(psi.mean.melt$Species)[i]]
-      raster::values(r_pred_sd_species[[i]]) [index_not_na] <- psi.sd.melt$sd[psi.sd.melt$Species == unique(psi.sd.melt$Species)[i]]
+      terra::values(r_pred_species[[i]])    [index_not_na] <- psi.mean.melt$mean[psi.mean.melt$Species == unique(psi.mean.melt$Species)[i]]
+      terra::values(r_pred_sd_species[[i]]) [index_not_na] <- psi.sd.melt$sd[psi.sd.melt$Species == unique(psi.sd.melt$Species)[i]]
     }
     names(r_pred_species) <- names(r_pred_sd_species) <- unique(psi.mean.melt$Species)
     
-    stack_out_mean <- raster::stack(r_pred_species)
-    stack_out_sd   <- raster::stack(r_pred_sd_species)
+    stack_out_mean <- terra::rast(r_pred_species)
+    stack_out_sd   <- terra::rast(r_pred_sd_species)
     }
 
     
@@ -548,21 +554,20 @@ predictionMapsCommunity <- function(object,
         psi.upper2$Species <- dimnames(object@data$y)[[1]][psi.upper2$Species]
       }
       
-      if("RasterStack" %in% class(x)) {
-      raster_template <- raster::raster(x)
+      if("SpatRaster" %in% class(x)) {
       r_pred_lower_species <- r_pred_upper_species <- list()
       
       for(i in 1:length(unique(psi.mean.melt$Species))) {
         r_pred_lower_species[[i]] <- raster_template
         r_pred_upper_species[[i]] <- raster_template
         
-        raster::values(r_pred_lower_species[[i]]) [index_not_na] <- psi.lower2[psi.lower2$Species == unique(psi.lower2$Species)[i], paste0("lower.ci.", level)]
-        raster::values(r_pred_upper_species[[i]]) [index_not_na] <- psi.upper2[psi.upper2$Species == unique(psi.upper2$Species)[i], paste0("upper.ci.", level)]
+        terra::values(r_pred_lower_species[[i]]) [index_not_na] <- psi.lower2[psi.lower2$Species == unique(psi.lower2$Species)[i], paste0("lower.ci.", level)]
+        terra::values(r_pred_upper_species[[i]]) [index_not_na] <- psi.upper2[psi.upper2$Species == unique(psi.upper2$Species)[i], paste0("upper.ci.", level)]
       }
       names(r_pred_lower_species) <- names(r_pred_upper_species) <- unique(psi.mean.melt$Species)
       
-      stack_out_lower   <- raster::stack(r_pred_lower_species)
-      stack_out_upper   <- raster::stack(r_pred_upper_species)
+      stack_out_lower   <- terra::rast(r_pred_lower_species)
+      stack_out_upper   <- terra::rast(r_pred_upper_species)
       
       return(list(mean  = stack_out_mean,
                   sd    = stack_out_sd,
@@ -579,7 +584,7 @@ predictionMapsCommunity <- function(object,
     }
     
     if(interval == "none"){
-      if("RasterStack" %in% class(x)){
+      if("SpatRaster" %in% class(x)){
         return(list(mean = stack_out_mean,
                     sd   = stack_out_sd))
       } else {
@@ -630,23 +635,22 @@ predictionMapsCommunity <- function(object,
       psi.bin.sum.upper <- apply(psi.bin.sum, 1, quantile, (1 - (1-level) / 2))
     }
     
-    if("RasterStack" %in% class(x)) {
-      raster_template <- raster::raster(x)
+    if("SpatRaster" %in% class(x)) {
       
       r.psi.bin.sum.mean <- r.psi.bin.sum.sd <- r.psi.bin.sum.lower <- r.psi.bin.sum.upper <- raster_template
-      raster::values(r.psi.bin.sum.mean) [index_not_na] <- psi.bin.sum.mean
-      raster::values(r.psi.bin.sum.sd) [index_not_na] <- psi.bin.sum.sd
+      terra::values(r.psi.bin.sum.mean) [index_not_na] <- psi.bin.sum.mean
+      terra::values(r.psi.bin.sum.sd) [index_not_na] <- psi.bin.sum.sd
       
       if(interval == "none"){
-        stack_out <- raster::stack(list(mean = r.psi.bin.sum.mean,
+        stack_out <- terra::rast(list(mean = r.psi.bin.sum.mean,
                                         sd   = r.psi.bin.sum.sd))
       }
       
       if(interval == "confidence"){
-        raster::values(r.psi.bin.sum.lower) [index_not_na] <- psi.bin.sum.lower
-        raster::values(r.psi.bin.sum.upper) [index_not_na] <- psi.bin.sum.upper
+        terra::values(r.psi.bin.sum.lower) [index_not_na] <- psi.bin.sum.lower
+        terra::values(r.psi.bin.sum.upper) [index_not_na] <- psi.bin.sum.upper
         
-        stack_out <- raster::stack(list(mean  = r.psi.bin.sum.mean,
+        stack_out <- terra::rast(list(mean  = r.psi.bin.sum.mean,
                                         sd    = r.psi.bin.sum.sd,
                                         lower = r.psi.bin.sum.lower,
                                         upper = r.psi.bin.sum.upper))
@@ -694,21 +698,20 @@ predictionMapsCommunity <- function(object,
     }
     
     # fill rasters with predicted values
-    if("RasterStack" %in% class(x)) {
-      raster_template <- raster::raster(x)
+    if("SpatRaster" %in% class(x)) {
       r_pred_species <- r_pred_sd_species <- list()
       
       for(i in 1:length(unique(lambda.mean.melt$Species))) {
         r_pred_species[[i]]    <- raster_template
         r_pred_sd_species[[i]] <- raster_template
         
-        raster::values(r_pred_species[[i]])    [index_not_na] <- lambda.mean.melt$mean[lambda.mean.melt$Species == unique(lambda.mean.melt$Species)[i]]
-        raster::values(r_pred_sd_species[[i]]) [index_not_na] <- lambda.sd.melt$sd[lambda.sd.melt$Species == unique(lambda.sd.melt$Species)[i]]
+        terra::values(r_pred_species[[i]])    [index_not_na] <- lambda.mean.melt$mean[lambda.mean.melt$Species == unique(lambda.mean.melt$Species)[i]]
+        terra::values(r_pred_sd_species[[i]]) [index_not_na] <- lambda.sd.melt$sd[lambda.sd.melt$Species == unique(lambda.sd.melt$Species)[i]]
       }
       names(r_pred_species) <- names(r_pred_sd_species) <- unique(lambda.mean.melt$Species)
       
-      stack_out_mean <- raster::stack(r_pred_species)
-      stack_out_sd   <- raster::stack(r_pred_sd_species)
+      stack_out_mean <- terra::rast(r_pred_species)
+      stack_out_sd   <- terra::rast(r_pred_sd_species)
     }
     
     
@@ -727,21 +730,20 @@ predictionMapsCommunity <- function(object,
         lambda.upper2$Species <- dimnames(object@data$y)[[1]][lambda.upper2$Species]
       }
       
-      if("RasterStack" %in% class(x)) {
-        raster_template <- raster::raster(x)
+      if("SpatRaster" %in% class(x)) {
         r_pred_lower_species <- r_pred_upper_species <- list()
         
         for(i in 1:length(unique(lambda.mean.melt$Species))) {
           r_pred_lower_species[[i]] <- raster_template
           r_pred_upper_species[[i]] <- raster_template
           
-          raster::values(r_pred_lower_species[[i]]) [index_not_na] <- lambda.lower2[lambda.lower2$Species == unique(lambda.lower2$Species)[i], paste0("lower.ci.", level)]
-          raster::values(r_pred_upper_species[[i]]) [index_not_na] <- lambda.upper2[lambda.upper2$Species == unique(lambda.upper2$Species)[i], paste0("upper.ci.", level)]
+          terra::values(r_pred_lower_species[[i]]) [index_not_na] <- lambda.lower2[lambda.lower2$Species == unique(lambda.lower2$Species)[i], paste0("lower.ci.", level)]
+          terra::values(r_pred_upper_species[[i]]) [index_not_na] <- lambda.upper2[lambda.upper2$Species == unique(lambda.upper2$Species)[i], paste0("upper.ci.", level)]
         }
         names(r_pred_lower_species) <- names(r_pred_upper_species) <- unique(lambda.mean.melt$Species)
         
-        stack_out_lower   <- raster::stack(r_pred_lower_species)
-        stack_out_upper   <- raster::stack(r_pred_upper_species)
+        stack_out_lower   <- terra::rast(r_pred_lower_species)
+        stack_out_upper   <- terra::rast(r_pred_upper_species)
         
         return(list(mean  = stack_out_mean,
                     sd    = stack_out_sd,
@@ -758,7 +760,7 @@ predictionMapsCommunity <- function(object,
     }
     
     if(interval == "none"){
-      if("RasterStack" %in% class(x)){
+      if("SpatRaster" %in% class(x)){
         return(list(mean = stack_out_mean,
                     sd   = stack_out_sd))
       } else {
@@ -775,7 +777,7 @@ predictionMapsCommunity <- function(object,
 
 #' Predictions from community occupancy models
 #' 
-#' Create (spatial) predictions of species occupancy and species richness from community occupancy models and raster stacks or covariate data frames.
+#' Create (spatial) predictions of species occupancy and species richness from community occupancy models and spatial rasters or covariate data frames.
 #'
 #' @param object \code{commOccu} object
 #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
@@ -783,19 +785,19 @@ predictionMapsCommunity <- function(object,
 #' @param draws  Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used
 #' @param level  Probability mass to include in the uncertainty interval
 #' @param interval  Type of interval calculation. Can be "none" or "confidence" (can be abbreviated). Calculation can be slow for type = "psi" with many cells and posterior samples.
-#' @param x   RasterStack or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names. 
-#' @param aoi RasterLayer with same dimensions as x, indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.
+#' @param x   SpatRaster or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names. 
+#' @param aoi SpatRaster with same dimensions as x (if x is a SpatRaster), indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.
 #' @param speciesSubset  species to include in richness estimates. Can be index number or species names.
 #' @param batch logical or numeric. If FALSE, all raster cells / data frame rows will be processed at once (can be memory intensive). If TRUE, computation is conducted in batches of 1000. If numeric, it is the desired batch size.
 #' @param seed numeric. Seed to use in \code{set.seed} for reproducible results (ensures that \code{draws} are identical).
 #'
 #' @details Processing can be very memory-intensive. If memory is insufficient, use the  \code{batch} parameter. This can enable processing for higher numbers of \code{draws} or very large rasters / data frames. 
 #' 
-#' @return A raster stack or data.frame, depending on \code{x}. If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [cell, species, draw].
+#' @return A SpatRaster or data.frame, depending on \code{x}. If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [cell, species, draw].
 #' 
 #' @aliases predict
 #' @method predict commOccu
-#' @importFrom  stats rbinom dpois sd
+#' @importFrom stats rbinom dpois sd
 #' @importFrom utils object.size
 #' @importFrom methods .hasSlot
 #' @export
