@@ -1,11 +1,11 @@
 citHeader("To cite camtrapR in publications use:")
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
   title = "camtrapR: an R package for efficient camera trap data management",
-  author = personList(as.person("Jürgen Niedballa"),
-                      as.person("Rahel Sollmann"),
-                      as.person("Alexandre Courtiol"),
-                     as.person("Andreas Wilting")),
+  author = c(as.person("Jürgen Niedballa"),
+             as.person("Rahel Sollmann"),
+             as.person("Alexandre Courtiol"),
+             as.person("Andreas Wilting")),
   journal = "Methods in Ecology and Evolution",
   year = "2016",
   volume = "7",
