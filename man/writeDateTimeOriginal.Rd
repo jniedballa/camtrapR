@@ -13,7 +13,7 @@ EXIF:DateTimeOriginal tag of the files in fileNames.}
 \item{fileNames}{character. Full file names (including directories) of
 images to process.}
 
-\item{parallel}{A snow cluster object. Specify if you wish to run this
+\item{parallel}{A parallel cluster object. Specify if you wish to run this
 function in parallel. Provide a cluster object (output of makeCluster()) -
 optional.}
 
@@ -83,7 +83,7 @@ df_image_data
 
 
 
-library(snow)
+library(parallel)
 library(lubridate)
 
 # prepare DateTimeOriginal column (ymd_hms() automatically respects the PM indicator)
@@ -95,8 +95,10 @@ cl <- makeCluster(3)
 
 # assign new DateTimeOriginal
 writeDateTimeOriginal(DateTimeOriginal = df_image_data$DateTimeOriginal,
-                      fileNames = df_image_data$DateTimeOriginal,
+                      fileNames = df_image_data$filename_full,
                       parallel = cl)
+                      
+stopCluster(cl)
                    
 }
 

@@ -31,7 +31,7 @@
 #' EXIF:DateTimeOriginal tag of the files in fileNames.
 #' @param fileNames character. Full file names (including directories) of
 #' images to process.
-#' @param parallel A snow cluster object. Specify if you wish to run this
+#' @param parallel A parallel cluster object. Specify if you wish to run this
 #' function in parallel. Provide a cluster object (output of makeCluster()) -
 #' optional.
 #' @param overwrite logical. Overwrite existing files (TRUE) or create new
@@ -76,7 +76,7 @@
 #' 
 #' 
 #' 
-#' library(snow)
+#' library(parallel)
 #' library(lubridate)
 #' 
 #' # prepare DateTimeOriginal column (ymd_hms() automatically respects the PM indicator)
@@ -88,8 +88,10 @@
 #' 
 #' # assign new DateTimeOriginal
 #' writeDateTimeOriginal(DateTimeOriginal = df_image_data$DateTimeOriginal,
-#'                       fileNames = df_image_data$DateTimeOriginal,
+#'                       fileNames = df_image_data$filename_full,
 #'                       parallel = cl)
+#'                       
+#' stopCluster(cl)
 #'                    
 #' }
 #' 
@@ -112,12 +114,12 @@ writeDateTimeOriginal <- function(DateTimeOriginal,
   
   
   if(hasArg(parallel)){
-    if (!requireNamespace("snow", quietly = TRUE)) {
-      stop("Please install the package snow to run this function in parallel")
+    if (!requireNamespace("parallel", quietly = TRUE)) {
+      stop("Please install the package parallel to run this function in parallel")
     }
-    if(!is(parallel, "cluster")) stop("parallel must be a cluster object, i.e. output of snow::makeCluster()", call. = FALSE)
+    if(!is(parallel, "cluster")) stop("parallel must be a cluster object, i.e. output of parallel::makeCluster()", call. = FALSE)
     
-    out <- snow::parLapply(parallel, exif_call, system)
+    out <- parallel::parLapply(parallel, exif_call, system)
     
   } else {
     out <- lapply(exif_call, system)
