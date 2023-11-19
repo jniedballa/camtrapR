@@ -158,7 +158,7 @@
 #' @section Warning : Custom image metadata must be organised hierarchically
 #' (tag group - tag; e.g. "Species" - "Leopard Cat"). Detailed information on
 #' how to set up and use metadata tags can be found in
-#' \href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html#metadata-tagging}{vignette
+#' \href{https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.pdf}{vignette
 #' 2: Species and Individual Identification}.
 #' 
 #' Custom image metadata tags must be written to the images. The function
@@ -169,7 +169,7 @@
 #' Please note the section about defining argument \code{timeZone} in the
 #' vignette on data extraction (accessible via
 #' \code{vignette("DataExtraction")} or online
-#' (\url{https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html})).
+#' (\url{https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.pdf})).
 #' 
 #' @author Juergen Niedballa
 #' 

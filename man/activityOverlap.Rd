@@ -100,6 +100,8 @@ representations of species activity.
 }
 \examples{
 
+if(requireNamespace("overlap")) {
+
 # load record table
 data(recordTableSample)
 
@@ -137,6 +139,7 @@ activityOverlap (recordTable = recordTableSample,
                                      speciesA_for_activity, "and", 
                                      speciesB_for_activity)
 )
+}
 
 }
 \references{

@@ -34,7 +34,6 @@ Imports:
         ggplot2,
         lubridate,
         methods,
-        overlap,
         secr,
         sf
 Suggests: 
@@ -48,6 +47,7 @@ Suggests:
         mapview,
         nimble,
         nimbleEcology,
+        overlap,
         parallel,
         plotly,
         reshape2,

@@ -60,6 +60,7 @@
 #' 
 #' @examples
 #' 
+#' if(requireNamespace("overlap")) {
 #' # load record table
 #' data(recordTableSample)
 #' 
@@ -76,8 +77,10 @@
 #'                 writePNG    = FALSE,
 #'                 plotR       = TRUE,
 #'                 add.rug     = TRUE)
+#'  }
 #' 
 #' @export activityDensity
+#' 
 activityDensity <- function(recordTable,
                             species,
                             allSpecies = FALSE,
@@ -93,6 +96,9 @@ activityDensity <- function(recordTable,
                             ...
 ){
   
+  if (!requireNamespace("overlap", quietly = TRUE)) {
+    stop("Please install the package overlap to run this function")
+  }
   
   wd0 <- getwd()
   mar0 <- par()$mar
@@ -150,7 +156,7 @@ activityDensity <- function(recordTable,
     try_error_tmp <- try({
       if(isTRUE(writePNG))  png(filename = paste("activity_density_", species, "_", Sys.Date(), ".png", sep = ""),
                                 width = pngWidth, height = pngHeight, units = "px", res = 96, type = "cairo")
-      if(isTRUE(writePNG) | isTRUE(plotR)){ densityPlot(subset_species$Time.rad,
+      if(isTRUE(writePNG) | isTRUE(plotR)){ overlap::densityPlot(subset_species$Time.rad,
                                                         main = paste("Activity of", species),
                                                         rug  = add.rug,
                                                         ...)
@@ -177,7 +183,7 @@ activityDensity <- function(recordTable,
         try_error_tmp <- try({
           if(isTRUE(writePNG))  png(filename = paste("activity_density_", spec.tmp, "_", Sys.Date(), ".png", sep = ""),
                                     width = pngWidth, height = pngHeight, units = "px", res = 96, type = "cairo")
-          if(isTRUE(writePNG) | isTRUE(plotR)){ densityPlot(subset_species$Time.rad,
+          if(isTRUE(writePNG) | isTRUE(plotR)){ overlap::densityPlot(subset_species$Time.rad,
                                                             main = plot_main_title,
                                                             rug  = add.rug,
                                                             ...)

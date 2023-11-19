@@ -83,6 +83,7 @@ and time formats in R see \code{\link[base]{strptime}} or
 }
 \examples{
 
+if(requireNamespace("overlap")) {
 # load record table
 data(recordTableSample)
 
@@ -99,6 +100,7 @@ activityDensity(recordTable = recordTableSample,
                 writePNG    = FALSE,
                 plotR       = TRUE,
                 add.rug     = TRUE)
+ }
 
 }
 \references{
