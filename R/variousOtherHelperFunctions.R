@@ -11,7 +11,7 @@
   suppressWarnings( conn <- try( url(cran_pkg_loc) , silent=TRUE ) )
   
   # If connection, try to parse values, otherwise return NULL
-  if ( all( class(conn) != "try-error") ) {
+  if (!inherits(conn, "try-error") ) {
     suppressWarnings( cran_pkg_page <- try( readLines(conn) , silent=TRUE ) )
     close(conn)
   } else {
@@ -716,7 +716,7 @@ checkCamOpColumnNames <- function(cameraOperationMatrix){
     camopTest <- try(as.Date(colnames(cameraOperationMatrix)), silent = TRUE)
   }
   
-  if("try-error" %in% class(camopTest)) stop(paste('Could not interpret column names in camOp as Dates. Desired format is YYYY-MM-DD (e.g. "2016-12-31") YYYY-MM-DD+Xh (X being a number, e.g. "2016-12-31+12h"). First column name in your camera operation matrix is "', colnames(cameraOperationMatrix)[1], '"', sep = '' ), call. = FALSE)
+  if(inherits(camopTest, "try-error")) stop(paste('Could not interpret column names in camOp as Dates. Desired format is YYYY-MM-DD (e.g. "2016-12-31") YYYY-MM-DD+Xh (X being a number, e.g. "2016-12-31+12h"). First column name in your camera operation matrix is "', colnames(cameraOperationMatrix)[1], '"', sep = '' ), call. = FALSE)
   
   
   colnames(cameraOperationMatrix) <- as.character(camopTest)
@@ -1599,7 +1599,7 @@ parseDateTimeObject <- function(inputColumn,
                                 quiet = FALSE
 ){
   
-  if(any(c("POSIXct", "POSIXlt") %in% class(inputColumn))){
+  if(inherits(inputColumn, c("POSIXct", "POSIXlt"))){
     if(inherits(inputColumn, "POSIXlt")) {
       # warning(paste("datetime column is in POSIXlt format. Converting to character:", deparse(substitute(inputColumn)), ""), call. = FALSE)
     }
@@ -1610,7 +1610,7 @@ parseDateTimeObject <- function(inputColumn,
     # inputColumn <- as.character(inputColumn)  # converts date-time to date if time = 00:00:00
     inputColumn <- format(inputColumn, format = "%Y-%m-%d %H:%M:%S")
   } else {
-    if(!class(inputColumn) %in% c("character")) stop(paste("datetime column must be a character:", deparse(substitute(inputColumn))), call. = FALSE)
+    if(!inherits(inputColumn, "character")) stop(paste("datetime column must be a character:", deparse(substitute(inputColumn))), call. = FALSE)
   }
   
   if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
@@ -1638,8 +1638,8 @@ parseDateTimeObject <- function(inputColumn,
                                                deparse(substitute(inputColumn)), "cannot be interpreted using dateTimeFormat:", dateTimeFormat, "\n",
                                                "rows", paste(which(is.na(out)), collapse = ", ")), call. = FALSE)
   
-  
-  if(!any(class(out) %in% c("POSIXct", "POSIXlt"))) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat. Output is not POSIX object")
+ 
+  if(inherits(inputColumn, c("POSIXct", "POSIXlt"))) stop("couldn't interpret recordDateTimeCol of recordTable using specified recordDateTimeFormat. Output is not POSIX object")
   return(out)
 }
 

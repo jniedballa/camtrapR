@@ -190,7 +190,7 @@ detectionMaps <- function(CTtable,
 
   if(hasArg(backgroundPolygon)){
     if (!requireNamespace("sf", quietly = TRUE)) stop("package 'sf' is required to plot backgroundPolygon")
-    stopifnot(any(class(backgroundPolygon) %in% c("sf", "sfg")))
+    stopifnot(inherits(backgroundPolygon, c("sf", "sfg")))
   }
 
   if(hasArg(speciesToShow)){

@@ -90,13 +90,14 @@ predictionMapsCommunity <- function(object,
   
   
   # convert raster to covariate data frame
-  if(class(x) %in% c("SpatRaster", "RasterStack")) {
-    if(class(x) == "RasterStack"){
+  if(inherits(x, c("SpatRaster", "RasterStack"))) {
+    if(inherits(x, "RasterStack")){
     warning("x is a RasterStack. Please use SpatRaster (from the terra package) in the future. Convert via: 
 rast(YourRaster)")
-      x <- terra::rast(x)
-      raster_template <- terra::rast(x, nlyrs = 1, vals = NA)
     }
+
+    raster_template <- terra::rast(x, nlyrs = 1, vals = NA)
+    
     values_to_predict_all <- as.data.frame(terra::values(x))
   } else {
     if(is.data.frame(x)) {
@@ -521,7 +522,7 @@ rast(YourRaster)")
     }
     
     # fill rasters with predicted values
-    if("SpatRaster" %in% class(x)) {
+    if(inherits(x, "SpatRaster")) {
     
     r_pred_species <- r_pred_sd_species <- list()
     
@@ -554,7 +555,7 @@ rast(YourRaster)")
         psi.upper2$Species <- dimnames(object@data$y)[[1]][psi.upper2$Species]
       }
       
-      if("SpatRaster" %in% class(x)) {
+      if(inherits(x, "SpatRaster")) {
       r_pred_lower_species <- r_pred_upper_species <- list()
       
       for(i in 1:length(unique(psi.mean.melt$Species))) {
@@ -584,7 +585,7 @@ rast(YourRaster)")
     }
     
     if(interval == "none"){
-      if("SpatRaster" %in% class(x)){
+      if(inherits(x, "SpatRaster")){
         return(list(mean = stack_out_mean,
                     sd   = stack_out_sd))
       } else {
@@ -635,7 +636,7 @@ rast(YourRaster)")
       psi.bin.sum.upper <- apply(psi.bin.sum, 1, quantile, (1 - (1-level) / 2))
     }
     
-    if("SpatRaster" %in% class(x)) {
+    if(inherits(x, "SpatRaster")) {
       
       r.psi.bin.sum.mean <- r.psi.bin.sum.sd <- r.psi.bin.sum.lower <- r.psi.bin.sum.upper <- raster_template
       terra::values(r.psi.bin.sum.mean) [index_not_na] <- psi.bin.sum.mean
@@ -698,7 +699,7 @@ rast(YourRaster)")
     }
     
     # fill rasters with predicted values
-    if("SpatRaster" %in% class(x)) {
+    if(inherits(x, "SpatRaster")) {
       r_pred_species <- r_pred_sd_species <- list()
       
       for(i in 1:length(unique(lambda.mean.melt$Species))) {
@@ -730,7 +731,7 @@ rast(YourRaster)")
         lambda.upper2$Species <- dimnames(object@data$y)[[1]][lambda.upper2$Species]
       }
       
-      if("SpatRaster" %in% class(x)) {
+      if(inherits(x, "SpatRaster")) {
         r_pred_lower_species <- r_pred_upper_species <- list()
         
         for(i in 1:length(unique(lambda.mean.melt$Species))) {
@@ -760,7 +761,7 @@ rast(YourRaster)")
     }
     
     if(interval == "none"){
-      if("SpatRaster" %in% class(x)){
+      if(inherits(x, "SpatRaster")){
         return(list(mean = stack_out_mean,
                     sd   = stack_out_sd))
       } else {

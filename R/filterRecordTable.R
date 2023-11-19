@@ -137,7 +137,7 @@ filterRecordTable <- function(#inDir,
   # try to extract timezone (if available)
   if(is.POSIXt(recordTable[, recordDateTimeCol])){
     timeZone <- try(tz(recordTable[, recordDateTimeCol]))
-    if(is(class(timeZone), "try-error")) {
+    if(inherits(timeZone, "try-error")) {
       warning("recordDateTimeCol is POSIX, but no time zone information is available. Assuming UTC.") 
       recordTable[, recordDateTimeCol] <- as.character(recordTable[, recordDateTimeCol])
       timeZone <- "UTC"
