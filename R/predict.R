@@ -67,6 +67,9 @@ predictionMapsCommunity <- function(object,
     set.seed(seed)
   }
   
+  # define function for inverse logit (logit to probability)
+  ilogit <- function(x) 1 / (1 + exp(-x))
+  
   # subset posterior matrix to number of draws
   posterior_matrix <- as.matrix(mcmc.list)
   if(hasArg(draws)) {
@@ -265,7 +268,7 @@ rast(YourRaster)")
         # sum up individual effects
         if(object@model == "Occupancy") {
           logit.psi <- Reduce('+', out) + out_intercept
-          psi <- nimble::ilogit(logit.psi)
+          psi <- ilogit(logit.psi)
           rm(logit.psi, out)
         }
         # psi <- exp(logit.psi) / (exp(logit.psi) + 1)   # leads to NaN when numbers are very large
@@ -412,7 +415,7 @@ rast(YourRaster)")
       # sum up individual effects
       if(object@model == "Occupancy") {
         logit.psi <- Reduce('+', out) + out_intercept
-        psi <- nimble::ilogit(logit.psi)
+        psi <- ilogit(logit.psi)
         rm(logit.psi, out)
       }
       # psi <- exp(logit.psi) / (exp(logit.psi) + 1)   # leads to NaN when numbers are very large
