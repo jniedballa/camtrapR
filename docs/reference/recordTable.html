@@ -20,7 +20,7 @@ Station/Camera/Species) or from image metadata tags."><!-- mathjax --><script sr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -243,7 +243,7 @@ taken less than <code>minDeltaTime</code> minutes after the last record
 (<code>deltaTimeComparedTo = "lastRecord"</code>) or the last independent record
 (<code>deltaTimeComparedTo = "lastIndependentRecord"</code>).</p>
 <p><code>removeDuplicateRecords</code> determines whether duplicate records
-(identical station, species, date/time, (and camera if applicable)) are are
+(identical station, species, date/time, (and camera if applicable)) are
 all returned (FALSE) or collapsed into a single unique record (TRUE).</p>
 <p><code>camerasIndependent</code> defines if the cameras at a station are to be
 considered independent. If <code>TRUE</code>, records of the same species taken by
@@ -308,7 +308,7 @@ independence):</p>
     <p>Custom image metadata must be organised hierarchically
 (tag group - tag; e.g. "Species" - "Leopard Cat"). Detailed information on
 how to set up and use metadata tags can be found in
-<a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html#metadata-tagging" class="external-link">vignette
+<a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.pdf" class="external-link">vignette
 2: Species and Individual Identification</a>.</p>
 <p>Custom image metadata tags must be written to the images. The function
 cannot read tags from .xmp sidecar files. Make sure you set the preferences
@@ -317,7 +317,7 @@ make sure "Write to sidecar files" is unchecked.</p>
 <p>Please note the section about defining argument <code>timeZone</code> in the
 vignette on data extraction (accessible via
 <code>vignette("DataExtraction")</code> or online
-(<a href="https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html" class="external-link">https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.html</a>)).</p>
+(<a href="https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.pdf" class="external-link">https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.pdf</a>)).</p>
     </div>
     <div id="references">
     <h2>References</h2>
@@ -436,7 +436,8 @@ vignette on data extraction (accessible via
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"ExifTool is not available. Cannot test function. Loading recordTableSample instead"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">recordTableSample</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ExifTool is not available. Cannot test function. Loading recordTableSample instead</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> timeZone is not specified. Assuming UTC</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'wd_images_ID_species' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
@@ -454,7 +455,7 @@ vignette on data extraction (accessible via
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

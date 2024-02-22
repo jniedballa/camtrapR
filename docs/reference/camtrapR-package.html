@@ -19,7 +19,7 @@ The only manual input needed is species (and individual) identification, which i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -102,7 +102,7 @@ Information about the camera-specific trapping periods (and periods of malfuncti
     <h2>Image data extraction</h2>
     
 
-<p>These function use the directory structure built above (Section 'Image management workflow') and a table containing basic information about camera traps and/or stations (IDs, location, trapping period).</p><table class="table table"><tr><td><code><a href="recordTable.html">recordTable</a></code></td><td>Create a species record table from camera trap images and videos</td></tr><tr><td><code><a href="recordTableIndividual.html">recordTableIndividual</a></code></td><td>Create a single-species record table from camera trap images and videos with individual IDs</td></tr><tr><td><code><a href="exifTagNames.html">exifTagNames</a></code></td><td>Return Exif metadata tags and tag names from JPEG images</td></tr><tr><td><code><a href="exiftoolPath.html">exiftoolPath</a></code></td><td>Add the directory containing exiftool.exe to PATH temporarily (Windows only)</td></tr><tr><td><code><a href="filterRecordTable.html">filterRecordTable</a></code></td><td>Filter existing record table for temporal independence.</td></tr></table></div>
+<p>These function use the directory structure built above (Section 'Image management workflow') and a table containing basic information about camera traps and/or stations (IDs, location, trapping period).</p><table class="table table"><tr><td><code><a href="recordTable.html">recordTable</a></code></td><td>Create a species record table from camera trap images and videos</td></tr><tr><td><code><a href="recordTableIndividual.html">recordTableIndividual</a></code></td><td>Create a single-species record table from camera trap images and videos with individual IDs</td></tr><tr><td><code><a href="exifTagNames.html">exifTagNames</a></code></td><td>Return Exif metadata tags and tag names from JPEG images</td></tr><tr><td><code><a href="addToPath.html">addToPath</a></code></td><td>Add the directory containing exiftool.exe to PATH temporarily (Windows only)</td></tr><tr><td><code><a href="filterRecordTable.html">filterRecordTable</a></code></td><td>Filter existing record table for temporal independence.</td></tr></table></div>
     <div id="data-exploration-and-visualisation">
     <h2>Data exploration and visualisation</h2>
     
@@ -112,12 +112,12 @@ Information about the camera-specific trapping periods (and periods of malfuncti
     <h2>Community (multi-species) occupancy models</h2>
     
 
-<p>These plots are generated from the record table and the camera trap table.</p><table class="table table"><tr><td><code><a href="communityModel.html">communityModel</a></code></td><td>Create a community (multi-species) occupancy model for JAGS or Nimble</td></tr><tr><td><code><a href="commOccu-class.html">commOccu-class</a></code></td><td>commOccu objects</td></tr><tr><td><code><a href="fit-commOccu-method.html">fit,commOccu-method</a></code></td><td>Fit a community (multi-species) occupancy model</td></tr><tr><td><code><a href="predict-commOccu-method.html">predict,commOccu-method</a></code></td><td>Predictions from community occupancy models</td></tr><tr><td><code><a href="summary-commOccu-method.html">summary,commOccu-method</a></code></td><td>Summarize community occupancy model</td></tr><tr><td><code><a href="plot_coef-commOccu-method.html">plot_coef</a></code></td><td>Plot effect sizes of covariates in community occupancy model</td></tr><tr><td><code><a href="plot_effects-commOccu-method.html">plot_effects</a></code></td><td>Plot Marginal Effects of Covariates</td></tr></table></div>
-    <div id="data-export">
-    <h2>Data export</h2>
+<table class="table table"><tr><td><code><a href="communityModel.html">communityModel</a></code></td><td>Create a community (multi-species) occupancy model for JAGS or Nimble</td></tr><tr><td><code><a href="commOccu-class.html">commOccu-class</a></code></td><td>commOccu objects</td></tr><tr><td><code><a href="fit-commOccu-method.html">fit,commOccu-method</a></code></td><td>Fit a community (multi-species) occupancy model</td></tr><tr><td><code><a href="predict-commOccu-method.html">predict,commOccu-method</a></code></td><td>Predictions from community occupancy models</td></tr><tr><td><code><a href="summary-commOccu-method.html">summary,commOccu-method</a></code></td><td>Summarize community occupancy model</td></tr><tr><td><code><a href="plot_coef-commOccu-method.html">plot_coef</a></code></td><td>Plot effect sizes of covariates in community occupancy model</td></tr><tr><td><code><a href="plot_effects-commOccu-method.html">plot_effects</a></code></td><td>Plot Marginal Effects of Covariates</td></tr></table></div>
+    <div id="prepare-occupancy-and-spatial-capture-recapture-analyses-and-summarise-surveys">
+    <h2>Prepare occupancy and spatial capture-recapture analyses, and summarise surveys</h2>
     
 
-<table class="table table"><tr><td><code><a href="cameraOperation.html">cameraOperation</a></code></td><td>Create a camera operability matrix</td></tr><tr><td><code><a href="detectionHistory.html">detectionHistory</a></code></td><td>Species detection histories for occupancy analyses (single and multi-season)</td></tr><tr><td><code><a href="spatialDetectionHistory.html">spatialDetectionHistory</a></code></td><td>Detection histories of individuals for spatial capture-recapture analyses</td></tr><tr><td><code><a href="surveyReport.html">surveyReport</a></code></td><td>Create a report about camera trap surveys and species detections</td></tr></table></div>
+<table class="table table"><tr><td><code><a href="cameraOperation.html">cameraOperation</a></code></td><td>Create a camera operability matrix</td></tr><tr><td><code><a href="detectionHistory.html">detectionHistory</a></code></td><td>Species detection histories for occupancy analyses (single and multi-season)</td></tr><tr><td><code><a href="spatialDetectionHistory.html">spatialDetectionHistory</a></code></td><td>Detection histories of individuals for spatial capture-recapture analyses</td></tr><tr><td><code><a href="surveyReport.html">surveyReport</a></code></td><td>Create a report about camera trap surveys and species detections</td></tr><tr><td><code><a href="surveyDashboard.html">surveyDashboard</a></code></td><td>Shiny dashboard for summarizing and analyzing camera trap survey data</td></tr></table></div>
     <div id="sample-data">
     <h2>Sample data</h2>
     
@@ -127,7 +127,7 @@ Information about the camera-specific trapping periods (and periods of malfuncti
     <h2>Vignettes</h2>
     
 
-<table class="table table"><tr><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr1.html" class="external-link">1. Organising raw camera trap images</a></td><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.html" class="external-link">2. Identifying species and individuals</a></td></tr><tr><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr3.html" class="external-link">3. Extracting Data from Camera Trapping Images and Videos</a></td><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr4.html" class="external-link">4. Data exploration and visualisation</a></td></tr><tr><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr5.html" class="external-link">5. Multi-species occupancy models</a></td><td></td></tr></table></div>
+<table class="table table"><tr><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr1.pdf" class="external-link">1. Organising raw camera trap images</a></td><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr2.pdf" class="external-link">2. Identifying species and individuals</a></td></tr><tr><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr3.pdf" class="external-link">3. Extracting Data from Camera Trapping Images and Videos</a></td><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr4.pdf" class="external-link">4. Data exploration and visualisation</a></td></tr><tr><td><a href="https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr5.html" class="external-link">5. Multi-species occupancy models</a></td><td></td></tr></table></div>
     <div id="author">
     <h2>Author</h2>
     <p>Juergen Niedballa</p>
@@ -139,8 +139,6 @@ Information about the camera-specific trapping periods (and periods of malfuncti
 
 <p>Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016): camtrapR: an R package for efficient camera trap data management. Methods in Ecology and Evolution, 7(12). <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600" class="external-link">https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600</a> <br></p>
 <p>camtrapR Google Group <a href="https://groups.google.com/forum/#!forum/camtrapr" class="external-link">https://groups.google.com/forum/#!forum/camtrapr</a> <br></p>
-<p>Lemon, J. (2006) Plotrix: a package in the red light district of R. R-News, 6(4): 8-12. <br></p>
-<p>Mike Meredith and Martin Ridout (2018). overlap: Estimates of coefficient of overlapping for animal activity patterns. R package version 0.3.2. <a href="https://CRAN.R-project.org/package=overlap" class="external-link">https://CRAN.R-project.org/package=overlap</a> <br></p>
 <p>Phil Harvey's ExifTool <a href="https://exiftool.org/" class="external-link">https://exiftool.org/</a> <br></p>
     </div>
     <div id="see-also">

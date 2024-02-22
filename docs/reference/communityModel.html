@@ -23,7 +23,7 @@ The function returns several derived quantities, e.g. species richness, Bayesian
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -99,7 +99,8 @@ Such a model will run slower than proper single-species model JAGS code due to t
 <span>  richnessCategories <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  augmentation <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  modelFile <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  nimble <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  nimble <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  keyword_quadratic <span class="op">=</span> <span class="st">"_squared"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -152,6 +153,10 @@ Such a model will run slower than proper single-species model JAGS code due to t
 <dt>nimble</dt>
 <dd><p>logical. If TRUE, model code will be for Nimble (incompatible with JAGS). If FALSE, model code is for JAGS.</p></dd>
 
+
+<dt>keyword_quadratic</dt>
+<dd><p>character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name (e.g. if the covariate is "elevation", the quadratic covariate would be "elevation_squared").</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -169,7 +174,7 @@ Currently independent effects are only supported for continuous site covariates,
 Furthermore, is is possible to use use nested random effects of species and another categorical site covariate (so that there is a random effect of species and an additional random effect of a categorical covariate within each species).</p>
 
 <p>Derived quantities returned by the model are:</p>  
-<p></p><table class="table table"><tr><td><code>Bpvalue</code></td><td>Bayesian p-value (overall)</td></tr><tr><td><code>Bpvalue_species</code></td><td>Bayesian p-value (by species)</td></tr><tr><td><code>Nspecies</code></td><td>Species richness (only in JAGS model)</td></tr><tr><td><code>Nspecies_Covariate</code></td><td>Species richness by categorical covariate (when using <code>richnessCategories</code>, only in JAGS model)</td></tr><tr><td><code>R2</code></td><td>sum of Freeman-Tukey residuals of observed data within each species</td></tr><tr><td><code>new.R2</code></td><td>sum of Freeman-Tukey residuals of simulated data within each species</td></tr><tr><td><code>R3</code></td><td>Total sum of Freeman-Tukey residuals of observed data</td></tr><tr><td><code>new.R3</code></td><td>Total sum of Freeman-Tukey residuals of simulated data</td></tr><tr><td><em><code>Ntotal</code></em></td><td>Total metacommunity size (= observed species + n0)</td></tr><tr><td><em><code>n0</code></em></td><td>Number of unseen species in metacommunity</td></tr><tr><td><em><code>omega</code></em></td><td>Data augmentation parameter</td></tr><tr><td><em><code>w</code></em></td><td>Metacommunity membership indicator for each species</td></tr></table><p>Quantities in <em>italic</em> at the bottom are only returned in full data augmentation. <code>Nspecies</code> and <code>Nspecies_Covariate</code> are only returned in JAGS models (because Nimble models don't explicitly return latent occupancy status z).</p>
+<p></p><table class="table table"><tr><td><code>Bpvalue</code></td><td>Bayesian p-value (overall)</td></tr><tr><td><code>Bpvalue_species</code></td><td>Bayesian p-value (by species)</td></tr><tr><td><code>Nspecies</code></td><td>Species richness (only in JAGS models)</td></tr><tr><td><code>Nspecies_station</code></td><td>Species richness at each sampling locations (only in JAGS models)</td></tr><tr><td><code>Nspecies_Covariate</code></td><td>Species richness by categorical covariate (when using <code>richnessCategories</code>, only in JAGS models)</td></tr><tr><td><code>R2</code></td><td>sum of Freeman-Tukey residuals of observed data within each species</td></tr><tr><td><code>new.R2</code></td><td>sum of Freeman-Tukey residuals of simulated data within each species</td></tr><tr><td><code>R3</code></td><td>Total sum of Freeman-Tukey residuals of observed data</td></tr><tr><td><code>new.R3</code></td><td>Total sum of Freeman-Tukey residuals of simulated data</td></tr><tr><td><em><code>Ntotal</code></em></td><td>Total metacommunity size (= observed species + n0)</td></tr><tr><td><em><code>n0</code></em></td><td>Number of unseen species in metacommunity</td></tr><tr><td><em><code>omega</code></em></td><td>Data augmentation parameter</td></tr><tr><td><em><code>w</code></em></td><td>Metacommunity membership indicator for each species</td></tr></table><p>Quantities in <em>italic</em> at the bottom are only returned in full data augmentation. <code>Nspecies</code> and <code>Nspecies_Covariate</code> are only returned in JAGS models (because Nimble models don't explicitly return latent occupancy status z).</p>
     </div>
     <div id="parameter-naming-convention">
     <h2>Parameter naming convention</h2>
@@ -218,7 +223,7 @@ Furthermore, is is possible to use use nested random effects of species and anot
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"recordTableSample"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># make list of detection histories</span></span></span>
-<span class="r-in"><span><span class="va">DetHist_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">recordTableSample</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">DetHist_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">recordTableSample</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="detectionHistory.html">detectionHistory</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    recordTable         <span class="op">=</span> <span class="va">recordTableSample</span>,</span></span>
 <span class="r-in"><span>    camOp                <span class="op">=</span> <span class="va">camop_no_problem</span>,</span></span>
@@ -236,7 +241,7 @@ Furthermore, is is possible to use use nested random effects of species and anot
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># assign species names to list items</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">DetHist_list</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">recordTableSample</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">DetHist_list</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">recordTableSample</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># extract detection histories (omit effort matrices)</span></span></span>
 <span class="r-in"><span><span class="va">ylist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">DetHist_list</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">detection_history</span><span class="op">)</span></span></span>
@@ -246,7 +251,7 @@ Furthermore, is is possible to use use nested random effects of species and anot
 <span class="r-in"><span><span class="va">sitecovs</span><span class="op">$</span><span class="va">elevation</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">300</span>, <span class="fl">500</span>, <span class="fl">600</span><span class="op">)</span>   </span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># scale numeric covariates</span></span></span>
-<span class="r-in"><span><span class="va">sitecovs</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">sitecovs</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sitecovs</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">sitecovs</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># bundle input data for communityModel</span></span></span>
@@ -263,14 +268,14 @@ Furthermore, is is possible to use use nested random effects of species and anot
 <span class="r-in"><span>                           intercepts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>det <span class="op">=</span> <span class="st">"ranef"</span>, occu <span class="op">=</span> <span class="st">"ranef"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                           modelFile <span class="op">=</span> <span class="va">modelfile1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.jags</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.jags</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># fit in JAGS</span></span></span>
 <span class="r-in"><span><span class="va">fit.jags</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span><span class="va">mod.jags</span>,</span></span>
 <span class="r-in"><span>                n.iter <span class="op">=</span> <span class="fl">1000</span>,</span></span>
 <span class="r-in"><span>                n.burnin <span class="op">=</span> <span class="fl">500</span>,</span></span>
 <span class="r-in"><span>                chains <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>   </span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit.jags</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit.jags</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># response curves (= marginal effect plots)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot_effects-commOccu-method.html">plot_effects</a></span><span class="op">(</span><span class="va">mod.jags</span>, </span></span>
@@ -314,7 +319,7 @@ Furthermore, is is possible to use use nested random effects of species and anot
 <span class="r-in"><span>                       compile <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># parameter summary statistics</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit.nimble.comp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit.nimble.comp</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># response curves (= marginal effect plots)</span></span></span>
@@ -334,7 +339,7 @@ Furthermore, is is possible to use use nested random effects of species and anot
 <span class="r-in"><span>          submodel <span class="op">=</span> <span class="st">"det"</span><span class="op">)</span>   </span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># traceplots</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.nimble.comp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.nimble.comp</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>

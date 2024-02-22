@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -80,10 +80,11 @@
 <span>  <span class="va">object</span>,</span>
 <span>  <span class="va">mcmc.list</span>,</span>
 <span>  submodel <span class="op">=</span> <span class="st">"state"</span>,</span>
+<span>  response <span class="op">=</span> <span class="st">"occupancy"</span>,</span>
 <span>  draws <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  <span class="va">outdir</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
-<span>  keyword_squared <span class="op">=</span> <span class="st">"_squared"</span>,</span>
+<span>  keyword_quadratic <span class="op">=</span> <span class="st">"_squared"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -102,8 +103,12 @@
 <dd><p>Submodel to get plots for. Can be "det" or "state"</p></dd>
 
 
+<dt>response</dt>
+<dd><p>response type on y axis. Only relevant for submodel = "state". Default is "occupancy", can be set to "abundance" for Royle-Nichols models</p></dd>
+
+
 <dt>draws</dt>
-<dd><p>Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used</p></dd>
+<dd><p>Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in <code>draws</code> are available, all posterior samples are used.</p></dd>
 
 
 <dt>outdir</dt>
@@ -114,8 +119,8 @@
 <dd><p>Probability mass to include in the uncertainty interval</p></dd>
 
 
-<dt>keyword_squared</dt>
-<dd><p>character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name.</p></dd>
+<dt>keyword_quadratic</dt>
+<dd><p>character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name (e.g. if the covariate is "elevation", the quadratic covariate would be "elevation_squared").</p></dd>
 
 
 <dt>...</dt>
@@ -141,7 +146,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

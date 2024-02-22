@@ -19,7 +19,7 @@ overlap."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/ma
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -204,6 +204,7 @@ for animal activity patterns. R package version 0.3.2.
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"overlap"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co"># load record table</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">recordTableSample</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -211,7 +212,6 @@ for animal activity patterns. R package version 0.3.2.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">activityDensity</span><span class="op">(</span>recordTable <span class="op">=</span> <span class="va">recordTableSample</span>,</span></span>
 <span class="r-in"><span>                species     <span class="op">=</span> <span class="va">species4activity</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="activityDensity-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># all species at once</span></span></span>
@@ -221,6 +221,8 @@ for animal activity patterns. R package version 0.3.2.
 <span class="r-in"><span>                writePNG    <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>                plotR       <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>                add.rug     <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="op">}</span></span></span>
+<span class="r-plt img"><img src="activityDensity-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="activityDensity-2.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="activityDensity-3.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="activityDensity-4.png" alt="" width="700" height="433"></span>
@@ -241,7 +243,7 @@ for animal activity patterns. R package version 0.3.2.
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

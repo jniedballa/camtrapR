@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -91,7 +91,8 @@
 <span>  writecsv <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">outDir</span>,</span>
 <span>  <span class="va">eventSummaryColumn</span>,</span>
-<span>  <span class="va">eventSummaryFunction</span></span>
+<span>  <span class="va">eventSummaryFunction</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -181,6 +182,10 @@ a metadata tag) by to summarise non-independent records (those within
 <code>eventSummaryColumn</code> of non-independent records, e.g. "sum", "max"
 (optional)</p></dd>
 
+
+<dt>quiet</dt>
+<dd><p>logical. If TRUE, suppress printing of progress.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -197,10 +202,12 @@ about stations, date, time, filtered for temporal independence.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.which.html" class="external-link">Sys.which</a></span><span class="op">(</span><span class="st">"exiftool"</span><span class="op">)</span> <span class="op">!=</span> <span class="st">""</span><span class="op">)</span><span class="op">{</span>        <span class="co"># only run example if ExifTool is available</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># set directory with camera trap images in station directories</span></span></span>
 <span class="r-in"><span><span class="va">wd_images_ID_species</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pictures/sample_images_species_dir"</span>, </span></span>
 <span class="r-in"><span>                                    package <span class="op">=</span> <span class="st">"camtrapR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                                    </span></span>
 <span class="r-in"><span><span class="co"># create record table without temporal filtering</span></span></span>
 <span class="r-in"><span><span class="va">rec_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="recordTable.html">recordTable</a></span><span class="op">(</span>inDir                  <span class="op">=</span> <span class="va">wd_images_ID_species</span>,</span></span>
 <span class="r-in"><span>                        IDfrom                 <span class="op">=</span> <span class="st">"directory"</span>,</span></span>
@@ -209,21 +216,22 @@ about stations, date, time, filtered for temporal independence.</p>
 <span class="r-in"><span>                        timeZone               <span class="op">=</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</span></span>
 <span class="r-in"><span>                        removeDuplicateRecords <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>                        <span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> StationA:      8 images    0 duplicates removed      |=======             |   33%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> StationB:     22 images    6 duplicates removed      |=============       |   67%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> StationC:     37 images    6 duplicates removed      |====================|  100%</span>
 <span class="r-in"><span>                        </span></span>
 <span class="r-in"><span><span class="co"># filter for 60 minutes temporal independence</span></span></span>
 <span class="r-in"><span><span class="va">rec_table_filt</span> <span class="op">&lt;-</span> <span class="fu">filterRecordTable</span><span class="op">(</span>recordTable         <span class="op">=</span> <span class="va">rec_table</span>, </span></span>
 <span class="r-in"><span>                                    minDeltaTime        <span class="op">=</span> <span class="fl">60</span>, </span></span>
 <span class="r-in"><span>                                    stationCol          <span class="op">=</span> <span class="st">"Station"</span>,</span></span>
 <span class="r-in"><span>                                    deltaTimeComparedTo <span class="op">=</span> <span class="st">"lastIndependentRecord"</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rec_table</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rec_table_filt</span><span class="op">)</span></span></span>
+<span class="r-in"><span> </span></span>
+<span class="r-in"><span> <span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> StationA:      8 images    0 duplicates removed      |=======             |   33%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> StationB:     22 images    6 duplicates removed      |=============       |   67%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> StationC:     37 images    6 duplicates removed      |====================|  100%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> StationA:      8 images    0 duplicates removed      |=======             |   33%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> StationB:     16 images    0 duplicates removed      |=============       |   67%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> StationC:     31 images    0 duplicates removed      |====================|  100%</span>
-<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rec_table</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 55</span>
-<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rec_table_filt</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 39</span>
 </code></pre></div>
     </div>

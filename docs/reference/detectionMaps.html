@@ -19,7 +19,7 @@ in GIS software."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
       </span>
     </div>
 
@@ -274,16 +274,19 @@ is <a href="https://spatialreference.org/" class="external-link">https://spatial
 <span class="r-in"><span><span class="co"># with a polygon in the background, and for one species only</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># make a dummy polygon for the background</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/edzer/sp/" class="external-link">sp</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">poly1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">Polygon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">521500</span>,<span class="fl">526500</span>,<span class="fl">527000</span>, <span class="fl">521500</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">607500</span>, <span class="fl">608000</span>, <span class="fl">603500</span>, <span class="fl">603500</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">poly2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">Polygons</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">poly1</span><span class="op">)</span>, <span class="st">"s1"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">poly3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPolygons.html" class="external-link">SpatialPolygons</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">poly2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">Sr1</span> <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st.html" class="external-link">st_polygon</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">521500</span>,<span class="fl">526500</span>,<span class="fl">527000</span>, <span class="fl">521500</span>, <span class="fl">521500</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">607500</span>, <span class="fl">608000</span>, <span class="fl">603500</span>, <span class="fl">603500</span>, <span class="fl">607500</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">aoi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"My AOI"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">aoi</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">Sr1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">aoi</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">32650</span>  <span class="co"># assign CRS: UTM50N</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">Mapstest2</span> <span class="op">&lt;-</span> <span class="fu">detectionMaps</span><span class="op">(</span>CTtable           <span class="op">=</span> <span class="va">camtraps</span>,</span></span>
 <span class="r-in"><span>                           recordTable       <span class="op">=</span> <span class="va">recordTableSample</span>,</span></span>
 <span class="r-in"><span>                           Xcol              <span class="op">=</span> <span class="st">"utm_x"</span>,</span></span>
 <span class="r-in"><span>                           Ycol              <span class="op">=</span> <span class="st">"utm_y"</span>,</span></span>
-<span class="r-in"><span>                           backgroundPolygon <span class="op">=</span> <span class="va">poly3</span>,             <span class="co"># this was added</span></span></span>
+<span class="r-in"><span>                           backgroundPolygon <span class="op">=</span> <span class="va">aoi</span>,               <span class="co"># this was added</span></span></span>
 <span class="r-in"><span>                           speciesToShow     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PBE"</span>, <span class="st">"VTA"</span><span class="op">)</span>,   <span class="co"># this was added</span></span></span>
 <span class="r-in"><span>                           stationCol        <span class="op">=</span> <span class="st">"Station"</span>,</span></span>
 <span class="r-in"><span>                           speciesCol        <span class="op">=</span> <span class="st">"Species"</span>,</span></span>
@@ -314,7 +317,7 @@ is <a href="https://spatialreference.org/" class="external-link">https://spatial
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
