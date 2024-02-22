@@ -6,12 +6,12 @@ output:
     rmarkdown::html_vignette:
       toc: true
       toc_depth: 2
-      toc_float: true
+      toc_float: false
       df_print: kable
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{5. Multi-species occupancy models}
-  %\VignetteDepends{raster}
+  %\VignetteDepends{terra, sf}
   \usepackage[utf8]{inputenc}
 ---
 
@@ -21,16 +21,17 @@ library(purrr)
 library(DT)
 library(knitr)
 library(ggplot2)
+library(sf)
 ```
 
 # Overview
 
-Multi-species occupancy models are a powerful group of models that combine information from many species to estimate individual species' responses as well as community-level responses to environmental variables. 
+Multi-species occupancy models are a powerful tool for combining information from multiple species to estimate both individual and community-level responses to environmental variables. These models are typically fit using Bayesian frameworks such as BUGS, JAGS, or Nimble. However, preparing the necessary input from camera trapping data, writing the model code, setting parameters to monitor, and providing initial values can be a daunting and time-consuming task, even for experienced users.
 
-They are normally fit in Bayesian frameworks, e.g. BUGS, JAGS or Nimble. Creating the necessary input for these models from camera trapping data, writing the model code, setting parameters to monitor, initial values etc. can however be daunting, and even for seasoned users can be a tedious and time-consuming task. 
+To simplify this process, a new extension of camtrapR automatically generates custom community occupancy models for analysis in JAGS or Nimble. This flexible workflow supports:
 
-A new extension of camtrapR aims to simplify this process by automatically and flexibly creating custom community occupancy models that are ready for analysis in JAGS or Nimble. The workflow supports:
 
+* standard and Royle-Nichols occupancy models
 * continuous and categorical site covariates on detection and occupancy probability
 * continuous and categorical observation-level covariates on detection probability
 * fixed and random effects of all these covariates
@@ -49,7 +50,7 @@ The main function is `communityModel()`. It automates:
 * setting initial values
 * bundling input data
 
-The output is a `commOccu` object. The workflow then provides methods for: 
+The output is a `commOccu` object. The workflow provides methods for: 
 
 * fitting models
 * plotting marginal effects (response curves)
@@ -59,18 +60,18 @@ The output is a `commOccu` object. The workflow then provides methods for:
 
 The output of fit() is an mcmc.list from the coda package and can be uses as such, so the summary(), plot(), etc. methods are available as well as the functions from bayesplot.
 
-The main function `communityModel` does not support R formula syntax the way packages like unmarked or ubms do Instead, covariates and their effect types are specified via a few dedicated function arguments. This non-standard approach may change in the future to instead support formula syntax. On the other hand it might be less confusing than the lme4 syntax for random effects. 
+Unlike packages such as unmarked or ubms, the `communityModel` function does not currently support R formula syntax. Instead, covariates and their effect types are specified through dedicated function arguments. While this non-standard approach may change in the future to support formula syntax, it may be less confusing than the lme4 syntax for random effects.
 
 
 # Warning
 
-A word of caution, please always check the model code and make sure you understand the code and agree with it. The workflow is meant to be convenient and does not require you to even look at the model code, but you should (there are many comments in the model code to make it easier). This workflow still requires a proper understanding of Bayesian modelling frameworks and the concepts behind multi-species occupancy models.
+A word of caution, please always check the model code and make sure you understand the code and agree with it. While the workflow is designed for convenience and does not require you to examine the model code, it is highly recommended that you do so. The model code contains many comments to facilitate understanding. This workflow still requires a proper understanding of Bayesian modelling frameworks and the concepts behind multi-species occupancy models.
 
 # Limitations
 
-The workflow is still rather experimental, so please remain critical of the results and check carefully. If you encounter any problems, please let me know. 
+Please note that the workflow is still experimental and it is important to carefully review and critically evaluate the results. If you encounter any issues, do not hesitate to report them.
 
-There are currently a few limitations in the workflow: 
+Currently, there are some limitations to the workflow:
 
 * priors can not be customized 
 * models with categorical observation-level covariates cannot be compiled in Nimble and must be fit in JAGS instead
@@ -133,7 +134,8 @@ Site-occasion covariates are denoted by *.obs* after the submodel, e.g.:
 
 # Quick example
 
-Here is a quick example using the sample data that are included in camtrapR. The data set only contains five species at three fictional camera trap stations, and use made-up covariates (so the parameter estimates will be nonsense, ecologically). It is only a technical demonstration for how community models fit into the camtrapR workflow.
+Below is a brief example using the sample data included in camtrapR. This data set contains only five species at three fictional camera trap stations and uses made-up covariates. As a result, the parameter estimates will not have any ecological significance. This example serves only as a technical demonstration of how community models fit into the camtrapR workflow.
+
 
 ## Data preparation
 
@@ -151,7 +153,7 @@ First load the camera trap table and create a camera operation matrix:
  )
 ```
 
-Now we load the record table and create a list of detection histories. Here we include all species, but you may want to subset the record table first. Note the argument `includeEffort = TRUE`, hence the output for each species will be a list (containing the detection history and effort matrix).
+First, we load the record table and create a list of detection histories. While all species are included in this example, you may choose to subset the record table beforehand. It is important to note the includeEffort = TRUE argument, which means that the output for each species will be a list containing both the detection history and effort matrix.
 
 ```{r}
  data("recordTableSample")
@@ -181,12 +183,14 @@ Now we load the record table and create a list of detection histories. Here we i
 ```
 
  
-Get the detection history of each species and put into a new list (get rid of effort matrix).
+Get the detection history of each species and put into a new list (thereby removing the effort matrix).
+
 ```{r}
  ylist <- lapply(DetHist_list, FUN = function(x) x$detection_history)
 ```
 
-Create some fake covariates (only for demonstration):
+Create some made-up covariates (only for demonstration):
+
 ```{r}
  sitecovs <- camtraps[, c(1:3)]
  sitecovs$elevation <- c(300, 500, 600)
@@ -210,9 +214,9 @@ Now we bundle the necessary data for `communityModel` in a list with 3 items:
 
 Now `data_list` is a list containing the detection histories, site covariates and occasion level covariates. 
 
-N.B.: It is always necessary to provide an effort matrix. This is to ensure that detection probability is 0 when there was no effort. This is achieved by creating a binary effort matrix based on the user-provided effort matrix. The binary effort matrix is 0 for all cells where effort = NA, and 1 for all cells with values (no matter what values). Thus, all occasions with effort = NA in the povided above effort matrix will have detection probability = 0.
+Please note that it is always necessary to provide an effort matrix. This ensures that the detection probability is set to 0 when there was no effort. This is achieved by creating a binary effort matrix based on the user-provided effort matrix. In the binary effort matrix, all cells with effort = NA are set to 0, while all cells with values are set to 1, regardless of the value of effort (as long as it is not NA). As a result, all occasions with effort = NA in the provided effort matrix will have a detection probability of 0.
 
-Also note that this does **not** automatically include effort as a covariate on detection probability. To include effort as a covariate on detection probability, include "effort" in argument `detCovsObservation` (you can specify a fixed or random effect). 
+This does **not** automatically include effort as a covariate on detection probability. To include effort as a covariate on detection probability, include "effort" in argument `detCovsObservation` (you can specify a fixed or random effect of effort on detection probability). 
 
 
 ## Fit model in JAGS
@@ -334,7 +338,7 @@ You can obtain Rtools from: https://cran.r-project.org/bin/windows/Rtools/.
 It then needs to be put in PATH, see here for how to do it: 
 https://cran.r-project.org/bin/windows/Rtools/#putting-rtools-on-the-path.
 
-Depending on where you installed Rtools, you should see something like "C:/rtools40/usr/bin" somewhere in the output of the following line (for me it's usually the first or second entry).
+Depending on the version and where you installed Rtools, you should see something like "C:/rtools40/usr/bin" or "C:/RBuildTools/4.2" somewhere in the output of the following line (for me it's usually the first or second entry).
 
 ```{r eval = FALSE}
 Sys.getenv("PATH") 
@@ -392,12 +396,12 @@ The output as an `mcmc.list`, just like for the JAGS model above, and can be wor
 
 Response curves (= marginal effect plots):
 ```{r}
- plot_effects(mod.nimble,
-              fit.nimble.comp,
+ plot_effects(object = mod.nimble,
+              mcmc.list = fit.nimble.comp,
               submodel = "state")
 
- plot_effects(mod.nimble,
-              fit.nimble.comp,
+ plot_effects(object = mod.nimble,
+              mcmc.list = fit.nimble.comp,
               submodel = "det")
 ```
 
@@ -1086,7 +1090,8 @@ model1_jags_quadratic <- communityModel(
   detCovsObservation = list(ranef = "wind"),
   intercepts = list(det = "ranef", occu = "ranef"),
   data_list = input_AHM,
-  modelFile = modelFile_jags_quadratic)
+  modelFile = modelFile_jags_quadratic,
+  keyword_quadratic = "_squared")   # this is the default, added for clarity
 
 # short model run for demonstration
 out_ahm_jags_quadratic<- fit(model1_jags_quadratic, 
@@ -1100,7 +1105,7 @@ out_ahm_jags_quadratic<- fit(model1_jags_quadratic,
 ```
 
 
-Thanks to to keyword "_squared", `plot_effects` knows that "habitat" and "habitat_squared" are the same covariate and will combine the effects of "habitat" and "habitat_squared" in response curves.
+Thanks to to keyword "_squared" in the covariate name, `plot_effects` knows that "habitat" and "habitat_squared" are the same covariate and will combine the effects of "habitat" and "habitat_squared" in response curves. If a different keyword was used, set the parameter "keyword_quadratic" accordingly (it defaults to "_squared").
 
 ```{r}
 plot_effects(model1_jags_quadratic, 
@@ -1195,15 +1200,16 @@ DT::datatable(round(summary(out_ahm_jags_rich)$statistics, 3))
 
 ## Spatial predictions
 
-You can create spatial predictions based on the occupancy models created with `communityModel`, their model fits and covariate raster stacks.
+You can create spatial predictions based on the occupancy models created with `communityModel`, their model fits and covariate rasters.
 
-This requires the raster package.
+This requires the terra package.
 
 ```{r message=FALSE, warning=FALSE, results="hide"}
-  library(raster)
+  library(terra)
 ```
 
-In this example we will use a model that has both a continuous and a categorical covariate. 
+
+For demonstration we will use a model that has both a continuous and a categorical covariate. 
 
 ```{r message=FALSE, warning=FALSE, results="hide"}
 modelFile_jags_categ3 <- tempfile(fileext = ".txt")
@@ -1228,18 +1234,18 @@ out_ahm_jags_categ3 <- fit(model_jags_categ3,
 
 
 
-Create a habitat raster. We'll use the volcano raster for demonstration. The coordinates are not geographic though since this is only for demonstration. 
+**Create a habitat raster**. We'll use the volcano raster for demonstration. The coordinates are not geographic though since this is only for demonstration. 
 ```{r}
 data("volcano")
-r_volcano <- scale(raster(volcano))
+r_volcano <- scale(rast(volcano))
 ```
 
-create a categorical raster. Since it is not possible to have categorical raster (with data type "factor"), the raster must consist of integer numbers that refer to the factor levels (as defined in the model input). 
+**Create a categorical raster**. Since it is not possible to have categorical raster (with data type "factor"), the raster must consist of integer numbers that refer to the factor levels (as defined in the model input). 
 
 ```{r}
 levels(input_AHM$siteCovs$categ)    # show the order of factor levels, first one is reference
 
-raster_categ <- raster(x = matrix(rep(c(1,2, 3), each = length(r_volcano) / 3), 
+raster_categ <- rast(x = matrix(rep(c(1,2, 3), each = ncell(r_volcano) / 3), 
                                   ncol = ncol(r_volcano),
                                   nrow = nrow(r_volcano)))
 ```
@@ -1248,9 +1254,10 @@ raster_categ <- raster(x = matrix(rep(c(1,2, 3), each = length(r_volcano) / 3),
 
 ```{r}
 # add raster to list
-  stack_prediction <- stack(list(habitat = r_volcano,
+stack_prediction <- rast(list(habitat = r_volcano,
                                  categ = raster_categ))
-plot(stack_prediction)
+
+plot(stack_prediction, asp = 1)
 # raster categ, from west to east: 1 = medium, 2 = low, 3 = high
 ```
 
@@ -1266,7 +1273,8 @@ Species occupancy maps:
 
   plot(predictions_psi$mean, zlim = c(0,1), 
        col = hcl.colors(100), 
-       maxnl = 9)   # plotting only the first 9 species for space reasons
+       maxnl = 9,   # plotting only the first 9 species for space reasons
+       asp = 1)  
 
 ```
 
@@ -1278,14 +1286,14 @@ Species richness maps:
                              x         = stack_prediction,
                              type      = "richness")
   
-  plot(predictions_rich, col = hcl.colors(100))
+  plot(predictions_rich, col = hcl.colors(100), asp = 1)
   # mean = mean species richness estimate
   # sd = standard deviation of richness estimate
 ```
 
 In these examples we did not return confidence intervals. Doing so would be easy by setting `intervals =  "confidence"`.
 
-Computation can take long on larger rasters and can require lots of RAM. Check RAM usage during computations. 
+Computation can take long on larger rasters and can require lots of RAM. Check RAM usage during computations. Parameter "batch" can help reduce memory load.
 
 
 
@@ -1294,22 +1302,22 @@ Computation can take long on larger rasters and can require lots of RAM. Check R
 
 The `predict` function can be used to calculate Percentage of Area Occupied (PAO) for all species, optionally for a given area of interest (AOI). 
 
-For demonstration, let's create a AOI as a SpatialPolygonsDataFrame. Normally you'd just load a shapefile or other spatial vector data set.
+For demonstration, let's create a AOI as a simple feature (from the sf package) Normally you'd just load a shapefile or other spatial vector data set.
 
 ```{r}
-Sr1 = Polygon(cbind(c(0.2,0.2, 0.6,0.6, 0.2),c(0.4,0.7, 0.8,0.4,0.4)))
-Srs1 = Polygons(list(Sr1), "1")
-SpP = SpatialPolygons(list(Srs1))
-aoi = SpatialPolygonsDataFrame(SpP, data = data.frame(name = "My AOI"))
+Sr1 = st_polygon(list(cbind(c(10, 10, 30, 30, 10),
+                    c(40, 70, 80, 40, 40))))
+aoi <- data.frame(name = "My AOI")
+st_geometry(aoi) <- st_geometry(Sr1)
 ```
 
 ```{r}
 plot(r_volcano)
-plot(aoi, add = T)
+plot(vect(aoi), add = T)   # easier plotting via SpatVect object from terra 
 ```
 
 
-To use the SpatialPolygonsDataFrame as an AOI, we need to rasterize it. PAO will refer to all cells in the AOI raster that are not NA. 
+To use the vector layer as an AOI, we need to rasterize it. PAO will refer to all cells in the AOI raster that are not NA. 
 
 ```{r}
 r_aoi <- rasterize(aoi, r_volcano)
@@ -1349,7 +1357,7 @@ $pao_df is similar to $pao_matrix, but in a data frame in long format, ready for
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-$aoi is a RasterLayer showing the AOI (now with cells removed that are NA in the prediction rasters)
+$aoi is a raster layer (SpatRaster) showing the AOI (now with cells removed that are NA in the prediction rasters)
 
 ```{r}
 plot(predictions_pao$aoi)
@@ -1431,12 +1439,20 @@ Summary statistics of model parameters:
 DT::datatable(round(summary(out_ahm_jags_RN)$statistics, 3))
 ```
 
-Response curves (marginal effect plots):
+Response curves (marginal effect plots). 
 
 ```{r}
+# In the occupancy (state) submodel, one can show abundance (the latent quantity modelled) 
 plot_effects(model1_jags_RN, 
-             out_ahm_jags_RN)
+             out_ahm_jags_RN,
+             submodel = "state",
+             response = "abundance")
 
+# In the occupancy (state) submodel, one can also show occupancy (which is derived from abundance):
+plot_effects(model1_jags_RN, 
+             out_ahm_jags_RN,
+             submodel = "state",
+             response = "occupancy")
 
 
 plot_effects(model1_jags_RN, 
@@ -1511,7 +1527,9 @@ DT::datatable(predictions_pao_RN$pao_summary)
 
 ## Single-species occupancy models
 
-Incidentally, the workflow above can be used for single-species models too. The code will be less streamlined and possibly slower than normal code for single-species models (due to the species loop which is unnecessary for single-species models), but it is possible. Simply pass a single detection history in the data_list$ylist of the input to `communityModel`. 
+Incidentally, the workflow above can be used for single-species models too. The code will be less streamlined and possibly slower than normal code for single-species models (due to the species loop which is unnecessary for single-species models), but it is possible. 
+
+To create a single-species occupancy model, simply pass a single detection history in the data_list$ylist of the input to `communityModel`. 
 
 Take care to only define fixed effects for covariates and the intercepts, not random effects of species. It is possible however to specify random effects of categorical site covariates on continuous site covariates as in the example below. 
 

@@ -13,11 +13,11 @@ output:
   html_document: null
 vignette: |
   %\VignetteIndexEntry{4. Data exploration and visualisation} 
-  %\VignetteDepends{raster, sf, overlap} 
+  %\VignetteDepends{terra, sf, overlap} 
   \usepackage[utf8]{inputenc}
 ---
 
-```{r  results = "hide"}
+```{r message=FALSE}
 library(camtrapR)
 ```
 
@@ -149,33 +149,30 @@ library(mapview)
 mapview(detections_sf)
 ```
 
-One can also color the points by values, e.g. 
+One can also modify color or size of the points by values, e.g. 
 
 ```{r eval = FALSE}
-mapview(detections_sf, zcol = "n_species")
+mapview(detections_sf, 
+        zcol = "n_species",
+        cex  = "n_species")
 ```
 
 The map viewer is interactive and allows different base maps, including satellite imagery. Here is an example with OpenStreetMap: 
 
 ![Example map in mapview (the locations are fictional)](mapview_example.png)
 
-## Making and using a SpatialPointsDataFrame
+## Using the output of detectionMaps for extracting covariate values from rasters
 
-If writeShapefile = TRUE, the output of detectionMaps is a sf object (a data frame with a column contain the spatial information). If writeShapefile = TRUE, it can be converted to an sf object easily. 
+If writeShapefile = TRUE, the output of detectionMaps is a sf object (a data frame with a geometry column contain the spatial information). It can be used for extracting values from rasters for use as covariates.
 
-<!-- The data frame that `detectionMaps` returns can be turned into a SpatialPointsDataFrame as defined in the package `sp`. SpatialPointsDataFrames can be used for spatial analyses and queries in R, e.g. for extracting data from raster layers such as elevation maps. -->
 
-<!-- This is how it works. We use the output of `detectionMaps` created above and make a SpatialPointsDataFrame. Afterwards, a sample raster is created, plotted together with the points and the values are extracted. -->
-
-```{r eval = "raster" %in% installed.packages()}
-
-# convert sf object to sp object
-detections_spdf <- as(detections_sf, "Spatial")
+```{r eval = "terra" %in% installed.packages()}
 
 # create a sample raster and extract data from it (if the raster package is available)
-if("raster" %in% installed.packages()){
-  library(raster)
-  raster_test <- raster(x = extend(extent(detections_spdf), y = 500), nrows = 10, ncols = 10)
+if("terra" %in% installed.packages()){
+  library(terra)
+  raster_test <- rast(extend(ext(detections_sf), y = 500),
+                      nrows = 10, ncols = 10)
   values(raster_test) <- rpois(n = 100, lambda = seq(1, 100))    # fill raster with random numbers
   
   # plot raster
@@ -185,32 +182,24 @@ if("raster" %in% installed.packages()){
        xlab = "UTM E")     # needs to be adjusted if data are not in UTM coordinate system
   
   # add points to plot
-  points(detections_spdf, pch = 16)
+  points(detections_sf, pch = 16)
      
   # add point labels
-  text(x      = coordinates(detections_spdf)[,1],
-       y      = coordinates(detections_spdf)[,2],
-       labels = detections_spdf$Station,
+  text(x      = st_coordinates(detections_sf)[,1],
+       y      = st_coordinates(detections_sf)[,2],
+       labels = detections_sf$Station,
        pos = 1)
   
   # extracting raster values. See ?extract for more information
-  detections_spdf$raster_value <- extract(x = raster_test, y = detections_spdf)
+  detections_sf$raster_value <- extract(x = raster_test, y = detections_sf)
   
   # checking the attribute table
-  detections_spdf@data
+  detections_sf
 
 }
 ```
 
 The same procedure also works with the camera trap station information table instead of the `detectionMaps` output.
-
-The SpatialPointsDataFrame can easily be converted back to a sf object via 
-
-```{r}
-library(sf)
-detections_sf <- as(detections_spdf, "sf")
-```
-
 
 
 # Visualising species activity data
@@ -393,8 +382,4 @@ reportTest[[4]]    # number of species events by station
 A zip file containing the output of `surveyReport`, the input tables, activity plots, detection maps and a prepared R script can be created by setting `makezip = TRUE`. 
 The zip file is relatively small and can easily be used for data sharing with colleagues. 
 
-## Data archiving
 
-The tables provided by the function `surveyReport` together with the camera station table and the record table provide key information about surveys. 
-These data can be used for archiving survey data in online repositories such as the Knowledge Network for Biocomplexity ([KNB](https://knb.ecoinformatics.org)), a DataONE member node (https://www.dataone.org). 
-To make these survey data understandable and usable for everyone, they need to be described thoroughly by metadata. Because of the amount of metadata needed to adequately describe the survey data and the technical requirement involved, we recommend using external software (e.g. [Morpho](https://knb.ecoinformatics.org/#tools/morpho)) for annotating data generated with camtrapR before upload to repositories.

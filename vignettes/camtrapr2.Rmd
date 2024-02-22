@@ -40,9 +40,9 @@ Generally, species identification comes before individual identification. camtra
 1. by moving renamed images into species/individual directories within station directories (drag & drop) or 
 2. by assigning metadata tags to images in image management software (metadata tagging). 
 
-It is recommended to to work with the renamed images (function `imageRename`), not the original generic file names. Species names are case-sensitive and must be spelled *exactly* the same in each station, including interpunction and white spaces. "Leopard" is not identical to "leopard" and "Pig-tailed Macaque" is different from "Pig-tailed Macaque ".
+It is recommended to to work with the renamed images (function `imageRename`), not the original generic file names. Species names are case-sensitive and must be spelled *exactly* the same in each station, including interpunction and white spaces. "Leopard" is not identical to "leopard" and "Pig-tailed Macaque" is different from "Pig tailed Macaque".
 
-Since version 2.0.0, camtrapR partially supports video files. You can use both of the following methods for identification (drag & drop, metadata) for video files as well.
+Since version 2.0.0, camtrapR supports video files. You can use both of the following methods for identification (drag & drop, metadata) for video files as well.
 
 ## Drag & drop
 

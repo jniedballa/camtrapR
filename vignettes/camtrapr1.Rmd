@@ -29,11 +29,11 @@ print("WARNING: THIS VIGNETTE WAS CREATED WITHOUT EXIFTOOL. OUTPUT IS INCOMPLETE
 # Introduction
 
 
-**camtrapR** provides functions for organising and managing camera trap images and for the preparation of occupancy and (spatial) capture-recapture analyses. The package handles JPG images and since camtrapR 2.0.0, provides limited support for video files.
+**camtrapR** provides functions for organising and managing camera trap images and for the preparation of occupancy and (spatial) capture-recapture analyses. The package handles JPG images and supports video files.
 
-The four vignettes demonstrate the camtrapR workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
+The five vignettes demonstrate the camtrapR workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
 
-camtrapR is compatible with other software for camera trap data management. So if you prefer to manage images and identify species in other software, you usually can. For example, Camelot and TRAPPER export csv files that can be used as input for camtrapR. camtrapR uses a simple data structure and standard data types (data frames and matrices) to store information about the camera trap survey and the detected species and individuals in separate data frames to maximise compatibility. 
+camtrapR is compatible with other software for camera trap data management. If you prefer to manage images and identify species using other software, you can usually do so. For example, Camelot and TRAPPER can export csv files that can be used as input for camtrapR. To maximize compatibility, camtrapR uses a simple data structure and standard data types (data frames and matrices) to store information about the camera trap survey and the detected species and individuals in separate data frames.
 
 ## Installation
 
@@ -43,7 +43,7 @@ You can install the newest stable version from CRAN via:
 install.packages("camtrapR")
 ```
 
-Alternatively, you can install the development version from GitHub (requires package devtools):
+Alternatively, you can install the development version with the latest features and bugfixes from GitHub (requires package remotes):
 
 ```{r eval = FALSE}
 library(remotes)
@@ -65,7 +65,7 @@ The latest vignettes, function reference and changelog can be found on the [camt
 
 ## Workflow
 
-The workflow in camptrapR is made up of a number of function that build upon one another in a logical sequence. Here is a list of functions grouped by work steps in the order in which they should be run. Details on all functions are provided below, in the other vignettes, and the function help files.
+The camtrapR workflow consists of a series of functions that build upon one another in a logical sequence. Below is a list of functions grouped by work steps. Detailed information about each function can be found in the sections below, as well as in the other vignettes and the function help files.
 
 * Organising raw images
 1. `createStationFolders`
@@ -98,6 +98,7 @@ The workflow in camptrapR is made up of a number of function that build upon one
 1. `cameraOperation`
 1. `detectionHistory` (for occupancy analyses)
 1. `spatialDetectionHistory	` (for spatial capture-recapture analyses)
+1. `communityModel` (for multi-species occupancy models)
 
 
 ## General sampling situation
@@ -193,7 +194,9 @@ Station and camera IDs can be any combination of characters and numbers. Please 
 
 ## Column names
 
-Column names are not prescribed to allow users freedom in naming their data the way they wish (with one exception detailed below). In the sample table, 'Station' contains station IDs, 'utm_y' and 'utm_x' contain the station's geographic coordinates. 'Setup_date' and 'Retrieval_date' are the dates the stations were set up and retrieved from the field. All of these may have user-defined names. 'Problem1_from' and 'Problem1_to' are optional columns to specify periods in which cameras/stations were not operational.  Additional pairs of columns such as 'Problem2_from' and 'Problem2_to' etc. can be added if cameras/stations malfunctioned repeatedly. Their names must follow the pattern given here.
+Column names in camtrapR are not prescribed, allowing users the freedom to name their data as they wish, with one exception detailed below. In the sample table, 'Station' contains station IDs, 'utm_y' and 'utm_x' contain the station's geographic coordinates. 'Setup_date' and 'Retrieval_date' are the dates the stations were set up and retrieved from the field.  All of these column names can be user-defined. 
+
+'Problem1_from' and 'Problem1_to' are optional columns to specify periods in which cameras/stations were not operational.  If cameras or stations malfunctioned repeatedly, additional pairs of columns such as ‘Problem2_from’ and ‘Problem2_to’ can be added. These column names must follow the given pattern.
 
 ## Date format
 
