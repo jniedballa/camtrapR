@@ -1,13 +1,13 @@
 
-plot.effects.commOccu <- function(object,       # commOccu object
-                                  mcmc.list,    # mcmc.list (output of fit())
-                                  submodel = "state",      # "det" or "state"
+plot_effects_commOccu <- function(object,
+                                  mcmc.list,
+                                  submodel = "state",
                                   response = "occupancy",
-                                  draws = 1000,    # number of posterior samples to use (will draw random sample from posterior distribution if defined). 
-                                  outdir,       # directory to save plots in (optional)
-                                  level = 0.95,   # confidence level for CIs in plot
-                                  keyword_quadratic = "_squared",   # the suffix of a covariate that indicates a quadratic effect  (e.g. "elevation" and "elevation_squared" -> will be combined in plot)
-                                  ...)                            # additional arguments for ggsave()
+                                  draws = 1000,
+                                  outdir,
+                                  level = 0.95,
+                                  keyword_quadratic = "_squared",
+                                  ...)
 {
   
   
@@ -376,7 +376,7 @@ plot.effects.commOccu <- function(object,       # commOccu object
 }
 
 
-  setGeneric("plot_effects", function(object, ...) standardGeneric("plot_effects"))
+  setGeneric("plot_effects", def = function(object, ...) standardGeneric("plot_effects"))
   
   
   #' Plot Marginal Effects of Covariates
@@ -394,21 +394,25 @@ plot.effects.commOccu <- function(object,       # commOccu object
   #' @param keyword_quadratic  character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name (e.g. if the covariate is "elevation", the quadratic covariate would be "elevation_squared").
   #' @param ...  additional arguments for \code{\link[ggplot2]{ggsave}}
   #'
+    #' @details
+  #' Users who wish to create their own visualizations can use the data stored in the ggplot output. It is accessed via e.g. \code{output$covariate_name$data}
+  #' 
   #'
-  #' @return list of ggplot objects
+  #' @return A list of ggplot objects (one list item per covariate).
   #' @export
   #' @importFrom ggplot2 geom_vline geom_linerange geom_pointrange element_blank theme labs expr
   #' @importFrom ggplot2 scale_color_manual scale_y_discrete aes_string vars facet_grid facet_wrap ylim geom_col
   # @import coda
   #'
-  setMethod("plot_effects", signature(object = "commOccu"), 
-            plot.effects.commOccu)
+  setMethod("plot_effects", 
+            signature = c(object = "commOccu"), 
+            plot_effects_commOccu)
   
   
   
   
 
-plot.coef.commOccu <- function(object, 
+plot_coef_commOccu <- function(object, 
                                mcmc.list,
                                submodel = "state",
                                ordered = TRUE,
@@ -855,7 +859,7 @@ plot.coef.commOccu <- function(object,
 
 
 
-  setGeneric("plot_coef", function(object, ...) standardGeneric("plot_coef"))
+  setGeneric("plot_coef", def = function(object, ...) standardGeneric("plot_coef"))
   
   
   #' Plot effect sizes of covariates in community occupancy model
@@ -878,7 +882,8 @@ plot.coef.commOccu <- function(object,
   #' @export
   #' 
   #'
-  setMethod("plot_coef", signature(object = "commOccu"), 
-            plot.coef.commOccu)
+  setMethod("plot_coef", 
+            signature = c(object = "commOccu"), 
+            plot_coef_commOccu)
   
   

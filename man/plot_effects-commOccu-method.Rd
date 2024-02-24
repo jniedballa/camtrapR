@@ -37,8 +37,11 @@
 \item{...}{additional arguments for \code{\link[ggplot2]{ggsave}}}
 }
 \value{
-list of ggplot objects
+A list of ggplot objects (one list item per covariate).
 }
 \description{
 Plot marginal effect plots (= response curves if covariates are continuous) for all species in a community (multi-species) occupancy model. Takes into account species-specific intercepts (if any). Currently only supports continuous covariates, not categorical covariates.
+}
+\details{
+Users who wish to create their own visualizations can use the data stored in the ggplot output. It is accessed via e.g. \code{output$covariate_name$data}
 }
