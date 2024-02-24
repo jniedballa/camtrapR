@@ -1,4 +1,4 @@
-#' Shiny dashboard summarizing and analyzing camera trap survey data
+#' Shiny dashboard for summarizing and analyzing camera trap survey data
 #'
 #' @description 
 #' Open a Shiny dashboard to summarize a camera trapping survey. It provides an 

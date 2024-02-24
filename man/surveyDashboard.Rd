@@ -2,7 +2,7 @@
 % Please edit documentation in R/surveyDashboard.R
 \name{surveyDashboard}
 \alias{surveyDashboard}
-\title{Shiny dashboard summarizing and analyzing camera trap survey data}
+\title{Shiny dashboard for summarizing and analyzing camera trap survey data}
 \usage{
 surveyDashboard(
   CTtable,
