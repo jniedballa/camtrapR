@@ -42,6 +42,7 @@ reference:
   - title: Data export
     desc: Functions to prepare occupancy and spatial capture-recapture analyses, and summarise surveys
     contents:
+      - '`createCovariates`'
       - '`cameraOperation`'
       - '`detectionHistory`'
       - '`spatialDetectionHistory`'

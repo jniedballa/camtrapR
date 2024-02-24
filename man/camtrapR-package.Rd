@@ -77,6 +77,7 @@ These plots are generated from the record table and the camera trap table.
 \section{Prepare occupancy and spatial capture-recapture analyses, and summarise surveys}{
 
 \tabular{ll}{
+\code{\link{createCovariates}}        \tab Extract covariate values from spatial rasters and prepare rasters for spatial predictions \cr
 \code{\link{cameraOperation}}         \tab Create a camera operation matrix \cr
 \code{\link{detectionHistory}}        \tab Species detection histories for occupancy analyses (single and multi-season) \cr
 \code{\link{spatialDetectionHistory}} \tab Detection histories of individuals for spatial capture-recapture analyses  \cr
