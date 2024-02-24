@@ -7,8 +7,8 @@
 
 ## new features
 * communityModel: new argument "model" allows Royle-Nichols models
-* fit(), predict(), plot_effects(), plot_coef() also support Royle-Nichols models
-* predict: now accepts type = "pao" (for percentage of area occupied, by species) and "psi_array" (raw occupancy probabilities), "abundance" ( abundance statistics, for Royle-Nichols model) and "lambda_array" (raw abundances from Royle-Nichols model)
+* fit, predict, plot_effects, plot_coef also support Royle-Nichols models
+* predict: now accepts type = "pao" (for percentage of area occupied, by species), "psi_array" (raw occupancy probabilities), "abundance" (abundance statistics, for Royle-Nichols model) and "lambda_array" (raw abundances from Royle-Nichols model)
 * predict: new argument "batch" to allow memory-friendly processing in batches
 * communityModel: returns species richness at sampling locations (only in JAGS models)
 
@@ -18,9 +18,9 @@
 * predict / plot_effects: fixed wrong assignment of intercept estimates to posterior draws
 
 ## Other
-* migrated function from raster/sp to terra/sf, removed rgdal
-* removed exiftoolPath()
+* migrated functions from raster/sp to terra/sf, removed rgdal
 * modified plot titles in activityRadial().
+* package "overlap" in Suggests, not Depends
  
 
 
@@ -59,7 +59,6 @@
 * imageRename: fixed error when hasCameraFolders is TRUE, but a station has only 1 camera (reported by Camille Coudrat and Ezekiel Gading)
 * detectionHistory: fixed a bug that caused errors when using multiple sessions and non-standard date/time formats (reported by Daniele Barcelos)
 * checkSpeciesNames: fixed error due to change in taxize::get_tsn (reported by Ivonne Oddoy)
-
 
 ## other changes
 * lubridate is a dependency now (for cameraOperation)
