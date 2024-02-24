@@ -427,6 +427,7 @@ plot_coef_commOccu <- function(object,
   
   submodel <- match.arg(submodel, choices = c("det", "state"))
   colorby  <- match.arg(colorby, choices = c("significance", "Bayesian p-value"))
+  if(colorby == "Bayesian p-value") stop(paste("colorby = 'Bayesian p-value' is currently not supported."))
   
   scales <- match.arg(scales, choices = c("free", "free_y"))
   

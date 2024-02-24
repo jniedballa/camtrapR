@@ -100,23 +100,23 @@
 
 
 <dt>submodel</dt>
-<dd><p>Submodel to get plots for. Can be "det" or "state"</p></dd>
+<dd><p>character. Submodel to get plots for. Can be <code>"det"</code> (detection submodel) or <code>"state"</code> (occupancy submodel)</p></dd>
 
 
 <dt>response</dt>
-<dd><p>response type on y axis. Only relevant for submodel = "state". Default is "occupancy", can be set to "abundance" for Royle-Nichols models</p></dd>
+<dd><p>character. response type on y axis. Only relevant for <code>submodel = "state"</code>. Default is <code>"occupancy"</code>, can be set to <code>"abundance"</code> for Royle-Nichols models</p></dd>
 
 
 <dt>draws</dt>
-<dd><p>Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in <code>draws</code> are available, all posterior samples are used.</p></dd>
+<dd><p>integer. Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in <code>draws</code> are available, all posterior samples are used.</p></dd>
 
 
 <dt>outdir</dt>
-<dd><p>Directory to save plots to (optional)</p></dd>
+<dd><p>character. Directory to save plots to (optional)</p></dd>
 
 
 <dt>level</dt>
-<dd><p>Probability mass to include in the uncertainty interval</p></dd>
+<dd><p>numeric. Probability mass to include in the uncertainty interval.</p></dd>
 
 
 <dt>keyword_quadratic</dt>
@@ -124,14 +124,18 @@
 
 
 <dt>...</dt>
-<dd><p>additional arguments for <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></code></p></dd>
+<dd><p>additional arguments for <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></code> - only relevant if <code>outdir</code> is defined</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>list of ggplot objects</p>
+<p>A list of ggplot objects (one list item per covariate).</p>
+    </div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>Users who wish to create their own visualizations can use the data stored in the ggplot output. It is accessed via e.g. <code>output$covariate_name$data</code></p>
     </div>
 
   </div>
