@@ -29,7 +29,7 @@ reference:
       - '`recordTable`'
       - '`recordTableIndividual`'
       - '`exifTagNames`'
-      - '`exiftoolPath`'
+      - '`addToPath`'
       - '`filterRecordTable`'
   - title: Data exploration and visualisation
     desc: Functions for plotting species activity, detection maps and exporting shapefiles
@@ -47,6 +47,7 @@ reference:
       - '`spatialDetectionHistory`'
       - '`surveyReport`'
       - '`communityModel`'
+      - '`surveyDashboard`'
   - title: Community occupancy models
     desc: 
     contents: 
