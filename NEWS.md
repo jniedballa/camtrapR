@@ -1,4 +1,4 @@
-# camtrapR 2.2.1
+# camtrapR 2.3.0
 
 ## new functions
 * surveyDashboard: Shiny dashboard for summarizing and analyzing camera trap survey data
@@ -19,8 +19,9 @@
 
 ## Other
 * migrated function from raster/sp to terra/sf, removed rgdal
-* deprecated exiftoolPath()
+* removed exiftoolPath()
 * modified plot titles in activityRadial().
+ 
 
 
 
