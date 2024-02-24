@@ -14,10 +14,6 @@
 #' The function returns several derived quantities, e.g. species richness, Bayesian p-values (overall and by species), Freeman-Tukey residuals for actual and simulated data (by station and total). If doing data augmentation, metacommunity size and number of unseen species are returned also. 
 #'
 #' @importFrom generics fit
-#  @importFrom rjags jags.model coda.samples
-# @importFrom coda c coda::mcmc.list mcmc
-# @importFrom snowfall snowfall::sfInit snowfall::sfLibrary snowfall::sfExportAll snowfall::sfClusterSetupRNG snowfall::sfLapply snowfall::sfStop
-# @importFrom nimble nimble::readBUGSmodel nimble::buildMCMC nimble::compileNimble nimble::runMCMC
 #' @importFrom stats rnorm window 
 #' @importFrom ggplot2 ggplot ggsave xlim geom_line facet_wrap geom_ribbon theme_bw ggtitle xlab ylab aes
 #' @export
@@ -1315,9 +1311,10 @@ communityModel <- function(data_list,
                    
                    
                    paste0("y[", speciesIndex, ",", stationIndex, ",", occasionIndex,"] ~ dbern(p.eff[", speciesIndex, ",", stationIndex, ",", occasionIndex,"])"),
-                   
-                   "\n### generate new data from model under consideration",
-                   paste0("new.y[", speciesIndex, ",", stationIndex, ",", occasionIndex,"] ~ dbern(p.eff[", speciesIndex, ",", stationIndex, ",", occasionIndex,"])"),
+
+                   ## remove GOF calculation temporarily until it is corrected
+                   # "\n### generate new data from model under consideration",
+                   # paste0("new.y[", speciesIndex, ",", stationIndex, ",", occasionIndex,"] ~ dbern(p.eff[", speciesIndex, ",", stationIndex, ",", occasionIndex,"])"),
                    "}   # close occasion loop", 
                    "\n", sep = "\n")
     attr(loop3, "params") <- NULL
@@ -1345,11 +1342,14 @@ communityModel <- function(data_list,
                    
                    # NOTE: which functions from nimbleEcology to use for RN-Model? 
                    # to replace: dOcc_v / rOcc_v
-                   "\n### calculate probability of observed data ",
+                   
+                   
+                   # "\n### calculate probability of observed data ",
                    paste0("y[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "] ~ dOcc_v(probOcc = psi[", speciesIndex, ",", stationIndex, "], probDetect = p.eff[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "], len = ", occasionMax, ")"),
                    
-                   "\n### generate new data from model under consideration",
-                   paste0("new.y[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "]  <- rOcc_v(n = 1, probOcc = psi[", speciesIndex, ",", stationIndex, "], probDetect = p.eff[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "], len = ", occasionMax, ")"), 
+                   ## remove GOF calculation temporarily until it is corrected
+                   # "\n### generate new data from model under consideration",
+                   # paste0("new.y[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "]  <- rOcc_v(n = 1, probOcc = psi[", speciesIndex, ",", stationIndex, "], probDetect = p.eff[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "], len = ", occasionMax, ")"), 
                    
                    "\n", sep = "\n")
     attr(loop3, "params") <- NULL
@@ -1361,23 +1361,32 @@ communityModel <- function(data_list,
   
   ## derived quantities #### 
   
-  close_loop2 <-  paste( "### calculate Freeman-Tukey residuals for real and new data",
-                         paste0("res[", speciesIndex, ",", stationIndex, "] <- (sqrt(sum(y[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])) - sqrt(sum(p.eff[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])))^2"),
-                         paste0("new.res[", speciesIndex, ",", stationIndex, "] <- (sqrt(sum(new.y[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])) - sqrt(sum(p.eff[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])))^2"),
-                         "}   # close station loop",
-                         "\n", sep = "\n")
-  attr(close_loop2, "params") <- NULL
+  if(!nimble) {    
+    # remove GOF calculation  temporarily until it is corrected
+    close_loop2 <-  paste(# "### calculate Freeman-Tukey residuals for real and new data",
+                          # paste0("res[", speciesIndex, ",", stationIndex, "] <- (sqrt(sum(y[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])) - sqrt(sum(p.eff[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])))^2"),
+                          # paste0("new.res[", speciesIndex, ",", stationIndex, "] <- (sqrt(sum(new.y[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])) - sqrt(sum(p.eff[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])))^2"),
+                           "}   # close station loop",
+                           "\n", sep = "\n")
+    attr(close_loop2, "params") <- NULL
+    
+    
+    
+    close_loop1a1 <- paste(#"### sum residuals over stations",
+                           #paste0("R2[", speciesIndex, "] <- sum(res[", speciesIndex, ", 1:", stationMax, "])"),
+                           #paste0("new.R2[", speciesIndex, "] <- sum(new.res[", speciesIndex, ", 1:", stationMax, "])"),
+                           
+                           #"\n### species-level Bayesian p-value",
+                           #paste0("Bpvalue_species[", speciesIndex, "] <- R2[", speciesIndex, "] > new.R2[", speciesIndex, "]"),
+                           "# Goodness-of-fit test was temporarily removed from models.",
+                           "\n", sep = "\n")
+    # attr(close_loop1a1, "params") <- c("R2", "new.R2", "Bpvalue_species")
+  } else {
+    close_loop2 <- "}   # close station loop\n"
+    close_loop1a1 <- "# Goodness-of-fit test was temporarily removed from models.\n"
+  }
   
   
-  
-  close_loop1a1 <- paste("### sum residuals over stations",
-                         paste0("R2[", speciesIndex, "] <- sum(res[", speciesIndex, ", 1:", stationMax, "])"),
-                         paste0("new.R2[", speciesIndex, "] <- sum(new.res[", speciesIndex, ", 1:", stationMax, "])"),
-                         
-                         "\n### species-level Bayesian p-value",
-                         paste0("Bpvalue_species[", speciesIndex, "] <- R2[", speciesIndex, "] > new.R2[", speciesIndex, "]"),
-                         "\n", sep = "\n")
-  attr(close_loop1a1, "params") <- c("R2", "new.R2", "Bpvalue_species")
   
   if(!nimble){
     close_loop1a2 <- paste("\n### Number of occupied stations for each species",
@@ -1386,7 +1395,7 @@ communityModel <- function(data_list,
                            paste0("speciesInCommunity[", speciesIndex ,"] <- 1 - equals(NStationsOccupied[", speciesIndex ,"],0)"),
                            "\n", sep = "\n")
   } else {
-    close_loop1a2 <- "# Total number of occupied and community membership indicator are not returned if nimble = TRUE"
+    close_loop1a2 <- "# Total number of occupied and community membership indicator are not returned if nimble = TRUE\n"
   }
   attr(close_loop1a2, "params") <- NULL
   
@@ -1448,13 +1457,17 @@ communityModel <- function(data_list,
     close_loop1c <- paste("}    # close species loop\n\n")
   }
   
-  finish_residuals <- paste("###sum residuals over observed species", 
-                            paste0("R3 <- sum(R2[1:", speciesMax, "])"),
-                            paste0("new.R3 <- sum(new.R2[1:", speciesMax, "])"),
-                            paste0("Bpvalue <- R3 > new.R3"),
-                            "\n", sep = "\n")
-  attr(finish_residuals, "params") <- c("R3", "new.R3", "Bpvalue")
   
+  # if(!nimble){    # remove GOF calculation temporarily until it it corrected
+  #   finish_residuals <- paste("###sum residuals over observed species", 
+  #                             paste0("R3 <- sum(R2[1:", speciesMax, "])"),
+  #                             paste0("new.R3 <- sum(new.R2[1:", speciesMax, "])"),
+  #                             paste0("Bpvalue <- R3 > new.R3"),
+  #                             "\n", sep = "\n")
+  #   attr(finish_residuals, "params") <- c("R3", "new.R3", "Bpvalue")
+  # } else {
+    finish_residuals <- ""
+  # }
   
   
   if(augment == "full") {
