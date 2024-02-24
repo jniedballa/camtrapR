@@ -1,7 +1,7 @@
 Package: camtrapR
 Type: Package
 Title: Camera Trap Data Management and Preparation of Occupancy and Spatial Capture-Recapture Analyses
-Version: 2.3.0
+Version: 2.3.1
 Date: 2024-02-24
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
