@@ -386,15 +386,15 @@ plot_effects_commOccu <- function(object,
   #' @aliases plot_effects
   #' @param object \code{commOccu} object
   #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
-  #' @param submodel  Submodel to get plots for. Can be "det" or "state"
-  #' @param response response type on y axis. Only relevant for submodel = "state". Default is "occupancy", can be set to "abundance" for Royle-Nichols models
-  #' @param draws  Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in \code{draws} are available, all posterior samples are used.
-  #' @param outdir Directory to save plots to (optional)
-  #' @param level  Probability mass to include in the uncertainty interval
+  #' @param submodel  character. Submodel to get plots for. Can be \code{"det"} (detection submodel) or \code{"state"} (occupancy submodel)
+  #' @param response character. response type on y axis. Only relevant for \code{submodel = "state"}. Default is \code{"occupancy"}, can be set to \code{"abundance"} for Royle-Nichols models
+  #' @param draws  integer. Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in \code{draws} are available, all posterior samples are used.
+  #' @param outdir character. Directory to save plots to (optional)
+  #' @param level  numeric. Probability mass to include in the uncertainty interval.
   #' @param keyword_quadratic  character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name (e.g. if the covariate is "elevation", the quadratic covariate would be "elevation_squared").
-  #' @param ...  additional arguments for \code{\link[ggplot2]{ggsave}}
+  #' @param ...  additional arguments for \code{\link[ggplot2]{ggsave}} - only relevant if \code{outdir} is defined
   #'
-    #' @details
+  #' @details
   #' Users who wish to create their own visualizations can use the data stored in the ggplot output. It is accessed via e.g. \code{output$covariate_name$data}
   #' 
   #'
@@ -421,6 +421,7 @@ plot_coef_commOccu <- function(object,
                                level = c(outer = 0.95, inner = 0.75),
                                colorby = "significance",
                                scales = "free_y",
+                               community_lines = FALSE,
                                ...) {
   
   
@@ -753,15 +754,18 @@ plot_coef_commOccu <- function(object,
       
       p_list[[cov]] <- ggplot (df_quantiles_i, aes_string(y = "species", x = "median", color = color_by)) +
         
-        
+        if(community_lines) {
         # community effect
-        geom_vline(data = df_quantiles_i[df_quantiles_i$type == "mean", -which(colnames(df_quantiles_i) == "type")],    
-                   aes(xintercept = median), col = color_community, linetype = 1, alpha = alpha_community) +
-        geom_vline(data = df_quantiles_i[df_quantiles_i$type == "mean", -which(colnames(df_quantiles_i) == "type")],
-                   aes(xintercept = lower_outer), col = color_community, linetype = 2, alpha = alpha_community) +
-        geom_vline(data = df_quantiles_i[df_quantiles_i$type == "mean", -which(colnames(df_quantiles_i) == "type")],
-                   aes(xintercept = upper_outer), col = color_community, linetype = 2, alpha = alpha_community) +
-        
+          p_list[[cov]] <- p_list[[cov]] + 
+            geom_vline(data = df_quantiles_i[df_quantiles_i$type == "mean", -which(colnames(df_quantiles_i) == "type")],
+                       aes(xintercept = median), col = color_community, linetype = 1, alpha = alpha_community) +
+            geom_vline(data = df_quantiles_i[df_quantiles_i$type == "mean", -which(colnames(df_quantiles_i) == "type")],
+                       aes(xintercept = lower_outer), col = color_community, linetype = 2, alpha = alpha_community) +
+            geom_vline(data = df_quantiles_i[df_quantiles_i$type == "mean", -which(colnames(df_quantiles_i) == "type")],
+                       aes(xintercept = upper_outer), col = color_community, linetype = 2, alpha = alpha_community)
+        }
+      
+      p_list[[cov]] <- p_list[[cov]] +
         geom_vline(xintercept = 0, alpha = alpha_zero) +
         
         # species effects
@@ -810,17 +814,19 @@ plot_coef_commOccu <- function(object,
     df_quantiles_all$species <- factor(df_quantiles_all$species, 
                                        levels = rev(sort(unique(as.character(df_quantiles_all$species)))))
     
-    p <- ggplot (df_quantiles_all, aes_string(y = "species", x = "median", color = color_by)) +
+    p <- ggplot (df_quantiles_all, aes_string(y = "species", x = "median", color = color_by))
       
+    if(community_lines)  {
       # community effect
-      geom_vline(data = df_quantiles_all[df_quantiles_all$type == "mean", -which(colnames(df_quantiles_all) == "type")],    
-                 aes(xintercept = median), col = color_community, linetype = 1, alpha = alpha_community) +
-      geom_vline(data = df_quantiles_all[df_quantiles_all$type == "mean", -which(colnames(df_quantiles_all) == "type")],
-                 aes(xintercept = lower_outer), col = color_community, linetype = 2, alpha = alpha_community) +
-      geom_vline(data = df_quantiles_all[df_quantiles_all$type == "mean", -which(colnames(df_quantiles_all) == "type")],
-                 aes(xintercept = upper_outer), col = color_community, linetype = 2, alpha = alpha_community) +
-      
-      geom_vline(xintercept = 0, alpha = alpha_zero) +
+     p <- p + 
+       geom_vline(data = df_quantiles_all[df_quantiles_all$type == "mean", -which(colnames(df_quantiles_all) == "type")],    
+                  aes(xintercept = median), col = color_community, linetype = 1, alpha = alpha_community) +
+       geom_vline(data = df_quantiles_all[df_quantiles_all$type == "mean", -which(colnames(df_quantiles_all) == "type")],
+                  aes(xintercept = lower_outer), col = color_community, linetype = 2, alpha = alpha_community) +
+       geom_vline(data = df_quantiles_all[df_quantiles_all$type == "mean", -which(colnames(df_quantiles_all) == "type")],
+                  aes(xintercept = upper_outer), col = color_community, linetype = 2, alpha = alpha_community) 
+    }
+    p <- p + geom_vline(xintercept = 0, alpha = alpha_zero) +
       # species effects
       geom_pointrange(aes_string(xmin = "lower_outer", xmax = "upper_outer")) + 
       geom_linerange (aes_string(xmin = "lower_inner", xmax = "upper_inner"), size = 1) +
@@ -844,16 +850,13 @@ plot_coef_commOccu <- function(object,
              plot = p,
              ...)
     }
-    
     return(p)
   }
   
   
   if(!combine){
-    
     names(p_list) <-  cov_info_subset$covariate
     return(p_list)
-    
   }
 }
 
@@ -869,16 +872,21 @@ plot_coef_commOccu <- function(object,
   #' @aliases plot_coef
   #' @param object \code{commOccu} object
   #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
-  #' @param submodel  Submodel to get plots for. Can be "det" or "state"
+  #' @param submodel  character. Submodel to get plots for. Can be \code{"det"} or \code{"state"}
   #' @param ordered logical. Order species in plot by median effect (TRUE) or by species name (FALSE)
-  #' @param combine logical. Combine multiple plots into one (via facets)?
-  #' @param outdir Directory to save plots to (optional)
-  #' @param level  Probability mass to include in the uncertainty interval (two values, second value - inner interval - will be plotted thicker)
-  #' @param colorby Whether to color estimates by "significance" (of the effect estimates), or "Bayesian p-value" (of the species)
-  #' @param scales Passed to \code{\link[ggplot2]{facet_grid}}. Can be "free" to scale x axes of effect estimates independently, or "free_y" to scale all x axes identically.
-  #' @param ...  additional arguments for \code{\link[ggplot2]{ggsave}}
+  #' @param combine logical. Combine multiple plots into one plot (via facets)?
+  #' @param outdir character. Directory to save plots to (optional)
+  #' @param level  numeric. Probability mass to include in the uncertainty interval (two values named "outer" and "inner", in that order). Second value (= inner interval) will be plotted thicker.
+  #' @param colorby character. Whether to color estimates by \code{"significance"} (of the effect estimates), or \code{"Bayesian p-value"} (of the species). Currently allows only \code{"significance"}.
+  #' @param scales character. Passed to \code{\link[ggplot2]{facet_grid}}. Can be \code{"free"} to scale x axes of effect estimates independently, or "free_y" to scale all x axes identically.
+  #' @param community_lines logical. Add faint vertical lines to the plot indicating median community effect (solid line) and its confidence interval (first value from \code{level}).
+  #' @param ...  additional arguments for \code{\link[ggplot2]{ggsave}} - only relevant if \code{outdir} is defined.
   #'
-  #' @return list of ggplot objects
+  #' @return A list of ggplot objects (one list item per covariate).
+  #' 
+  #' @details
+  #' Users who wish to create their own visualizations can use the data stored in the ggplot output. It is accessed via e.g. \code{output$covariate_name$data}
+  #' 
   #' @export
   #' 
   #'

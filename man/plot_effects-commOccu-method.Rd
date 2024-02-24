@@ -22,19 +22,19 @@
 
 \item{mcmc.list}{mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object}
 
-\item{submodel}{Submodel to get plots for. Can be "det" or "state"}
+\item{submodel}{character. Submodel to get plots for. Can be \code{"det"} (detection submodel) or \code{"state"} (occupancy submodel)}
 
-\item{response}{response type on y axis. Only relevant for submodel = "state". Default is "occupancy", can be set to "abundance" for Royle-Nichols models}
+\item{response}{character. response type on y axis. Only relevant for \code{submodel = "state"}. Default is \code{"occupancy"}, can be set to \code{"abundance"} for Royle-Nichols models}
 
-\item{draws}{Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in \code{draws} are available, all posterior samples are used.}
+\item{draws}{integer. Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in \code{draws} are available, all posterior samples are used.}
 
-\item{outdir}{Directory to save plots to (optional)}
+\item{outdir}{character. Directory to save plots to (optional)}
 
-\item{level}{Probability mass to include in the uncertainty interval}
+\item{level}{numeric. Probability mass to include in the uncertainty interval.}
 
 \item{keyword_quadratic}{character. A suffix in covariate names in the model that indicates a covariate is a quadratic effect of another covariate which does not carry the suffix in its name (e.g. if the covariate is "elevation", the quadratic covariate would be "elevation_squared").}
 
-\item{...}{additional arguments for \code{\link[ggplot2]{ggsave}}}
+\item{...}{additional arguments for \code{\link[ggplot2]{ggsave}} - only relevant if \code{outdir} is defined}
 }
 \value{
 A list of ggplot objects (one list item per covariate).

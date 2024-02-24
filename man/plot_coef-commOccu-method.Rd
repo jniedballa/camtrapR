@@ -15,6 +15,7 @@
   level = c(outer = 0.95, inner = 0.75),
   colorby = "significance",
   scales = "free_y",
+  community_lines = FALSE,
   ...
 )
 }
@@ -23,25 +24,30 @@
 
 \item{mcmc.list}{mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object}
 
-\item{submodel}{Submodel to get plots for. Can be "det" or "state"}
+\item{submodel}{character. Submodel to get plots for. Can be \code{"det"} or \code{"state"}}
 
 \item{ordered}{logical. Order species in plot by median effect (TRUE) or by species name (FALSE)}
 
-\item{combine}{logical. Combine multiple plots into one (via facets)?}
+\item{combine}{logical. Combine multiple plots into one plot (via facets)?}
 
-\item{outdir}{Directory to save plots to (optional)}
+\item{outdir}{character. Directory to save plots to (optional)}
 
-\item{level}{Probability mass to include in the uncertainty interval (two values, second value - inner interval - will be plotted thicker)}
+\item{level}{numeric. Probability mass to include in the uncertainty interval (two values named "outer" and "inner", in that order). Second value (= inner interval) will be plotted thicker.}
 
-\item{colorby}{Whether to color estimates by "significance" (of the effect estimates), or "Bayesian p-value" (of the species)}
+\item{colorby}{character. Whether to color estimates by \code{"significance"} (of the effect estimates), or \code{"Bayesian p-value"} (of the species). Currently allows only \code{"significance"}.}
 
-\item{scales}{Passed to \code{\link[ggplot2]{facet_grid}}. Can be "free" to scale x axes of effect estimates independently, or "free_y" to scale all x axes identically.}
+\item{scales}{character. Passed to \code{\link[ggplot2]{facet_grid}}. Can be \code{"free"} to scale x axes of effect estimates independently, or "free_y" to scale all x axes identically.}
 
-\item{...}{additional arguments for \code{\link[ggplot2]{ggsave}}}
+\item{community_lines}{logical. Add faint vertical lines to the plot indicating median community effect (solid line) and its confidence interval (first value from \code{level}).}
+
+\item{...}{additional arguments for \code{\link[ggplot2]{ggsave}} - only relevant if \code{outdir} is defined.}
 }
 \value{
-list of ggplot objects
+A list of ggplot objects (one list item per covariate).
 }
 \description{
 Plot effect sizes for all species in a community (multi-species) occupancy model. Currently only supports continuous covariates, not categorical covariates.
+}
+\details{
+Users who wish to create their own visualizations can use the data stored in the ggplot output. It is accessed via e.g. \code{output$covariate_name$data}
 }
