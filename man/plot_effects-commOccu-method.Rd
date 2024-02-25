@@ -10,6 +10,7 @@
   mcmc.list,
   submodel = "state",
   response = "occupancy",
+  speciesSubset,
   draws = 1000,
   outdir,
   level = 0.95,
@@ -25,6 +26,8 @@
 \item{submodel}{character. Submodel to get plots for. Can be \code{"det"} (detection submodel) or \code{"state"} (occupancy submodel)}
 
 \item{response}{character. response type on y axis. Only relevant for \code{submodel = "state"}. Default is \code{"occupancy"}, can be set to \code{"abundance"} for Royle-Nichols models}
+
+\item{speciesSubset}{character. Species to include in effect plots.}
 
 \item{draws}{integer. Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in \code{draws} are available, all posterior samples are used.}
 

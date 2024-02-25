@@ -3,6 +3,7 @@ plot_effects_commOccu <- function(object,
                                   mcmc.list,
                                   submodel = "state",
                                   response = "occupancy",
+                                  speciesSubset,
                                   draws = 1000,
                                   outdir,
                                   level = 0.95,
@@ -305,6 +306,16 @@ plot_effects_commOccu <- function(object,
     }
     
     
+    # subset species, if requested
+    if(hasArg(speciesSubset)) {
+      if(any(!speciesSubset %in% unique(vals$Species))) {
+        stop(paste("Species", 
+                   paste(speciesSubset[!speciesSubset %in% unique(vals$Species)], collapse = ", "), 
+                   "not found in model."))
+      }
+      vals <- vals[vals$Species %in% speciesSubset, ]
+    }
+    
     
     # plot
     
@@ -344,7 +355,7 @@ plot_effects_commOccu <- function(object,
       p <- ggplot(vals, aes_string(x = params_covariate[[cov]], y = "mean", group = "Species")) + 
         geom_col() +
         facet_wrap(~Species) +
-        geom_linerange(aes_string(ymin = "lower", ymax = "upper")) +
+        geom_linerange(aes(ymin = "lower", ymax = "upper")) +
         theme_bw() +
         ggtitle(label = main,
                 subtitle = subtitle) +
@@ -388,6 +399,7 @@ plot_effects_commOccu <- function(object,
   #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
   #' @param submodel  character. Submodel to get plots for. Can be \code{"det"} (detection submodel) or \code{"state"} (occupancy submodel)
   #' @param response character. response type on y axis. Only relevant for \code{submodel = "state"}. Default is \code{"occupancy"}, can be set to \code{"abundance"} for Royle-Nichols models
+  #' @param speciesSubset  character. Species to include in effect plots.
   #' @param draws  integer. Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in \code{draws} are available, all posterior samples are used.
   #' @param outdir character. Directory to save plots to (optional)
   #' @param level  numeric. Probability mass to include in the uncertainty interval.
@@ -415,6 +427,7 @@ plot_effects_commOccu <- function(object,
 plot_coef_commOccu <- function(object, 
                                mcmc.list,
                                submodel = "state",
+                               speciesSubset,
                                ordered = TRUE,
                                combine = FALSE,
                                outdir,
@@ -519,42 +532,9 @@ plot_coef_commOccu <- function(object,
     
     covariate_is_site_cov <- ifelse(cov_info_subset$covariate_type [cov] == "siteCovs", T, F) 
     
-    
-    #if(covariate_is_indep) {
-      
-     # if(covariate_is_numeric){
 
     
-       # index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
-        
-       #df_quantiles_i  <- df_quantiles[index_covariate, ]
-        
-        #if(covariate_is_fixed)   df_quantiles_i$type  <- c("mean")
-        # if(covariate_is_ranef) {
-        #   # get community mean
-        #   index_covariate_mean_ranef <- grep(paste0(current_coef, ".mean$"), rownames(df_quantiles))
-        #   
-        #   df_quantiles_i  <- rbind(df_quantiles[index_covariate_mean_ranef, ], df_quantiles_i)
-        #   
-        #   df_quantiles_i$type  <- c("mean", rep("species", times = length(index_covariate)))
-        # # }  
-        # if(covariate_is_indep) {
-        #   # get community mean
-        #   index_covariate_mean_indep <- grep(paste0(current_coef, ".mean$"), rownames(df_quantiles))
-        #   
-        #   df_quantiles_i  <- rbind(df_quantiles[index_covariate_mean_indep, ], df_quantiles_i)
-          
-         # df_quantiles_i$type  <- rep("species", times = length(index_covariate))
-        # }  
-   #   }
-      
-      
-  #  } else {
-    
     if(covariate_is_numeric){
-      
-      # if(covariate_is_fixed)  index_covariate <- grep(paste0(current_coef, "$"), rownames(df_quantiles))
-      # if(covariate_is_ranef)  index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
       
       if(effect_type == "fixed")       index_covariate <- grep(paste0(current_coef, "$"), rownames(df_quantiles))
       if(effect_type == "ranef")       index_covariate <- grep(paste0(current_coef, "[" ), rownames(df_quantiles), fixed = T)
@@ -565,6 +545,7 @@ plot_coef_commOccu <- function(object,
       
       if(effect_type == "fixed")   df_quantiles_i$type  <- c("mean")
       if(effect_type == "ranef") {
+        
         # get community mean
         index_covariate_mean_ranef <- grep(paste0(current_coef, ".mean$"), rownames(df_quantiles))
         
@@ -578,8 +559,6 @@ plot_coef_commOccu <- function(object,
       }
       
     }
-    #  }
-    
     
     
     if(covariate_is_factor){
@@ -603,6 +582,7 @@ plot_coef_commOccu <- function(object,
       if(effect_type == "fixed") df_quantiles_i$type  <- c("mean")
       
       if(effect_type == "ranef") {
+        
         # add community mean
         index_covariate_mean_ranef <- grep(paste0(current_coef, ".mean"), rownames(df_quantiles), fixed = T)   # does this affect categ fixed effects?
         
@@ -662,6 +642,7 @@ plot_coef_commOccu <- function(object,
     if(!is.null(dimnames(object@data$y)[[1]])) speciesnames <- dimnames(object@data$y)[[1]]
     if( is.null(dimnames(object@data$y)[[1]])) speciesnames <- seq_len(dim(object@data$y)[1])
     
+  
     
     if(effect_type == "ranef")  {
       if(covariate_is_numeric) df_quantiles_i$species <- c("community", speciesnames)
@@ -672,6 +653,20 @@ plot_coef_commOccu <- function(object,
     
     if(effect_type == "fixed")     df_quantiles_i$species  <- "community"
     if(effect_type == "independent") df_quantiles_i$species  <- speciesnames
+    
+    
+    
+        # subset species, if requested
+    if(hasArg(speciesSubset)) {
+      if(any(!speciesSubset %in% speciesnames)) {
+        stop(paste("Species", 
+                   paste(speciesSubset[!speciesSubset %in% speciesnames], collapse = ", "), 
+                   "not found in model."))
+      }
+      df_quantiles_i <- df_quantiles_i[c(1, which(df_quantiles_i$species %in% speciesSubset)), ]
+    }
+    
+    
     
     
     
@@ -771,7 +766,7 @@ plot_coef_commOccu <- function(object,
         
         # species effects
         geom_pointrange(aes_string(xmin = "lower_outer", xmax = "upper_outer")) + 
-        geom_linerange( aes_string(xmin = "lower_inner", xmax = "upper_inner"), size = 1) +
+        geom_linerange( aes_string(xmin = "lower_inner", xmax = "upper_inner"), linewidth = 1) +
         facet_grid(rows = vars(type),
                    cols = vars(covariate),
                    scales = scales,
@@ -874,6 +869,7 @@ plot_coef_commOccu <- function(object,
   #' @param object \code{commOccu} object
   #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
   #' @param submodel  character. Submodel to get plots for. Can be \code{"det"} or \code{"state"}
+  #' @param speciesSubset  character. Species to include in coefficient plots.
   #' @param ordered logical. Order species in plot by median effect (TRUE) or by species name (FALSE)
   #' @param combine logical. Combine multiple plots into one plot (via facets)?
   #' @param outdir character. Directory to save plots to (optional)

@@ -9,6 +9,7 @@
   object,
   mcmc.list,
   submodel = "state",
+  speciesSubset,
   ordered = TRUE,
   combine = FALSE,
   outdir,
@@ -25,6 +26,8 @@
 \item{mcmc.list}{mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object}
 
 \item{submodel}{character. Submodel to get plots for. Can be \code{"det"} or \code{"state"}}
+
+\item{speciesSubset}{character. Species to include in coefficient plots.}
 
 \item{ordered}{logical. Order species in plot by median effect (TRUE) or by species name (FALSE)}
 
