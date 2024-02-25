@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+.Renviron
 camtrapR.Rcheck/
 to_do.txt
