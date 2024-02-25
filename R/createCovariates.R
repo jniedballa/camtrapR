@@ -200,9 +200,9 @@ createCovariates <- function(CTtable,
     }
     # extract at camera trap location + buffer
     if(!is.null(buffer_ct)){
-      CTtable_i_buff <- st_buffer(sf::st_transform(CTtable_buff, 
-                                                   current_crs), 
-                                  dist = buffer_ct)
+      CTtable_i_buff <- sf::st_buffer(sf::st_transform(CTtable_buff, 
+                                                       current_crs), 
+                                      dist = buffer_ct)
       return(terra::extract(list_r_cov[[i]], 
                             terra::vect(CTtable_i_buff), 
                             fun = mean, 
