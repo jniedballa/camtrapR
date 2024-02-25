@@ -1,3 +1,12 @@
+# camtrapR 2.3.1
+
+## new functions
+* createCovariates: Extract covariate values from spatial rasters and prepare rasters for spatial predictions
+
+## new features
+* plot_coef / plot_effects: new argument "subsetSpecies" to show only desired species in plots
+
+
 # camtrapR 2.3.0
 
 ## new functions
