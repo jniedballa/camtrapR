@@ -153,6 +153,10 @@ imageRename <- function(inDir,
   dirs       <- list.dirs(inDir, full.names = TRUE,  recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
   
+  # Remove the ".dtrash" folder if present (on Mac)
+  dirs <- dirs[dirs_short != ".dtrash"]
+  dirs_short <- dirs_short[dirs_short != ".dtrash"]
+  
   if(length(dirs) == 0) stop("inDir contains no station directories", call. = FALSE)
   
   # make sure none is empty
