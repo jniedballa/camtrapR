@@ -1895,10 +1895,10 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
   
   # see if stationDir exists in database
   if(!stationDir %in% Albums[, pathColumn]){
-    stop(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE)
+    # stop(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE)
     # try to handle with a warning instead
-    # warning(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE, immediate. = T)
-    # next
+    warning(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE, immediate. = T)
+    next
   }
   
   # find current station in albums
