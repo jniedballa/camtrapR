@@ -149,6 +149,16 @@ imageRename <- function(inDir,
     if(isTRUE(grepl("/$", inDir))) stop("inDir may not end with /", call. = FALSE)
   }
   
+  # Check input file path lengths
+  max_length <- 255
+  all_input_files <- list.files(inDir, recursive = TRUE, full.names = TRUE)
+  if (any(nchar(all_input_files) > max_length)) {
+    long_files <- all_input_files[nchar(all_input_files) > max_length]
+    stop(paste("The following input file paths exceed", max_length, "characters:", 
+               paste(long_files, collapse = ", ")), call. = FALSE)
+  }
+  
+  
   # list of subdirectories of inDir
   dirs       <- list.dirs(inDir, full.names = TRUE,  recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
@@ -156,6 +166,19 @@ imageRename <- function(inDir,
   # Remove the ".dtrash" folder if present (on Mac)
   dirs <- dirs[dirs_short != ".dtrash"]
   dirs_short <- dirs_short[dirs_short != ".dtrash"]
+
+    # Check for Umlaute in path names
+  paths_to_check <- inDir
+  if (hasArg(outDir)) {
+    paths_to_check <- c(paths_to_check, outDir)
+  }
+  
+
+  if (any(grepl("[äöüÄÖÜ]", list.dirs(paths_to_check)))) {
+    warning("Umlaute (ä, ö, ü) detected in path names. This may cause issues on certain operating systems.", call. = FALSE)
+  }
+  
+  
   
   if(length(dirs) == 0) stop("inDir contains no station directories", call. = FALSE)
   
@@ -340,6 +363,16 @@ imageRename <- function(inDir,
                                                    paste(apply(copy.info.table[!copy.info.table$DateReadable, c("Directory", "FileName")],  MARGIN = 1, FUN = paste, collapse = file.sep), collapse = "\n")),
                                               call. = FALSE)
   
+  # Check output file path lengths
+  if (hasArg(outDir)) {
+    all_output_files <- file.path(copy.info.table$outDir, copy.info.table$filename_new)
+    if (any(nchar(all_output_files) > max_length)) {
+      long_files <- all_output_files[nchar(all_output_files) > max_length]
+      stop(paste("The following output file paths would exceed", max_length, "characters:", 
+                 paste(long_files, collapse = ", ")), call. = FALSE)
+    }
+  }
+  
   # create directory structure in outDir
   if(isTRUE(copyImages)){
     
@@ -395,6 +428,7 @@ imageRename <- function(inDir,
       # find items to copy
       items_to_copy <- which(copy.info.table$DateReadable == TRUE & copy.info.table$fileExistsAlready == FALSE)
       
+     
       message(paste("copying", length(items_to_copy), "images to", outDir, " ... This may take some time."))
       
       copy.info.table$CopyStatus[items_to_copy] <- file.copy(from      = apply(copy.info.table[items_to_copy, c("Directory", "FileName")],  MARGIN = 1, FUN = paste, collapse = file.sep),
