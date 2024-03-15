@@ -11,7 +11,8 @@ imageRename(
   keepCameraSubfolders,
   createEmptyDirectories = FALSE,
   copyImages = FALSE,
-  writecsv = FALSE
+  writecsv = FALSE,
+  video
 )
 }
 \arguments{
@@ -35,6 +36,9 @@ empty, should they be copied nevertheless (causing empty directories in
 
 \item{writecsv}{logical. Save a data frame with a summary as a .csv? The csv
 will be saved in \code{outDir}.}
+
+\item{video}{list. Contains information on how to handle video data
+(optional). See details.}
 }
 \value{
 A \code{data.frame} with original directory and file names, new
@@ -79,8 +83,9 @@ functions (e.g. for retrieving camera IDs in \code{\link{recordTable}} if
 camera subdirectories are not preserved (\code{keepCameraSubfolders =
 FALSE})).
 
-The function finds all JPEG images and extracts the image timestamp from the
-image metadata using ExifTool and copies the images (with new file names)
+The function finds all JPEG images (optionally, also videos) and extracts 
+the image timestamp from the image metadata using ExifTool (digiKam database 
+for videos) and copies the images with new file names
 into \code{outDir}, where it will set up a directory structure based on the
 station IDs and, if required by \code{keepCameraSubfolders = TRUE}, camera
 IDs (e.g. outDir/StationA/ or outDir/StationA/CameraA1).
@@ -88,6 +93,23 @@ IDs (e.g. outDir/StationA/ or outDir/StationA/CameraA1).
 \code{copyImages} can be set to FALSE to simulate the renaming and check the
 file names of the renamed images without copying. If you are handling large
 number of images (>e.g., 100,000), the function may take some time to run.
+
+Argument \code{video} is a named list 4 items 
+(\code{file_formats}, \code{dateTimeTag}, (\code{db_directory}, 
+\code{db_filename}). Video date/time is read from video metadata stored in
+the digiKam database. Hence, \code{inDir} must be in your digiKam database.
+
+The items of argument \code{video} are:
+
+\tabular{ll}{ \code{file_formats} \tab The video formats to extract (include
+"jpg" if you want .JPG image metadata) \cr \code{dateTimeTag} \tab the
+metadata tag to extract date/time from (use \code{\link{exifTagNames}} to
+find out which tag is suitable) \cr \code{db_directory} \tab The directory
+containing digiKam database  \cr
+\code{db_filename} \tab The digiKam database file in \code{db_directory} \cr }
+
+See the examples in \code{\link{recordTable}} for for how to specify the 
+argument \code{video}.
 }
 \examples{
 

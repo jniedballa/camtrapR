@@ -36,8 +36,9 @@
 #' camera subdirectories are not preserved (\code{keepCameraSubfolders =
 #' FALSE})).
 #' 
-#' The function finds all JPEG images and extracts the image timestamp from the
-#' image metadata using ExifTool and copies the images (with new file names)
+#' The function finds all JPEG images (optionally, also videos) and extracts 
+#' the image timestamp from the image metadata using ExifTool (digiKam database 
+#' for videos) and copies the images with new file names
 #' into \code{outDir}, where it will set up a directory structure based on the
 #' station IDs and, if required by \code{keepCameraSubfolders = TRUE}, camera
 #' IDs (e.g. outDir/StationA/ or outDir/StationA/CameraA1).
@@ -45,6 +46,24 @@
 #' \code{copyImages} can be set to FALSE to simulate the renaming and check the
 #' file names of the renamed images without copying. If you are handling large
 #' number of images (>e.g., 100,000), the function may take some time to run.
+#' 
+#' Argument \code{video} is a named list 4 items 
+#' (\code{file_formats}, \code{dateTimeTag}, (\code{db_directory}, 
+#' \code{db_filename}). Video date/time is read from video metadata stored in
+#' the digiKam database. Hence, \code{inDir} must be in your digiKam database.
+#' 
+#' The items of argument \code{video} are:
+#' 
+#' \tabular{ll}{ \code{file_formats} \tab The video formats to extract (include
+#' "jpg" if you want .JPG image metadata) \cr \code{dateTimeTag} \tab the
+#' metadata tag to extract date/time from (use \code{\link{exifTagNames}} to
+#' find out which tag is suitable) \cr \code{db_directory} \tab The directory
+#' containing digiKam database  \cr
+#' \code{db_filename} \tab The digiKam database file in \code{db_directory} \cr }
+#' 
+#' See the examples in \code{\link{recordTable}} for for how to specify the 
+#' argument \code{video}.
+#' 
 #' 
 #' @param inDir character. Directory containing camera trap images sorted into
 #' station subdirectories (e.g. inDir/StationA/)
@@ -60,6 +79,8 @@
 #' @param copyImages logical. Copy images to \code{outDir}?
 #' @param writecsv logical. Save a data frame with a summary as a .csv? The csv
 #' will be saved in \code{outDir}.
+#' @param video list. Contains information on how to handle video data
+#' (optional). See details.
 #' 
 #' @return A \code{data.frame} with original directory and file names, new
 #' directory and file names and an indicator for whether images were copied
@@ -122,7 +143,8 @@ imageRename <- function(inDir,
                         keepCameraSubfolders,
                         createEmptyDirectories = FALSE,
                         copyImages = FALSE,
-                        writecsv = FALSE){
+                        writecsv = FALSE,
+                        video){
   
   wd0 <- getwd()
   on.exit(setwd(wd0))
@@ -167,27 +189,47 @@ imageRename <- function(inDir,
   dirs <- dirs[dirs_short != ".dtrash"]
   dirs_short <- dirs_short[dirs_short != ".dtrash"]
 
-    # Check for Umlaute in path names
+  # Check for Umlaute in path names
   paths_to_check <- inDir
   if (hasArg(outDir)) {
     paths_to_check <- c(paths_to_check, outDir)
   }
   
+  unicode_vector <- c("\u{00E4}", "\u{00F6}", "\u{00FC}", "\u{00C4}", "\u{00D6}", "\u{00DC}")
 
-  if (any(grepl("[äöüÄÖÜ]", list.dirs(paths_to_check)))) {
-    warning("Umlaute (ä, ö, ü) detected in path names. This may cause issues on certain operating systems.", call. = FALSE)
+  if (any(grepl(paste0("[", paste(unicode_vector, collapse = ""), "]"), list.dirs(paths_to_check)))) {
+    warning("Umlaute (", 
+            paste(unicode_vector[1:3], collapse = ", "),
+    ") detected in path names. This may cause issues on certain operating systems.", call. = FALSE)
   }
-  
   
   
   if(length(dirs) == 0) stop("inDir contains no station directories", call. = FALSE)
   
   # make sure none is empty
-  list_n_files <- lapply(dirs, list.files, pattern = ".jpg$|.JPG$", recursive = TRUE)
+  fileext_pattern <- ".jpg$|.JPG$"
+  names(fileext_pattern) <- "jpg"
+  if(hasArg(video))  fileext_pattern <- c(fileext_pattern, 
+                                          sapply(video$file_formats, FUN = function(x) paste0(tolower(x), "$|", toupper(x), "$"))
+                                          )
   
-  if(any(unlist(lapply(list_n_files, length)) == 0)){
-    warning("at least one station directory contains no JPEGs:  ", paste(dirs_short[which(lapply(list_n_files, length) == 0)], collapse = "; "), call. = FALSE, immediate. = TRUE)
+  list_n_files <- lapply(dirs, list.files, recursive = TRUE)   # need to adapt this to include video formats also (in fileext_pattern)
+  list_n_files <- lapply(list_n_files, FUN = function(x) sapply(fileext_pattern, grepl, x))
+
+  
+  # if(any(unlist(lapply(list_n_files, length)) == 0) && !hasArg(video)){
+  #     warning("at least one station directory contains no JPEGs:  ", paste(dirs_short[which(lapply(list_n_files, length) == 0)], collapse = "; "), call. = FALSE, immediate. = TRUE)
+  # }
+  
+  if(any(sapply(list_n_files, sum) == 0)) {
+    if(hasArg(video)){
+      warning("at least one station directory contains no JPEGs or ", paste(video$file_formats, collapse = ' / '), " files:  ", paste(dirs_short[which(sapply(list_n_files, sum) == 0)], collapse = "; "), call. = FALSE, immediate. = TRUE)
+    } else {
+      warning("at least one station directory contains no JPEGs:  ", paste(dirs_short[which(sapply(list_n_files, sum) == 0)], collapse = "; "), call. = FALSE, immediate. = TRUE)
+    }
   }
+  
+  
   
   stopifnot(is.logical(createEmptyDirectories))
   
@@ -202,6 +244,20 @@ imageRename <- function(inDir,
   # for pretty console messages
   max_nchar_station <- max(nchar(dirs_short))
   
+  # process video argument (if present)
+  if(hasArg(video)){
+    # Check if the video argument is a list with the required elements
+    if(!is.list(video) || !all(c("file_formats", "dateTimeTag") %in% names(video))) {
+      stop("The 'video' argument must be a list with elements 'file_formats' and 'dateTimeTag'")
+    }
+    
+    video_out <- processVideoArgument(IDfrom = "metadata",   # to ensure digikam DB is read
+                                      video  = video)
+    digiKam_data <- video_out$digiKam_data
+    file_formats <- video_out$file_formats
+  } else {
+    file_formats <- "jpg"   # jpg, as the default, if video not requested
+  }
   
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
   
@@ -234,8 +290,19 @@ imageRename <- function(inDir,
       stop(paste("Directory ", dirs[i], " contains images not sorted into Camera Trap subfolders. Check argument 'hasCameraFolders'"), call. = FALSE)
     }
     
-    command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -ext JPG "', dirs[i], '"', sep = "")
+    # create Exiftool call (photos only)
+    # command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal -ext JPG "', dirs[i], '"', sep = "")
+    
+    # create Exiftool call (photos and videos)
+    command.tmp  <- paste('exiftool -q -f -t -r -Directory -FileName -EXIF:DateTimeOriginal', 
+                         ifelse(hasArg(video),
+                                 paste(" -", video$dateTimeTag, sep = ""), 
+                                ""),    # if video requested, video date time tag
+                          paste(" -ext", file_formats, collapse = " ", sep = " "),    # requested file extensions
+                          ' "', dirs[i], '"', sep = "")
+    
     colnames.tmp <- c("Directory", "FileName", "DateTimeOriginal")
+    if(hasArg(video)) colnames.tmp <- c(colnames.tmp, video$dateTimeTag)
     
     # run exiftool to get image date and time
     metadata.tmp <- runExiftool(command.tmp = command.tmp, colnames.tmp = colnames.tmp)
@@ -268,9 +335,15 @@ imageRename <- function(inDir,
       }
       
       # make time readable
-      metadata.tmp$DateTimeOriginal <- as.POSIXct(strptime(x = as.character(metadata.tmp$DateTimeOriginal),
+      if(hasArg(video)){
+        metadata.tmp <- addVideoDateTimeOriginal(metadata.tmp = metadata.tmp, video = video)
+        metadata.tmp$DateTimeOriginal <- lubridate::ymd_hms(metadata.tmp$DateTimeOriginal)
+      } else {
+        metadata.tmp$DateTimeOriginal <- as.POSIXct(strptime(x = as.character(metadata.tmp$DateTimeOriginal),
                                                            format = "%Y:%m:%d %H:%M:%S", tz = "UTC"))
+      }
       metadata.tmp$DateTimeOriginal2 <- as.POSIXlt(metadata.tmp$DateTimeOriginal)
+      
       
       # exclude images for which no DateTimeOriginal was found
       if(any(is.na(metadata.tmp$DateTimeOriginal))){
@@ -291,12 +364,6 @@ imageRename <- function(inDir,
       metadata.tmp <- metadata.tmp[,c("Directory",  "FileName", stationCol, cameraCol,
                                       "DateTimeOriginal", "DateTimeOriginal2", "DateReadable")]
       
-      # # sort images by Station, (Camera), Time and filename
-      # metadata.tmp <- metadata.tmp[order(metadata.tmp$Directory, 
-      #                                    metadata.tmp$Station,
-      #                                    metadata.tmp$Camera,
-      #                                    metadata.tmp$DateTimeOriginal,
-      #                                    metadata.tmp$FileName),]
       
       # find images taken within 1 minute of one another (to append number)
       metadata.tmp$DateTimeOriginal2$sec <- 0
@@ -342,12 +409,16 @@ imageRename <- function(inDir,
                                                   metadata.tmp2[,cameraCol],
                                                   paste(metadata.tmp2$DateTime_for_filename, "(",metadata.tmp2$minute.append, ")", sep = ""),
                                                   sep = "__"),
-                                            ".JPG", sep = "")
+                                            ".", tools::file_ext(metadata.tmp2$FileName), 
+                                            #"JPG", 
+                                            sep = "")
       } else {
         metadata.tmp2$filename_new <- paste(paste(metadata.tmp2[,stationCol],
                                                   paste(metadata.tmp2$DateTime_for_filename, "(",metadata.tmp2$minute.append, ")", sep = ""),
                                                   sep = "__"),
-                                            ".JPG", sep = "")
+                                            ".", tools::file_ext(metadata.tmp2$FileName), 
+                                            # ".JPG", 
+                                            sep = "")
       }
       
       copy.info.table <- rbind(copy.info.table, metadata.tmp2)
