@@ -1562,7 +1562,8 @@ parseDateObject <- function(inputColumn,
   if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
   if(checkEmpty & any(inputColumn == "")) stop(paste("there are blank values in", deparse(substitute(inputColumn))), call. = FALSE)
   
-  if(all(inputColumn == "") & allowEmptyOutput) return(NA)
+  if(all(is.na(inputColumn)) & allowEmptyOutput) return(NA)
+  if(all(inputColumn == "")  & allowEmptyOutput) return(NA)
   
   inputColumn.char <- as.character(inputColumn)
   
@@ -1616,6 +1617,7 @@ parseDateTimeObject <- function(inputColumn,
   if(checkNA & any(is.na(inputColumn)))   stop(paste("there are NAs in", deparse(substitute(inputColumn))), call. = FALSE)
   if(checkEmpty & any(inputColumn == "")) stop(paste("there are blank values in", deparse(substitute(inputColumn))), call. = FALSE)
   
+  if(all(is.na(inputColumn)) & allowEmptyOutput) return(NA)
   if(all(inputColumn == "") & allowEmptyOutput) return(NA)
   
   
