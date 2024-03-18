@@ -185,9 +185,19 @@ imageRename <- function(inDir,
   dirs       <- list.dirs(inDir, full.names = TRUE,  recursive = FALSE)
   dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
   
-  # Remove the ".dtrash" folder if present (on Mac)
-  dirs <- dirs[dirs_short != ".dtrash"]
-  dirs_short <- dirs_short[dirs_short != ".dtrash"]
+  # Ignore the ".dtrash" folder if present (on Mac)
+  if(".dtrash" %in% dirs_short) {
+    message("Ignoring .dtrash folder.")
+    dirs <- dirs[dirs_short != ".dtrash"]
+    dirs_short <- dirs_short[dirs_short != ".dtrash"]
+  }
+  
+  # Ignore  the ".mysql.digikam" folder if present
+  if(".mysql.digikam" %in% dirs_short) {
+    message("Ignoring .mysql.digikam folder.")
+    dirs <- dirs[dirs_short != ".mysql.digikam"]
+    dirs_short <- dirs_short[dirs_short != ".mysql.digikam"]
+  }
 
   # Check for Umlaute in path names
   paths_to_check <- inDir
