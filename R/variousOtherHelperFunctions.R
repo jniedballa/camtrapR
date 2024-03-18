@@ -1900,7 +1900,8 @@ digiKamVideoHierarchicalSubject <- function(stationDir,
     # stop(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE)
     # try to handle with a warning instead
     warning(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE, immediate. = T)
-    next
+    # next
+    return(NULL)
   }
   
   # find current station in albums
@@ -2048,6 +2049,7 @@ addVideoHierarchicalSubject <- function(metadata.tmp,
                                         videoFormat){
   
   if(nrow(digiKamVideoMetadata) == 0) return(metadata.tmp)
+  if(is.null(digiKamVideoMetadata))   return(metadata.tmp)
   # add HierarchialSubject for video files (match by filename, must be unique)
 
   # new version, should match filenames AND paths in digiKamVideoMetadata with metadata.tmp (can deal with duplicate file names in separate folders)
