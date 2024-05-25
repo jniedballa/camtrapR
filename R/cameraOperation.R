@@ -587,9 +587,13 @@ cameraOperation <- function(CTtable,
   #  trapping intervals for all cameras (setup to retrieval)
   # for each day in camop, make an interval covering the entire day
   camop_daily_intervals <- lapply(as.Date(colnames(camOp_empty)),
-                                  FUN = function(x) interval(start = x + dhours(occasionStartTime),  
-                                                             end =   x + ddays(1) + dhours(occasionStartTime) - dseconds(1)
-                                  ))
+                                  FUN = function(x){
+                                    start <- x + dhours(occasionStartTime)
+                                    end <- start + ddays(1) - dseconds(1)
+                                    interval(start = start,  
+                                             end =  end)
+                                  }
+                                  )
   names(camop_daily_intervals) <- colnames(camOp_empty)
   
   # get start / end of the days covered by the study (+ occasionStartTime, if defined)
@@ -600,10 +604,18 @@ cameraOperation <- function(CTtable,
   int_start_total <- int_start(start_to_end)
   int_end_total   <- int_end(start_to_end)
   
-  
   # alternative to data.table madness below. Find overlapping intervals between camera traps and days
   camop_binary <- sapply(camop_daily_intervals, int_overlaps, start_to_end)
+  
+  # handle case of 1-camera input table
+  if(nrow(CTtable) == 1) {
+    camop_binary <- t(as.matrix(camop_binary))
+    dimnames(camop_binary) <- dimnames(camOp_empty)
+  }
+  
   rownames(camop_binary) <- rownames(camOp_empty)
+  
+  
   
   
   # identify overlapping intervals with data.table
