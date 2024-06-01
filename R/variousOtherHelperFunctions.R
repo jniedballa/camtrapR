@@ -337,9 +337,15 @@ checkDateTimeOriginal <- function (intable, dirs_short, i, stationCol, recordDat
   
   if(any(is.na(intable[, recordDateTimeCol]))){
     which_na_time <- which(is.na(intable[, recordDateTimeCol]))
-    warning(paste0(dirs_short[i], ": Removing ", length(which_na_time), " out of ",
-                   nrow(intable)," images because date/time is NA:\n",
-                   paste("  ", file.path(intable$Directory, intable$FileName)[which_na_time], collapse = "\n")), call. = FALSE,  immediate. = TRUE)
+    if(hasArg(dirs_short)) {
+      warning(paste0(dirs_short[i], ": Removing ", length(which_na_time), " out of ",
+                     nrow(intable)," images because date/time is NA:\n",
+                     paste("  ", file.path(intable$Directory, intable$FileName)[which_na_time], collapse = "\n")), call. = FALSE,  immediate. = TRUE)
+    } else {
+      warning(paste0("Removing ", length(which_na_time), " out of ",
+                     nrow(intable)," images because date/time is NA."), 
+              call. = FALSE,  immediate. = TRUE)
+    }
     intable <- intable[-which_na_time,]
   }
     
