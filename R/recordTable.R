@@ -417,14 +417,14 @@ recordTable <- function(inDir,
   
   # Ignore the ".dtrash" folder if present (on Mac)
   if(".dtrash" %in% dirs_short) {
-    message("Ignoring .dtrash folder.")
+    # message("Ignoring .dtrash folder.")
     dirs <- dirs[dirs_short != ".dtrash"]
     dirs_short <- dirs_short[dirs_short != ".dtrash"]
   }
   
   # Ignore  the ".mysql.digikam" folder if present
   if(".mysql.digikam" %in% dirs_short) {
-    message("Ignoring .mysql.digikam folder.")
+    # message("Ignoring .mysql.digikam folder.")
     dirs <- dirs[dirs_short != ".mysql.digikam"]
     dirs_short <- dirs_short[dirs_short != ".mysql.digikam"]
   }
