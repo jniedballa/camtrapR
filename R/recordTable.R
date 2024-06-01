@@ -553,6 +553,7 @@ recordTable <- function(inDir,
 
         # sort by station, (camera), species and time
         if(camerasIndependent == TRUE) {
+          if(all(is.na(metadata.tmp[, cameraCol]))) stop(paste("Failed to extract camera ID from", cameraID))
           metadata.tmp <- metadata.tmp[order(metadata.tmp[,stationCol], metadata.tmp[,speciesCol], metadata.tmp[,cameraCol], metadata.tmp$DateTimeOriginal),]
         } else {
           metadata.tmp <- metadata.tmp[order(metadata.tmp[,stationCol], metadata.tmp[,speciesCol], metadata.tmp$DateTimeOriginal),]
