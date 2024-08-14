@@ -471,8 +471,8 @@ cameraOperation <- function(CTtable,
     
 
     # check that there are some problems at all (since hasProblems = TRUE)
-    if(all(is.na(CTtable[, problemFromColumn]))) warning("in problemFromColumn column(s), all values are NA", call. = FALSE)
-    if(all(is.na(CTtable[, problemToColumn])))   warning("in Problem_to column(s), all values are NA", call. = FALSE)
+    if(all(is.na(CTtable[, cols.prob.from]))) warning("in problemFromColumn column(s), all values are NA", call. = FALSE)
+    if(all(is.na(CTtable[, cols.prob.to])))   warning("in Problem_to column(s), all values are NA", call. = FALSE)
     
     # if problems begin on setup day, make sure it's the same time as setup (if only dates are specified)
     if(isFALSE(effortAsFraction)){
@@ -519,6 +519,12 @@ cameraOperation <- function(CTtable,
       problem_colnames_index_list[[Problem_group]]$prob.from <- CTtable[, cols.prob.from [order(colnames(CTtable) [cols.prob.from])] [Problem_group]]
       problem_colnames_index_list[[Problem_group]]$prob.to   <- CTtable[, cols.prob.to   [order(colnames(CTtable) [cols.prob.to])]   [Problem_group]]
     }
+    
+    # enure that no problem pairs are all NA
+    lapply(1:length(problem_colnames_index_list),
+           FUN = function(x) {
+             if(all(is.na(unlist(problem_colnames_index_list[x])))) stop(paste0("Problem", x, " columns are both NA"), call. = F)
+           })
     
     # loop over cameras, make and concatenate the problem intervals by station
     problem_intervals_by_row <- list()

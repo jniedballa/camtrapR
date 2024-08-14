@@ -148,6 +148,14 @@ camop_dates_time_format <- cameraOperation(CTtable      = camtraps_date_time_for
 )
 
 
+
+# add empty Problem columns
+camtraps2 <- camtraps
+camtraps2$Problem2_from <- NA
+camtraps2$Problem2_to <- NA
+
+
+
 # Test section
 test_that("POSIX and character give same output", {
   expect_equal(camop_dates_time, camop_dates_time_char)
@@ -276,3 +284,18 @@ test_that("setting time to 00:00:00 works", {
 }
 )
 
+
+test_that("Error when all NA in problem columns", {
+  
+  expect_error(cameraOperation(CTtable      = camtraps2,
+                               stationCol   = "Station",
+                               setupCol     = "Setup_date",
+                               retrievalCol = "Retrieval_date",
+                               writecsv     = FALSE,
+                               hasProblems  = TRUE,
+                               dateFormat   = "dmy"
+  ),
+  "Problem2 columns are both NA"
+  )
+}
+)
