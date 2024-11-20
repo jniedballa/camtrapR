@@ -173,24 +173,53 @@ surveyDashboard <- function(CTtable = NULL,
   
   
   pkg_required <- c(
+    # UI packages
     "shiny",
-    "shinyWidgets",
+    "shinyWidgets", 
     "shinydashboard",
-    "dplyr",
     "DT",
-    "ggplot2",
+    
+    # Data manipulation
     "dplyr",
+    "lubridate",
+    "sf",
+    "terra",
+    
+    # Visualization
+    "ggplot2",
     "plotly",
     "patchwork",
     "mapview",
     "leaflet",
-    "sf")
+    "viridisLite",
+    "scales",
+    
+    # Modeling
+    "unmarked",
+    "ubms",
+    "bayesplot",
+    "coda"
+  )
   
+  pkg_optional <- c(
+    "corrdplot",
+    "psych",
+    "rstudioapi",
+    "callr"
+  )
   
-  for(pkg in pkg_required){
-    if (!requireNamespace(pkg, quietly = TRUE)) {
-      stop(paste("Please install the package", pkg, " to use the dashboard."))
-    }
+  # Check required packages
+  missing_required <- pkg_required[!sapply(pkg_required, requireNamespace, quietly = TRUE)]
+  if (length(missing_required) > 0) {
+    stop("Please install the following required packages: ", 
+         paste(missing_required, collapse = ", "))
+  }
+  
+  # Check optional packages and warn if missing
+  missing_optional <- pkg_optional[!sapply(pkg_optional, requireNamespace, quietly = TRUE)]
+  if (length(missing_optional) > 0) {
+    warning("The following optional packages are not installed. Some features may be limited: ",
+            paste(missing_optional, collapse = ", "))
   }
   
   
@@ -5072,7 +5101,7 @@ surveyDashboard <- function(CTtable = NULL,
       output$correlationPlot <- renderPlot({
         
         if(input$plotType == "matrix") {
-          if(check_package("psych")) {
+          if(check_package("corrplot")) {
             output$correlationPlotWarning <- renderText(NULL)
             
             corrplot::corrplot(cor_matrix,
