@@ -2,21 +2,21 @@
 % Please edit documentation in R/surveyDashboard.R
 \name{surveyDashboard}
 \alias{surveyDashboard}
-\title{Shiny dashboard for summarizing and analyzing camera trap survey data}
+\title{Survey Dashboard for Camera Trap Data Analysis}
 \usage{
 surveyDashboard(
-  CTtable,
-  recordTable,
-  stationCol,
+  CTtable = NULL,
+  recordTable = NULL,
+  stationCol = NULL,
   cameraCol = NULL,
-  xcol,
-  ycol,
-  crs,
-  setupCol,
-  retrievalCol,
+  xcol = NULL,
+  ycol = NULL,
+  crs = NULL,
+  setupCol = NULL,
+  retrievalCol = NULL,
   hasProblems = FALSE,
   CTdateFormat = "ymd",
-  camerasIndependent,
+  camerasIndependent = NULL,
   speciesCol = "Species",
   recordDateTimeCol = "DateTimeOriginal",
   recordDateTimeFormat = "ymd HMS",
@@ -60,51 +60,110 @@ surveyDashboard(
 \item{exclude}{Species to be excluded from the data set}
 }
 \value{
-A Shiny dashboard for camera trap survey data.
+A Shiny dashboard application for camera trap survey data analysis
 }
 \description{
-Open a Shiny dashboard to summarize a camera trapping survey. It provides an 
-overview of the data, maps, can create and run occupancy models in unmarked, 
-and plot species activity. 
+A comprehensive Shiny dashboard for analyzing camera trap survey data. The dashboard provides 
+interactive visualization, data exploration, and analysis tools including:
 
-Maps are interactive and can be panned, zoomed and queried. Users can choose 
-a suitable basemap in the layers button.
+\itemize{
+  \item Data import from CSV files, Wildlife Insights exports, or camtrapDP format
+  \item Interactive maps for camera locations and species detections
+  \item Species activity pattern analysis
+  \item Covariate extraction and analysis tools
+  \item Single-species and community occupancy modeling
+  \item Spatial prediction capabilities
+}
+}
+\details{
+The dashboard includes several major components:
 
-For occupancy models, users can flexibly customize detection histories. Then 
-the user can specify the model structure (by selecting site covariates on 
-detection and occupancy probability from the camera trap table) and 
-optionally including effort. Models are fitted automatically with unmarked. 
-Response curves (marginal effect plots), model and parameter summaries are 
-computed and updated automatically with every change to the model. 
-Multiple models can be compared using model selection.
+\strong{Data Import & Management:}
+\itemize{
+  \item CSV file import with column mapping
+  \item Wildlife Insights data import (zip, CSV, or directory)
+  \item Support for camtrapDP format (coming soon)
+  \item Study area import from shapefiles
+  \item Save/restore functionality for app state
+}
+
+\strong{Data Processing:}
+\itemize{
+  \item Flexible station filtering with multiple criteria
+  \item Temporal record filtering with independence criteria
+  \item Automated covariate extraction from local rasters or online 
+  elevation models
+  \item Covariate correlation analysis with visualization
+}
+
+\strong{Basic Analysis:}
+\itemize{
+  \item Basic summary statistics
+  \item Interactive species detection maps
+  \item Activity pattern analysis (single species and two-species overlap)
+  \item Camera operation visualization
+}
+
+\strong{Occupancy Modeling:}
+\itemize{
+  \item Basic workflow for simple model specification (linear effects)
+  \item Advanced workflow for complex models (linear, quadratic, interaction, 
+  random effects)
+  \item Support for both unmarked and ubms packages
+  \item Automated detection history creation
+  \item Model comparison and selection
+  \item Response curves and spatial predictions
+}
+
+\strong{Community Occupancy Modeling:}
+\itemize{
+  \item Flexible species selection with filtering
+  \item Support for fixed, random, and independent effects
+  \item Species-site random effects
+  \item Effort handling on detection
+  \item MCMC diagnostics and convergence assessment
+  \item Species richness and PAO predictions
+}
+
+\strong{Visualization Improvements:}
+\itemize{
+  \item Response curve visualization
+  \item MCMC diagnostics plots
+  \item Spatial prediction maps
+}
 }
 \note{
+\itemize{
+  \item Interactive maps with multiple basemap options and customizable 
+  color schemes and symbology
+  \item Covariate scaling is performed automatically where appropriate
+  \item The app state can be saved and restored
+}
+
 Current limitations include:
 
 - supports only single-season data
-
-- only single-species occupancy models
-
-- no random or interaction effects in occupancy models
-
-- no (spatial) model predictions yet (planned for Q4/2023)
-
 - no support for spatial capture-recapture models (or anything related to individual IDs)
-
-- only models in unmarked, no Bayesian models in ubms yet (likely to be included later)
 }
 \examples{
 
 \dontrun{
+
+# Start the dashboard without parameters
+# This opens the application with a welcome screen where data can be imported
+surveyDashboard()
+
+# Basic usage with minimal parameters
+
 data("camtraps")
 data("recordTableSample")
- 
+
   surveyDashboard(
     CTtable = camtraps,
     recordTable = recordTableSample,
     xcol = "utm_x",
     ycol = "utm_y",
-    crs = "epsg:32650",      # = UTM50N (Sabah, Malaysian Borneo)
+    crs = "epsg:32650",      # = UTM50N
     stationCol = "Station",
     setupCol = "Setup_date",
     retrievalCol = "Retrieval_date",
