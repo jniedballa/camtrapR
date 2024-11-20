@@ -12,7 +12,7 @@
   draws = 1000,
   level = 0.95,
   interval = c("none", "confidence"),
-  x,
+  x = NULL,
   aoi = NULL,
   speciesSubset,
   batch = FALSE,
@@ -24,7 +24,7 @@
 
 \item{mcmc.list}{mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object}
 
-\item{type}{character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array. For Royle-Nichols models, "abundance" for species abundance, or "lambda_array" for raw species abundance estimates in an array.}
+\item{type}{character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array. For Royle-Nichols models, "abundance" for species abundance, or "lambda_array" for raw species abundance estimates in an array. "p_array" for raw detection probabilities in an array.}
 
 \item{draws}{Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used}
 
@@ -32,7 +32,7 @@
 
 \item{interval}{Type of interval calculation. Can be "none" or "confidence" (can be abbreviated). Calculation can be slow for type = "psi" with many cells and posterior samples.}
 
-\item{x}{SpatRaster or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names.}
+\item{x}{SpatRaster, data.frame or NULL. Must be scaled with same parameters as site covariates used in model, and have same names. If NULL, use site covariate data frame from model input (\code{commOccu} object in parameter \code{object})}
 
 \item{aoi}{SpatRaster with same dimensions as x (if x is a SpatRaster), indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.}
 
@@ -43,7 +43,7 @@
 \item{seed}{numeric. Seed to use in \code{set.seed} for reproducible results (ensures that \code{draws} are identical).}
 }
 \value{
-A SpatRaster or data.frame, depending on \code{x}. If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [cell, species, draw].
+A SpatRaster or data.frame, depending on \code{x} (for type = "psi", "abundance", "richness". If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [site, species, draw]. If type = "p_array", a 4D-array [site, species, draw, occasion].
 }
 \description{
 Create (spatial) predictions of species occupancy and species richness from community occupancy models and spatial rasters or covariate data frames.

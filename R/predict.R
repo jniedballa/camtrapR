@@ -17,7 +17,7 @@ predictionMapsCommunity <- function(object,
                                     draws = 1000,
                                     level = 0.95,
                                     interval = c("none", "confidence"),
-                                    x,
+                                    x = NULL,
                                     aoi = NULL,
                                     speciesSubset,
                                     batch = FALSE,
@@ -25,7 +25,8 @@ predictionMapsCommunity <- function(object,
 {
   
   # type <- match.arg(type, choices = c("psi_array", "psi", "richness", "pao"))
-  type <- match.arg(type, choices = c("psi_array", "psi", "richness", "pao", "abundance", "lambda_array"))
+  type <- match.arg(type, choices = c("psi_array", "psi", "richness", "pao", "abundance", "lambda_array",
+                                      "p_array"))
   interval <- match.arg(interval, choices = c("none", "confidence"))
 
   
@@ -35,7 +36,11 @@ predictionMapsCommunity <- function(object,
     }
   }
   # subset occupancy (beta) parameters
-  submodel <- "state"
+  if(type == "p_array") {
+    submodel <- "det"
+  } else {
+    submodel <- "state"
+  }
   
   submodel <- match.arg(submodel, choices = c("det", "state"))
   
@@ -76,7 +81,7 @@ predictionMapsCommunity <- function(object,
     if(nrow(posterior_matrix) > draws){
       posterior_matrix <- posterior_matrix[sample(1:nrow(posterior_matrix), draws),]
     } else {
-      message(paste0("draws (", draws, ") is greater than the number of available samples (", nrow(posterior_matrix), ")."))
+      message(paste0("draws (", draws, ") is greater than the number of available samples. Using all samples (", nrow(posterior_matrix), ")."))
     }
   } 
   
@@ -91,6 +96,9 @@ predictionMapsCommunity <- function(object,
   
   list_responses <- list()
   
+  
+  # if x is not defined, use the site covariates from the model input
+  if(is.null(x)) x <- object@input$siteCovs
   
   # convert raster to covariate data frame
   if(inherits(x, c("SpatRaster", "RasterStack"))) {
@@ -131,9 +139,10 @@ rast(YourRaster)")
   }
   
   values_to_predict_subset <- values_to_predict_all[index_not_na, , drop = F]
-  
-  
 
+
+  
+if(type != "p_array") {
   
   if(isTRUE(batch) | is.numeric(batch)) {
     
@@ -219,7 +228,7 @@ rast(YourRaster)")
         effect_type <- ifelse(cov_info_subset$ranef[cov], "ranef",
                               ifelse(cov_info_subset$independent[cov], "independent", "fixed"))
         
-        covariate_is_site_cov <- ifelse(cov_info_subset$covariate_type [cov] == "siteCovs", T, F) 
+        # covariate_is_site_cov <- ifelse(cov_info_subset$covariate_type [cov] == "siteCovs", T, F) 
         
         
         # species loop
@@ -366,7 +375,7 @@ rast(YourRaster)")
       effect_type <- ifelse(cov_info_subset$ranef[cov], "ranef",
                             ifelse(cov_info_subset$independent[cov], "independent", "fixed"))
       
-      covariate_is_site_cov <- ifelse(cov_info_subset$covariate_type [cov] == "siteCovs", T, F) 
+      # covariate_is_site_cov <- ifelse(cov_info_subset$covariate_type [cov] == "siteCovs", T, F) 
       
       
       # species loop
@@ -430,9 +439,248 @@ rast(YourRaster)")
     }
   }   # end  if(!batch) 
   
+  
+} else {   # = if type == "p_array", do:
+  
+  if (!requireNamespace("abind", quietly = TRUE)) {
+    stop(paste("Please install the package abind to run this function with type =", type))
+  }
+  
+  # # create array for intercepts
+  # array_NA <- array(data = NA, dim = c(nrow(values_to_predict_subset),    # raster cell
+  #                                      object@data$M,                     # species
+  #                                      nrow(posterior_matrix)))           # posterior sample
+
+
+  # # get intercepts
+  # out_intercept <- array_NA
+  # 
+  # for(i in 1:dim(array_NA)[2]){    # species loop
+  #   if(cov_info_intercept$ranef == TRUE | cov_info_intercept$independent == TRUE){  # random or independent intercepts
+  #     out_intercept[,i,] <- matrix(posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] ,
+  #                                  nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
+  #   } else {
+  #     out_intercept[,i,] <- matrix(posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] ,
+  #                                  nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
+  #   }
+  # }
+  # gc()
+  # 
+  # # memory warning (if applicable)
+  # if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ){
+  #   ram_usage_estimate <- round(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) / 1e3) # in Gb
+  #   message(paste("Watch RAM usage. At least", ram_usage_estimate, "Gb will be required"))
+  # }
+  
+  # intercept
+  a0_matrix<-posterior_matrix[,grep('alpha0[', colnames(posterior_matrix), fixed=TRUE)]
+  
+  a1_matrix_list <- list()
+  
+  # out <- list()
+  
+  # values_to_predict_subset_backup <- values_to_predict_subset
+  
+  # loop over covariates 
+  for(cov in 1:nrow(cov_info_subset)) {
+    
+    # values_to_predict_subset <- values_to_predict_subset_backup
+    
+    current_cov  <- cov_info_subset$covariate[cov]
+    current_coef <- cov_info_subset$coef[cov]
+    
+    # determine data type of current covariate
+    covariate_is_numeric <- cov_info_subset$data_type [cov] == "cont"
+    covariate_is_factor  <- cov_info_subset$data_type [cov] == "categ"
+    
+    effect_type <- ifelse(cov_info_subset$ranef[cov], "ranef",
+                          ifelse(cov_info_subset$independent[cov], "independent", "fixed"))
+    
+    covariate_is_site_cov <- ifelse(cov_info_subset$covariate_type [cov] == "siteCovs", T, F)
+    covariate_is_site_occasion_cov <- ifelse(cov_info_subset$covariate_type [cov] == "obsCovs", T, F) 
+    
+    
+    
+    if(!current_cov %in% colnames(values_to_predict_subset) && covariate_is_site_cov) {
+      stop(paste("Covariate", current_cov, "not found in data for prediction (x)."), call. = FALSE)
+    }
+    # if(!current_cov %in% colnames(values_to_predict_subset) && covariate_is_site_occasion_cov) {
+    #   values_to_predict_subset <- object@input$obsCovs[current_cov]
+    # }
+    
+    if(!is.na(cov_info_subset$ranef_cov[cov])){
+      stop(paste(current_cov, 
+                 " has a random effect other than species. This is currently not supported.", call. = F))
+      next
+    }
+    
+    if(cov_info_subset$ranef_nested[cov])  {
+      stop(paste(current_cov, 
+                 " has a nested random effect. This is currently not supported.", call. = F))
+      next
+    }
+    
+    # if(covariate_is_site_cov) out[[cov]] <- array_NA
+    # if(covariate_is_site_occasion_cov) {
+    #   out[[cov]] <- array(data = NA, dim = c(nrow(values_to_predict_subset),   # raster cell
+    #                                         object@data$M,                     # species
+    #                                         nrow(posterior_matrix),            # posterior sample
+    #                                         object@data$maxocc))               # number of occasions
+    # }
+    
+
+    
+
+  #   # species loop
+  #   # for(i in 1:dim(out[[cov]])[2]){
+  #   for(i in 1:object@data$M) {
+  #     
+  #     if(covariate_is_numeric) {
+  #       
+  #       if(effect_type == "fixed") {
+  #         index_covariate <- grep(paste0(current_coef, "$"), colnames(posterior_matrix))
+  #       } else {    # ranef or independent
+  #         index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
+  #       }
+  #       
+  #       if(length(index_covariate) == 0) stop(paste("Covariate", current_coef, "not found in posterior matrix"), call. = FALSE)
+  #       if(length(index_covariate) >= 2) stop(paste("Covariate", current_coef, "has more than 2 matches in posterior matrix"), call. = FALSE)
+  #       
+  #       
+  #       a1_matrix_list[[cov]] <- posterior_matrix[,grep(current_coef, colnames(posterior_matrix), fixed=TRUE)]
+  #       
+  #       
+  #       if(covariate_is_site_cov) {
+  #         # out[[cov]][,i,] <-  sapply(posterior_matrix[, index_covariate], FUN = function(x){
+  #         #   x * values_to_predict_subset[, current_cov]
+  #       # })
+  #       } 
+  #       
+  #       if(covariate_is_site_occasion_cov) {
+  #         # tmp <-  abind(lapply(posterior_matrix[, index_covariate], FUN = function(x){
+  #         #   # x * values_to_predict_subset[, current_cov]
+  #         #   x * object@input$obsCovs[[current_cov]]
+  #         # }), along = 3) 
+  #         # 
+  #         # aperm(tmp, c())
+  #         # out[[cov]][,i,] <- 
+  #       }
+  #     }
+  #     
+  #     # if(covariate_is_factor) {
+  #     #   
+  #     #   if(effect_type == "fixed") index_covariate <- grep(current_coef, colnames(posterior_matrix))
+  #     #   if(effect_type == "ranef") index_covariate <- grep(paste0(current_coef, "[", i, ","), colnames(posterior_matrix), fixed = T)
+  #     #   
+  #     #   # this assumes that the numeric values in the raster correspond to the factor levels in the covariate
+  #     #   # since it uses the raster values to index the posterior matrix
+  #     #   
+  #     #   # for data.frames, it seems to work with the categorical column being integer (= factor level, as in as.data.frame(rasterStack)), or proper factor
+  #     #   # out[[cov]][,i,] <- t(posterior_matrix[, index_covariate[values_to_predict_subset[, current_cov]]])
+  #     #   
+  #     # }
+  #     suppressWarnings(rm(index_covariate))
+  #   }   # end species loop
+  # }    # end covariate loop
+  
+  # sum up individual effects
+  # if(!.hasSlot(object, "model")) {
+  #   logit.psi <- Reduce('+', out) + out_intercept    # this is for legacy versions before RN models were added
+  #   psi <- exp(logit.psi) / (exp(logit.psi) + 1)
+  #   
+  # } else {
+    
+    
+    # p_list<-list()
+    # keep<-sample(1:nrow(posterior_matrix), draws)
+    
+    a1_matrix <- posterior_matrix[, grep(paste0("alpha+(\\S+)", current_cov, "\\["), colnames(posterior_matrix))]
+    
+    p_arr_list <- list()
+    
+    for (i in 1:object@data$M){   # species loop
+      p_arr_list [[i]] <- array(NA, c(draws, object@data$J, object@data$maxocc))
+      
+      # p_arr[,j,k] <- plogis(a0_matrix[keep,i] + a1_matrix[keep,i]*input_AHM$obsCovs$wind[j,k])
+      
+      # for (j in 1:object@data$J){   # site loop
+      for (k in 1:object@data$maxocc){ # occasion loop
+        
+        if(covariate_is_site_occasion_cov){      
+          # p_arr[,j,k] <- plogis(a0_matrix[,i] + a1_matrix[,i] * object@input$obsCovs[current_cov] [j,k])
+          p_arr_list [[i]] [,,k]  <- outer(a1_matrix[, i],  object@input$obsCovs[[current_cov]] [,k])
+          
+          # if
+          
+        
+        }
+        # }
+        
+        if(covariate_is_site_cov) {
+          # p_arr[,j,k] <- plogis(a0_matrix[,i] + a1_matrix[,i]*object@input$siteCovs[, current_cov] [j,k])
+          p_arr_list [[i]][,, k] <- outer(a1_matrix[, i], object@input$siteCovs[, current_cov])
+        }
+      }
+    }
+    
+    
+    # if(covariate_is_site_cov) {
+      p_arr_4d <- abind::abind(p_arr_list, along = 4)    # [draws, station, occasion, species]
+      
+      p_arr_4d <- aperm(p_arr_4d,  c(2,4,1,3))   # harmonize order with out_intercept
+    #   p_arr <- p_arr_tmp
+    #   # replicate_factor <- matrix(1, nrow = nrow(p_arr_tmp), ncol = 5)
+    #   
+    #   # new_array4d <- abind(p_arr_tmp, p_arr_tmp, along = 4)
+    # } 
+    
+    # if(covariate_is_site_occasion_cov){
+    #   ...
+    # }
+    
+    
+    a1_matrix_list[[cov]] <- p_arr_4d
+  }
+    
+    
+    
+    # sum up individual effects
+    # if(object@model == "Occupancy") {
+  
+      logit.p <- Reduce('+', a1_matrix_list)  # doesn't include intercept yet
+      
+      # add a0_matrix to each element
+      for(i in 1:dim(logit.p)[1]) {   # station
+        for(k in 1:dim(logit.p)[4]) {   # occasion
+          logit.p[i,,,k] <- logit.p[i,,,k] + t(a0_matrix)
+        }
+      }
+      
+      p <- ilogit(logit.p)
+      rm(logit.p, a0_matrix, a1_matrix, a1_matrix_list)
+    # }
+    # # psi <- exp(logit.psi) / (exp(logit.psi) + 1)   # leads to NaN when numbers are very large
+    # if(object@model == "RN"){
+    #   log.lambda <- Reduce('+', out) + out_intercept
+    #   lambda <- exp(log.lambda)   # lambda is expected abundance   (Poisson intensity / rate parameter)
+    #   rm(log.lambda)
+    #   if(!type %in% c("abundance", "lambda_array")){   # convert to occupancy probability
+    #     psi <- 1-dpois(0, lambda)
+    #   }
+    # }
+  # }
+  
+}
   gc()
   
+# }
   
+
+if(type == "p_array") {
+  dimnames(p) <- list(index_not_na,
+                        rownames(object@data$y))
+  return(p)
+}
   
   
   # return raw probabilities [cell, species, posterior_draw]
@@ -772,7 +1020,7 @@ rast(YourRaster)")
                           sd = lambda.sd.melt$sd))
       }
     }
-  }
+  } # close if(type == "abundance")
   
 }
 
@@ -785,11 +1033,11 @@ rast(YourRaster)")
 #'
 #' @param object \code{commOccu} object
 #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
-#' @param type character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array. For Royle-Nichols models, "abundance" for species abundance, or "lambda_array" for raw species abundance estimates in an array.
+#' @param type character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array. For Royle-Nichols models, "abundance" for species abundance, or "lambda_array" for raw species abundance estimates in an array. "p_array" for raw detection probabilities in an array.
 #' @param draws  Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used
 #' @param level  Probability mass to include in the uncertainty interval
 #' @param interval  Type of interval calculation. Can be "none" or "confidence" (can be abbreviated). Calculation can be slow for type = "psi" with many cells and posterior samples.
-#' @param x   SpatRaster or data.frame. Must be scaled with same parameters as site covariates used in model, and have same names. 
+#' @param x   SpatRaster, data.frame or NULL. Must be scaled with same parameters as site covariates used in model, and have same names. If NULL, use site covariate data frame from model input (\code{commOccu} object in parameter \code{object}) 
 #' @param aoi SpatRaster with same dimensions as x (if x is a SpatRaster), indicating the area of interest (all cells with values are AOI, all NA cells are ignored). If NULL, predictions are made for all cells.
 #' @param speciesSubset  species to include in richness estimates. Can be index number or species names.
 #' @param batch logical or numeric. If FALSE, all raster cells / data frame rows will be processed at once (can be memory intensive). If TRUE, computation is conducted in batches of 1000. If numeric, it is the desired batch size.
@@ -797,7 +1045,7 @@ rast(YourRaster)")
 #'
 #' @details Processing can be very memory-intensive. If memory is insufficient, use the  \code{batch} parameter. This can enable processing for higher numbers of \code{draws} or very large rasters / data frames. 
 #' 
-#' @return A SpatRaster or data.frame, depending on \code{x}. If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [cell, species, draw].
+#' @return A SpatRaster or data.frame, depending on \code{x} (for type = "psi", "abundance", "richness". If type = "pao", a list. If type = "psi_array" or "lambda_array", a 3D-array [site, species, draw]. If type = "p_array", a 4D-array [site, species, draw, occasion].
 #' 
 #' @aliases predict
 #' @method predict commOccu
