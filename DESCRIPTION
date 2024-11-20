@@ -1,8 +1,8 @@
 Package: camtrapR
 Type: Package
-Title: Camera Trap Data Management and Preparation of Occupancy and Spatial Capture-Recapture Analyses
-Version: 2.3.2
-Date: 2024-03-18
+Title: Camera Trap Data Management and Analysis Framework
+Version: 2.4.0
+Date: 2024-11-19
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
                 comment = c(ORCID = "0000-0002-9187-2116")),
@@ -30,19 +30,27 @@ Depends:
         R (>= 3.1.0)
 Imports: 
         data.table,
+        dplyr,
+        DT, 
         generics,
         ggplot2,
+        leaflet,
         lubridate,
         methods,
         secr,
-        sf
+        sf,
+        shiny,
+        shinydashboard,
+        terra
 Suggests: 
         abind,
+        bayesplot,
+        callr,
         coda,
-        DT,
+        corrplot,
+        elevatr,
         knitr,
         lattice,
-        leaflet,
         magick,
         mapview,
         nimble,
@@ -50,27 +58,32 @@ Suggests:
         overlap,
         parallel,
         plotly,
+        psych,
+        raster,
         reshape2,
         rjags,
         R.rsp,
         RSQLite,
         ritis,
         rmarkdown,
-        shiny,
-        shinydashboard,
+        rstudioapi,
+        scales,
+        shinyWidgets,
+        stringr,
         tesseract,
         taxize,
-        terra,
         testthat,
         tibble,
+        ubms,
         units,
         unmarked,
+        viridisLite,
         zip
 VignetteBuilder: R.rsp
 SystemRequirements: ExifTool (https://exiftool.org/)
-Description: Management of and data extraction from camera trap data in wildlife studies. The package provides a workflow for storing and sorting camera trap photos (and videos), tabulates records of species and individuals, and creates detection/non-detection matrices for occupancy and spatial capture-recapture analyses with great flexibility. In addition, it can visualise species activity data and provides simple mapping functions with GIS export.
+Description: Management and analysis of camera trap wildlife data through an integrated workflow. Provides functions for image/video organization and metadata extraction, species/individual identification. Creates detection histories for occupancy and spatial capture-recapture analyses, with support for multi-season studies. Includes tools for fitting community occupancy models in JAGS and NIMBLE, and an interactive dashboard for survey data visualization and analysis. Features visualization of species distributions and activity patterns, plus export capabilities for GIS and reports. Emphasizes automation and reproducibility while maintaining flexibility for different study designs.
 URL: https://github.com/jniedballa/camtrapR, https://jniedballa.github.io/camtrapR/, https://groups.google.com/forum/#!forum/camtrapr
 BugReports: https://groups.google.com/forum/#!forum/camtrapr
 Encoding: UTF-8
 License: GPL (>= 2)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
