@@ -628,6 +628,40 @@ communityModel <- function(data_list,
     }
   }
   
+  # check if there area NAs in site covariates
+  if(length(covariates_numeric) >= 1) {
+    na_in_covs <- apply(data_list$siteCovs[, covariates_numeric], 2, FUN = function(x) any(is.na(x)))
+    if(any(na_in_covs)) stop(paste("There are NAs in site covariate(s): ", paste(names(na_in_covs)[na_in_covs], collapse = ", ")))
+  }
+  
+  if(length(covariates_categ) >= 1) {
+    na_in_covs <- apply(data_list$siteCovs[, covariates_categ], 2, FUN = function(x) any(is.na(x)))
+    if(any(na_in_covs)) stop(paste("There are NAs in site covariate(s): ", paste(names(na_in_covs)[na_in_covs], collapse = ", ")))
+  }
+  
+  # check that dimensions / pattern of NA / not NA matches between observations and effort
+  if (!all(dim(data_list$ylist[[1]]) == dim(data_list$obsCovs[[effortCov]]))) {
+    stop("detection history and effort matrix must have the same dimensions")
+  }
+  
+  all_matching <- all(!is.na(data_list$ylist[[1]]) == !is.na(data_list$obsCovs[[effortCov]]))
+  if(isFALSE(all_matching)) stop("NAs in detection history and effort matrix differ")
+  
+  
+  # check that dimensions / pattern of NA / not NA matches between observations and observation covariates
+  obs_cov_tmp <- which(covariate_info$param  == "param" & covariate_info$covariate_type == "obsCovs")
+  
+  if(length(obs_cov_tmp) >= 1) {
+    lapply(obs_cov_tmp, FUN = function(obs_cov_tmp_i) {
+      obs_cov_tmp_i_name <- covariate_info$covariate[obs_cov_tmp_i]
+      if (!all(dim(data_list$ylist[[1]]) == dim(data_list$obsCovs[[obs_cov_tmp_i_name]]))) {
+        stop(paste("detection history and", obs_cov_tmp_i_name, "matrix must have the same dimensions"))
+      }
+      
+      all_matching <- all(!is.na(data_list$ylist[[1]]) == !is.na(data_list$obsCovs[[obs_cov_tmp_i_name]]))
+      if(isFALSE(all_matching)) stop(paste("NAs in detection history and", obs_cov_tmp_i_name, "matrix differ"))
+    })
+  }
   
   # check is covariates are scaled
   if(length(covariates_numeric) >= 1) {
