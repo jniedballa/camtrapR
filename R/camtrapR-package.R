@@ -66,8 +66,8 @@
 #' \url{https://CRAN.R-project.org/package=overlap} \cr
 #' 
 #' Phil Harvey's ExifTool \url{https://exiftool.org/} \cr
-#' @keywords package
-NULL
+#' @keywords internal
+"_PACKAGE"
 
 
 
