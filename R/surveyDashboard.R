@@ -210,7 +210,7 @@ surveyDashboard <- function(CTtable = NULL,
   get_github_version <- function(repo = "jniedballa/camtrapR") {
     tryCatch({
       # Get DESCRIPTION content from GitHub
-      desc_url <- paste0("https://raw.githubusercontent.com/", repo, "/master/DESCRIPTION")
+      desc_url <- paste0("https://raw.githubusercontent.com/", repo, "/dev/DESCRIPTION")
       
       # Try to download DESCRIPTION file
       desc_content <- readLines(desc_url, warn = FALSE)
