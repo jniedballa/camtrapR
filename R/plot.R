@@ -466,6 +466,7 @@ plot_coef_commOccu <- function(object,
   # get covariate information for submodel
   cov_info_subset <- object@covariate_info[object@covariate_info$submodel == submodel & object@covariate_info$param == "param",]
   
+  if(nrow(cov_info_subset) == 0) stop(paste("No covariates in submodel", submodel), call. = F)
   
   
   list_responses <- list()
