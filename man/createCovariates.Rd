@@ -11,10 +11,11 @@ createCovariates(
   buffer_ct = 0,
   bilinear = FALSE,
   buffer_aoi = 1000,
-  raster_template,
-  resolution,
+  raster_template = NULL,
+  resolution = NULL,
   append = TRUE,
-  formats = ".tif"
+  formats = ".tif",
+  recursive = FALSE
 )
 }
 \arguments{
@@ -30,18 +31,22 @@ createCovariates(
 
 \item{buffer_aoi}{numeric. A value (in meters) by which to buffer the overall camera trapping grid to ensure that prediction rasters are larger than the camera trapping grid.}
 
-\item{raster_template}{SparRaster. A SparRaster (as defined in the \code{terra} package) to use as template for the creation of prediction rasters.}
+\item{raster_template}{SpatRaster. A SpatRaster (as defined in the \code{terra} package) to use as template for the creation of prediction rasters.}
 
 \item{resolution}{numeric. Spatial resolution of prediction rasters. Ignored if \code{raster_template} is provided.}
 
 \item{append}{logical. If \code{TRUE}, add the extracted covariates to the existing \code{CTtable}. If \code{FALSE}, return only the extracted covariate values without the existing \code{CTtable}.}
 
 \item{formats}{character. Possible file formats for raster data. Defaults to \code{.tif} files.}
+
+\item{recursive}{logical. If \code{TRUE}, search for raster files recursively in subdirectories when a directory is provided. Defaults to \code{FALSE}.}
 }
 \value{
 \describe{
+A list containing three elements:
   \item{CTtable}{An \code{sf} object representing the camera trap data frame with extracted covariate values.}
-  \item{prediction_raster}{A \code{SpatRaster} object containing prediction rasters.}
+  \item{predictionRaster}{A \code{SpatRaster} object containing covariate raster layers}
+  \item{originalRaster}{A list of the original input rasters}
 }
 }
 \description{
@@ -66,11 +71,15 @@ This function extracts covariate values from spatial raster data
 \details{
 The input camera trap table must be an \code{\link[sf]{sf}} object (a data 
 frame with a geometry column specifying the spatial information). For details 
-on how to convert an exising camera trap table to sf, see the Examples below.
+on how to convert an exising camera trap table to sf, see the examples below.
 The input rasters can be in different coordinate systems. During covariate 
 extraction the CTtable is projected to each raster's coordinate system 
 individually. For the prediction raster all input rasters are either 
 resampled or reprojected to a consistent coordinate system.
+
+When \code{recursive = TRUE} and a directory is provided, the function will search
+for raster files in all subdirectories. In this case, the subdirectory names are
+used as covariate names, and only one raster file per subdirectory is allowed.
 }
 \examples{
 
@@ -84,11 +93,17 @@ camtraps_sf <- st_as_sf(camtraps,
                         crs = 32650)
 
 # extract covariates (with 100m buffer around cameras)
-camtraps_sf_cov <- createCovariates(camtraps_sf, 
+covariates <- createCovariates(camtraps_sf, 
 "path/to/covariate_rasters", 
 buffer_ct = 100, 
-buffer_aoi = 1000, 
-raster_template = my_template)
+buffer_aoi = 1000,
+resolution = 100)
+
+# camera trap table with extracted covariate values
+camtraps_sf_cov <- covariates$CTtable
+
+# covariate raster layer
+r_cov <- covariates$predictionRaster
 
 }
 
