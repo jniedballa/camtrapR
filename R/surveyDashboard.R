@@ -202,7 +202,7 @@ surveyDashboard <- function(CTtable = NULL,
   )
   
   pkg_optional <- c(
-    "corrdplot",
+    "corrplot",
     "psych",
     "rstudioapi",
     "callr"
