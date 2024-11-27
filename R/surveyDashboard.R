@@ -172,54 +172,86 @@ surveyDashboard <- function(CTtable = NULL,
                             exclude = NULL) {
   
   
-  pkg_required <- c(
-    # UI packages
+  # pkg_required <- c(
+  #   # UI packages
+  #   "shiny",
+  #   "shinyWidgets", 
+  #   "shinydashboard",
+  #   "DT",
+  #   
+  #   # Data manipulation
+  #   "dplyr",
+  #   "lubridate",
+  #   "sf",
+  #   "terra",
+  #   
+  #   # Visualization
+  #   "ggplot2",
+  #   "plotly",
+  #   "patchwork",
+  #   "mapview",
+  #   "leaflet",
+  #   "viridisLite",
+  #   "scales",
+  #   
+  #   # Modeling
+  #   "unmarked",
+  #   "ubms",
+  #   "bayesplot",
+  #   "coda"
+  # )
+  # 
+  # pkg_optional <- c(
+  #   "corrplot",
+  #   "psych",
+  #   "rstudioapi",
+  #   "callr"
+  # )
+  # 
+  # # Check required packages
+  # missing_required <- pkg_required[!sapply(pkg_required, requireNamespace, quietly = TRUE)]
+  # if (length(missing_required) > 0) {
+  #   stop("Please install the following required packages: ", 
+  #        paste(missing_required, collapse = ", "))
+  # }
+  # 
+  # # Check optional packages and warn if missing
+  # missing_optional <- pkg_optional[!sapply(pkg_optional, requireNamespace, quietly = TRUE)]
+  # if (length(missing_optional) > 0) {
+  #   warning("The following optional packages are not installed. Some features may be limited: ",
+  #           paste(missing_optional, collapse = ", "))
+  # }
+  # 
+  
+   # For now do aggressive package check until I load functions cleanly with pkg::function()
+  
+  # Load all required packages
+  required_packages <- c(
     "shiny",
-    "shinyWidgets", 
     "shinydashboard",
     "DT",
-    
-    # Data manipulation
     "dplyr",
-    "lubridate",
     "sf",
     "terra",
-    
-    # Visualization
+    "leaflet",
     "ggplot2",
     "plotly",
-    "patchwork",
-    "mapview",
-    "leaflet",
-    "viridisLite",
+    "lubridate",
+    "grDevices",
+    "graphics",
+    "utils",
+    "stats",
     "scales",
-    
-    # Modeling
-    "unmarked",
-    "ubms",
-    "bayesplot",
-    "coda"
-  )
-  
-  pkg_optional <- c(
     "corrplot",
-    "psych",
-    "rstudioapi",
-    "callr"
+    "unmarked",
+    "ubms"
   )
   
-  # Check required packages
-  missing_required <- pkg_required[!sapply(pkg_required, requireNamespace, quietly = TRUE)]
-  if (length(missing_required) > 0) {
-    stop("Please install the following required packages: ", 
-         paste(missing_required, collapse = ", "))
-  }
-  
-  # Check optional packages and warn if missing
-  missing_optional <- pkg_optional[!sapply(pkg_optional, requireNamespace, quietly = TRUE)]
-  if (length(missing_optional) > 0) {
-    warning("The following optional packages are not installed. Some features may be limited: ",
-            paste(missing_optional, collapse = ", "))
+  for (pkg in required_packages) {
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      stop(paste("Package", pkg, "is required but not installed"))
+    }
+    library(pkg, character.only = TRUE)
   }
   
   
@@ -345,7 +377,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     shinydashboard::dashboardHeader(
       title = "Survey dashboard",
-      dropdownMenuOutput("stateMenu")
+      shinydashboard::dropdownMenuOutput("stateMenu")
     ),
     
     
@@ -622,13 +654,13 @@ surveyDashboard <- function(CTtable = NULL,
               solidHeader = TRUE,
               shiny::tabsetPanel(
                 shiny::tabPanel("Records by Species",
-                                plotly::plotlyOutput("plot_n_records")
+                                plotly::plotlyOutput("plot_n_records", height = "500px")
                 ),
                 shiny::tabPanel("Species by Station",
-                                plotly::plotlyOutput("plot_n_species")
+                                plotly::plotlyOutput("plot_n_species", height = "500px")
                 ),
                 shiny::tabPanel("Stations by Species",
-                                plotly::plotlyOutput("plot_n_stations")
+                                plotly::plotlyOutput("plot_n_stations", height = "500px")
                 )
               )
             )
@@ -648,10 +680,10 @@ surveyDashboard <- function(CTtable = NULL,
         shinydashboard::tabItem(tabName = "camera_table",
                                 shiny::tabsetPanel(
                                   shiny::tabPanel(title = "Current Camera trap table",     
-                                                  DTOutput("current_camera_traps_table")
+                                                  DT::DTOutput("current_camera_traps_table")
                                   ),
                                   shiny::tabPanel(title = "Aggregated Camera trap table", 
-                                                  DTOutput("aggregated_camera_traps_table")
+                                                  DT::DTOutput("aggregated_camera_traps_table")
                                   )
                                 )
         ),
@@ -789,7 +821,7 @@ surveyDashboard <- function(CTtable = NULL,
                          status = "primary",
                          solidHeader = TRUE,
                          width = NULL,
-                         leafletOutput("filterMap", height = 400),
+                         leaflet::leafletOutput("filterMap", height = 400),
                          collapsible = TRUE
                        )
                 )
@@ -954,7 +986,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                                              value = FALSE)
                                                         ),
                                                         column(6,
-                                                               leafletOutput("ctBufferPreview", height = "300px")
+                                                               leaflet::leafletOutput("ctBufferPreview", height = "300px")
                                                         )
                                                       )
                                                     ),
@@ -994,7 +1026,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                                )
                                                         ),
                                                         column(6,
-                                                               leafletOutput("predictionExtentPreview", height = "300px")
+                                                               leaflet::leafletOutput("predictionExtentPreview", height = "300px")
                                                         )
                                                       )
                                                     )
@@ -1124,7 +1156,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                                        value = 1, min = 1, max = 100, step = 1, ticks = FALSE)
                                                     )
                                                   ),
-                                                  leafletOutput("originalCovariatePlot", height = "600px")
+                                                  leaflet::leafletOutput("originalCovariatePlot", height = "600px")
                                   ),
                                   
                                   # Prediction Rasters tab
@@ -1160,7 +1192,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                            
                                                     )
                                                   ),
-                                                  leafletOutput("predictionRasterPlot", height = "600px")
+                                                  leaflet::leafletOutput("predictionRasterPlot", height = "600px")
                                   )
                                 )
         ),
@@ -1769,7 +1801,7 @@ surveyDashboard <- function(CTtable = NULL,
                          ),
                          column(
                            width = 9,
-                           leafletOutput("basic_prediction_map", height = "600px")
+                           leaflet::leafletOutput("basic_prediction_map", height = "600px")
                          )
                        )
               )
@@ -2025,7 +2057,7 @@ surveyDashboard <- function(CTtable = NULL,
                          ),
                          column(
                            width = 9,
-                           leafletOutput("adv_prediction_map", height = "600px")
+                           leaflet::leafletOutput("adv_prediction_map", height = "600px")
                          )
                        )
               )
@@ -2546,7 +2578,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                           )
                                                       ),
                                                       div(class = "panel-body",
-                                                          leafletOutput("occupancyMap", height = "600px"),
+                                                          leaflet::leafletOutput("occupancyMap", height = "600px"),
                                                           uiOutput("occupancyStats")
                                                       )
                                                   )
@@ -2578,7 +2610,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                           )
                                                       ),
                                                       div(class = "panel-body",
-                                                          leafletOutput("richnessMap", height = "600px"),
+                                                          leaflet::leafletOutput("richnessMap", height = "600px"),
                                                           uiOutput("richnessStats")
                                                       )
                                                   )
@@ -2938,12 +2970,12 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     # Render Wildlife Insights data previews
-    output$wi_deployment_preview <- renderDT({
+    output$wi_deployment_preview <- DT::renderDT({
       req(wi_data())
       datatable(head(wi_data()$CTtable, 100), options = list(scrollX = TRUE))
     })
     
-    output$wi_detection_preview <- renderDT({
+    output$wi_detection_preview <- DT::renderDT({
       req(wi_data())
       datatable(head(wi_data()$recordTable, 100), options = list(scrollX = TRUE))
     })
@@ -3054,7 +3086,7 @@ surveyDashboard <- function(CTtable = NULL,
         data$study_area <- st_make_valid(study_area)
         
         # Create preview map
-        output$aoi_preview <- renderLeaflet({
+        output$aoi_preview <- leaflet::renderLeaflet({
           req(data$study_area)
           
           base_map <- mapview::mapview(st_buffer(data$study_area, 0),
@@ -3459,7 +3491,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Tab: camera traps table     ####
-    output$current_camera_traps_table <- renderDT({
+    output$current_camera_traps_table <- DT::renderDT({
       req(data$CTtable_sf)
       DT::datatable(
         sf::st_drop_geometry(data$CTtable_sf),
@@ -3471,7 +3503,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     ## Tab: camera traps table (aggregated)     ####
-    output$aggregated_camera_traps_table <- renderDT({
+    output$aggregated_camera_traps_table <- DT::renderDT({
       req(data$aggregated_CTtable)
       DT::datatable(
         sf::st_drop_geometry(data$aggregated_CTtable),
@@ -3986,7 +4018,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Map output showing filtered vs excluded stations
-    output$filterMap <- renderLeaflet({
+    output$filterMap <- leaflet::renderLeaflet({
       req(data$CTtable_sf, original_data())
       
       # Get all stations and currently filtered stations
@@ -4379,7 +4411,7 @@ surveyDashboard <- function(CTtable = NULL,
       }
       
       # Preview map
-      output$extent_preview <- renderLeaflet({
+      output$extent_preview <- leaflet::renderLeaflet({
         map_view <- mapview::mapview(final_extent,
                                      col.regions = "transparent",
                                      color = "red",
@@ -4740,7 +4772,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Preview for camera trap buffers
-    output$ctBufferPreview <- renderLeaflet({
+    output$ctBufferPreview <- leaflet::renderLeaflet({
       req(data$CTtable_sf)
       
       # Transform to lat/long for leaflet if needed
@@ -4787,7 +4819,7 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     # Preview for prediction extent
-    output$predictionExtentPreview <- renderLeaflet({
+    output$predictionExtentPreview <- leaflet::renderLeaflet({
       req(data$CTtable_sf)
       
       # Transform camera points to lat/long
@@ -5521,7 +5553,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Helper function to update prediction maps
     updatePredictionMap <- function(map_id, predictions, input_prefix) {
-      output[[map_id]] <- renderLeaflet({
+      output[[map_id]] <- leaflet::renderLeaflet({
         # Get current layer based on user selection
         layer_input <- paste0(input_prefix, "_prediction_layer")
         palette_input <- paste0(input_prefix, "_predictionColorPalette")
@@ -5598,7 +5630,7 @@ surveyDashboard <- function(CTtable = NULL,
         basic_model(NULL)
         my_object$basic_modList <- list()
         output$basic_model_selection <- renderTable({ NULL })
-        output$basic_prediction_map <- renderLeaflet({ NULL })
+        output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
         shiny::showNotification("Basic model cleared due to input changes", type = "warning")
       }
     }, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -5617,7 +5649,7 @@ surveyDashboard <- function(CTtable = NULL,
         advanced_model(NULL)
         my_object$adv_modList <- list()
         output$adv_model_selection <- renderTable({ NULL })
-        output$adv_prediction_map <- renderLeaflet({ NULL })
+        output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
         shiny::showNotification("Advanced model cleared due to input changes", type = "warning")
       }
     }, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -5631,14 +5663,14 @@ surveyDashboard <- function(CTtable = NULL,
         basic_model(NULL)
         my_object$basic_modList <- list()
         output$basic_model_selection <- renderTable({ NULL })
-        output$basic_prediction_map <- renderLeaflet({ NULL })
+        output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
       }
       if (!is.null(advanced_model()) || length(my_object$adv_modList) > 0) {
         something_to_clear <- TRUE
         advanced_model(NULL)
         my_object$adv_modList <- list()
         output$adv_model_selection <- renderTable({ NULL })
-        output$adv_prediction_map <- renderLeaflet({ NULL })
+        output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
       }
       if(something_to_clear) shiny::showNotification("Models and predictions cleared due to data changes", type = "warning")
     }, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -6513,14 +6545,14 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Render parameter estimates
-    output$parameterEstimates <- renderDT({
+    output$parameterEstimates <- DT::renderDT({
       req(model_summary())
       summary_data <- model_summary()
       round(as.data.frame(summary_data$statistics), digits = 4)
     }) 
     
     # Render parameter quantiles
-    output$parameterQuantiles <- renderDT({
+    output$parameterQuantiles <- DT::renderDT({
       req(model_summary())
       summary_data <- model_summary()
       round(as.data.frame(summary_data$quantiles), digits = 4)
@@ -6933,7 +6965,7 @@ surveyDashboard <- function(CTtable = NULL,
         )
       }
       
-      output$occupancyMap <- renderLeaflet({ m@map })
+      output$occupancyMap <- leaflet::renderLeaflet({ m@map })
     })
     
     # Render richness map
@@ -6963,7 +6995,7 @@ surveyDashboard <- function(CTtable = NULL,
         )
       }
       
-      output$richnessMap <- renderLeaflet({ m@map })
+      output$richnessMap <- leaflet::renderLeaflet({ m@map })
     })
     
     # Render PAO plot and table
