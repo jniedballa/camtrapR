@@ -170,7 +170,7 @@ detectionMaps <- function(CTtable,
 
   # check all stations in recordTable are matched in CTtable
   if(all(recordTable[,stationCol] %in% CTtable[,stationCol]) == FALSE) {
-    stop(paste("items of stationCol in recordTable are not matched in stationCol of CTtable: ", paste(recordTable[-which(recordTable[,stationCol] %in% CTtable[,stationCol]),stationCol], collapse = ", ")))
+    stop(paste("items of stationCol in recordTable are not matched in stationCol of CTtable: ", paste(unique(recordTable[-which(recordTable[,stationCol] %in% CTtable[,stationCol]),stationCol]), collapse = ", ")))
   }
 
   recordTable[,speciesCol] <- as.character(recordTable[,speciesCol])
