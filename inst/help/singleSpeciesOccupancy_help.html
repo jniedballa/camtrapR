@@ -1,0 +1,131 @@
+<h4>Getting Started with Single-Species Occupancy Models</h4>
+
+<p>This dashboard supports two workflows for fitting occupancy models: Basic and Advanced. Both use the same underlying statistical methods but offer different levels of control over model specification.</p>
+
+<h4>Choosing Your Workflow</h4>
+<ul>
+    <li><strong>Basic Workflow</strong>: Best for standard analyses and newcomers to occupancy modeling
+        <ul>
+            <li>Simple linear effects of covariates</li>
+            <li>Streamlined model specification</li>
+            <li>Quick model comparison</li>
+        </ul>
+    </li>
+    <li><strong>Advanced Workflow</strong>: For complex analyses requiring:
+        <ul>
+            <li>Quadratic effects</li>
+            <li>Interaction terms</li>
+            <li>Random effects</li>
+            <li>Fine control over model structure</li>
+        </ul>
+    </li>
+</ul>
+
+<h4>Basic Workflow Guide</h4>
+<ol>
+    <li><strong>Model Setup</strong>
+        <ul>
+            <li>Choose between 'unmarked' (faster) and 'ubms' (Bayesian) packages</li>
+            <li>Select model type: Occupancy or Royle-Nichols</li>
+            <li>Optionally scale covariates (recommended)</li>
+            <li>Select detection covariates (including effort if desired)</li>
+            <li>Select occupancy covariates</li>
+        </ul>
+    </li>
+    <li><strong>Model Selection</strong>
+        <ul>
+            <li>Run multiple models with different covariate combinations</li>
+            <li>Add models to model selection table</li>
+            <li>Compare using AIC (unmarked) or elpd (expected log pointwise predictive density, in ubms)</li>
+        </ul>
+    </li>
+    <li><strong>Response Plots</strong>
+        <ul>
+            <li>Visualize relationships between covariates and detection/occupancy</li>
+            <li>Adjust confidence levels</li>
+            <li>Compare detection vs. occupancy effects</li>
+        </ul>
+    </li>
+    <li><strong>Spatial Predictions</strong>
+        <ul>
+            <li>Generate prediction maps using extracted covariates or custom rasters</li>
+            <li>View uncertainty in predictions</li>
+            <li>Export results for further analysis or visualization in GIS software</li>
+        </ul>
+    </li>
+</ol>
+
+<h4>Advanced Workflow Guide</h4>
+<ol>
+    <li><strong>Model Setup</strong>
+        <ul>
+            <li>Same package and model type options as Basic workflow</li>
+            <li>Add effects one at a time with more options:
+                <ul>
+                    <li>Linear effects (standard relationship)</li>
+                    <li>Quadratic effects (unimodal relationships)</li>
+                    <li>Interactions (combined effects of two covariates)</li>
+                    <li>Random effects (for grouped or nested data)</li>
+                </ul>
+            </li>
+            <li>Preview formula before fitting</li>
+        </ul>
+    </li>
+    <li><strong>Results & Diagnostics</strong>
+        <ul>
+            <li>Detailed model summaries</li>
+            <li>MCMC diagnostics for ubms models</li>
+            <li>Trace plots for convergence checking</li>
+        </ul>
+    </li>
+    <li><strong>Effect Visualization</strong>
+        <ul>
+            <li>Response curves for each effect type</li>
+            <li>Separate plots for detection and occupancy</li>
+        </ul>
+    </li>
+</ol>
+
+<h4>Tips and Best Practices</h4>
+<ul>
+    <li><strong>General Tips</strong>
+        <ul>
+            <li>Start with the Basic workflow unless you need Advanced features</li>
+            <li>Scale covariates to improve model convergence (especially with large absolute covariate values)</li>
+            <li>Include effort as a detection covariate</li>
+            <li>Check for correlations between covariates before modeling (section "Data Processing" > "Covariate Correlation")</li>
+        </ul>
+    </li>
+    <li><strong>Model Selection</strong>
+        <ul>
+            <li>Start with simple models and gradually add complexity</li>
+            <li>Use AIC/elpd to compare models formally</li>
+            <li>Consider biological significance alongside statistical significance</li>
+        </ul>
+    </li>
+    <li><strong>MCMC Settings (ubms)</strong>
+        <ul>
+            <li>Increase iterations if chains haven't converged</li>
+            <li>Use multiple chains to assess convergence</li>
+            <li>Check trace plots for mixing</li>
+            <li>Adjust thinning if autocorrelation is high (recommended value for thinning is 1 though, see ?stan_occu)</li>
+        </ul>
+    </li>
+</ul>
+
+<h4>Common Issues</h4>
+<ul>
+    <li><strong>Model Convergence</strong>
+        <ul>
+            <li>Non-convergence often indicates insufficient data for complex models</li>
+            <li>Ensure adequate detections for reliable parameter estimation</li>
+        </ul>
+    </li>
+    <li><strong>Prediction Issues</strong>
+        <ul>
+            <li>Ensure prediction rasters match the scale of model covariates (if not using extracted rasters created by dashboard - dashboard handles scaling of prediction rasters automatically)</li>
+            <li>Check for missing values in prediction surfaces</li>
+            <li>Be cautious about predicting beyond the range of observed covariates</li>
+        </ul>
+    </li>
+</ul>
