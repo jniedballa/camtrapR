@@ -329,8 +329,25 @@ surveyDashboard <- function(CTtable = NULL,
   }
   
   
+  # function to locate help files
+  help_text <- function(filename) {
+    # When in package
+    pkg_file <- system.file("help", filename, package = "camtrapR")
+    
+    # When in development (assuming standard package structure)
+    dev_file <- file.path("inst/help", filename)
+    
+    if (file.exists(pkg_file)) {
+      readLines(pkg_file)
+    } else if (file.exists(dev_file)) {
+      readLines(dev_file)
+    } else {
+      stop("Help file not found")
+    }
+  }
   
   
+  # Data checks
   if(inherits(CTtable, "tbl")) CTtable <- as.data.frame(CTtable)
   if(inherits(recordTable, "tbl")) recordTable <- as.data.frame(recordTable)
   
@@ -410,8 +427,8 @@ surveyDashboard <- function(CTtable = NULL,
                                  shinydashboard::menuSubItem("Records Temporal Filtering", tabName = "filterRecords"),
                                  shinydashboard::menuSubItem("Extract Covariates", tabName = "extract"),
                                  shinydashboard::menuSubItem("Covariate Correlation", tabName = "covariateCorrelation"),
-                                 shinydashboard::menuSubItem("Camera operation matrix", tabName = "CameraOperation")
-                                 
+                                 shinydashboard::menuSubItem("Camera operation matrix", tabName = "CameraOperation"),
+                                 shinydashboard::menuSubItem("Species Accumulation", tabName = "speciesAccumulation")
         ),
         shinydashboard::menuItem("Single-species Occupancy", icon = shiny::icon("calculator"),
                                  shinydashboard::menuSubItem("Detection History", tabName = "DetectionHistory"),
@@ -885,82 +902,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                       title = "How to Extract Covariates", 
                                                       width = 12, 
                                                       status = "info",
-                                                      shiny::HTML(
-                                                        "<h4>Instructions for Covariate Extraction</h4>
-        <ol>
-          <li><strong>Configure Global Settings</strong>
-            <ul>
-              <li><em>Camera Trap Covariate Settings:</em>
-                <ul>
-                  <li>Set buffer around camera traps for value extraction</li>
-                  <li>Choose whether to use bilinear interpolation</li>
-                  <li>Preview map shows camera locations and buffer</li>
-                </ul>
-              </li>
-              <li><em>Prediction Raster Settings:</em>
-                <ul>
-                  <li>Choose prediction area: no clipping, camera trap grid, study area, or their intersection</li>
-                  <li>Set buffer for prediction area (up to 500m for 'no clipping' option)</li>
-                  <li>Upload raster template (optional) or specify resolution</li>
-                  <li>Preview map shows selected extent with interactive basemap</li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          
-          <li><strong>Choose Data Source</strong>
-            <ul>
-              <li><em>Local Rasters:</em>
-                <ul>
-                  <li>Choose directory containing your covariate rasters, or</li>
-                  <li>Specify individual raster files</li>
-                  <li>Set file format (default: .tif)</li>
-                  <li>Enable recursive search if rasters are in subdirectories</li>
-                </ul>
-              </li>
-              <li><em>Elevation & Terrain:</em>
-                <ul>
-                  <li>Downloads elevation data from AWS Terrain Tiles</li>
-                  <li>Choose zoom level for resolution (z10: ~80m, z11: ~40m, z12: ~20m)</li>
-                  <li>Select which terrain indices to calculate (slope, aspect, TRI, TPI, roughness)</li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          
-          <li><strong>Processing Behavior</strong>
-            <ul>
-              <li>Values at camera locations are always extracted from original resolution data</li>
-              <li>Prediction rasters are created based on:</li>
-              <ol>
-                <li>Provided template if available</li>
-                <li>Otherwise, existing prediction rasters if available</li>
-                <li>Otherwise, specified resolution if provided</li>
-                <li>If no specifications given, local rasters will not create prediction rasters and elevation data will use source resolution</li>
-              </ol>
-              <li>Prediction rasters are masked to selected extent if clipping is requested</li>
-            </ul>
-          </li>
-          
-          <li><strong>Output</strong>
-            <ul>
-              <li>Covariate values are added to the camera trap table</li>
-              <li>Original rasters are stored at their native resolution</li>
-              <li>Prediction rasters are created according to specifications</li>
-              <li>All covariate data can be cleared at once using the 'Clear All Covariates' button</li>
-            </ul>
-          </li>
-        </ol>
-
-        <h4>Notes:</h4>
-        <ul>
-          <li>Large rasters or numerous covariates may take some time to process</li>
-          <li>When using elevation data, a minimum 5km buffer is applied for download to ensure proper terrain calculations</li>
-          <li>The preview maps update in real-time to show the impact of your buffer and prediction area settings</li>
-          <li>You can process local rasters and elevation data independently</li>
-          <li>Clearing covariates removes all added columns from the camera trap table and clears both original and prediction rasters</li>
-        </ul>"
-                                                      )
+                                                      shiny::HTML(paste(help_text("covariateExtraction_help.html"), collapse = "\n"))
                                                     )
                                                   )
                                   ),
@@ -1213,93 +1155,7 @@ surveyDashboard <- function(CTtable = NULL,
                                 title = "How to Use Covariate Correlation Analysis", 
                                 width = 12, 
                                 status = "info",
-                                shiny::HTML(
-                                  "<h4>Instructions for Covariate Correlation Analysis</h4>
-            <ol>
-              <li><strong>Basic Settings</strong>
-                <ul>
-                  <li><em>Correlation Method:</em>
-                    <ul>
-                      <li>Pearson: For linear relationships between continuous variables</li>
-                      <li>Spearman: For monotonic relationships, robust to outliers</li>
-                      <li>Kendall: For ordinal relationships, good for small sample sizes</li>
-                    </ul>
-                  </li>
-                  <li><em>Correlation Threshold:</em>
-                    <ul>
-                      <li>Set minimum correlation value to highlight (0-1)</li>
-                      <li>Default 0.7 is commonly used</li>
-                      <li>Lower values (e.g., 0.5) for stricter multicollinearity control</li>
-                      <li>Higher values (e.g., 0.8) for more relaxed variable inclusion</li>
-                    </ul>
-                  </li>
-                  <li><em>Non-numeric Variables:</em>
-                    <ul>
-                      <li>Option to exclude non-numeric covariates</li>
-                      <li>Categorical variables are automatically excluded if enabled</li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-              
-              <li><strong>Visualization Options</strong>
-                <ul>
-                  <li><em>Plot Type:</em>
-                    <ul>
-                      <li>Correlation matrix: Compact view of all correlations</li>
-                      <li>Scatter plot matrix: Detailed view of relationships</li>
-                    </ul>
-                  </li>
-                  <li><em>Display Method:</em>
-                    <ul>
-                      <li>Color: Simple color-coded squares</li>
-                      <li>Circle/Square: Size indicates correlation strength</li>
-                      <li>Ellipse: Shape shows correlation direction and strength</li>
-                      <li>Shade: Uses color intensity</li>
-                      <li>Pie: Fills circles with pie charts</li>
-                    </ul>
-                  </li>
-                  <li><em>Ordering Method:</em>
-                    <ul>
-                      <li>Original: Keep input order</li>
-                      <li>AOE/FPC: Order by eigenvectors or first principal component</li>
-                      <li>Hclust: Group similar variables</li>
-                      <li>Alphabet: Sort alphabetically</li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-
-              <li><strong>Output Components</strong>
-                <ul>
-                  <li><em>Correlation Plot:</em>
-                    <ul>
-                      <li>Blue indicates positive correlations</li>
-                      <li>Red indicates negative correlations</li>
-                      <li>Color intensity shows correlation strength</li>
-                      <li>Values display exact correlation coefficients</li>
-                    </ul>
-                  </li>
-                  <li><em>Highly Correlated Pairs:</em>
-                    <ul>
-                      <li>Table shows pairs exceeding threshold</li>
-                      <li>Lists exact correlation values</li>
-                      <li>Helps identify potential multicollinearity issues</li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-            </ol>
-
-            <h4>Notes:</h4>
-            <ul>
-              <li>Large correlations suggest redundant information between variables</li>
-              <li>Consider removing one variable from highly correlated pairs before modeling</li>
-              <li>Choice of which variable to remove should be based on ecological relevance and data quality</li>
-              <li>Remember that correlation does not imply causation</li>
-              <li>Missing values are handled pairwise in correlation calculations</li>
-            </ul>"
-                                )
+                                shiny::HTML(paste(help_text("covariateCorrelation_help.html"), collapse = "\n"))
                               )
                             )
             ),
@@ -1397,6 +1253,170 @@ surveyDashboard <- function(CTtable = NULL,
                                height = "600px")
         ),
         
+        ## Tab: Species Accumulation Curves ----
+        
+        shinydashboard::tabItem(
+          tabName = "speciesAccumulation",
+          fluidRow(
+            # Left column with settings and species selection
+            column(3,
+                   # Tabs for settings and species selection
+                   tabsetPanel(
+                     # Settings tab
+                     tabPanel("Settings",
+                              wellPanel(
+                                h4("Basic Settings", class = "text-primary"),
+                                
+                                numericInput("acc_q", 
+                                             "Diversity order (q):",
+                                             value = 0,
+                                             min = 0,
+                                             max = 2,
+                                             step = 1
+                                ),
+                                
+                                selectInput("acc_x_unit", 
+                                            "Sampling unit:",
+                                            choices = c(
+                                              "Stations" = "station",
+                                              "Days" = "day"
+                                            ),
+                                            selected = "station"
+                                ),
+                                
+                                hr(),
+                                h4("Curve Settings", class = "text-primary"),
+                                
+                                
+                                numericInput("acc_knots",
+                                             "Number of points on curve:",
+                                             value = 40,
+                                             min = 10,
+                                             max = 100,
+                                             step = 5
+                                ),
+                                
+                                hr(),
+                                h4("Bootstrap Settings", class = "text-primary"),
+                                sliderInput("acc_conf",
+                                            "Confidence level:",
+                                            min = 0.8,
+                                            max = 0.99,
+                                            value = 0.95,
+                                            step = 0.01
+                                ),
+                                
+                                numericInput("acc_nboot",
+                                             "Number of bootstrap replicates:",
+                                             value = 50,
+                                             min = 10,
+                                             max = 200,
+                                             step = 10
+                                ),
+                                
+                                hr(),
+                                h4("Plot Settings", class = "text-primary"),
+                                numericInput("acc_plot_scale", 
+                                             "Plot size scale:", 
+                                             value = 1.5, 
+                                             min = 0.5, 
+                                             max = 3, 
+                                             step = 0.1
+                                ),
+                                
+                                hr(),
+                                
+                                # Run analysis button at the bottom of settings
+                                actionButton("runAccumulation", "Run Analysis", 
+                                             class = "btn-primary btn-lg btn-block")
+                              )
+                     ),
+         
+                     
+                     # Species Selection tab
+                     tabPanel("Species",
+                              wellPanel(
+                                h4("Species Selection", class = "text-primary"),
+                                # Species table
+                                DT::dataTableOutput("acc_speciesTable"),
+                                
+                                hr(),
+                                # Selection controls
+                                fluidRow(
+                                  column(6, actionButton("acc_selectAll", "Select All", class = "btn-block")),
+                                  column(6, actionButton("acc_deselectAll", "Deselect All", class = "btn-block"))
+                                ),
+                                
+                                hr(),
+                                h4("Filtering", class = "text-primary"),
+                                numericInput("acc_minStations", "Min Stations:", value = 1, min = 1),
+                                numericInput("acc_minRecords", "Min Records:", value = 1, min = 1),
+                                fluidRow(
+                                  column(6, actionButton("acc_selectByStations", "By Stations", class = "btn-block")),
+                                  column(6, actionButton("acc_selectByRecords", "By Records", class = "btn-block"))
+                                ),
+                                actionButton("acc_selectByBoth", "Select by Both Criteria", 
+                                             class = "btn-block")
+                              )
+                     )
+                   )
+            ),
+            
+            # Right column with output
+            column(9,
+                   # Results tabs
+                   tabsetPanel(
+                     selected = "All Curves",
+                     # Add to UI in speciesAccumulation tabsetPanel:
+                     tabPanel("Instructions",
+                              fluidRow(
+                                shinydashboard::box(
+                                  title = "Species Accumulation Curves", 
+                                  width = 12, 
+                                  status = "info",
+                                  shiny::HTML(paste(help_text("speciesAccum_help.html"), collapse = "\n"))
+                                )
+                              )
+                     ),
+                     
+                     # Add new tab for combined plots view:
+                     tabPanel("All Curves",
+                              fluidRow(
+                                div(
+                                  style = "display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between;",
+                                  div(
+                                    style = "flex: 1; min-width: 300px;",
+                                    plotOutput("acc_rarefaction_plot_combined", height = "600px")
+                                  ),
+                                  div(
+                                    style = "flex: 1; min-width: 300px;",
+                                    plotOutput("acc_coverage_plot_combined", height = "600px")
+                                  ),
+                                  div(
+                                    style = "flex: 1; min-width: 300px;",
+                                    plotOutput("acc_richness_plot_combined", height = "600px")
+                                  )
+                                )
+                              )
+                     ),
+                     
+                     tabPanel("Rarefaction/Extrapolation Curve",
+                              plotOutput("acc_rarefaction_plot", height = "600px")
+                     ),
+                     tabPanel("Sample Coverage",
+                              plotOutput("acc_coverage_plot", height = "600px")
+                     ),
+                     tabPanel("Coverage-based Curve",
+                              plotOutput("acc_richness_plot", height = "600px")
+                     ),
+                     tabPanel("Summary Statistics",
+                              DTOutput("acc_summary")
+                     )
+                   )
+            )
+          )
+        ),
+        
         ## Tab: Detection history  ----
         shinydashboard::tabItem(
           tabName = "DetectionHistory",
@@ -1408,100 +1428,7 @@ surveyDashboard <- function(CTtable = NULL,
                                 title = "How to Create Detection Histories", 
                                 width = 12, 
                                 status = "info",
-                                shiny::HTML(
-                                  "<h4>Instructions for Creating and Using Detection Histories</h4>
-            <ol>
-              <li><strong>Basic Settings</strong>
-                <ul>
-                  <li><em>Species Selection:</em>
-                    <ul>
-                      <li>Choose target species from dropdown menu</li>
-                      <li>Only species present in record table are shown</li>
-                    </ul>
-                  </li>
-                  <li><em>Occasion Length:</em>
-                    <ul>
-                      <li>Define the length of sampling occasions in days</li>
-                      <li>Maximum length depends on total survey duration</li>
-                      <li>Consider species behavior and survey design when choosing length</li>
-                    </ul>
-                  </li>
-                  <li><em>Output Type:</em>
-                    <ul>
-                      <li>Binary (0/1): Records detection/non-detection in each occasion</li>
-                      <li>Count: Records number of detections in each occasion</li>
-                      <li>Binary typically used for occupancy models</li>
-                    </ul>
-                  </li>
-                  <li><em>Day 1 Definition:</em>
-                    <ul>
-                      <li>Survey: Start all stations from first day of overall survey</li>
-                      <li>Station: Start each station from its own setup date</li>
-                      <li>Affects how occasions are aligned across stations</li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-
-              <li><strong>Output Components</strong>
-                <ul>
-                  <li><em>Summary Statistics:</em>
-                    <ul>
-                      <li>Total number of records for selected species</li>
-                      <li>Number of detections in detection history</li>
-                      <li>Number of stations with detections</li>
-                      <li>Percentage of occasions with detections</li>
-                    </ul>
-                  </li>
-                  <li><em>Detection History Plot:</em>
-                    <ul>
-                      <li>Left panel: Detection matrix (0/1 or counts)</li>
-                      <li>Right panel: Camera operation/effort matrix</li>
-                      <li>Rows represent stations</li>
-                      <li>Columns represent sampling occasions</li>
-                      <li>Color intensity indicates detection/effort values</li>
-                    </ul>
-                  </li>
-                  <li><em>unmarkedFrame Summary:</em>
-                    <ul>
-                      <li>Shows structure of data formatted for unmarked package</li>
-                      <li>Includes number of sites and occasions</li>
-                      <li>Lists available covariates</li>
-                      <li>Displays observation model type</li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-
-              <li><strong>Export Options</strong>
-                <ul>
-                  <li><em>Detection History:</em>
-                    <ul>
-                      <li>Export raw detection history matrix</li>
-                      <li>Includes both detection and effort matrices</li>
-                      <li>Useful for custom analyses or verification</li>
-                    </ul>
-                  </li>
-                  <li><em>unmarkedFrame:</em>
-                    <ul>
-                      <li>Export formatted data ready for occupancy modeling</li>
-                      <li>Includes all necessary components for analysis: detection history, site covariates, observation covariate 'effort'</li>
-                      <li>Can be used directly with unmarked or ubms package functions</li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-            </ol>
-
-            <h4>Notes:</h4>
-            <ul>
-              <li>Detection histories form the basis for occupancy modeling</li>
-              <li>Missing values (NA) occur when cameras were not operational</li>
-              <li>Ensure sufficient detections for reliable model estimation</li>
-              <li>Check camera operation matrix for adequate survey effort</li>
-              <li>Binary format appropriate for most single-season occupancy models</li>
-            </ul>"
-                                )
+                                shiny::HTML(paste(help_text("detectionHistories_help.html"), collapse = "\n"))
                               )
                             )
             ),
@@ -2069,6 +1996,7 @@ surveyDashboard <- function(CTtable = NULL,
         shinydashboard::tabItem(
           tabName = "CommunityOccupancy",
           tabsetPanel(
+            selected = "Species Selection",
             
             # Add this as the first tab in Community Occupancy Models tabsetPanel
             tabPanel("Instructions",
@@ -2077,98 +2005,7 @@ surveyDashboard <- function(CTtable = NULL,
                          title = "Community Occupancy Model Workflow", 
                          width = 12, 
                          status = "info",
-                         shiny::HTML(
-                           "<h4>Step-by-Step Guide to Community Occupancy Modeling</h4>
-        <ol>
-          <li><strong>Species Selection</strong>
-            <ul>
-              <li>First, select which species to include in your community model</li>
-              <li>Review the species table showing detections and number of sites for each species</li>
-              <li>Use the filtering options to select species based on minimum number of detections or sites</li>
-              <li>You can manually select/deselect individual species by clicking the rows</li>
-              <li>Consider removing rare species with too few detections for reliable parameter estimation</li>
-            </ul>
-          </li>
-
-          <li><strong>Model Configuration</strong>
-            <ul>
-              <li>Choose model type (Occupancy or Royle-Nichols model)</li>
-              <li>Set occasion length (in days) to create detection histories</li>
-              <li>Configure detection and occupancy covariates:
-                <ul>
-                  <li><em>Fixed Effects:</em> Effect is same for all species</li>
-                  <li><em>Species Random Effects:</em> Species-specific effects with shared variance</li>
-                  <li><em>Independent Effects:</em> Completely independent effects for each species</li>
-                </ul>
-              </li>
-              <li>Configure how species intercepts are modeled (fixed, random, or independent)</li>
-              <li>Optional & recommended: Include survey effort as detection covariate</li>
-              <li>Optional: Add species-site random effects</li>
-              
-            </ul>
-          </li>
-
-          <li><strong>Model Fitting</strong>
-            <ul>
-              <li>Set MCMC parameters (chains, iterations, burn-in, thinning)</li>
-              <li>Run model</li>
-              <li>Monitor progress (currently R console output, not in the dashboard)</li>
-            </ul>
-          </li>
-
-          <li><strong>Results Inspection</strong>
-            <ul>
-              <li>Review parameter estimates and their uncertainties</li>
-              <li>Check convergence diagnostics (Gelman-Rubin statistics)</li>
-              <li>Examine trace plots for key parameters</li>
-              <li>Optional: Run Goodness-of-Fit tests (not yet implemented)</li>
-            </ul>
-          </li>
-
-          <li><strong>Effect Visualization</strong>
-            <ul>
-              <li>View response curves for covariates</li>
-              <li>Compare effect sizes across species</li>
-              <li>You can:
-                <ul>
-                  <li>Select subsets of species to display</li>
-                  <li>Order effects by size</li>
-                  <li>Adjust confidence intervals</li>
-                  <li>Scale plot sizes for better visibility</li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-
-          <li><strong>Spatial Predictions</strong>
-            <ul>
-              <li>Generate species-specific occupancy/abundance maps</li>
-              <li>Create species richness predictions</li>
-              <li>Calculate percentage of area occupied</li>
-              <li>Maps include uncertainty estimates</li>
-            </ul>
-          </li>
-        </ol>
-
-        <h4>Important Notes:</h4>
-        <ul>
-          <li>More species and covariates increase computation time</li>
-          <li>Check convergence diagnostics before interpreting results</li>
-          <li>Covariates are scaled to mean = 0 and standard deviation = 1 automatically.</li>
-          <li>Prediction rasters shuold be provided in original scale. They are scaled automatically to match model covariatesy</li>
-          <li>Species with very few detections may have unreliable estimates</li>
-          <li>Save your model objects to avoid rerunning long computations</li>
-        </ul>
-
-        <h4>Tips for Model Convergence:</h4>
-        <ul>
-          <li>Start with simpler models and gradually add complexity</li>
-          <li>Covariates are standardized automatically</li>
-          <li>Increase iterations if chains haven't converged</li>
-          <li>Check for highly correlated covariates</li>
-          <li>Consider removing rare species or combining similar species</li>
-        </ul>"
-                         )
+                         shiny::HTML(paste(help_text("communityModels_help.html"), collapse = "\n"))
                        )
                      )
             ),
@@ -2903,6 +2740,31 @@ surveyDashboard <- function(CTtable = NULL,
     observeEvent(input$wi_import_button, {
       req(input$wi_import_type)
       
+      # Clean up previously imported data
+      wi_data(NULL)  # Clear the reactive value
+      
+      # Reset main data reactive values to NULL
+      data$CTtable <- NULL
+      data$CTtable_sf <- NULL 
+      data$aggregated_CTtable <- NULL
+      data$recordTable <- NULL
+      
+      # Reset column specifications to NULL
+      data$stationCol <- NULL
+      data$cameraCol <- NULL
+      data$xcol <- NULL
+      data$ycol <- NULL
+      data$crs <- NULL
+      data$setupCol <- NULL
+      data$retrievalCol <- NULL
+      data$speciesCol <- NULL
+      data$recordDateTimeCol <- NULL
+      
+      # Clear data previews
+      output$wi_deployment_preview <- DT::renderDT({ NULL })
+      output$wi_detection_preview <- DT::renderDT({ NULL })
+      
+      
       withProgress(message = 'Importing Wildlife Insights data...', value = 0, {
         tryCatch({
           if (input$wi_import_type == "zip") {
@@ -3476,7 +3338,8 @@ surveyDashboard <- function(CTtable = NULL,
           theme_bw() +
           labs(y = data$speciesCol, x = "Number of stations") +
           scale_y_discrete(limits = species_order) +
-          ggtitle(label = "Number of stations with detections (by species)")
+          ggtitle(label = "Number of stations with detections (by species)") +
+          geom_vline(xintercept = num_stations(), alpha = 0.5, linetype = 3)
       )
     })
     
@@ -3528,7 +3391,11 @@ surveyDashboard <- function(CTtable = NULL,
     mcp <- shiny::reactive({
       req(data$CTtable_sf)
       tryCatch({
-        sf::st_convex_hull(sf::st_union(data$CTtable_sf))
+        mcp <- sf::st_as_sf(sf::st_convex_hull(sf::st_union(data$CTtable_sf)))
+        mcp$name <- "Minimum Convex Polygon"
+        mcp$n_stations <- num_stations()   #length(unique(data$CTtable_sf[[stationCol]]))
+        mcp$area_km2 <- round(sf::st_area(mcp) / 1e6, 3)
+        mcp
       }, error = function(e) {
         message("Error in MCP calculation: ", e$message)
         NULL
@@ -3597,6 +3464,7 @@ surveyDashboard <- function(CTtable = NULL,
                            paste(round(as.numeric(area_mcp_km2()), 2), "km\U00B2"),
                            ")"
                          ),
+                         label = paste(mcp()[["name"]], "around", num_stations(), "camera trap stations"),
                          hide = TRUE
         )
       
@@ -3865,10 +3733,17 @@ surveyDashboard <- function(CTtable = NULL,
         original_data()$recordTable[[data$stationCol]] %in% filtered_stations, 
       ]
       
+
       # Update all relevant data
       data$CTtable_sf <- filtered
+      data$CTtable <- st_drop_geometry(filtered)
       data$recordTable <- filtered_records
       data$aggregated_CTtable <- aggregateCTtableByStation(filtered, data$stationCol)
+      data$aggregated_CTtable_sf <- sf::st_as_sf(
+        data$aggregated_CTtable,
+        coords = c(data$xcol, data$ycol),
+        crs = sf::st_crs(data$CTtable_sf)
+      )
       
       showNotification(sprintf("Filtered to %d stations and %d records", 
                                length(filtered_stations), nrow(filtered_records)), 
@@ -3970,8 +3845,14 @@ surveyDashboard <- function(CTtable = NULL,
     observeEvent(input$clearAllFilters, {
       active_filters(list())
       data$CTtable_sf <- original_data()$CTtable_sf
+      data$CTtable <- sf::st_drop_geometry(original_data()$CTtable_sf) 
       data$recordTable <- original_data()$recordTable
       data$aggregated_CTtable <- original_data()$aggregated_CTtable
+      data$aggregated_CTtable_sf <-sf::st_as_sf(
+        data$aggregated_CTtable,
+        coords = c(data$xcol, data$ycol),
+        crs = sf::st_crs(original_data()$CTtable_sf)
+      )
       filtered_data(original_data()$CTtable_sf)
       showNotification("All filters cleared", type = "message")
     })
@@ -5156,14 +5037,7 @@ surveyDashboard <- function(CTtable = NULL,
         } else {
           if(check_package("psych")) {
             output$correlationPlotWarning <- renderText(NULL)
-            # GGally::ggpairs(covariates_df,
-            #                 progress = FALSE) +
-            #   theme_bw() +
-            #   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-            #         strip.background = element_rect(fill = "white"))
             
-            # psych::pairs.panels is faster than GGally and provides correlation coefficients,
-            # histograms, and scatterplots with smooth lines
             psych::pairs.panels(
               covariates_df,
               method = input$correlationMethod,
@@ -5172,7 +5046,7 @@ surveyDashboard <- function(CTtable = NULL,
               ellipses = TRUE,      # Show correlation ellipses
               smooth = TRUE,        # Add loess smoothers
               cex.cor = 1.3,                    # Default is 1, increased for better readability
-              ci = FALSE,                        # Default is FALSE, added confidence intervals
+              ci = FALSE,                        # 
               cex = 1              # point size
               # lwd = 2              # Thicker lines
             )
@@ -5188,9 +5062,336 @@ surveyDashboard <- function(CTtable = NULL,
       })
     })
     
+    
+    
+    # Tab: species accumulation curves  ----
+    
+  
+    
+    
+    # Species table for accumulation curves
+    output$acc_speciesTable <- DT::renderDT({
+      req(data$recordTable, data$speciesCol, data$stationCol)
+      
+      # Create summary table
+      species_summary <- data$recordTable %>%
+        dplyr::group_by(!!sym(data$speciesCol)) %>%
+        dplyr::summarize(
+          Records = n(),
+          Stations = n_distinct(!!sym(data$stationCol))
+        )
+      
+      DT::datatable(species_summary, 
+                    selection = list(
+                      mode = 'multiple',
+                      selected = seq_len(nrow(species_summary))  # Select all rows
+                    ),
+                    options = list(pageLength = 10)
+      )
+    })
+    
+    
+    # Handle species selection buttons
+    observeEvent(input$acc_selectAll, {
+      proxy <- DT::dataTableProxy("acc_speciesTable")
+      DT::selectRows(proxy, input$acc_speciesTable_rows_all)
+    })
+    
+    observeEvent(input$acc_deselectAll, {
+      proxy <- DT::dataTableProxy("acc_speciesTable")
+      DT::selectRows(proxy, NULL)
+    })
+    
+    # Function to get species meeting criteria
+    getAccSpeciesMeetingCriteria <- function(minStations, minRecords) {
+      req(data$recordTable, data$speciesCol, data$stationCol)
+      
+      data$recordTable %>%
+        dplyr::group_by(!!sym(data$speciesCol)) %>%
+        dplyr::summarize(
+          Records = n(),
+          Stations = n_distinct(!!sym(data$stationCol))
+        ) %>%
+        dplyr::filter(Records >= minRecords, Stations >= minStations) %>%
+        dplyr::pull(!!sym(data$speciesCol))
+    }
+    
+    # Handle filtering buttons
+    observeEvent(input$acc_selectByStations, {
+      species_to_select <- getAccSpeciesMeetingCriteria(input$acc_minStations, 1)
+      updateAccSpeciesSelection(species_to_select)
+    })
+    
+    observeEvent(input$acc_selectByRecords, {
+      species_to_select <- getAccSpeciesMeetingCriteria(1, input$acc_minRecords)
+      updateAccSpeciesSelection(species_to_select)
+    })
+    
+    observeEvent(input$acc_selectByBoth, {
+      species_to_select <- getAccSpeciesMeetingCriteria(
+        input$acc_minStations, 
+        input$acc_minRecords
+      )
+      updateAccSpeciesSelection(species_to_select)
+    })
+    
+    # Function to update species selection
+    updateAccSpeciesSelection <- function(species_to_select) {
+      req(data$recordTable, data$speciesCol)
+      
+      if (length(species_to_select) > 0) {
+        proxy <- DT::dataTableProxy("acc_speciesTable")
+        species_summary <- data$recordTable %>%
+          dplyr::group_by(!!sym(data$speciesCol)) %>%
+          dplyr::summarize(
+            Records = n(),
+            Stations = n_distinct(!!sym(data$stationCol))
+          )
+        rows_to_select <- which(species_summary[[data$speciesCol]] %in% species_to_select)
+        DT::selectRows(proxy, rows_to_select)
+      }
+    }
+    
+    
+    
+    # Create reactive value to store selected species
+    # necessary so user doesn't need to open species tab first to run analysis
+    selected_species <- reactiveVal(NULL)
+    
+    # Initialize selected species when data loads
+    observe({
+      req(data$recordTable, data$speciesCol)
+      if (is.null(selected_species())) {
+        all_species <- unique(data$recordTable[[data$speciesCol]])
+        selected_species(all_species)
+      }
+    })
+    
+    # Update selected species when table selection changes
+    observeEvent(input$acc_speciesTable_rows_selected, {
+      species_summary <- data$recordTable %>%
+        dplyr::group_by(!!sym(data$speciesCol)) %>%
+        dplyr::summarize(
+          Records = n(),
+          Stations = n_distinct(!!sym(data$stationCol))
+        )
+      
+      selected_species(species_summary[[data$speciesCol]][input$acc_speciesTable_rows_selected])
+    })
+    
+    # initialize x_label reactive container
+    x_label <- shiny::reactiveVal("")
+
+    # Run accumulation analysis
+    observeEvent(input$runAccumulation, {
+      
+      # Check for iNEXT package
+      if (!requireNamespace("iNEXT", quietly = TRUE)) {
+        showNotification(
+          "Package 'iNEXT' is required. Please install it with: install.packages('iNEXT')", 
+          type = "error",
+          duration = NULL
+        )
+        return()
+      }
+      
+      req(data$recordTable, data$CTtable, selected_species())
+
+      # Set x_label based on current selection
+      x_label(if(input$acc_x_unit == "station") {
+        "Number of sampling stations"
+      } else {
+        "Number of sampling days"
+      })      
+   
+      # Get selected species
+      species_summary <- data$recordTable %>%
+        dplyr::group_by(!!sym(data$speciesCol)) %>%
+        dplyr::summarize(
+          Records = n(),
+          Stations = n_distinct(!!sym(data$stationCol))
+        )
+      selected_species <- species_summary[[data$speciesCol]][input$acc_speciesTable_rows_selected]
+      
+
+      # Filter recordTable to selected species
+      filtered_records <- data$recordTable[data$recordTable[[data$speciesCol]] %in% selected_species(),]
+      
+      
+      # Set assemblageCol parameter
+      # assemblageCol <- if(input$acc_assemblageCol != "") input$acc_assemblageCol else NULL
+      
+      withProgress(message = 'Running analysis...', value = 0, {
+        # Run iNEXT analysis
+        tryCatch({
+          out <- speciesAccum(
+            CTtable = data$CTtable,
+            recordTable = filtered_records,
+            speciesCol = data$speciesCol,
+            recordDateTimeCol = data$recordDateTimeCol,
+            setupCol = data$setupCol,
+            stationCol = data$stationCol,
+            assemblageCol = NULL, #assemblageCol,
+            q = as.numeric(input$acc_q),
+            x_unit = input$acc_x_unit,
+            knots = input$acc_knots,
+            conf = input$acc_conf,
+            nboot = input$acc_nboot
+          )
+          
+          
+          # Generate plots
+          output$acc_rarefaction_plot <- renderPlot({
+
+            iNEXT::ggiNEXT(out, type = 1, color.var= "Order.q") +
+              theme_bw() +
+              theme(
+                text = element_text(size = 12 * input$acc_plot_scale),
+                axis.text = element_text(size = 11 * input$acc_plot_scale),
+                axis.title = element_text(size = 12 * input$acc_plot_scale),
+                strip.text = element_text(size = 12 * input$acc_plot_scale),
+                legend.text = element_text(size = 11 * input$acc_plot_scale),
+                legend.title = element_text(size = 12 * input$acc_plot_scale)
+              ) +
+              labs(
+                title = "Sample-size-based R/E curve",
+                x = x_label()
+              )
+          })
+          
+          output$acc_coverage_plot <- renderPlot({
+         
+            iNEXT::ggiNEXT(out, type = 2, color.var="Order.q") +
+              theme_bw() +
+              theme(
+                text = element_text(size = 12 * input$acc_plot_scale),
+                axis.text = element_text(size = 11 * input$acc_plot_scale),
+                axis.title = element_text(size = 12 * input$acc_plot_scale),
+                strip.text = element_text(size = 12 * input$acc_plot_scale),
+                legend.text = element_text(size = 11 * input$acc_plot_scale),
+                legend.title = element_text(size = 12 * input$acc_plot_scale)
+              ) +
+              labs(
+                title = "Sample completeness curve",
+                x = x_label()
+              )
+          })
+          
+          output$acc_richness_plot <- renderPlot({
+            
+            iNEXT::ggiNEXT(out, type = 3, color.var="Order.q") +
+              theme_bw() +
+              theme(
+                text = element_text(size = 12 * input$acc_plot_scale),
+                axis.text = element_text(size = 11 * input$acc_plot_scale),
+                axis.title = element_text(size = 12 * input$acc_plot_scale),
+                strip.text = element_text(size = 12 * input$acc_plot_scale),
+                legend.text = element_text(size = 11 * input$acc_plot_scale),
+                legend.title = element_text(size = 12 * input$acc_plot_scale)
+              ) +
+              labs(
+                title = "Coverage-based R/E curve",
+                x = x_label()
+              )
+          })
+          
+          
+          
+          
+          # Generate combined plots
+          
+          output$acc_rarefaction_plot_combined <- renderPlot({
+            
+            iNEXT::ggiNEXT(out, type = 1, color.var="Order.q") +
+              theme_bw() +
+              theme(
+                text = element_text(size = 10 * input$acc_plot_scale),
+                axis.text = element_text(size = 9 * input$acc_plot_scale),
+                axis.title = element_text(size = 10 * input$acc_plot_scale),
+                strip.text = element_text(size = 10 * input$acc_plot_scale),
+                legend.text = element_text(size = 9 * input$acc_plot_scale),
+                legend.title = element_text(size = 10 * input$acc_plot_scale)
+              ) +
+              labs(
+                title = "Sample-size-based R/E curve",
+                x = x_label()
+              )
+          })
+          
+          output$acc_coverage_plot_combined <- renderPlot({
+            
+            iNEXT::ggiNEXT(out, type = 2, color.var="Order.q") +
+              theme_bw() +
+              theme(
+                text = element_text(size = 10 * input$acc_plot_scale),
+                axis.text = element_text(size = 9 * input$acc_plot_scale),
+                axis.title = element_text(size = 10 * input$acc_plot_scale),
+                strip.text = element_text(size = 10 * input$acc_plot_scale),
+                legend.text = element_text(size = 9 * input$acc_plot_scale),
+                legend.title = element_text(size = 10 * input$acc_plot_scale)
+              ) +
+              labs(
+                title = "Sample completeness curve",
+                x = x_label()
+              )
+          })
+          
+          output$acc_richness_plot_combined <- renderPlot({
+            
+            iNEXT::ggiNEXT(out, type = 3, color.var="Order.q") +
+              theme_bw() +
+              theme(
+                text = element_text(size = 10 * input$acc_plot_scale),
+                axis.text = element_text(size = 9 * input$acc_plot_scale),
+                axis.title = element_text(size = 10 * input$acc_plot_scale),
+                strip.text = element_text(size = 10 * input$acc_plot_scale),
+                legend.text = element_text(size = 9 * input$acc_plot_scale),
+                legend.title = element_text(size = 10 * input$acc_plot_scale)
+              ) +
+              labs(
+                title = "Coverage-based R/E curve",
+                x = x_label()
+              )
+          })
+          
+          
+          
+          
+          # Display summary statistics
+          output$acc_summary <- renderDT({
+            print_AsyEst <- out$AsyEst
+            print_AsyEst[, -c(1,2)] <- round(print_AsyEst[, -c(1,2)], 2) 
+            DT::datatable(print_AsyEst)
+          })
+          
+          
+          showNotification("Analysis completed successfully", type = "message")
+          
+        }, error = function(e) {
+          showNotification(paste("Error in analysis:", e$message), type = "error")
+        })
+      })
+    })
+    
+    
+    # clear species accumulation curves if input data change
+    observeEvent(c(data$CTtable, data$recordTable), {
+      output$acc_rarefaction_plot <- NULL
+      output$acc_coverage_plot <- NULL
+      output$acc_richness_plot <- NULL
+      output$acc_summary <- NULL
+      output$acc_rarefaction_plot_combined <- NULL
+      output$acc_coverage_plot_combined <- NULL
+      output$acc_richness_plot_combined <- NULL
+      
+      x_label("")  # Reset the x-axis label
+       
+      # showNotification("Species accumulation plots cleared due to data changes", type = "warning")
+    })
+    
+    
+    
     # Tab: detectionHistory     ####
-    
-    
     
     # container for saving reactive objects
     my_object <- shiny::reactiveValues()
@@ -7411,7 +7612,7 @@ surveyDashboard <- function(CTtable = NULL,
         ),
         
         prediction_states = list(
-          spatial_predictions = spatial_predictions(),
+          # spatial_predictions = spatial_predictions(),
           community_predictions = list(
             occupancy = spatial_predictions_community$occupancy,
             richness = spatial_predictions_community$richness,
