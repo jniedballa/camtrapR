@@ -1,8 +1,8 @@
 Package: camtrapR
 Type: Package
 Title: Camera Trap Data Management and Analysis Framework
-Version: 2.4.1
-Date: 2024-11-27
+Version: 2.4.2
+Date: 2024-12-04
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
                 comment = c(ORCID = "0000-0002-9187-2116")),
@@ -49,6 +49,7 @@ Suggests:
         coda,
         corrplot,
         elevatr,
+        iNEXT,
         knitr,
         lattice,
         magick,
