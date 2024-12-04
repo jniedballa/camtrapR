@@ -6,7 +6,11 @@ globalVariables(c(
   "export_table",
   "plot_effect_det",
   "plot_effect_occu",
-  "generate_spatial_predictions"
+  "generate_spatial_predictions",
+  "create_species_detections_sf",
+  "all_models",
+  "p",
+  ".data"
   
   
 ))
