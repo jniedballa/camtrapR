@@ -1,0 +1,74 @@
+<h4>Instructions for Covariate Extraction</h4>
+        <ol>
+          <li><strong>Configure Global Settings</strong>
+            <ul>
+              <li><em>Camera Trap Covariate Settings:</em>
+                <ul>
+                  <li>Set buffer around camera traps for value extraction</li>
+                  <li>Choose whether to use bilinear interpolation</li>
+                  <li>Preview map shows camera locations and buffer</li>
+                </ul>
+              </li>
+              <li><em>Prediction Raster Settings:</em>
+                <ul>
+                  <li>Choose prediction area: no clipping, camera trap grid, study area, or their intersection</li>
+                  <li>Set buffer for prediction area (up to 500m for 'no clipping' option)</li>
+                  <li>Upload raster template (optional) or specify resolution</li>
+                  <li>Preview map shows selected extent with interactive basemap</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          
+          <li><strong>Choose Data Source</strong>
+            <ul>
+              <li><em>Local Rasters:</em>
+                <ul>
+                  <li>Choose directory containing your covariate rasters, or</li>
+                  <li>Specify individual raster files</li>
+                  <li>Set file format (default: .tif)</li>
+                  <li>Enable recursive search if rasters are in subdirectories</li>
+                </ul>
+              </li>
+              <li><em>Elevation & Terrain:</em>
+                <ul>
+                  <li>Downloads elevation data from AWS Terrain Tiles</li>
+                  <li>Choose zoom level for resolution (z10: ~80m, z11: ~40m, z12: ~20m)</li>
+                  <li>Select which terrain indices to calculate (slope, aspect, TRI, TPI, roughness)</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          
+          <li><strong>Processing Behavior</strong>
+            <ul>
+              <li>Values at camera locations are always extracted from original resolution data</li>
+              <li>Prediction rasters are created based on:</li>
+              <ol>
+                <li>Provided template if available</li>
+                <li>Otherwise, existing prediction rasters if available</li>
+                <li>Otherwise, specified resolution if provided</li>
+                <li>If no specifications given, local rasters will not create prediction rasters and elevation data will use source resolution</li>
+              </ol>
+              <li>Prediction rasters are masked to selected extent if clipping is requested</li>
+            </ul>
+          </li>
+          
+          <li><strong>Output</strong>
+            <ul>
+              <li>Covariate values are added to the camera trap table</li>
+              <li>Original rasters are stored at their native resolution</li>
+              <li>Prediction rasters are created according to specifications</li>
+              <li>All covariate data can be cleared at once using the 'Clear All Covariates' button</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h4>Notes:</h4>
+        <ul>
+          <li>Large rasters or numerous covariates may take some time to process</li>
+          <li>When using elevation data, a minimum 5km buffer is applied for download to ensure proper terrain calculations</li>
+          <li>The preview maps update in real-time to show the impact of your buffer and prediction area settings</li>
+          <li>You can process local rasters and elevation data independently</li>
+          <li>Clearing covariates removes all added columns from the camera trap table and clears both original and prediction rasters</li>
+        </ul>

@@ -1,0 +1,85 @@
+<h4>Instructions for Covariate Correlation Analysis</h4>
+            <ol>
+              <li><strong>Basic Settings</strong>
+                <ul>
+                  <li><em>Correlation Method:</em>
+                    <ul>
+                      <li>Pearson: For linear relationships between continuous variables</li>
+                      <li>Spearman: For monotonic relationships, robust to outliers</li>
+                      <li>Kendall: For ordinal relationships, good for small sample sizes</li>
+                    </ul>
+                  </li>
+                  <li><em>Correlation Threshold:</em>
+                    <ul>
+                      <li>Set minimum correlation value to highlight (0-1)</li>
+                      <li>Default 0.7 is commonly used</li>
+                      <li>Lower values (e.g., 0.5) for stricter multicollinearity control</li>
+                      <li>Higher values (e.g., 0.8) for more relaxed variable inclusion</li>
+                    </ul>
+                  </li>
+                  <li><em>Non-numeric Variables:</em>
+                    <ul>
+                      <li>Option to exclude non-numeric covariates</li>
+                      <li>Categorical variables are automatically excluded if enabled</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              
+              <li><strong>Visualization Options</strong>
+                <ul>
+                  <li><em>Plot Type:</em>
+                    <ul>
+                      <li>Correlation matrix: Compact view of all correlations</li>
+                      <li>Scatter plot matrix: Detailed view of relationships</li>
+                    </ul>
+                  </li>
+                  <li><em>Display Method:</em>
+                    <ul>
+                      <li>Color: Simple color-coded squares</li>
+                      <li>Circle/Square: Size indicates correlation strength</li>
+                      <li>Ellipse: Shape shows correlation direction and strength</li>
+                      <li>Shade: Uses color intensity</li>
+                      <li>Pie: Fills circles with pie charts</li>
+                    </ul>
+                  </li>
+                  <li><em>Ordering Method:</em>
+                    <ul>
+                      <li>Original: Keep input order</li>
+                      <li>AOE/FPC: Order by eigenvectors or first principal component</li>
+                      <li>Hclust: Group similar variables</li>
+                      <li>Alphabet: Sort alphabetically</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+
+              <li><strong>Output Components</strong>
+                <ul>
+                  <li><em>Correlation Plot:</em>
+                    <ul>
+                      <li>Blue indicates positive correlations</li>
+                      <li>Red indicates negative correlations</li>
+                      <li>Color intensity shows correlation strength</li>
+                      <li>Values display exact correlation coefficients</li>
+                    </ul>
+                  </li>
+                  <li><em>Highly Correlated Pairs:</em>
+                    <ul>
+                      <li>Table shows pairs exceeding threshold</li>
+                      <li>Lists exact correlation values</li>
+                      <li>Helps identify potential multicollinearity issues</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ol>
+
+            <h4>Notes:</h4>
+            <ul>
+              <li>Large correlations suggest redundant information between variables</li>
+              <li>Consider removing one variable from highly correlated pairs before modeling</li>
+              <li>Choice of which variable to remove should be based on ecological relevance and data quality</li>
+              <li>Remember that correlation does not imply causation</li>
+              <li>Missing values are handled pairwise in correlation calculations</li>
+            </ul>

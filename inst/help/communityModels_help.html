@@ -1,0 +1,90 @@
+<h4>Step-by-Step Guide to Community Occupancy Modeling</h4>
+        <ol>
+          <li><strong>Species Selection</strong>
+            <ul>
+              <li>First, select which species to include in your community model</li>
+              <li>Review the species table showing detections and number of sites for each species</li>
+              <li>Use the filtering options to select species based on minimum number of detections or sites</li>
+              <li>You can manually select/deselect individual species by clicking the rows</li>
+              <li>Consider removing rare species with too few detections for reliable parameter estimation</li>
+            </ul>
+          </li>
+
+          <li><strong>Model Configuration</strong>
+            <ul>
+              <li>Choose model type (Occupancy or Royle-Nichols model)</li>
+              <li>Set occasion length (in days) to create detection histories</li>
+              <li>Configure detection and occupancy covariates:
+                <ul>
+                  <li><em>Fixed Effects:</em> Effect is same for all species</li>
+                  <li><em>Species Random Effects:</em> Species-specific effects with shared variance</li>
+                  <li><em>Independent Effects:</em> Completely independent effects for each species</li>
+                </ul>
+              </li>
+              <li>Configure how species intercepts are modeled (fixed, random, or independent)</li>
+              <li>Optional & recommended: Include survey effort as detection covariate</li>
+              <li>Optional: Add species-site random effects</li>
+              
+            </ul>
+          </li>
+
+          <li><strong>Model Fitting</strong>
+            <ul>
+              <li>Set MCMC parameters (chains, iterations, burn-in, thinning)</li>
+              <li>Run model</li>
+              <li>Monitor progress (currently R console output, not in the dashboard)</li>
+            </ul>
+          </li>
+
+          <li><strong>Results Inspection</strong>
+            <ul>
+              <li>Review parameter estimates and their uncertainties</li>
+              <li>Check convergence diagnostics (Gelman-Rubin statistics)</li>
+              <li>Examine trace plots for key parameters</li>
+              <li>Optional: Run Goodness-of-Fit tests (not yet implemented)</li>
+            </ul>
+          </li>
+
+          <li><strong>Effect Visualization</strong>
+            <ul>
+              <li>View response curves for covariates</li>
+              <li>Compare effect sizes across species</li>
+              <li>You can:
+                <ul>
+                  <li>Select subsets of species to display</li>
+                  <li>Order effects by size</li>
+                  <li>Adjust confidence intervals</li>
+                  <li>Scale plot sizes for better visibility</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+          <li><strong>Spatial Predictions</strong>
+            <ul>
+              <li>Generate species-specific occupancy/abundance maps</li>
+              <li>Create species richness predictions</li>
+              <li>Calculate percentage of area occupied</li>
+              <li>Maps include uncertainty estimates</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h4>Important Notes:</h4>
+        <ul>
+          <li>More species and covariates increase computation time</li>
+          <li>Check convergence diagnostics before interpreting results</li>
+          <li>Covariates are scaled to mean = 0 and standard deviation = 1 automatically.</li>
+          <li>Prediction rasters shuold be provided in original scale. They are scaled automatically to match model covariatesy</li>
+          <li>Species with very few detections may have unreliable estimates</li>
+          <li>Save your model objects to avoid rerunning long computations</li>
+        </ul>
+
+        <h4>Tips for Model Convergence:</h4>
+        <ul>
+          <li>Start with simpler models and gradually add complexity</li>
+          <li>Covariates are standardized automatically</li>
+          <li>Increase iterations if chains haven't converged</li>
+          <li>Check for highly correlated covariates</li>
+          <li>Consider removing rare species or combining similar species</li>
+        </ul>

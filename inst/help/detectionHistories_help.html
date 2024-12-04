@@ -1,0 +1,92 @@
+<h4>Instructions for Creating and Using Detection Histories</h4>
+            <ol>
+              <li><strong>Basic Settings</strong>
+                <ul>
+                  <li><em>Species Selection:</em>
+                    <ul>
+                      <li>Choose target species from dropdown menu</li>
+                      <li>Only species present in record table are shown</li>
+                    </ul>
+                  </li>
+                  <li><em>Occasion Length:</em>
+                    <ul>
+                      <li>Define the length of sampling occasions in days</li>
+                      <li>Maximum length depends on total survey duration</li>
+                      <li>Consider species behavior and survey design when choosing length</li>
+                    </ul>
+                  </li>
+                  <li><em>Output Type:</em>
+                    <ul>
+                      <li>Binary (0/1): Records detection/non-detection in each occasion</li>
+                      <li>Count: Records number of detections in each occasion</li>
+                      <li>Binary typically used for occupancy models</li>
+                    </ul>
+                  </li>
+                  <li><em>Day 1 Definition:</em>
+                    <ul>
+                      <li>Survey: Start all stations from first day of overall survey</li>
+                      <li>Station: Start each station from its own setup date</li>
+                      <li>Affects how occasions are aligned across stations</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+
+              <li><strong>Output Components</strong>
+                <ul>
+                  <li><em>Summary Statistics:</em>
+                    <ul>
+                      <li>Total number of records for selected species</li>
+                      <li>Number of detections in detection history</li>
+                      <li>Number of stations with detections</li>
+                      <li>Percentage of occasions with detections</li>
+                    </ul>
+                  </li>
+                  <li><em>Detection History Plot:</em>
+                    <ul>
+                      <li>Left panel: Detection matrix (0/1 or counts)</li>
+                      <li>Right panel: Camera operation/effort matrix</li>
+                      <li>Rows represent stations</li>
+                      <li>Columns represent sampling occasions</li>
+                      <li>Color intensity indicates detection/effort values</li>
+                    </ul>
+                  </li>
+                  <li><em>unmarkedFrame Summary:</em>
+                    <ul>
+                      <li>Shows structure of data formatted for unmarked package</li>
+                      <li>Includes number of sites and occasions</li>
+                      <li>Lists available covariates</li>
+                      <li>Displays observation model type</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+
+              <li><strong>Export Options</strong>
+                <ul>
+                  <li><em>Detection History:</em>
+                    <ul>
+                      <li>Export raw detection history matrix</li>
+                      <li>Includes both detection and effort matrices</li>
+                      <li>Useful for custom analyses or verification</li>
+                    </ul>
+                  </li>
+                  <li><em>unmarkedFrame:</em>
+                    <ul>
+                      <li>Export formatted data ready for occupancy modeling</li>
+                      <li>Includes all necessary components for analysis: detection history, site covariates, observation covariate 'effort'</li>
+                      <li>Can be used directly with unmarked or ubms package functions</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ol>
+
+            <h4>Notes:</h4>
+            <ul>
+              <li>Detection histories form the basis for occupancy modeling</li>
+              <li>Missing values (NA) occur when cameras were not operational</li>
+              <li>Ensure sufficient detections for reliable model estimation</li>
+              <li>Check camera operation matrix for adequate survey effort</li>
+              <li>Binary format appropriate for most single-season occupancy models</li>
+            </ul>

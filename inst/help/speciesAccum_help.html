@@ -1,0 +1,116 @@
+<h4>Overview</h4>
+        <p>Species accumulation curves show how the number of observed species increases with sampling effort. 
+        They help assess sampling completeness and estimate total species richness.</p>
+        
+        <h4>Types of Curves</h4>
+        <ol>
+          <li><strong>Sample-size-based R/E curve:</strong>
+            <ul>
+              <li>Shows how species richness increases with sampling effort</li>
+              <li>Solid line shows rarefaction (interpolation)</li>
+              <li>Dashed line shows extrapolation</li>
+              <li>Shaded area represents confidence interval</li>
+            </ul>
+          </li>
+          
+          <li><strong>Sample completeness curve:</strong>
+            <ul>
+              <li>Shows sample coverage (proportion of total species detected)</li>
+              <li>Higher values indicate more complete sampling</li>
+              <li>Helps determine if additional sampling is needed</li>
+            </ul>
+          </li>
+          
+          <li><strong>Coverage-based R/E curve:</strong>
+            <ul>
+              <li>Shows species richness against sample coverage</li>
+              <li>Allows fair comparison between assemblages</li>
+              <li>Less sensitive to sample size differences</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h4>Diversity Order (q)</h4>
+           <p>The diversity order q determines which diversity measure is calculated:</p>
+              <ul>
+                 <li><strong>q = 0:</strong> Species richness
+              <ul>
+                 <li>Counts all species equally</li>
+                 <li>Not sensitive to species abundances</li>
+                 <li>Most commonly used for basic accumulation curves</li>
+               </ul>
+             </li>
+                 <li><strong>q = 1:</strong> Shannon diversity
+                    <ul>
+                        <li>Weighs species by their relative frequency</li>
+                        <li>Common and rare species contribute proportionally</li>
+                        <li>More informative when species have uneven detection rates</li>
+                    </ul>
+                 </li>
+                                      
+                 <li><strong>q = 2:</strong> Simpson diversity
+                    <ul>
+                       <li>Emphasizes common species</li>
+                       <li>Less sensitive to rarely detected species</li>
+                       <li>More robust to sampling variation</li>
+                    </ul>
+                 </li>
+              </ul>
+                                      
+            <p>Higher values of q increasingly favor common species. Consider using multiple q values 
+               to understand how diversity patterns change when accounting for species relative frequencies. 
+               For camera trap data, this can help distinguish between truly rare species and those that 
+               are just harder to detect.</p>
+                                    
+        <h4>Sampling Units</h4>
+        <p>You can choose between two types of sampling units:</p>
+        <ul>
+          <li><strong>Stations:</strong>
+            <ul>
+              <li>Each camera location counts as one sampling unit</li>
+              <li>Better for spatial coverage assessment</li>
+              <li>Useful when comparing areas with different camera densities</li>
+            </ul>
+          </li>
+          <li><strong>Days:</strong>
+            <ul>
+              <li>Each survey day counts as one sampling unit</li>
+              <li>Better for temporal coverage assessment</li>
+              <li>Useful when comparing surveys of different durations</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h4>Important Notes</h4>
+        <ul>
+          <li>These curves are based on observed detections only</li>
+          <li>They do not account for imperfect detection</li>
+          <li>Species may be present but not detected</li>
+          <li>Consider using alongside occupancy analyses for more complete understanding</li>
+        </ul>
+
+        <h4>Using the Interface</h4>
+        <ol>
+          <li><strong>Basic Settings:</strong>
+            <ul>
+              <li>Choose assemblage grouping (optional)</li>
+              <li>Set diversity order (q)</li>
+              <li>Select sampling unit type</li>
+            </ul>
+          </li>
+          
+          <li><strong>Species Selection:</strong>
+            <ul>
+              <li>Select species to include in analysis</li>
+              <li>Filter by minimum stations/records if needed</li>
+              <li>All species are selected by default</li>
+            </ul>
+          </li>
+          
+          <li><strong>Curve Settings:</strong>
+            <ul>
+              <li>Set confidence level and bootstrap replicates</li>
+              <li>Adjust plot scaling for better visibility</li>
+            </ul>
+          </li>
+        </ol>
