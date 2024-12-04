@@ -93,7 +93,9 @@ readWildlifeInsights <- function(directory = NULL, zipfile = NULL,
   deploymentCol <- "deployment_id"
   stationCol <- "placename"
   cameraCol  <- "camera_id"
-  date_format <- c("ymd!*HMS!z", "ymd HMS")
+  date_format <- c("ymd!*HMS!z", 
+                   "ymd HMS",     # standard format
+                   "mdy HM")      # if user modified content of zip in Excel
   
   if(any(duplicated(deployments[, deploymentCol]))) stop(paste("Duplicate deployment_id:", paste0(deployments[, deploymentCol][duplicated(deployments[, deploymentCol])], collapse = ", ")))
   
@@ -132,7 +134,7 @@ readWildlifeInsights <- function(directory = NULL, zipfile = NULL,
   deployments_agg <- cbind(deployments1, deployments2)
   deployments_agg <- deployments_agg[, colnames(deployments)]
   
-  # Convert images table to record table
+  # Remove bounding box column
   if("bounding_boxes" %in% colnames(images)) {
     images <- images[, colnames(images) != "bounding_boxes"]
   }
@@ -140,6 +142,12 @@ readWildlifeInsights <- function(directory = NULL, zipfile = NULL,
   # Add station / camera columns
   images_merged <- merge(images, 
                          deployments[, c(deploymentCol, stationCol, cameraCol)])
+  
+  # ensure record date/time column is formatted correctly
+  record_datetime_format <- c("ymd HMS",    # standard format
+                              "mdy HM")     # if user modified content of zip in Excel
+  images_merged$timestamp <- as.character(lubridate::parse_date_time(images_merged$timestamp, orders = record_datetime_format))
+  
   
   return(list(CTtable = deployments, 
               CTtable_aggregated = deployments_agg,
