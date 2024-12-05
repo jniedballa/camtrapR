@@ -147,6 +147,11 @@ Site-occasion covariates are denoted by ".obs" after the submodel, e.g.:
 \examples{
 
 \dontrun{
+# the example below fits community occupancy models to the sample data in camtrapR
+# models are fit both in JAGS and Nimble
+# The data set only contains 5 species and 3 stations, so the results will be nonsense. 
+# It is only a technical demonstration with the camtrapR workflow
+# for more complete examples, see vignette 5
 
 data("camtraps")
 
@@ -162,28 +167,23 @@ camop_no_problem <- cameraOperation(CTtable      = camtraps,
 data("recordTableSample")
 
 # make list of detection histories
-DetHist_list <- lapply(unique(recordTableSample$Species), FUN = function(x) {
-  detectionHistory(
+species_to_include <- unique(recordTableSample$Species)
+
+  DetHist_list <- detectionHistory(
     recordTable         = recordTableSample,
     camOp                = camop_no_problem,
     stationCol           = "Station",
     speciesCol           = "Species",
     recordDateTimeCol    = "DateTimeOriginal",
-    species              = x,
+    species              = species_to_include,
     occasionLength       = 7,
     day1                 = "station",
     datesAsOccasionNames = FALSE,
     includeEffort        = TRUE,
     scaleEffort          = TRUE,
     timeZone             = "Asia/Kuala_Lumpur"
-  )}
 )
 
-# assign species names to list items
-names(DetHist_list) <- unique(recordTableSample$Species)
-
-# extract detection histories (omit effort matrices)
-ylist <- lapply(DetHist_list, FUN = function(x) x$detection_history)
 
 # create some fake covariates for demonstration
 sitecovs <- camtraps[, c(1:3)]
@@ -194,9 +194,9 @@ sitecovs[, c(2:4)] <- scale(sitecovs[,-1])
 
 
 # bundle input data for communityModel
-data_list <- list(ylist = ylist,
+data_list <- list(ylist = DetHist_list$detection_history,
                   siteCovs = sitecovs,
-                  obsCovs = list(effort = DetHist_list[[1]]$effort))
+                  obsCovs = list(effort = DetHist_list$effort))
 
 
 # create community model for JAGS
