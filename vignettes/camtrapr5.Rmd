@@ -158,36 +158,32 @@ First, we load the record table and create a list of detection histories. While 
 ```{r}
  data("recordTableSample")
 
- # list of detection histories
- DetHist_list <- lapply(unique(recordTableSample$Species), FUN = function(x) {
-   detectionHistory(
+# select species to include (all in this example)
+species_to_use <- unique(recordTableSample$Species)
+
+
+ # create list of detection histories
+  DetHist_list <- detectionHistory(
      recordTable         = recordTableSample,
      camOp                = camop_no_problem,
      stationCol           = "Station",
      speciesCol           = "Species",
      recordDateTimeCol    = "DateTimeOriginal",
-     species              = x,     # this gets modifies by lapply
+     species              = species_to_use,
      occasionLength       = 7,
      day1                 = "station",
      datesAsOccasionNames = FALSE,
      includeEffort        = TRUE,
      scaleEffort          = FALSE,
      timeZone             = "Asia/Kuala_Lumpur"
-   )}
  )
 
- # assign species names to the list items
- names(DetHist_list) <- unique(recordTableSample$Species)
-
- # note, DetHist_list is a list containing a list for each species
 ```
 
- 
-Get the detection history of each species and put into a new list (thereby removing the effort matrix).
+DetHist_list is now a list containing:
 
-```{r}
- ylist <- lapply(DetHist_list, FUN = function(x) x$detection_history)
-```
+   - a list containing detection histories of each species (DetHist_list$detection_history)
+   - an effort matrix (DetHist_list$effort)
 
 Create some made-up covariates (only for demonstration):
 
@@ -206,9 +202,9 @@ Now we bundle the necessary data for `communityModel` in a list with 3 items:
 * obsCovs: (named) list with observation level covariates. Requires at least the effort matrix.
 
 ```{r}
- data_list <- list(ylist    = ylist,
+ data_list <- list(ylist    = DetHist_list$detection_history,
                    siteCovs = sitecovs,
-                   obsCovs  = list(effort = DetHist_list[[1]]$effort))  # is identical for all species
+                   obsCovs  = list(effort = DetHist_list$effort))  # is identical for all species
 ```
 
 
@@ -1189,7 +1185,7 @@ out_ahm_jags_rich <- fit(model1_jags_richness,
 Now search for "Nspecies" in the table below. You will see entries for three different parameters. 
 
 * "Nspecies" is overall species richness, 
-* "Nspecies_by_category[1]", "...[2]" and "...[3]" are for the stations in category "medium" and "low", "high" respectively.
+* "Nspecies_by_category[1]", "...[2]" and "...[3]" are for the stations in category "medium", "low", and "high" respectively.
 * "Nspecies_by_station[1]" to "...[30]" are species richness estimates for each sampling station.
 
 
