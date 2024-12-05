@@ -94,12 +94,13 @@ The dashboard includes several major components:
   \item Automated covariate extraction from local rasters or online 
   elevation models
   \item Covariate correlation analysis with visualization
+  \item Species accumulation curves
 }
 
 \strong{Basic Analysis:}
 \itemize{
   \item Basic summary statistics
-  \item Interactive species detection maps
+  \item Interactive overview and species detection maps
   \item Activity pattern analysis (single species and two-species overlap)
   \item Camera operation visualization
 }
@@ -124,19 +125,12 @@ The dashboard includes several major components:
   \item MCMC diagnostics and convergence assessment
   \item Species richness and PAO predictions
 }
-
-\strong{Visualization Improvements:}
-\itemize{
-  \item Response curve visualization
-  \item MCMC diagnostics plots
-  \item Spatial prediction maps
-}
 }
 \note{
 \itemize{
-  \item Interactive maps with multiple basemap options and customizable 
-  color schemes and symbology
-  \item Covariate scaling is performed automatically where appropriate
+  \item Interactive maps with multiple basemap options
+  \item Covariate scaling is performed automatically if requested (includes
+   automatic scaling of prediction rasters)
   \item The app state can be saved and restored
 }
 
