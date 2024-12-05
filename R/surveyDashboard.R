@@ -2767,6 +2767,7 @@ surveyDashboard <- function(CTtable = NULL,
       data$CTtable <- NULL
       data$CTtable_sf <- NULL 
       data$aggregated_CTtable <- NULL
+      data$aggregated_CTtable_sf <- NULL
       data$recordTable <- NULL
       
       # Reset column specifications to NULL
@@ -2783,6 +2784,8 @@ surveyDashboard <- function(CTtable = NULL,
       # Clear data previews
       output$wi_deployment_preview <- DT::renderDT({ NULL })
       output$wi_detection_preview <- DT::renderDT({ NULL })
+      
+      output$filterMap <- leaflet::renderLeaflet(NULL)
       
       
       withProgress(message = 'Importing Wildlife Insights data...', value = 0, {
@@ -6563,6 +6566,9 @@ surveyDashboard <- function(CTtable = NULL,
       
       
       # Create detection history list for selected species
+      #   can't use vectorized input to species since (probably) the reactive 
+      #   camop() doesn't play nice with match.call()
+      
       ylist_full <- lapply(selected_species, function(sp) {
         detection_hist <- detectionHistory(
           recordTable = data$recordTable[data$recordTable[, data$speciesCol] == sp, ],
