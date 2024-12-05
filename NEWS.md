@@ -1,3 +1,36 @@
+# camtrapR 2.4.3
+
+## new features
+* detectionHistory: allow vectorized input for parameter "species" (creates input for communityModel)
+
+
+# camtrapR 2.4.2
+
+## new functions
+* speciesAccum: create species accumulation curves from camera trapping data with package iNEXT
+* surveyDashboard: include species accumulation curves
+
+## bugfixes
+* readWildlifeInsights: allow date/time format "dmy HM"
+
+
+# camtrapR 2.4.1
+
+## bugfixes:
+# surveyDashboard: improved checks for available packages
+
+
+# camtrapR 2.4.0
+
+## new functions
+* readWildlifeInsights: import data directly from WildlifeInsights
+
+
+## new features
+* surveyDashboard: big update with many new functionalities (covariates, community models, visualization, etc.)
+* predict: allow type = "p_array" (4D array of detection probabilities)
+* createCovariates: added parameter "recursive", returns original rasters
+
 # camtrapR 2.3.1
 
 ## new functions
