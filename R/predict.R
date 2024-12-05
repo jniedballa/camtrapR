@@ -35,6 +35,7 @@ predictionMapsCommunity <- function(object,
       if(type %in% c("abundance", "lambda_array")) stop(paste0("type = '", type, "' is only implemented in Royle-Nichols models. The current model is a standard occupancy model"))
     }
   }
+  
   # subset occupancy (beta) parameters
   if(type == "p_array") {
     submodel <- "det"
@@ -446,50 +447,21 @@ if(type != "p_array") {
     stop(paste("Please install the package abind to run this function with type =", type))
   }
   
-  # # create array for intercepts
-  # array_NA <- array(data = NA, dim = c(nrow(values_to_predict_subset),    # raster cell
-  #                                      object@data$M,                     # species
-  #                                      nrow(posterior_matrix)))           # posterior sample
-
-
-  # # get intercepts
-  # out_intercept <- array_NA
-  # 
-  # for(i in 1:dim(array_NA)[2]){    # species loop
-  #   if(cov_info_intercept$ranef == TRUE | cov_info_intercept$independent == TRUE){  # random or independent intercepts
-  #     out_intercept[,i,] <- matrix(posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] ,
-  #                                  nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
-  #   } else {
-  #     out_intercept[,i,] <- matrix(posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] ,
-  #                                  nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
-  #   }
-  # }
-  # gc()
-  # 
-  # # memory warning (if applicable)
-  # if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ){
-  #   ram_usage_estimate <- round(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) / 1e3) # in Gb
-  #   message(paste("Watch RAM usage. At least", ram_usage_estimate, "Gb will be required"))
-  # }
-  
-  # intercept
+  # get intercept
   a0_matrix<-posterior_matrix[,grep('alpha0[', colnames(posterior_matrix), fixed=TRUE)]
+  # order: [draws, species]
   
+  # prepare empty list to contain parameters for covariate responses
   a1_matrix_list <- list()
   
-  # out <- list()
-  
-  # values_to_predict_subset_backup <- values_to_predict_subset
   
   # loop over covariates 
   for(cov in 1:nrow(cov_info_subset)) {
     
-    # values_to_predict_subset <- values_to_predict_subset_backup
-    
+    # collect information about current covariate
     current_cov  <- cov_info_subset$covariate[cov]
     current_coef <- cov_info_subset$coef[cov]
     
-    # determine data type of current covariate
     covariate_is_numeric <- cov_info_subset$data_type [cov] == "cont"
     covariate_is_factor  <- cov_info_subset$data_type [cov] == "categ"
     
@@ -500,13 +472,10 @@ if(type != "p_array") {
     covariate_is_site_occasion_cov <- ifelse(cov_info_subset$covariate_type [cov] == "obsCovs", T, F) 
     
     
-    
+    # a few checks (should be done before covariate loop to avoid wasting time if things go wrong)
     if(!current_cov %in% colnames(values_to_predict_subset) && covariate_is_site_cov) {
       stop(paste("Covariate", current_cov, "not found in data for prediction (x)."), call. = FALSE)
     }
-    # if(!current_cov %in% colnames(values_to_predict_subset) && covariate_is_site_occasion_cov) {
-    #   values_to_predict_subset <- object@input$obsCovs[current_cov]
-    # }
     
     if(!is.na(cov_info_subset$ranef_cov[cov])){
       stop(paste(current_cov, 
@@ -520,160 +489,93 @@ if(type != "p_array") {
       next
     }
     
-    # if(covariate_is_site_cov) out[[cov]] <- array_NA
-    # if(covariate_is_site_occasion_cov) {
-    #   out[[cov]] <- array(data = NA, dim = c(nrow(values_to_predict_subset),   # raster cell
-    #                                         object@data$M,                     # species
-    #                                         nrow(posterior_matrix),            # posterior sample
-    #                                         object@data$maxocc))               # number of occasions
-    # }
-    
 
+    # identify covariate column in MCMC list output
     
-
-  #   # species loop
-  #   # for(i in 1:dim(out[[cov]])[2]){
-  #   for(i in 1:object@data$M) {
-  #     
-  #     if(covariate_is_numeric) {
-  #       
-  #       if(effect_type == "fixed") {
-  #         index_covariate <- grep(paste0(current_coef, "$"), colnames(posterior_matrix))
-  #       } else {    # ranef or independent
-  #         index_covariate <- grep(paste0(current_coef, "[", i, "]"), colnames(posterior_matrix), fixed = T)
-  #       }
-  #       
-  #       if(length(index_covariate) == 0) stop(paste("Covariate", current_coef, "not found in posterior matrix"), call. = FALSE)
-  #       if(length(index_covariate) >= 2) stop(paste("Covariate", current_coef, "has more than 2 matches in posterior matrix"), call. = FALSE)
-  #       
-  #       
-  #       a1_matrix_list[[cov]] <- posterior_matrix[,grep(current_coef, colnames(posterior_matrix), fixed=TRUE)]
-  #       
-  #       
-  #       if(covariate_is_site_cov) {
-  #         # out[[cov]][,i,] <-  sapply(posterior_matrix[, index_covariate], FUN = function(x){
-  #         #   x * values_to_predict_subset[, current_cov]
-  #       # })
-  #       } 
-  #       
-  #       if(covariate_is_site_occasion_cov) {
-  #         # tmp <-  abind(lapply(posterior_matrix[, index_covariate], FUN = function(x){
-  #         #   # x * values_to_predict_subset[, current_cov]
-  #         #   x * object@input$obsCovs[[current_cov]]
-  #         # }), along = 3) 
-  #         # 
-  #         # aperm(tmp, c())
-  #         # out[[cov]][,i,] <- 
-  #       }
-  #     }
-  #     
-  #     # if(covariate_is_factor) {
-  #     #   
-  #     #   if(effect_type == "fixed") index_covariate <- grep(current_coef, colnames(posterior_matrix))
-  #     #   if(effect_type == "ranef") index_covariate <- grep(paste0(current_coef, "[", i, ","), colnames(posterior_matrix), fixed = T)
-  #     #   
-  #     #   # this assumes that the numeric values in the raster correspond to the factor levels in the covariate
-  #     #   # since it uses the raster values to index the posterior matrix
-  #     #   
-  #     #   # for data.frames, it seems to work with the categorical column being integer (= factor level, as in as.data.frame(rasterStack)), or proper factor
-  #     #   # out[[cov]][,i,] <- t(posterior_matrix[, index_covariate[values_to_predict_subset[, current_cov]]])
-  #     #   
-  #     # }
-  #     suppressWarnings(rm(index_covariate))
-  #   }   # end species loop
-  # }    # end covariate loop
-  
-  # sum up individual effects
-  # if(!.hasSlot(object, "model")) {
-  #   logit.psi <- Reduce('+', out) + out_intercept    # this is for legacy versions before RN models were added
-  #   psi <- exp(logit.psi) / (exp(logit.psi) + 1)
-  #   
-  # } else {
+    # first construct matching regular expression for:
+    # fixed effect
+    if(effect_type == "fixed") alpha_regex <- paste0("alpha.*", current_cov, "$")
+    # random effect
+    if(effect_type %in% c("ranef", "indep")) alpha_regex <- paste0("alpha.*", current_cov, "//[")
     
+    # find matching columns
+    alpha_regex_matches <- grep(alpha_regex,  colnames(posterior_matrix))
     
-    # p_list<-list()
-    # keep<-sample(1:nrow(posterior_matrix), draws)
+    # error if no match
+    if(length(alpha_regex_matches) == 0) stop(paste("Error identifying value column for covariate:", current_cov))
     
-    a1_matrix <- posterior_matrix[, grep(paste0("alpha+(\\S+)", current_cov, "\\["), colnames(posterior_matrix))]
+    # subset posterior matrix
+    a1_matrix <- posterior_matrix[, alpha_regex_matches, drop = F]
     
+    # empty list for covariate-specific effects
     p_arr_list <- list()
     
+    # loop over species and occasions to fill arrays
     for (i in 1:object@data$M){   # species loop
+      # prepare empty array (for current species)
       p_arr_list [[i]] <- array(NA, c(draws, object@data$J, object@data$maxocc))
+      # order: [draws, stations, occasions]
       
-      # p_arr[,j,k] <- plogis(a0_matrix[keep,i] + a1_matrix[keep,i]*input_AHM$obsCovs$wind[j,k])
-      
-      # for (j in 1:object@data$J){   # site loop
       for (k in 1:object@data$maxocc){ # occasion loop
         
+        # if covariate is site-occasion covariate, multiply parameter values from
+        # posterior draws with covariate values (by occasion)
         if(covariate_is_site_occasion_cov){      
-          # p_arr[,j,k] <- plogis(a0_matrix[,i] + a1_matrix[,i] * object@input$obsCovs[current_cov] [j,k])
-          p_arr_list [[i]] [,,k]  <- outer(a1_matrix[, i],  object@input$obsCovs[[current_cov]] [,k])
-          
-          # if
-          
-        
+          if(effect_type == "fixed") {
+            # a1_matrix contains only 1 column, identical for all species
+            p_arr_list [[i]] [,, k]  <- outer(a1_matrix[, 1],  object@input$obsCovs[[current_cov]] [,k])
+          } else { 
+            # if ranef, one column per species
+            p_arr_list [[i]] [,, k]  <- outer(a1_matrix[, i],  object@input$obsCovs[[current_cov]] [,k])
+          }
         }
-        # }
         
+        # if covariate is site covariate, multiply estimates with site covariate values
         if(covariate_is_site_cov) {
-          # p_arr[,j,k] <- plogis(a0_matrix[,i] + a1_matrix[,i]*object@input$siteCovs[, current_cov] [j,k])
-          p_arr_list [[i]][,, k] <- outer(a1_matrix[, i], object@input$siteCovs[, current_cov])
+          if(effect_type == "fixed") {
+            # a1_matrix contains only 1 column, identical for all species
+            p_arr_list [[i]] [,, k] <- outer(a1_matrix[, 1], object@input$siteCovs[, current_cov])
+            } else {
+              # if ranef, one column per species
+            p_arr_list [[i]] [,, k] <- outer(a1_matrix[, i], object@input$siteCovs[, current_cov])
+          }
         }
       }
     }
     
-    
-    # if(covariate_is_site_cov) {
-      p_arr_4d <- abind::abind(p_arr_list, along = 4)    # [draws, station, occasion, species]
+    # combine list of 3d arrays into 4d array
+    # oder: [draws, station, occasion, species]
+      p_arr_4d <- abind::abind(p_arr_list, along = 4)    
       
-      p_arr_4d <- aperm(p_arr_4d,  c(2,4,1,3))   # harmonize order with out_intercept
-    #   p_arr <- p_arr_tmp
-    #   # replicate_factor <- matrix(1, nrow = nrow(p_arr_tmp), ncol = 5)
-    #   
-    #   # new_array4d <- abind(p_arr_tmp, p_arr_tmp, along = 4)
-    # } 
+      # harmonize order with out_intercept
+      # rearrange into order: [station, species, draw, occasion]
+      p_arr_4d <- aperm(p_arr_4d,  c(2,4,1,3))   
     
-    # if(covariate_is_site_occasion_cov){
-    #   ...
-    # }
-    
-    
+      # store in list of covariate-specific arrays
     a1_matrix_list[[cov]] <- p_arr_4d
   }
     
     
     
     # sum up individual effects
-    # if(object@model == "Occupancy") {
   
       logit.p <- Reduce('+', a1_matrix_list)  # doesn't include intercept yet
       
-      # add a0_matrix to each element
+      # add a0_matrix (species-specific intercepts) to each element
+      # a0_matrix is [draw, species]
       for(i in 1:dim(logit.p)[1]) {   # station
         for(k in 1:dim(logit.p)[4]) {   # occasion
           logit.p[i,,,k] <- logit.p[i,,,k] + t(a0_matrix)
         }
       }
       
+      # convert to probability
       p <- ilogit(logit.p)
+      
+      # cleanup
       rm(logit.p, a0_matrix, a1_matrix, a1_matrix_list)
-    # }
-    # # psi <- exp(logit.psi) / (exp(logit.psi) + 1)   # leads to NaN when numbers are very large
-    # if(object@model == "RN"){
-    #   log.lambda <- Reduce('+', out) + out_intercept
-    #   lambda <- exp(log.lambda)   # lambda is expected abundance   (Poisson intensity / rate parameter)
-    #   rm(log.lambda)
-    #   if(!type %in% c("abundance", "lambda_array")){   # convert to occupancy probability
-    #     psi <- 1-dpois(0, lambda)
-    #   }
-    # }
-  # }
-  
 }
   gc()
-  
-# }
   
 
 if(type == "p_array") {
@@ -683,7 +585,7 @@ if(type == "p_array") {
 }
   
   
-  # return raw probabilities [cell, species, posterior_draw]
+  # return raw occupancy probabilities [cell, species, posterior_draw]
   if(type == "psi_array") {
     dimnames(psi) <- list(index_not_na,
                           rownames(object@data$y))
@@ -691,7 +593,7 @@ if(type == "p_array") {
   }
   
   
-  # return raw expected abunance [cell, species, posterior_draw]
+  # return raw expected abundance [cell, species, posterior_draw]
   if(type == "lambda_array") {
     dimnames(lambda) <- list(index_not_na,
                              rownames(object@data$y))
