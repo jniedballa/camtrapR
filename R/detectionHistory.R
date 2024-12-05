@@ -1,69 +1,71 @@
 #' Species detection histories for occupancy analyses
 #' 
 #' This function generates species detection histories that can be used in
-#' occupancy analyses, e.g. with package
-#' \link[unmarked:unmarked-package]{unmarked}. It generates detection histories
-#' in different formats, with adjustable occasion length and occasion start
-#' time.
+#' single-species occupancy analyses with packages \link[unmarked:unmarked-package]{unmarked} 
+#' and \pkg{ubms}, as well as multi-species/community occupancy models via 
+#' \code{\link{communityModel}}. It generates detection histories in different formats, 
+#' with adjustable occasion length and occasion start time.
+#'  
+#' 
+#' The function creates species detection matrices in two possible formats:
+#' detection-by-date or detection-by-occasion. The start of detection histories 
+#' is controlled by \code{day1}:
+#' \itemize{
+#'   \item \code{"station"}: Each station's history begins on its setup day
+#'   \item \code{"survey"}: All stations begin on the first day of the survey
+#'   \item A specific date (e.g., \code{"2015-12-31"}): All stations begin on this date
+#' }
+#' Dates must be in "YYYY-MM-DD" format if specified directly.
 #' 
 #' 
-#' The function computes a species detection matrix, either as a
-#' detection-by-date or a detection-by-occasion matrix. \code{day1} defines if
-#' each stations detection history will begin on that station's setup day
-#' (\code{day1 = "station"}) or if all station's detection histories have a
-#' common origin (the day the first station was set up if \code{day1 =
-#' "survey"} or a fixed date if, e.g. \code{day1 = "2015-12-31"}). If
-#' \code{day1} is a date, \code{\link[base]{as.Date}} must be able to
-#' understand it. The most suitable format is "YYYY-MM-DD", e.g. "2015-12-31".
+#' Two output formats are available via the \code{output} parameter:
+#' \itemize{
+#'   \item \code{"binary"}: Records detection (1) or non-detection (0)
+#'   \item \code{"count"}: Records the number of detections per occasion
+#' }
 #' 
-#' \code{output} is analogous to \code{\link{spatialDetectionHistory}}. It
-#' makes the function return either counts of detections during occasions, or a
-#' binary indicator for whether the species was detected.
 #' 
-#' \code{includeEffort} controls whether an additional effort matrix is
-#' computed or not. This also affects the detection matrices. If
-#' \code{includeEffort = FALSE}, all occasions in which a station was not set
-#' up or malfunctioning (NA or 0 in \code{camOp}) will result in NAs in the
-#' detection history. If \code{includeEffort = TRUE}, the record history will
-#' only contain 0 and 1, and no NAs. The effort matrix can then be included in
-#' occupancy models as a (continuous) observation covariate to estimate the
-#' effect of effort on detection probability.
+#' The \code{includeEffort} parameter determines how camera operation affects the output:
+#' \itemize{
+#'   \item If \code{FALSE}: Periods when cameras were not operational or only 
+#'   partly operational appear as NA in the detection history. This may lose 
+#'   species record from incomplete occasions.
+#'   \item If \code{TRUE}: Incomplete occasions are retained. Outputs contain a 
+#'   separate effort matrix that can be used as an observation covariate in occupancy models.
+#' }
+#' It is generally advisable to include effort as a covariate to account for 
+#' uneven sampling effort.
 #' 
-#' The number of days that are aggregated is controlled by
-#' \code{occasionLength}. \code{occasionStartTime} will be removed from the
-#' function. It has moved to \code{\link{cameraOperation}}, to ensure daily
-#' effort is computed correctly and takes the occasion start time into account.
-#' %can be used to make occasions begin another hour than midnight (the
-#' default). This may be relevant for nocturnal animals, in which 1 whole night
-#' would be considered an occasion.
+#' 
+#' \code{occasionLength} controls how many days are aggregated into each sampling occasion.
+#' Note that \code{occasionStartTime} has moved to \code{\link{cameraOperation}} to ensure
+#' proper calculation of daily effort.
 #' 
 #' The values of \code{stationCol} in \code{recordTable} must be matched by the
 #' row names of \code{camOp} (case-insensitive), otherwise an error is raised.
 #' 
-#' \code{recordDateTimeFormat} defaults to the "YYYY-MM-DD HH:MM:SS"
-#' convention, e.g. "2014-09-30 22:59:59". \code{recordDateTimeFormat} can be
-#' interpreted either by base-R via \code{\link[base]{strptime}} or in
-#' \pkg{lubridate} via \code{\link[lubridate]{parse_date_time}} (argument
-#' "orders"). \pkg{lubridate} will be used if there are no "\%" characters in
-#' \code{recordDateTimeFormat}.
+#' For date/time formatting, \code{recordDateTimeFormat} accepts two syntax styles:
+#' \itemize{
+#'   \item Base R style (using \%): e.g., "\%Y-\%m-\%d \%H:\%M:\%S"
+#'   \item lubridate style: e.g., "ymd HMS"
+#' }
+#' \pkg{lubridate} will be used if there are no "\%" characters in
+#' \code{recordDateTimeFormat}. The default and recommended format is 
+#' "YYYY-MM-DD HH:MM:SS" (e.g., "2014-09-30 22:59:59").
 #' 
-#' For "YYYY-MM-DD HH:MM:SS", \code{recordDateTimeFormat} would be either
-#' "\%Y-\%m-\%d \%H:\%M:\%S" or "ymd HMS". For details on how to specify date
-#' and time formats in R see \code{\link[base]{strptime}} or
-#' \code{\link[lubridate]{parse_date_time}}.
 #' 
-#' If the camera operation matrix (\code{camOp}) was created for a multi-season
-#' study (argument \code{sesssionCol} in \code{\link{cameraOperation}} was set,
-#' it will be detected automatically. Output can be for unmarkedMultFrame by
-#' setting \code{unmarkedMultFrameInput = TRUE}. Each row corresponds to a
-#' site, and the columns are in season-major, occasion-minor order, e.g.
-#' season1-occasion1, season1-occasion2, etc.).
+#' For multi-season studies where \code{sessionCol} was used in \code{\link{cameraOperation}},
+#' the function automatically detects this structure. Set \code{unmarkedMultFrameInput = TRUE}
+#' to format output for \code{unmarkedMultFrame}, with rows representing sites and columns
+#' ordered by season-major, occasion-minor (e.g., season1-occasion1, season1-occasion2, etc.).
+#' 
 #' 
 #' @param recordTable data.frame. the record table created by
 #' \code{\link{recordTable}}
-#' @param species character. the species for which to compute the detection
-#' history
-#' @param camOp The camera operability matrix as created by
+#' @param species character. species name(s) for which to compute detection histories. Can 
+#' be either a single species name (for use with \pkg{unmarked}/\pkg{ubms}) or a vector 
+#' of multiple species names (for input to \code{\link{communityModel}})
+#' @param camOp The camera operation matrix as created by
 #' \code{\link{cameraOperation}}
 #' @param output character. Return binary detections ("binary") or counts of
 #' detections ("count")
@@ -103,26 +105,28 @@
 #' occupancy models in unmarked (argument "y" in
 #' \code{\link[unmarked]{unmarkedMultFrame}}?
 #' 
-#' @return Depending on the value of \code{includeEffort} and
-#' \code{scaleEffort}, a list with either 1, 2 or 3 elements. The first element
-#' is the species detection history. The second is the optional effort matrix
-#' and the third contains the effort scaling parameters.
-#' \item{detection_history}{A species detection matrix} \item{effort}{A matrix
-#' giving the number of active camera trap days per station and occasion (=
-#' camera trapping effort). It is only returned if \code{includeEffort = TRUE}}
-#' \item{effort_scaling_parameters}{Scaling parameters of the effort matrix. It
-#' is only returned if \code{includeEffort} and \code{scaleEffort} are
-#' \code{TRUE}}
+#' @return If a single species is provided (typical for \pkg{unmarked}/\pkg{ubms} analyses), 
+#' returns a list with either 1, 2 or 3 elements depending on the value of \code{includeEffort} 
+#' and \code{scaleEffort}:
+#' \item{detection_history}{A species detection matrix}
+#' \item{effort}{A matrix giving the number of active camera trap days per station and 
+#' occasion (= camera trapping effort). Only returned if \code{includeEffort = TRUE}}
+#' \item{effort_scaling_parameters}{Scaling parameters of the effort matrix. Only 
+#' returned if \code{includeEffort} and \code{scaleEffort} are \code{TRUE}}
+#'
+#' If multiple species are provided (for use with \code{\link{communityModel}}), returns 
+#' a similar list structure but with \code{detection_history} containing a named list of 
+#' detection matrices, one for each species. The effort matrix is identical for all 
+#' species and thus returned only once.
+#' 
 #' 
 #' @section Warning: Setting \code{output = "count"} returns a count of
-#' detections, not individuals. We strongly advise against using it as input
-#' for models of animal abundance (such as N-Mixture models) models which use
-#' counts as input.
+#' detections, not individuals. These counts are not suitable for abundance modeling
+#' (e.g., N-mixture models) as they do not represent individual animals.
 #' 
-#' Please note the section about defining argument \code{timeZone} in the
-#' vignette on data extraction (accessible via
-#' \code{vignette("DataExtraction")} or online
-#' (\url{https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.pdf})).
+#' For important information about the \code{timeZone} parameter, please refer to
+#' the "Data Extraction" vignette (\code{vignette("DataExtraction")} or online at
+#' \url{https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.pdf}).
 #' 
 #' @author Juergen Niedballa
 #' 
@@ -233,7 +237,7 @@
 #' )
 #' 
 #' # multi-season detection history
-#' DetHist_multi <- detectionHistory(recordTable      = recordTableSampleMultiSeason,
+#' DetHist_multi_season <- detectionHistory(recordTable      = recordTableSampleMultiSeason,
 #'                             camOp                  = camop_season,
 #'                             stationCol             = "Station",
 #'                             speciesCol             = "Species",
@@ -247,8 +251,36 @@
 #'                             unmarkedMultFrameInput = TRUE
 #' )
 #' 
-#' DetHist_multi
+#' DetHist_multi_season
 #' 
+#' 
+#' # Multi-species example for community occupancy analysis with communityModel()
+#' DetHist_multi_species <- detectionHistory(recordTable = recordTableSample,
+#'                                  species = c("VTA", "PBE", "EGY"),   # multiple species
+#'                                  camOp = camop_no_problem,
+#'                                  stationCol = "Station",
+#'                                  speciesCol = "Species",
+#'                                  recordDateTimeCol = "DateTimeOriginal",
+#'                                  occasionLength = 7,
+#'                                  day1 = "station",
+#'                                  includeEffort = TRUE,
+#'                                  scaleEffort = FALSE,
+#'                                  timeZone = "Asia/Kuala_Lumpur"
+#' )
+#' 
+#' 
+#' # bundle input data for communityModel
+#' data_list <- list(ylist = DetHist_multi_species$detection_history,
+#'                   siteCovs = camtraps,
+#'                   obsCovs = list(effort = DetHist_multi_species$effort))
+#' 
+#' 
+#' \dontrun{
+#' 
+#' # create community model
+#' mod.jags <- communityModel(data_list,
+#'                            ...) # model specification 
+#' }
 #' 
 #' @export detectionHistory
 #' 
@@ -276,6 +308,16 @@ detectionHistory <- function(recordTable,
 {
   wd0 <- getwd()
   on.exit(setwd(wd0))
+  
+  
+  # Check if species is vector
+  is_multispecies <- length(species) > 1
+  
+  
+  # single-species case ----
+  if(!is_multispecies) { 
+    
+    
   #################
   # check input
   
@@ -292,7 +334,7 @@ detectionHistory <- function(recordTable,
   
   if(!hasArg(species)) stop("'species' is not defined", call. = FALSE)
   if(!is.character(species))  stop("species must be of class character", call. = FALSE)
-  if(!length(species) == 1)   stop("species may only contain one value", call. = FALSE)
+  # if(!length(species) == 1)   stop("species may only contain one value", call. = FALSE)
   
   if(!hasArg(occasionLength)) stop("'occasionLength' is not defined", call. = FALSE)
   
@@ -766,5 +808,61 @@ detectionHistory <- function(recordTable,
     }
   } else {
     return(list(detection_history = record.hist))
+  }
+  
+  }  # end is_multispecies
+  
+  
+  
+  # Multi-species case ----
+
+  # Check if all species are in the record table
+  species_not_found <- species[!species %in% recordTable[, speciesCol]]
+  if(length(species_not_found) > 0) {
+    stop(paste("The following species were not found in recordTable:", 
+               paste(species_not_found, collapse = ", ")), call. = FALSE)
+  }
+  
+  # Get the original call minus the species argument which we're modifying
+  call_args <- match.call(expand.dots = FALSE)
+  call_args$species <- NULL  # remove species as we'll modify it
+  
+  # Convert to list for manipulation
+  call_list <- as.list(call_args)[-1]  # -1 removes the function name
+  
+  
+  
+  # Create the lapply call with only defined arguments
+  results <- lapply(species, function(sp) {
+    # Add current species to argument list
+    call_list$species <- sp
+    
+    # Execute call with only the arguments that were provided
+    do.call(detectionHistory, call_list)[[1]]  
+  })
+  
+  names(results) <- species
+  
+
+  # Get effort matrix from first species result (they're identical)
+  call_list$species <- species[1]
+  full_result <- do.call(detectionHistory, call_list)
+  
+  # Return modified structure
+  if(includeEffort) {
+    if(scaleEffort) {
+      return(list(
+        detection_history = results,
+        effort = full_result$effort,
+        effort_scaling_parameters = full_result$effort_scaling_parameters
+      ))
+    } else {
+      return(list(
+        detection_history = results,
+        effort = full_result$effort
+      ))
+    }
+  } else {
+    return(list(detection_history = results))
   }
 }
