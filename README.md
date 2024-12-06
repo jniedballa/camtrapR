@@ -22,13 +22,18 @@ You can install the release version of camtrapR from CRAN:
 install.packages("camtrapR")
 ```
 
-or the latest GitHub version (containing recent changes and new
+or the  GitHub version (containing recent changes and new
 features) via:
 
 ``` r
 # install.packages("remotes")
 # install.packages("R.rsp")
 remotes::install_github("jniedballa/camtrapR", build_vignettes = TRUE)
+```
+
+or from the dev branch for the latest development version (may not always be available).
+``` r
+remotes::install_github("jniedballa/camtrapR", ref = "dev", build_vignettes = TRUE)
 ```
 
 For installation from GitHub make sure package `R.rsp` is available.
