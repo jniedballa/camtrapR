@@ -625,12 +625,12 @@ communityModel <- function(data_list,
   
   # check if there area NAs in site covariates
   if(length(covariates_numeric) >= 1) {
-    na_in_covs <- apply(data_list$siteCovs[, covariates_numeric], 2, FUN = function(x) any(is.na(x)))
+    na_in_covs <- apply(data_list$siteCovs[, covariates_numeric, drop = FALSE], 2, FUN = function(x) any(is.na(x)))
     if(any(na_in_covs)) stop(paste("There are NAs in site covariate(s): ", paste(names(na_in_covs)[na_in_covs], collapse = ", ")))
   }
   
   if(length(covariates_categ) >= 1) {
-    na_in_covs <- apply(data_list$siteCovs[, covariates_categ], 2, FUN = function(x) any(is.na(x)))
+    na_in_covs <- apply(data_list$siteCovs[, covariates_categ, drop = FALSE], 2, FUN = function(x) any(is.na(x)))
     if(any(na_in_covs)) stop(paste("There are NAs in site covariate(s): ", paste(names(na_in_covs)[na_in_covs], collapse = ", ")))
   }
   
