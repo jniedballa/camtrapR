@@ -496,7 +496,7 @@ if(type != "p_array") {
     # fixed effect
     if(effect_type == "fixed") alpha_regex <- paste0("alpha.*", current_cov, "$")
     # random effect
-    if(effect_type %in% c("ranef", "indep")) alpha_regex <- paste0("alpha.*", current_cov, "//[")
+    if(effect_type %in% c("ranef", "indep")) alpha_regex <- paste0("alpha.*", current_cov, "\\[")
     
     # find matching columns
     alpha_regex_matches <- grep(alpha_regex,  colnames(posterior_matrix))
