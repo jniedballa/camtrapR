@@ -1630,13 +1630,17 @@ parseDateTimeObject <- function(inputColumn,
   inputColumn.char <- as.character(inputColumn)
   
   # option 1: base functions for dates as per strptime (identified by "%")
-  if(grepl(pattern = "%", x = dateTimeFormat, fixed = TRUE)){
+  if(grepl(pattern = "%", x = dateTimeFormat[1], fixed = TRUE)){
     out <- as.POSIXct(inputColumn.char, tz = timeZone, format = dateTimeFormat)
   } else {
     # option 2: lubridate functions (identified by absence of "%")
     if(!requireNamespace("lubridate", quietly = TRUE)) stop(paste("package 'lubridate' is required for the specified dateTimeFormat", dateTimeFormat))
     
-    out <- lubridate::parse_date_time(inputColumn.char, orders = dateTimeFormat, tz = timeZone, quiet = quiet)
+    out <- lubridate::parse_date_time(inputColumn.char, orders = c(dateTimeFormat, 
+                                                                   "ymd"),   # to catch records exactly on midnight where R drops the time
+                                      tz = timeZone, 
+                                      quiet = quiet,
+                                      truncated = 3)    # allow time to be missing, defaulting to 00:00:00
   }
   
   if(all(is.na(out))) stop(paste0("Cannot read datetime format in ", deparse(substitute(inputColumn)), ". Output is all NA.\n",
