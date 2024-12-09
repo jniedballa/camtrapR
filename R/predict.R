@@ -54,15 +54,18 @@ predictionMapsCommunity <- function(object,
     keyword_submodel_short <- "alpha"
   } 
   
-  # get covariate information for submodel
-  cov_info_subset <- object@covariate_info[object@covariate_info$submodel == submodel & object@covariate_info$param == "param",]
-  
-  if(nrow(cov_info_subset) == 0) stop(paste("No covariates in submodel", submodel), call. = F)
-  
-  
+
   # get intercept information for submodel
   cov_info_intercept <- object@covariate_info[object@covariate_info$submodel == submodel & object@covariate_info$param == "intercept",]
   
+  # get covariate information for submodel
+  cov_info_subset <- object@covariate_info[object@covariate_info$submodel == submodel & object@covariate_info$param == "param",]
+  
+  
+  # if(nrow(cov_info_subset) == 0) stop(paste("No covariates in submodel", submodel), call. = F)
+  
+  
+
   # subset parameters of submodel
   stopifnot(all(cov_info_subset$coef %in% object@params))
   params_submodel <- object@params[grep(keyword_submodel, object@params)]
@@ -76,23 +79,26 @@ predictionMapsCommunity <- function(object,
   # define function for inverse logit (logit to probability)
   ilogit <- function(x) 1 / (1 + exp(-x))
   
+  
   # subset posterior matrix to number of draws
   posterior_matrix <- as.matrix(mcmc.list)
   if(hasArg(draws)) {
     if(nrow(posterior_matrix) > draws){
-      posterior_matrix <- posterior_matrix[sample(1:nrow(posterior_matrix), draws),]
+      selected_rows <- sort(sample(1:nrow(posterior_matrix), draws))
+      # print(selected_rows)
+      posterior_matrix <- posterior_matrix[selected_rows, , drop = FALSE]
     } else {
       message(paste0("draws (", draws, ") is greater than the number of available samples. Using all samples (", nrow(posterior_matrix), ")."))
     }
   } 
   
   # subset posterior matrix to current submodel
-  posterior_matrix <- posterior_matrix[, grep(keyword_submodel, colnames(posterior_matrix))]
+  posterior_matrix <- posterior_matrix[, grep(keyword_submodel, colnames(posterior_matrix)), drop = F]
   
   if(nrow(posterior_matrix) > 1000) message("More than 1000 posterior samples. Watch RAM usage")
   
   params_covariate <- cov_info_subset$covariate
-  if(length(params_covariate) == 0) stop ("No covariates found", call. = F)
+  # if(length(params_covariate) == 0) stop ("No covariates found", call. = F)
   
   
   list_responses <- list()
@@ -121,7 +127,9 @@ rast(YourRaster)")
 
   
   # identify cells with values
-  index_not_na <- which(apply(values_to_predict_all, 1, FUN = function(x) all(!is.na(x))))
+  index_not_na <- which(apply(values_to_predict_all[, cov_info_subset$covariate[cov_info_subset$covariate_type == "siteCovs"], drop = F], 
+                              1, 
+                              FUN = function(x) all(!is.na(x))))
   
   if(hasArg(aoi)) {
     if(inherits(x, "data.frame")) stop("aoi can only be defined if x is a SpatRaster (not a data.frame).")
@@ -139,7 +147,16 @@ rast(YourRaster)")
     }
   }
   
-  values_to_predict_subset <- values_to_predict_all[index_not_na, , drop = F]
+  # subset to cells / sites where all covariates have values
+  # if submodel has site covariates
+  if(nrow(cov_info_subset) >= 1 & any(cov_info_subset$covariate_type == "siteCovs")) {
+    values_to_predict_subset <- values_to_predict_all[index_not_na, 
+                                                      cov_info_subset$covariate [cov_info_subset$covariate_type == "siteCovs"], 
+                                                      drop = F]
+  } else {
+    # if no covariates just keep all values (won't affect predictions)
+    values_to_predict_subset <- values_to_predict_all[, , drop = F]
+  }
 
 
   
@@ -183,7 +200,7 @@ if(type != "p_array") {
           out_intercept[,i,] <- matrix(posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] , 
                                        nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
         } else {
-          out_intercept[,i,] <- matrix(posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] , 
+          out_intercept[,i,] <- matrix(posterior_matrix[, grep(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] , 
                                        nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
         }
       }
@@ -325,16 +342,19 @@ if(type != "p_array") {
     # # get intercepts
     out_intercept <- array_NA
     
+    
     for(i in 1:dim(array_NA)[2]){    # species loop
       if(cov_info_intercept$ranef == TRUE | cov_info_intercept$independent == TRUE){  # random or independent intercepts
         out_intercept[,i,] <- matrix(posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] , 
                                      nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
       } else {
-        out_intercept[,i,] <- matrix(posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] , 
+        out_intercept[,i,] <- matrix(posterior_matrix[, grepl(paste0("^", keyword_submodel_short, "0$"), colnames(posterior_matrix))] , 
                                      nrow = dim(out_intercept)[1], ncol = dim(out_intercept)[3], byrow = T)
       }
     }
-    gc()
+    
+    cleanup_threshold <- 500 #Mb
+    if(object.size(out_intercept) / 1e6 > cleanup_threshold)     gc()   # if intercept matrix > 500Mb, cleanup
     
     # memory warning (if applicable)
     if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ){
@@ -343,8 +363,10 @@ if(type != "p_array") {
     } 
     
     
+    if(nrow(cov_info_subset) >= 1) {
     out <- list()
     
+
     # loop over covariates 
     for(cov in 1:nrow(cov_info_subset)) {
       
@@ -438,6 +460,22 @@ if(type != "p_array") {
         }
       }
     }
+      
+    } else {
+      if(object@model == "Occupancy") {
+        logit.psi <- out_intercept
+        psi <- ilogit(logit.psi)
+        rm(logit.psi)
+      } 
+      if(object@model == "RN"){
+        log.lambda <- Reduce('+', out) + out_intercept
+        lambda <- exp(log.lambda)   # lambda is expected abundance   (Poisson intensity / rate parameter)
+        rm(log.lambda)
+        if(!type %in% c("abundance", "lambda_array")){   # convert to occupancy probability
+          psi <- 1-dpois(0, lambda)
+        }
+      }
+    }
   }   # end  if(!batch) 
   
   
@@ -448,13 +486,24 @@ if(type != "p_array") {
   }
   
   # get intercept
-  a0_matrix<-posterior_matrix[,grep('alpha0[', colnames(posterior_matrix), fixed=TRUE)]
+  
+  if(cov_info_intercept$ranef == FALSE  && cov_info_intercept$independent == FALSE  ) {
+    index_intercept <- rep(grep('^alpha0$', colnames(posterior_matrix)),
+                           times = object@data$M)    # repeat for each species
+  } else {
+    index_intercept <- grep('alpha0[', colnames(posterior_matrix), fixed=TRUE)
+  }
+  
+  if(length(index_intercept) == 0) stop(paste("error trying to access intercepts for submodel", submodel))
+  
+  a0_matrix <- posterior_matrix[, index_intercept]
   # order: [draws, species]
   
   # prepare empty list to contain parameters for covariate responses
   a1_matrix_list <- list()
   
   
+  if(nrow(cov_info_subset) >= 1) {
   # loop over covariates 
   for(cov in 1:nrow(cov_info_subset)) {
     
@@ -513,7 +562,9 @@ if(type != "p_array") {
     # loop over species and occasions to fill arrays
     for (i in 1:object@data$M){   # species loop
       # prepare empty array (for current species)
-      p_arr_list [[i]] <- array(NA, c(draws, object@data$J, object@data$maxocc))
+      p_arr_list [[i]] <- array(NA, c(nrow(posterior_matrix), 
+                                      object@data$J, 
+                                      object@data$maxocc))
       # order: [draws, stations, occasions]
       
       for (k in 1:object@data$maxocc){ # occasion loop
@@ -554,26 +605,43 @@ if(type != "p_array") {
       # store in list of covariate-specific arrays
     a1_matrix_list[[cov]] <- p_arr_4d
   }
-    
-    
-    
-    # sum up individual effects
   
-      logit.p <- Reduce('+', a1_matrix_list)  # doesn't include intercept yet
-      
-      # add a0_matrix (species-specific intercepts) to each element
-      # a0_matrix is [draw, species]
-      for(i in 1:dim(logit.p)[1]) {   # station
-        for(k in 1:dim(logit.p)[4]) {   # occasion
-          logit.p[i,,,k] <- logit.p[i,,,k] + t(a0_matrix)
-        }
+    
+    
+    # sum up individual covariate effects
+    logit.p <- Reduce('+', a1_matrix_list)  # doesn't include intercept yet
+    
+    
+    # add a0_matrix (species-specific intercepts) to each element
+    # a0_matrix is [draw, species]
+    for(i in 1:dim(logit.p)[1]) {   # station
+      for(k in 1:dim(logit.p)[4]) {   # occasion
+        logit.p[i,,,k] <- logit.p[i,,,k] + t(a0_matrix)
       }
-      
+    }
+    
+  } else {
+    # browser()
+    logit.p <- array(NA, 
+                     dim = c(object@data$J,        # stations
+                             object@data$M,        # species
+                             nrow(posterior_matrix),
+                             object@data$maxocc   # occasions
+                     ))
+    for(i in 1:object@data$J) {          # station
+      for(k in 1:object@data$maxocc) {   # occasion
+        logit.p[i,,,k] <- t(a0_matrix)
+      }
+    }
+  }
+  
       # convert to probability
       p <- ilogit(logit.p)
       
+      
       # cleanup
-      rm(logit.p, a0_matrix, a1_matrix, a1_matrix_list)
+      rm(logit.p, a0_matrix, a1_matrix_list)
+      if(exists("a1_matrix")) rm(a1_matrix)
 }
   gc()
   
