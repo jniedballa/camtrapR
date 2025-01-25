@@ -42,6 +42,7 @@
 #' @param knots numeric. number of values along x axis for which values are computed
 #' @param conf numeric. confidence interval
 #' @param nboot numeric. number of replications
+#' @param endpoint integer. Sample size used as endpoint for rarefaction/extrapolation (in \code{\link[iNEXT]{iNEXT})
 #' 
 #'
 #' @return An object of class "iNEXT" containing:
@@ -62,7 +63,7 @@
 #' @examples
 #' \dontrun{
 #' # Basic usage with stations as sampling units
-#' result <- run_camera_trap_inext(
+#' result <- speciesAccum(
 #'   CTtable = cams,
 #'   recordTable = recs,
 #'   speciesCol = "Species",
@@ -79,8 +80,8 @@
 #' ggiNEXT(result, type = 3)  # Coverage-based R/E curve
 #'
 #' # With assemblage grouping and days as sampling units
-#' result_by_assemblage <- run_camera_trap_inext(
-#'   CTtable = cams,
+#' result_by_assemblage <- speciesAccum(
+#'   CTtable                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              = cams,
 #'   recordTable = recs,
 #'   speciesCol = "Species",
 #'   recordDateTimeCol = "DateTime",
@@ -108,10 +109,11 @@ speciesAccum <- function(CTtable,
                          stationCol,
                          assemblageCol = NULL,
                          q = 0,
-                         x_unit = c("station", "day"),
+                         x_unit = c("station", "survey_day", "station_day"),
                          knots = 40,
                          conf = 0.95, 
-                         nboot = 50) {
+                         nboot = 50,
+                         endpoint = NULL) {
   
   # Input validation
   x_unit <- match.arg(x_unit)
@@ -128,54 +130,6 @@ speciesAccum <- function(CTtable,
   # Load required packages
   # requireNamespace("dplyr")
   
-  # Function to create incidence matrix
-  create_incidence_matrix <- function(records_subset, 
-                                      stations_subset, 
-                                      species_list, 
-                                      temporal = FALSE) {
-    if(temporal) {
-      # avoid CRAN check notes
-      survey_date <- NULL
-      
-      # For temporal analysis (days)
-      records_subset <- records_subset %>%
-        mutate(
-          survey_date = as.Date(.data[[recordDateTimeCol]]),
-          survey_day = as.numeric(survey_date - min(as.Date(stations_subset[[setupCol]]))) + 1
-        )
-      
-      units <- 1:max(records_subset$survey_day)
-      unit_col <- "survey_day"
-    } else {
-      # For spatial analysis (stations)
-      units <- unique(stations_subset[[stationCol]])
-      unit_col <- stationCol
-    }
-    
-    # Create empty matrix
-    incidence_matrix <- matrix(0, 
-                               nrow = length(species_list), 
-                               ncol = length(units),
-                               dimnames = list(species_list, as.character(units)))
-    
-    # Fill matrix
-    for(sp in species_list) {
-      for(unit in units) {
-        if(temporal) {
-          detected <- any(records_subset[[speciesCol]] == sp & 
-                            records_subset$survey_day == unit)
-        } else {
-          detected <- any(records_subset[[speciesCol]] == sp & 
-                            records_subset[[unit_col]] == unit)
-        }
-        if(detected) {
-          incidence_matrix[sp, as.character(unit)] <- 1
-        }
-      }
-    }
-    
-    return(incidence_matrix)
-  }
   
   # If assemblageCol is provided, create separate matrices for each assemblage
   if(!is.null(assemblageCol)) {
@@ -190,38 +144,137 @@ speciesAccum <- function(CTtable,
       records_subset <- recordTable[recordTable[[assemblageCol]] == assem,]
       stations_subset <- CTtable[CTtable[[stationCol]] %in% 
                                    unique(records_subset[[stationCol]]),]
-      species_list <- unique(records_subset[[speciesCol]])
+      # species_list <- unique(records_subset[[speciesCol]])  #only species in current assemblage
+      species_list <- unique(recordTable[[speciesCol]])    # all species (across assemblages)
       
       incidence_matrices[[assem]] <- create_incidence_matrix(
-        records_subset, 
-        stations_subset,
-        species_list,
-        temporal = x_unit == "day"
+        records_subset = records_subset, 
+        stations_subset = stations_subset,
+        species_list = species_list,
+        temporal = x_unit == "survey_day" | x_unit == "station_day",
+        by_station = x_unit == "station_day"
       )
     }
-  } else {
+  } else {  # if no assemblages defined
     # Create single matrix for all data
     species_list <- unique(recordTable[[speciesCol]])
     incidence_matrices <- create_incidence_matrix(
-      recordTable,
-      CTtable,
-      species_list,
-      temporal = x_unit == "day"
+      records_subset = recordTable, 
+      stations_subset = CTtable,
+      species_list = species_list,
+      temporal = x_unit == "survey_day" | x_unit == "station_day",
+      by_station = x_unit == "station_day"
     )
     incidence_matrices <- list(incidence_matrices)
   }
   
   
   # Run iNEXT
-  out <- iNEXT::iNEXT(incidence_matrices, 
+  out <- iNEXT::iNEXT(x = incidence_matrices, 
                       datatype = "incidence_raw", 
                       q = q,
                       knots = knots,
                       conf = conf,
-                      nboot = nboot)
+                      nboot = nboot,
+                      endpoint = endpoint)
   
   return(out)
 }
+
+
+
+# Function to create incidence matrix
+create_incidence_matrix <- function(records_subset, 
+                                    stations_subset, 
+                                    species_list, 
+                                    temporal = FALSE,
+                                    by_station) {    # only relevant if temporal = T
+  # if(temporal) {
+  #   # avoid CRAN check notes
+  #   survey_date <- NULL
+  # 
+  #   # For temporal analysis (days)
+  #   records_subset <- records_subset %>%
+  #     mutate(
+  #       survey_date = as.Date(.data[[recordDateTimeCol]]),
+  #       # difference between record date and setup if first station in survey (+1 so first day is 1, not 0)
+  #       survey_day  = as.numeric(survey_date - min(as.Date(stations_subset[[setupCol]]))) + 1
+  #       survey_day_by_station  = as.numeric(survey_date - min(as.Date(stations_subset[[setupCol]]))) + 1
+  #     )
+  # 
+  #   units <- 1:max(records_subset$survey_day)
+  #   unit_col <- "survey_day"
+  # } 
+  if(temporal) {
+    # avoid CRAN check notes
+    survey_date <- survey_day <- survey_day_by_station <- NULL
+    
+    # For temporal analysis (days)
+    records_subset <- records_subset %>%
+      # Join with station setup dates
+      left_join(stations_subset %>% select(!!sym(stationCol), !!sym(setupCol)), 
+                by = stationCol) %>%
+      mutate(
+        survey_date = as.Date(.data[[recordDateTimeCol]]),
+        station_setup_date = as.Date(.data[[setupCol]]),
+        # survey day relative to first camera setup in survey
+        survey_day = as.numeric(survey_date - min(as.Date(stations_subset[[setupCol]]))) + 1,
+        # survey day relative to each station's setup
+        survey_day_by_station = as.numeric(survey_date - station_setup_date) + 1
+      )
+    
+    # Allow choice between the two types of survey days
+    if(by_station) {
+      units <- 1:max(records_subset$survey_day_by_station)
+      unit_col <- "survey_day_by_station"
+    } else {
+      units <- 1:max(records_subset$survey_day)
+      unit_col <- "survey_day"
+    }
+    
+    # sanity check
+    if(any(records_subset[, unit_col] < 0)) {
+      warning(paste("Calculated negative survey days in",
+                    paste(
+                      unique(records_subset[records_subset[, unit_col] < 0, stationCol] ),
+                      collapse = ", "
+                    ), "\n"))
+    }
+  }
+  else {
+    # For spatial analysis (stations)
+    units <- unique(stations_subset[[stationCol]])
+    unit_col <- stationCol
+  }
+  
+  
+  
+  # Create empty matrix
+  incidence_matrix <- matrix(0, 
+                             nrow = length(species_list), 
+                             ncol = length(units),
+                             dimnames = list(species_list, as.character(units)))
+  
+  # Fill matrix
+  for(sp in species_list) {
+    for(unit in units) {
+      if(temporal) {
+        detected <- any(records_subset[[speciesCol]] == sp & 
+                          records_subset[[unit_col]] == unit)
+      } else {
+        detected <- any(records_subset[[speciesCol]] == sp & 
+                          records_subset[[unit_col]] == unit)
+      }
+      if(detected) {
+        incidence_matrix[sp, as.character(unit)] <- 1
+      }
+    }
+  }
+  
+  return(incidence_matrix)
+}
+
+
 
 
 # Helper function to convert records to station-days
@@ -242,7 +295,7 @@ convert_to_station_days <- function(recordTable,
   # Create lookup for station setup times
   station_setups <- setNames(setup_times, CTtable[[stationCol]])
   
-  # prevent CRAMN check notes
+  # prevent CRAN check notes
   datetime <- setup_time <- station_day <- species <- new_species <- station <- NULL
   
   # Calculate day number for each record
