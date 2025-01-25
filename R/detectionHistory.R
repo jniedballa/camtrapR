@@ -295,7 +295,7 @@ detectionHistory <- function(recordTable,
                              occasionLength,
                              minActiveDaysPerOccasion,
                              maxNumberDays,
-                             day1,
+                             day1 = "survey",
                              buffer,
                              includeEffort = TRUE,
                              scaleEffort = FALSE,
@@ -403,7 +403,7 @@ detectionHistory <- function(recordTable,
   }
   
   if(includeEffort){
-    if(!hasArg(scaleEffort))     stop("scaleEffort must be defined if includeEffort is TRUE", call. = FALSE)
+    # if(!hasArg(scaleEffort))     stop("scaleEffort must be defined if includeEffort is TRUE", call. = FALSE)
     if(!is.logical(scaleEffort)) stop("scaleEffort must be logical (TRUE or FALSE)", call. = FALSE)
   } else {scaleEffort <- FALSE}
   
