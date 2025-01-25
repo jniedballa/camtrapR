@@ -1,3 +1,8 @@
+# camtrapR 2.4.4
+
+# new features:
+* speciesAccum: add allowed x_unit "survey_day" and "station_day"
+
 # camtrapR 2.4.3
 
 ## new features
@@ -16,8 +21,8 @@
 
 # camtrapR 2.4.1
 
-## bugfixes:
-# surveyDashboard: improved checks for available packages
+## bugfixes
+* surveyDashboard: improved checks for available packages
 
 
 # camtrapR 2.4.0
