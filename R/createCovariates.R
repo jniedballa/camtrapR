@@ -243,11 +243,12 @@ createCovariates <- function(CTtable,
     # Extract covariate names and file paths from parameter 'filenames'
     if(!is.null(names(filenames))) {
       covariate_names <- names(filenames)
-      lf_covariates <- unname(filenames)
+      # lf_covariates <- unname(filenames)
     } else {
       covariate_names <- tools::file_path_sans_ext(basename(filenames))
+      # lf_covariates <- filenames
     }
-    list_r_cov <- lapply(lf_covariates, function(file) terra::rast(file))
+    list_r_cov <- lapply(filenames, function(file) terra::rast(file))
   }
   names(list_r_cov) <- covariate_names
   
