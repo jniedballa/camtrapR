@@ -463,9 +463,13 @@ surveyDashboard <- function(CTtable = NULL,
                               shiny::fileInput("ct_file", "Upload Camera Trap CSV", accept = c(".csv")),
                               shiny::selectInput("stationCol", "Station Column", choices = NULL),
                               shiny::selectInput("cameraCol", "Camera Column (optional)", choices = NULL),
+                              shiny::uiOutput("camerasIndependentImportUI"),
                               shiny::selectInput("xcol", "X Coordinate Column", choices = NULL),
                               shiny::selectInput("ycol", "Y Coordinate Column", choices = NULL),
-                              shiny::textInput("crs", "Coordinate Reference System (e.g., 'EPSG:4326')"),
+                              # shiny::textInput("crs", "Coordinate Reference System (e.g., 'EPSG:4326')"),
+                              shiny::textInput("crs", "Coordinate Reference System",
+                                               value = "",
+                                               placeholder = "e.g. EPSG:4326 or EPSG:32648 (no quotes needed)"),
                               shiny::selectInput("setupCol", "Setup Date Column", choices = NULL),
                               shiny::selectInput("retrievalCol", "Retrieval Date Column", choices = NULL),
                               shiny::textInput("CTdateFormat", "Date Format", value = "ymd"),
@@ -950,7 +954,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                                conditionalPanel(
                                                                  condition = "input.predictionExtent !== 'none'",
                                                                  numericInput("bufferPrediction", "Buffer prediction area (meters)", 
-                                                                              value = 1000, min = 0)
+                                                                              value = 1000, min = 0, step = 100)
                                                                ),
                                                                
                                                                fileInput("rasterTemplate", "Raster Template (optional)", 
@@ -1517,6 +1521,8 @@ surveyDashboard <- function(CTtable = NULL,
                                   ),
                                   selected = "basic"
                      ),
+                     collapsible = TRUE, 
+                     collapsed = FALSE,
                      helpText("Basic workflow is recommended for most analyses. Advanced workflow provides more control but requires deeper understanding of model structure.")
                    )
             )
@@ -1555,7 +1561,6 @@ surveyDashboard <- function(CTtable = NULL,
                                   selectInput("basic_model_type", "Model type:",
                                               choices = c("Occupancy", "Royle-Nichols"),
                                               selected = "Occupancy"),
-                                  checkboxInput("basic_scale_covariates", "Scale covariates", value = FALSE),
                                   hr(),
                                   
                                   h4("Covariates", class = "text-primary"),
@@ -1567,8 +1572,9 @@ surveyDashboard <- function(CTtable = NULL,
                                   varSelectizeInput("basic_occ_covs", "Occupancy covariates",
                                                     data = NULL, multiple = TRUE,
                                                     options = list(selectize = TRUE)),
+                                  checkboxInput("basic_scale_covariates", "Scale covariates", value = FALSE),
                                   
-                                  # UBMS Settings
+                                  # ubms Settings
                                   conditionalPanel(
                                     condition = "input.basic_model_package == 'ubms'",
                                     hr(),
@@ -2018,7 +2024,6 @@ surveyDashboard <- function(CTtable = NULL,
           tabsetPanel(
             selected = "Species Selection",
             
-            # Add this as the first tab in Community Occupancy Models tabsetPanel
             tabPanel("Instructions",
                      fluidRow(
                        shinydashboard::box(
@@ -2221,55 +2226,101 @@ surveyDashboard <- function(CTtable = NULL,
                                 )
                        ),
                        
-                       # # Goodness of Fit Tab
-                       # tabPanel("Goodness of Fit",
-                       #          fluidRow(
-                       #            box(
-                       #              title = "GoF Settings", 
-                       #              width = 4, 
-                       #              status = "primary",
-                       #              numericInput("gof_nsim", "Number of simulations:", 
-                       #                           value = 1000, min = 100, max = 10000),
-                       #              actionButton("run_gof", "Run Goodness of Fit Test", 
-                       #                           class = "btn-primary"),
-                       #              actionButton("run_gof_background", "Run in Background", 
-                       #                           class = "btn-info")
-                       #            ),
-                       #            box(
-                       #              title = "Results", 
-                       #              width = 8, 
-                       #              status = "info",
-                       #              verbatimTextOutput("gof_results")
-                       #            )
-                       #          ),
-                       #          fluidRow(
-                       #            box(
-                       #              title = "Diagnostic Plots", 
-                       #              width = 12, 
-                       #              status = "primary",
-                       #              plotOutput("gof_plots", height = "600px")
-                       #            )
-                       #          )
-                       # )
+          
+                       # Modified Goodness of Fit tabPanel
                        tabPanel("Goodness of Fit",
                                 fluidRow(
-                                  shinydashboard::box(
-                                    width = 12,
-                                    status = "info",
-                                    solidHeader = TRUE,
-                                    title = "Community Model Goodness of Fit",
-                                    div(
-                                      style = "text-align: center; padding: 20px;",
-                                      tags$h3(icon("chart-line"), " Coming Soon!"),
-                                      tags$p(
-                                        "Goodness of fit testing for community occupancy models will be implemented in a future update.",
-                                        style = "font-size: 16px; color: #666;"
-                                      ),
-                                      tags$p(
-                                        "This will include posterior predictive checks and other diagnostics specific to hierarchical community models.",
-                                        style = "font-size: 14px; color: #888;"
-                                      )
-                                    )
+                                  # Settings panel - stays fixed on the left
+                                  column(width = 3,
+                                         wellPanel(
+                                           h4("GoF Settings", class = "text-primary"),
+                                           numericInput("gof_draws", "Number of posterior draws:", 
+                                                        value = 1000, min = 100, max = 10000, step = 100),
+                                           checkboxInput("gof_z_cond", "Condition on occupancy (z)", 
+                                                         value = TRUE),
+                                           selectInput("gof_residual_type", "Residual type:",
+                                                       choices = c("Freeman-Tukey" = "FT",
+                                                                   "Pearson Chi-squared" = "PearChi2",
+                                                                   "Deviance" = "Deviance"),
+                                                       selected = "FT"),
+                                           tags$div(
+                                             style = "margin-top: 20px;",
+                                             actionButton("run_gof", "Run Goodness of Fit Test", 
+                                                          class = "btn-primary btn-lg btn-block"),
+                                             actionButton("run_gof_background", "Run in Background",
+                                                          class = "btn-info btn-block",
+                                                          style = "margin-top: 10px;")
+                                           )
+                                         )
+                                  ),
+                                  
+                                  # Results area with tabs on the right
+                                  column(width = 9,
+                                         tabsetPanel(
+                                           # Model Fit Results tab
+                                           tabPanel("Model Fit Results",
+                                                    # Overall fit box
+                                                    shinydashboard::box(
+                                                      title = "Overall Model Fit",
+                                                      width = NULL,
+                                                      status = "primary",
+                                                      solidHeader = TRUE,
+                                                      div(
+                                                        style = "text-align: center; padding: 20px;",
+                                                        h2("Community-level Bayesian p-value",
+                                                           style = "margin-bottom: 20px;"),
+                                                        h1(textOutput("gof_community_pvalue", inline = TRUE),
+                                                           style = "font-size: 48px; font-weight: bold;"),
+                                                        tags$div(
+                                                          class = "interpretBox",
+                                                          style = "margin: 15px; padding: 15px; border-radius: 5px; font-size: 24px;",
+                                                          uiOutput("gof_interpretation")
+                                                        )
+                                                      )
+                                                    ),
+                                                    
+                                                    # Species-level results
+                                                    shinydashboard::box(
+                                                      title = "Species-level Results",
+                                                      width = NULL,
+                                                      status = "info",
+                                                      solidHeader = TRUE,
+                                                      DT::dataTableOutput("gof_species_table")
+                                                    )
+                                           ),
+                                           
+                                           # Residual Plots tab
+                                           tabPanel("Residual Plots",
+                                                    shinydashboard::box(
+                                                      title = "Residual Plots",
+                                                      width = NULL,
+                                                      status = "primary",
+                                                      solidHeader = TRUE,
+                                                      
+                                                      # Plot controls
+                                                      fluidRow(
+                                                        column(4,
+                                                               numericInput("gof_plot_columns", 
+                                                                            "Number of columns:", 
+                                                                            value = 3, min = 1, max = 5)
+                                                        ),
+                                                        column(4,
+                                                               checkboxInput("gof_plot_free_scales", 
+                                                                             "Use free scales", 
+                                                                             value = FALSE)
+                                                        ),
+                                                        column(4,
+                                                               numericInput("gof_plot_scale", 
+                                                                            "Plot size scale:", 
+                                                                            value = 1.5, min = 0.5, max = 3, 
+                                                                            step = 0.1)
+                                                        )
+                                                      ),
+                                                      
+                                                      plotOutput("gof_residual_plot", height = "auto")
+                                                    )
+                                           )
+                                         )
                                   )
                                 )
                        )
@@ -2696,6 +2747,48 @@ surveyDashboard <- function(CTtable = NULL,
       })
     })
     
+    
+    output$camerasIndependentImportUI <- renderUI({ 
+      req(data$CTtable_temp, input$stationCol, input$cameraCol)
+      
+      # Only show camerasIndependent if camera column is selected and multiple cameras exist
+      if (input$cameraCol != "") {
+        n_cameras_per_station <- table(data$CTtable_temp[[input$stationCol]])
+        has_multiple_cameras <- any(n_cameras_per_station > 1)
+        
+        if (has_multiple_cameras) {
+          checkboxInput("camerasIndependentImport", 
+                        "Cameras are independent", 
+                        value = FALSE)
+        }
+      }
+    })
+    
+    # validate input coordinate system
+    observe({
+      req(input$crs)
+      
+      # Clean up CRS input
+      clean_crs <- gsub("['\"]", "", input$crs)  # Remove quotes if present
+      
+      # Validate CRS format
+      if (!grepl("^EPSG:\\d+$", clean_crs, ignore.case = TRUE)) {
+        showNotification("CRS should be in format 'EPSG:number' (e.g. EPSG:4326)", 
+                         type = "warning")
+        return()
+      }
+      
+      # Try to create CRS object to validate
+      tryCatch({
+        sf::st_crs(clean_crs)
+        # Store clean CRS in data if valid
+        data$crs <- clean_crs
+      }, error = function(e) {
+        showNotification("Invalid CRS specified. Please check the EPSG code.", 
+                         type = "error")
+      })
+    })
+    
     # Observer for CT "Done" button
     shiny::observeEvent(input$ct_done, {
       req(data$CTtable_temp)
@@ -2704,11 +2797,12 @@ surveyDashboard <- function(CTtable = NULL,
       data$cameraCol <- if(input$cameraCol != "") input$cameraCol else NULL
       data$xcol <- input$xcol
       data$ycol <- input$ycol
-      data$crs <- input$crs
+      data$crs <- data$crs  # This uses the cleaned/validated CRS from the observer above
       data$setupCol <- input$setupCol
       data$retrievalCol <- input$retrievalCol
       data$CTdateFormat <- input$CTdateFormat
       data$hasProblems <- input$hasProblems
+      data$camerasIndependent <- if(!is.null(input$camerasIndependentImport)) input$camerasIndependentImport else FALSE
       shiny::showNotification("Camera Trap data updated", type = "message")
     })
     
@@ -2781,10 +2875,6 @@ surveyDashboard <- function(CTtable = NULL,
       data$speciesCol <- NULL
       data$recordDateTimeCol <- NULL
       
-      # Clear data previews
-      output$wi_deployment_preview <- DT::renderDT({ NULL })
-      output$wi_detection_preview <- DT::renderDT({ NULL })
-      
       output$filterMap <- leaflet::renderLeaflet(NULL)
       
       
@@ -2832,6 +2922,18 @@ surveyDashboard <- function(CTtable = NULL,
           data$recordDateTimeFormat = "ymd HMS"
           data$CTdateFormat <- "ymd HMS"
           
+          # Explicitly update the previews
+          output$wi_deployment_preview <- DT::renderDT({
+            req(wi_imported$CTtable)
+            DT::datatable(head(wi_imported$CTtable, 100), 
+                          options = list(scrollX = TRUE))
+          })
+          
+          output$wi_detection_preview <- DT::renderDT({
+            req(wi_imported$recordTable)
+            DT::datatable(head(wi_imported$recordTable, 100), 
+                          options = list(scrollX = TRUE))
+          })
           
           # Show success message
           showNotification("Wildlife Insights data imported successfully", type = "message")
@@ -2854,16 +2956,16 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
-    # Render Wildlife Insights data previews
-    output$wi_deployment_preview <- DT::renderDT({
-      req(wi_data())
-      datatable(head(wi_data()$CTtable, 100), options = list(scrollX = TRUE))
-    })
-    
-    output$wi_detection_preview <- DT::renderDT({
-      req(wi_data())
-      datatable(head(wi_data()$recordTable, 100), options = list(scrollX = TRUE))
-    })
+    # # Render Wildlife Insights data previews
+    # output$wi_deployment_preview <- DT::renderDT({
+    #   req(wi_data())
+    #   datatable(head(wi_data()$CTtable, 100), options = list(scrollX = TRUE))
+    # })
+    # 
+    # output$wi_detection_preview <- DT::renderDT({
+    #   req(wi_data())
+    #   datatable(head(wi_data()$recordTable, 100), options = list(scrollX = TRUE))
+    # })
     
     # Update other inputs based on imported data
     
@@ -3522,73 +3624,149 @@ surveyDashboard <- function(CTtable = NULL,
       )
     })
     
-    # Render the species map
+    # # Render the species map
+    # Modify the existing map observer
     output$maps <- leaflet::renderLeaflet({
-      req(detmaps_sf(), input$species_for_map, input$no_record_more_transparent, input$scale_size)
+      req(detmaps_sf(), input$species_for_map)
       
-      if (input$species_for_map != "n_species") {
-        species_tmp <- gsub("[[:space:][:punct:]]+", ".", input$species_for_map)
-        layer.name <- input$species_for_map
-      } else {
-        species_tmp <- input$species_for_map
-        layer.name <- "Species richness (observed)"
-      }
+      # Invalidate when checkboxes change
+      input$scale_size
+      input$no_record_more_transparent
       
-      detmaps_sf_data <- detmaps_sf()
-      detmaps_sf_logi <- detmaps_sf_data
-      detmaps_sf_logi[[species_tmp]] <- detmaps_sf_logi[[species_tmp]] >= 1
-      detmaps_sf_logi <- detmaps_sf_logi[detmaps_sf_logi[[species_tmp]], ]
-      
-      # make stations without records more transparent
-      if(input$no_record_more_transparent) {
-        alpha <- ifelse(detmaps_sf_data[[species_tmp]] >= 1, 0.9, 0.85)
-      } else {
-        alpha <- 0.9
-      }
-      detmaps_sf_data$alpha <- alpha
-      
-      map_view <- mapview::mapview(
-        detmaps_sf_data,
-        xcol = data$xcol,
-        ycol = data$ycol,
-        zcol = species_tmp,
-        label = detmaps_sf_data[[data$stationCol]],
-        color = hcl.colors(100, "viridis"),
-        cex = ifelse(input$scale_size, species_tmp, 10),
-        alpha.regions = "alpha",
-        layer.name = layer.name
-      )
-      
-      # Add study area if available
-      if (!is.null(data$study_area)) {
-        map_view <- map_view + 
-          mapview::mapview(data$study_area,
-                           col.regions = "transparent",
-                           color = "red",
-                           lwd = 2,
-                           layer.name = "Study Area")
-      }
-      
-      # add little black dots at stations with detections
-      if (input$species_for_map != "n_species" & !input$scale_size) {
-        map_view <- map_view + mapview::mapview(
-          detmaps_sf_logi,
+      # Force recreation of the map
+      isolate({
+        if (input$species_for_map != "n_species") {
+          species_tmp <- gsub("[[:space:][:punct:]]+", ".", input$species_for_map)
+          layer.name <- input$species_for_map
+        } else {
+          species_tmp <- input$species_for_map
+          layer.name <- "Species richness (observed)"
+        }
+        
+        detmaps_sf_data <- detmaps_sf()
+        detmaps_sf_logi <- detmaps_sf_data
+        detmaps_sf_logi[[species_tmp]] <- detmaps_sf_logi[[species_tmp]] >= 1
+        detmaps_sf_logi <- detmaps_sf_logi[detmaps_sf_logi[[species_tmp]], ]
+        
+        # make stations without records more transparent
+        alpha <- if(input$no_record_more_transparent) {
+          ifelse(detmaps_sf_data[[species_tmp]] >= 1, 0.9, 0.85)
+        } else {
+          0.9
+        }
+        detmaps_sf_data$alpha <- alpha
+        
+        # Create map
+        map_view <- mapview::mapview(
+          detmaps_sf_data,
           xcol = data$xcol,
           ycol = data$ycol,
           zcol = species_tmp,
-          label = FALSE, 
-          popup = FALSE,
-          legend = FALSE,
-          color = "black",
-          col.regions = "black",
-          alpha.regions = 1,
-          cex = 2,
-          layer.name = "Stations with detections"
+          label = detmaps_sf_data[[data$stationCol]],
+          color = hcl.colors(100, "viridis"),
+          cex = if(input$scale_size) species_tmp else 10,
+          alpha.regions = "alpha",
+          layer.name = layer.name
         )
-      }
-      map_view@map
+        
+        # Add study area if available
+        if (!is.null(data$study_area)) {
+          map_view <- map_view + 
+            mapview::mapview(data$study_area,
+                             col.regions = "transparent",
+                             color = "red",
+                             lwd = 2,
+                             layer.name = "Study Area")
+        }
+        
+          # add little black dots at stations with detections
+          if (input$species_for_map != "n_species" & !input$scale_size) {
+            map_view <- map_view + mapview::mapview(
+              detmaps_sf_logi,
+              xcol = data$xcol,
+              ycol = data$ycol,
+              zcol = species_tmp,
+              label = FALSE,
+              popup = FALSE,
+              legend = FALSE,
+              color = "black",
+              col.regions = "black",
+              alpha.regions = 1,
+              cex = 2,
+              layer.name = "Stations with detections"
+            )
+          }
+        
+        map_view@map
+      })
     })
     
+    # output$maps <- leaflet::renderLeaflet({
+    #   req(detmaps_sf(), input$species_for_map, input$no_record_more_transparent, input$scale_size)
+    #   
+    #   if (input$species_for_map != "n_species") {
+    #     species_tmp <- gsub("[[:space:][:punct:]]+", ".", input$species_for_map)
+    #     layer.name <- input$species_for_map
+    #   } else {
+    #     species_tmp <- input$species_for_map
+    #     layer.name <- "Species richness (observed)"
+    #   }
+    #   
+    #   detmaps_sf_data <- detmaps_sf()
+    #   detmaps_sf_logi <- detmaps_sf_data
+    #   detmaps_sf_logi[[species_tmp]] <- detmaps_sf_logi[[species_tmp]] >= 1
+    #   detmaps_sf_logi <- detmaps_sf_logi[detmaps_sf_logi[[species_tmp]], ]
+    #   
+    #   # make stations without records more transparent
+    #   if(input$no_record_more_transparent) {
+    #     alpha <- ifelse(detmaps_sf_data[[species_tmp]] >= 1, 0.9, 0.85)
+    #   } else {
+    #     alpha <- 0.9
+    #   }
+    #   detmaps_sf_data$alpha <- alpha
+    #   
+    #   map_view <- mapview::mapview(
+    #     detmaps_sf_data,
+    #     xcol = data$xcol,
+    #     ycol = data$ycol,
+    #     zcol = species_tmp,
+    #     label = detmaps_sf_data[[data$stationCol]],
+    #     color = hcl.colors(100, "viridis"),
+    #     cex = ifelse(input$scale_size, species_tmp, 10),
+    #     alpha.regions = "alpha",
+    #     layer.name = layer.name
+    #   )
+    #   
+    #   # Add study area if available
+    #   if (!is.null(data$study_area)) {
+    #     map_view <- map_view + 
+    #       mapview::mapview(data$study_area,
+    #                        col.regions = "transparent",
+    #                        color = "red",
+    #                        lwd = 2,
+    #                        layer.name = "Study Area")
+    #   }
+    #   
+    #   # add little black dots at stations with detections
+    #   if (input$species_for_map != "n_species" & !input$scale_size) {
+    #     map_view <- map_view + mapview::mapview(
+    #       detmaps_sf_logi,
+    #       xcol = data$xcol,
+    #       ycol = data$ycol,
+    #       zcol = species_tmp,
+    #       label = FALSE, 
+    #       popup = FALSE,
+    #       legend = FALSE,
+    #       color = "black",
+    #       col.regions = "black",
+    #       alpha.regions = 1,
+    #       cex = 2,
+    #       layer.name = "Stations with detections"
+    #     )
+    #   }
+    #   map_view@map
+    # })
+    # 
     
     
     ## Tab: Filter Stations ####
@@ -4022,7 +4200,7 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
-    # Add this to store the original record table
+    # store the original record table
     original_record_table <- reactiveVal(NULL)
     
     # Initialize the original_record_table when the app starts
@@ -4373,13 +4551,13 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
-    # Calculate pixel size at latitude
-    calculate_pixel_size <- function(latitude) {
-      # At zoom level 12
-      # Approximate pixel size = 156543.03 * cos(latitude) / 2^zoom meters
-      pixel_size <- 156543.03 * cos(latitude * pi/180) / 2^input$elevationZoom
-      return(round(pixel_size, 1))
-    }
+    # # Calculate pixel size at latitude
+    # calculate_pixel_size <- function(latitude) {
+    #   # At zoom level 12
+    #   # Approximate pixel size = 156543.03 * cos(latitude) / 2^zoom meters
+    #   pixel_size <- 156543.03 * cos(latitude * pi/180) / 2^input$elevationZoom
+    #   return(round(pixel_size, 1))
+    # }
     
     # Helper function to clip / mask prediction rasters
     clip_prediction_rasters <- function(rasters, prediction_extent) {
@@ -4438,11 +4616,14 @@ surveyDashboard <- function(CTtable = NULL,
           # Add input source parameters
           if (input$inputType == "directory") {
             req(input$directory)
-            covariate_args$directory <- input$directory
+            # Normalize directory path to use forward slashes
+            covariate_args$directory <- gsub("\\", "/", input$directory, fixed = TRUE)
             covariate_args$recursive <- input$recursive
           } else {
             req(input$filenames)
-            covariate_args$filenames <- unlist(strsplit(input$filenames, ",\\s*"))
+            # Split by comma and optional whitespace, then normalize each path
+            raw_filenames <- unlist(strsplit(input$filenames, ",\\s*"))
+            covariate_args$filenames <- gsub("\\", "/", raw_filenames, fixed = TRUE)
           }
           
           # Handle raster template/resolution
@@ -4520,12 +4701,13 @@ surveyDashboard <- function(CTtable = NULL,
     observeEvent(input$processElevation, {
       req(data$CTtable_sf)
       
+      print(as.numeric(input$elevationZoom))
       
       withProgress(message = 'Processing elevation data...', value = 0, {
         tryCatch({
           
           # Create buffered polygon from points
-          buffered_sf <- sf::st_buffer(data$CTtable_sf, dist = min(1000, input$bufferPrediction))
+          buffered_sf <- sf::st_buffer(data$CTtable_sf, dist = input$bufferPrediction)
           
           # Get bounding box and transform to EPSG:4326 if needed
           if (sf::st_crs(buffered_sf) != sf::st_crs(4326)) {
@@ -4536,7 +4718,7 @@ surveyDashboard <- function(CTtable = NULL,
           
           elevation_rast <- elevatr::get_elev_raster(
             locations = buffered_sf_4326,
-            z = 11,
+            z = as.numeric(input$elevationZoom),
             source = "aws",
             clip = "bbox"
           )
@@ -5218,7 +5400,8 @@ surveyDashboard <- function(CTtable = NULL,
         return()
       }
       
-      req(data$recordTable, data$CTtable, selected_species())
+      req(data$recordTable, data$CTtable, data$stationCol, data$speciesCol, selected_species())
+      
 
       # Set x_label based on current selection
       x_label(if(input$acc_x_unit == "station") {
@@ -5820,6 +6003,7 @@ surveyDashboard <- function(CTtable = NULL,
     # Helper function for color palettes
     get_color_palette <- function(palette_name, n = 100, invert = FALSE) {
       colors <- switch(palette_name,
+                       "Terrain" = hcl.colors(n, palette = "Terrain2"),
                        "Viridis" = viridisLite::viridis(n),
                        "Plasma" = viridisLite::plasma(n),
                        "Inferno" = viridisLite::inferno(n),
@@ -5906,12 +6090,26 @@ surveyDashboard <- function(CTtable = NULL,
     observeEvent(input$basic_run_model, {
       req(umf())
       
+      
       # Create detection formula
       det_formula <- {
-        covs <- if (input$basic_scale_covariates && length(input$basic_det_covs) > 0) {
-          paste0("scale(", input$basic_det_covs, ")", collapse = " + ")
+        covs <- if (length(input$basic_det_covs) > 0) {
+          if (input$basic_scale_covariates) {
+            # Use scale() only for covariates that were scaled before
+            processed_covs <- sapply(input$basic_det_covs, function(cov) {
+              cov <- symbols_to_char_or_null(cov)
+              if (cov %in% names(data$scaling_params$means)) {
+                paste0("scale(", cov, ")")
+              } else {
+                cov
+              }
+            })
+            paste(processed_covs, collapse = " + ")
+          } else {
+            paste(input$basic_det_covs, collapse = " + ")
+          }
         } else {
-          paste(input$basic_det_covs, collapse = " + ")
+          ""
         }
         
         effort_term <- if (input$basic_effort_on_detection) {
@@ -5926,17 +6124,31 @@ surveyDashboard <- function(CTtable = NULL,
         else "1"
       }
       
+      
       # Create occupancy formula
       occ_formula <- {
         if (length(input$basic_occ_covs) == 0) "1"
-        else if (input$basic_scale_covariates) 
-          paste0("scale(", input$basic_occ_covs, ")", collapse = " + ")
-        else 
+        else if (input$basic_scale_covariates) {
+          # paste0("scale(", input$basic_occ_covs, ")", collapse = " + ")
+          processed_covs <- sapply(input$basic_occ_covs, function(cov) {
+            cov <- symbols_to_char_or_null(cov)
+            if (cov %in% names(data$scaling_params$means)) {
+              paste0("scale(", cov, ")")
+            } else {
+              cov
+            }
+          })
+          paste(processed_covs, collapse = " + ")
+        } else 
           paste(input$basic_occ_covs, collapse = " + ")
       }
       
+      
       # Combine formulas
       formula_tmp <- stats::formula(paste0("~", det_formula, " ~", occ_formula))
+      
+      # browser()
+      
       
       withProgress(message = 'Fitting basic model...', value = 0, {
         tryCatch({
@@ -6226,7 +6438,7 @@ surveyDashboard <- function(CTtable = NULL,
           show_data = input$adv_show_data
         )
         
-        print(plot_data)
+        # print(plot_data)
         
       } else {
         # For ubms models
@@ -6437,6 +6649,8 @@ surveyDashboard <- function(CTtable = NULL,
     }
     
     
+
+    
     # observer for scaling data when aggregated_CTtable changes
     observe({
       req(data$aggregated_CTtable)
@@ -6447,6 +6661,8 @@ surveyDashboard <- function(CTtable = NULL,
       # Store results
       data$scaling_params <- scaling_result$scaling_params
       data$aggregated_CTtable_scaled <- scaling_result$scaled_data
+      
+      print(str(data$prediction_raster))
       
       # Scale prediction raster if it exists
       if (!is.null(data$prediction_raster)) {
@@ -6568,6 +6784,8 @@ surveyDashboard <- function(CTtable = NULL,
       # Create detection history list for selected species
       #   can't use vectorized input to species since (probably) the reactive 
       #   camop() doesn't play nice with match.call()
+      
+      # browser()
       
       ylist_full <- lapply(selected_species, function(sp) {
         detection_hist <- detectionHistory(
@@ -7026,7 +7244,264 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
+    ## Goodness of fit (community models) ----
+        
+    # Reactive value to store GOF results
+    gof_results <- reactiveVal(NULL)
     
+    
+    
+    
+    # Run GOF test
+    observeEvent(input$run_gof, {
+      req(fitted_comm_model(), commOccu_model())
+      
+      
+      
+      # browser()
+      
+      withProgress(message = 'Running Goodness of Fit test...', value = 0, {
+        tryCatch({
+          seed <- as.numeric(Sys.time())
+          
+          
+          # Get predictions for p and psi using subset of MCMC draws
+          p_pred <- predict(
+            object = commOccu_model(),
+            mcmc.list = fitted_comm_model(),
+            type = "p_array",
+            draws = input$gof_draws,
+            seed = seed
+          )
+          
+          psi_pred <- predict(
+            object = commOccu_model(),
+            mcmc.list = fitted_comm_model(),
+            type = "psi_array",
+            draws = input$gof_draws,
+            seed = seed
+          )
+          
+          # Run community PPC
+          results <- PPC.community(
+            p = p_pred,
+            psi = psi_pred,
+            y = commOccu_model()@input$ylist,
+            model = input$communityModelType,
+            type = input$gof_residual_type,
+            z.cond = input$gof_z_cond
+          )
+          
+          # Store results
+          gof_results(results)
+          
+          print("GOF Finished")
+          showNotification("Goodness of fit test completed", type = "message")
+        }, error = function(e) {
+          showNotification(paste("Error in GOF test:", e$message), type = "error")
+        })
+      })
+    })
+    
+    # Render community p-value
+    output$gof_community_pvalue <- renderText({
+      req(gof_results())
+      sprintf("%.3f", gof_results()$BP$BP[nrow(gof_results()$BP)])  # Last row is community-level
+    })
+    
+    # Render community p-value interpretation
+    output$gof_interpretation <- renderText({
+      req(gof_results())
+      bp <- gof_results()$BP$BP[nrow(gof_results()$BP)]
+      print(get_fit_interpretation(bp))
+    })
+    
+    # Consistent interpretation function for both community and species level
+    get_fit_interpretation <- function(bp) {
+      if (bp >= 0.45 && bp <= 0.55) {
+        "Excellent fit"
+      } else if (bp >= 0.25 && bp <= 0.75) {
+        "Good fit"
+      } else if (bp >= 0.1 && bp <= 0.9) {
+        "Moderate fit"
+      } else {
+        "Lack of fit"
+      }
+    }
+    
+    # Get dispersion pattern 
+    get_dispersion_pattern <- function(bp) {
+      if (bp >= 0.35 && bp <= 0.65) {
+        ""  # Empty for good/excellent fit
+      } else if (bp < 0.35) {
+        "Underdispersed"
+      } else {
+        "Overdispersed"
+      }
+    }
+    
+    
+
+    
+    # Render species table
+    output$gof_species_table <- DT::renderDT({
+      req(gof_results())
+      
+      # Create enhanced table with interpretation
+      species_results <- gof_results()$BP[-nrow(gof_results()$BP),]  # Remove community row
+      species_results$Deviation <- abs(species_results$BP - 0.5)
+      species_results$Interpretation <- sapply(species_results$BP, get_fit_interpretation)
+      species_results$Pattern <- sapply(species_results$BP, get_dispersion_pattern)
+      
+      
+      
+      DT::datatable(
+        species_results,
+        options = list(
+          pageLength = 10,
+          order = list(list(2, 'desc'))  # Sort by deviation
+        ),
+        rownames = FALSE
+      ) %>%
+        DT::formatRound(c("BP", "Deviation"), digits = 3) %>%
+        DT::formatStyle(
+          'BP',
+          backgroundColor = styleInterval(
+            c(0.1, 0.25, 0.45, 0.55, 0.75, 0.9),
+            c('#ff6666',              # Lack of fit: red
+              '#e6f5c9',              # Moderate fit: very light green
+              '#d9f0b3',              # Good fit: light green
+              '#99cc99',              # Excellent fit: medium-light green
+              '#d9f0b3',              # Good fit: light green
+              '#e6f5c9',              # Moderate fit: very light green
+              '#ff6666')              # Lack of fit: red
+          )
+        )
+    })
+    
+    # Helper function to get fill color based on p-value
+    get_fit_color <- function(bp) {
+      if(bp < 0.1 || bp > 0.9) {
+        "#ff6666"  # Red for lack of fit
+      } else if(bp >= 0.45 && bp <= 0.55) {
+        "#cceb99"  # Medium-light green for excellent fit
+      } else if(bp >= 0.35 && bp <= 0.65) {
+        "#d9f0b3"  # Light green for good fit
+      } else {
+        "#e6f5c9"  # Very light green for moderate fit
+      }
+    }
+    
+    # # Render residual plot
+    output$gof_residual_plot <- renderPlot({
+      req(gof_results())
+
+      # Create plot data
+      plot_data <- data.frame()
+
+      for (species in names(gof_results()$residuals)) {
+        species_data <- gof_results()$residuals[[species]]
+
+        plot_data <- rbind(plot_data, data.frame(
+          Species = species,
+          Observed = apply(species_data$res.obs, 2, mean),
+          Predicted = apply(species_data$res.new, 2, mean)
+        ))
+      }
+
+
+      # Calculate base sizes scaled by input
+      base_size <- 12 * input$gof_plot_scale
+
+
+      # Create plot
+      p <- ggplot(plot_data, aes(x = Observed, y = Predicted)) +
+        geom_point(alpha = 0.6) +
+        geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+        facet_wrap(~Species,
+                   ncol = input$gof_plot_columns,
+                   scales = if(input$gof_plot_free_scales) "free" else "fixed") +
+        theme_bw(base_size = base_size) +
+        theme(
+          strip.background = element_rect(fill = "lightgray"),
+          strip.text = element_text(face = "bold",
+                                    size = base_size),
+          axis.title = element_text(size = base_size),
+          axis.text = element_text(size = base_size * 0.9),
+          plot.title = element_text(size = base_size * 1.2),
+          plot.subtitle = element_text(size = base_size * 0.9)
+        ) +
+        labs(
+          title = "Observed vs. Predicted Residuals by Species",
+          subtitle = sprintf("Using %s residuals", input$gof_residual_type)
+        )
+
+      print(p)
+    }, height = function()   input$gof_plot_height
+    )
+    
+    # Updated residual plot
+    # output$gof_residual_plot <- renderPlot({
+    #   req(gof_results())
+    #   
+    #   # Create plot data with fit information
+    #   plot_data <- data.frame()
+    #   bp_values <- gof_results()$bp_values  # Get BP values once
+    #   
+    #   for (species in names(gof_results()$species_results)) {
+    #     species_data <- gof_results()$species_results[[species]]
+    #     # Get BP value safely
+    #     bp_value <- bp_values$BP[bp_values$Species == species]
+    #     
+    #     plot_data <- rbind(plot_data, data.frame(
+    #       Species = species,
+    #       Observed = apply(species_data$res.obs, 2, mean),
+    #       Predicted = apply(species_data$res.new, 2, mean),
+    #       BP = bp_value,
+    #       FitColor = get_fit_color(bp_value),
+    #       Fit = get_fit_interpretation(bp_value)
+    #     ))
+    #   }
+    #   
+    #   # Calculate base sizes scaled by input
+    #   base_size <- 12 * input$gof_plot_scale
+    #   
+    #   # Create mapping of species to colors
+    #   species_colors <- setNames(plot_data$FitColor, plot_data$Species)
+    #   
+    #   # Create plot with colored strips
+    #   p <- ggplot(plot_data, aes(x = Observed, y = Predicted)) +
+    #     geom_point(alpha = 0.6, size = 2 * input$gof_plot_scale) +
+    #     geom_abline(intercept = 0, slope = 1, color = "red", 
+    #                 linetype = "dashed", 
+    #                 linewidth = 0.5 * input$gof_plot_scale) +
+    #     facet_wrap(~Species, 
+    #                ncol = input$gof_plot_columns,
+    #                scales = if(input$gof_plot_free_scales) "free" else "fixed") +
+    #     theme_bw(base_size = base_size) +
+    #     theme(
+    #       strip.background = element_rect(fill = species_colors[levels(factor(plot_data$Species))]),
+    #       strip.text = element_text(
+    #         face = "bold", 
+    #         size = base_size,
+    #         color = ifelse(plot_data$BP < 0.1 | plot_data$BP > 0.9, "white", "black")
+    #       ),
+    #       axis.title = element_text(size = base_size),
+    #       axis.text = element_text(size = base_size * 0.9),
+    #       plot.title = element_text(size = base_size * 1.2),
+    #       plot.subtitle = element_text(size = base_size * 0.9)
+    #     ) +
+    #     labs(
+    #       title = "Observed vs. Predicted Residuals by Species",
+    #       subtitle = sprintf("Using %s residuals. Facet colors indicate model fit.", 
+    #                          input$gof_residual_type)
+    #     )
+    #   
+    #   print(p)
+    # }, height = function() input$gof_plot_height
+    # )
+    # 
+
     
     
     
