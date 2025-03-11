@@ -42,7 +42,7 @@
 #' @param knots numeric. number of values along x axis for which values are computed
 #' @param conf numeric. confidence interval
 #' @param nboot numeric. number of replications
-#' @param endpoint integer. Sample size used as endpoint for rarefaction/extrapolation (in \code{\link[iNEXT]{iNEXT})
+#' @param endpoint integer. Sample size used as endpoint for rarefaction/extrapolation (in \code{\link[iNEXT]{iNEXT}})
 #' 
 #'
 #' @return An object of class "iNEXT" containing:
@@ -81,7 +81,7 @@
 #'
 #' # With assemblage grouping and days as sampling units
 #' result_by_assemblage <- speciesAccum(
-#'   CTtable                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              = cams,
+#'   CTtable = cams,
 #'   recordTable = recs,
 #'   speciesCol = "Species",
 #'   recordDateTimeCol = "DateTime",
@@ -97,7 +97,7 @@
 #'
 #' @author Juergen Niedballa
 #'
-#' @importFrom dplyr mutate arrange distinct count
+#' @importFrom dplyr mutate arrange distinct count left_join select
 #' @importFrom stats setNames
 #' @export
 #' 
@@ -117,6 +117,7 @@ speciesAccum <- function(CTtable,
   
   # Input validation
   x_unit <- match.arg(x_unit)
+  
   
   # Check if required columns exist
   required_cols <- c(speciesCol, recordDateTimeCol, stationCol)
@@ -152,22 +153,30 @@ speciesAccum <- function(CTtable,
         stations_subset = stations_subset,
         species_list = species_list,
         temporal = x_unit == "survey_day" | x_unit == "station_day",
-        by_station = x_unit == "station_day"
+        by_station = x_unit == "station_day",
+        recordDateTimeCol = recordDateTimeCol,
+        setupCol = setupCol, 
+        stationCol = stationCol,
+        speciesCol = speciesCol
       )
     }
   } else {  # if no assemblages defined
     # Create single matrix for all data
     species_list <- unique(recordTable[[speciesCol]])
+    
     incidence_matrices <- create_incidence_matrix(
       records_subset = recordTable, 
       stations_subset = CTtable,
       species_list = species_list,
       temporal = x_unit == "survey_day" | x_unit == "station_day",
-      by_station = x_unit == "station_day"
+      by_station = x_unit == "station_day",
+      recordDateTimeCol = recordDateTimeCol,
+      setupCol = setupCol, 
+      stationCol = stationCol,
+      speciesCol = speciesCol
     )
     incidence_matrices <- list(incidence_matrices)
   }
-  
   
   # Run iNEXT
   out <- iNEXT::iNEXT(x = incidence_matrices, 
@@ -186,33 +195,23 @@ speciesAccum <- function(CTtable,
 # Function to create incidence matrix
 create_incidence_matrix <- function(records_subset, 
                                     stations_subset, 
+                                    stationCol,
+                                    setupCol,
+                                    recordDateTimeCol,
+                                    speciesCol,
                                     species_list, 
                                     temporal = FALSE,
                                     by_station) {    # only relevant if temporal = T
-  # if(temporal) {
-  #   # avoid CRAN check notes
-  #   survey_date <- NULL
-  # 
-  #   # For temporal analysis (days)
-  #   records_subset <- records_subset %>%
-  #     mutate(
-  #       survey_date = as.Date(.data[[recordDateTimeCol]]),
-  #       # difference between record date and setup if first station in survey (+1 so first day is 1, not 0)
-  #       survey_day  = as.numeric(survey_date - min(as.Date(stations_subset[[setupCol]]))) + 1
-  #       survey_day_by_station  = as.numeric(survey_date - min(as.Date(stations_subset[[setupCol]]))) + 1
-  #     )
-  # 
-  #   units <- 1:max(records_subset$survey_day)
-  #   unit_col <- "survey_day"
-  # } 
+
   if(temporal) {
     # avoid CRAN check notes
-    survey_date <- survey_day <- survey_day_by_station <- NULL
+    survey_date <- survey_day <- survey_day_by_station <- station_setup_date <- NULL
     
     # For temporal analysis (days)
     records_subset <- records_subset %>%
       # Join with station setup dates
-      left_join(stations_subset %>% select(!!sym(stationCol), !!sym(setupCol)), 
+      left_join(stations_subset %>% 
+                  select(!!sym(stationCol), !!sym(setupCol)), 
                 by = stationCol) %>%
       mutate(
         survey_date = as.Date(.data[[recordDateTimeCol]]),
