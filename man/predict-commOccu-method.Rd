@@ -16,7 +16,7 @@
   aoi = NULL,
   speciesSubset,
   batch = FALSE,
-  seed
+  seed = NULL
 )
 }
 \arguments{

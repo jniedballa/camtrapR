@@ -21,7 +21,7 @@ predictionMapsCommunity <- function(object,
                                     aoi = NULL,
                                     speciesSubset,
                                     batch = FALSE,
-                                    seed) 
+                                    seed = NULL) 
 {
   
   # type <- match.arg(type, choices = c("psi_array", "psi", "richness", "pao"))
@@ -71,7 +71,7 @@ predictionMapsCommunity <- function(object,
   params_submodel <- object@params[grep(keyword_submodel, object@params)]
   
   
-  if(hasArg(seed)){
+  if(!is.null(seed)){
     stopifnot(is.numeric(seed))
     set.seed(seed)
   }
