@@ -1,5 +1,5 @@
 globalVariables(c(
-  "PAO", "Predicted", "Records", "Species", "Stations",
+  "PAO", "Observed", "Predicted", "Records", "Species", "Stations",
   "covariateValue", "lower", "upper", "median",
   "modelEffects",
   "generateFormula",
