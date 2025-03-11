@@ -13,10 +13,11 @@ speciesAccum(
   stationCol,
   assemblageCol = NULL,
   q = 0,
-  x_unit = c("station", "day"),
+  x_unit = c("station", "survey_day", "station_day"),
   knots = 40,
   conf = 0.95,
-  nboot = 50
+  nboot = 50,
+  endpoint = NULL
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ speciesAccum(
 \item{conf}{numeric. confidence interval}
 
 \item{nboot}{numeric. number of replications}
+
+\item{endpoint}{integer. Sample size used as endpoint for rarefaction/extrapolation (in \code{\link[iNEXT]{iNEXT}})}
 }
 \value{
 An object of class "iNEXT" containing:
@@ -88,7 +91,7 @@ Requires package \pkg{iNEXT}.
 \examples{
 \dontrun{
 # Basic usage with stations as sampling units
-result <- run_camera_trap_inext(
+result <- speciesAccum(
   CTtable = cams,
   recordTable = recs,
   speciesCol = "Species",
@@ -105,7 +108,7 @@ ggiNEXT(result, type = 2)  # Sample completeness curve
 ggiNEXT(result, type = 3)  # Coverage-based R/E curve
 
 # With assemblage grouping and days as sampling units
-result_by_assemblage <- run_camera_trap_inext(
+result_by_assemblage <- speciesAccum(
   CTtable = cams,
   recordTable = recs,
   speciesCol = "Species",
