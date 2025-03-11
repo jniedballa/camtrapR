@@ -16,7 +16,7 @@ detectionHistory(
   occasionLength,
   minActiveDaysPerOccasion,
   maxNumberDays,
-  day1,
+  day1 = "survey",
   buffer,
   includeEffort = TRUE,
   scaleEffort = FALSE,
