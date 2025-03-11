@@ -29,8 +29,10 @@
 #' wi_data <- readWildlifeInsights(deployment_file = "path/to/deployments.csv",
 #'                                 image_file = "path/to/images.csv")
 #' }
-readWildlifeInsights <- function(directory = NULL, zipfile = NULL, 
-                                 deployment_file = NULL, image_file = NULL)
+readWildlifeInsights <- function(directory = NULL, 
+                                 zipfile = NULL, 
+                                 deployment_file = NULL, 
+                                 image_file = NULL)
 {
   # Check consistency of input parameters
   if (sum(!is.null(directory), !is.null(zipfile), 
@@ -89,13 +91,15 @@ readWildlifeInsights <- function(directory = NULL, zipfile = NULL,
     images      <- read.csv(image_file)
   }
   
-  # Rest of the function remains the same
+  
   deploymentCol <- "deployment_id"
   stationCol <- "placename"
   cameraCol  <- "camera_id"
-  date_format <- c("ymd!*HMS!z", 
-                   "ymd HMS",     # standard format
-                   "mdy HM")      # if user modified content of zip in Excel
+  date_formats <- c("ymd!*HMS!z", 
+                    "ymd HMS", 
+                   "mdy HMS",  
+                   "dmy HMS"            
+  )
   
   if(any(duplicated(deployments[, deploymentCol]))) stop(paste("Duplicate deployment_id:", paste0(deployments[, deploymentCol][duplicated(deployments[, deploymentCol])], collapse = ", ")))
   
@@ -115,8 +119,78 @@ readWildlifeInsights <- function(directory = NULL, zipfile = NULL,
     }
   }
   
-  deployments$start_date <- lubridate::parse_date_time(deployments$start_date, orders = date_format)
-  deployments$end_date   <- lubridate::parse_date_time(deployments$end_date, orders = date_format)
+  
+  deployments_start_date_original <- deployments$start_date
+  deployments_end_date_original <- deployments$end_date
+  
+  
+  deployments$start_date <- lubridate::parse_date_time(deployments$start_date, 
+                                                       orders = date_formats,
+                                                       truncated = 1)
+  deployments$end_date   <- lubridate::parse_date_time(deployments$end_date, 
+                                                       orders = date_formats,
+                                                       truncated = 1)
+  
+  
+  
+  # NA checking
+  if(any(is.na(deployments$start_date))) {
+    # Get examples of problematic date strings to show in the error
+    problem_indices <- which(is.na(deployments$start_date))
+    example_strings <- head(as.character(deployments_start_date_original[problem_indices]), 3)
+    deployment_ids <- head(deployments[problem_indices, deploymentCol], 3)
+    
+    stop(paste0(
+      "Failed to parse ", sum(is.na(deployments$start_date)), " out of ", nrow(deployments), " start date(s) in Wildlife Insights data.\n",
+      "Examples of unparseable dates from deployments: ", 
+      paste(paste0(deployment_ids, ": '", example_strings, "'"), collapse = ", "), "\n",
+      "Current supported formats: ", paste(date_formats, collapse = ", "), ".\n",
+      "Check if date format in your data matches one of the supported formats.\n",
+      "Date parsing may fail if data was edited in Excel or exported with non-default settings."
+    ))
+  }
+  
+  if(any(is.na(deployments$end_date))) {
+    # Get examples of problematic date strings to show in the error
+    problem_indices <- which(is.na(deployments$end_date))
+    example_strings <- head(as.character(deployments$end_date[problem_indices]), 3)
+    deployment_ids <- head(deployments[problem_indices, deploymentCol], 3)
+    
+    stop(paste0(
+      "Failed to parse ", sum(is.na(deployments$end_date)), " out of ", nrow(deployments), " end date(s) in Wildlife Insights data.\n",
+      "Examples of unparseable dates from deployments: ", 
+      paste(paste0(deployment_ids, ": '", example_strings, "'"), collapse = ", "), "\n",
+      "Current supported formats: ", paste(date_formats, collapse = ", "), ".\n",
+      "Check if date format in your data matches one of the supported formats.\n",
+      "Date parsing may fail if data was edited in Excel or exported with non-default settings."
+    ))
+  }
+  
+  
+  # Check that all end dates are after start dates
+  invalid_deployments <- which(deployments$end_date <= deployments$start_date)
+  
+  if(length(invalid_deployments) > 0) {
+    # Get details of problematic deployments for the error message
+    problem_deployments <- deployments[invalid_deployments, ]
+    examples <- head(problem_deployments, 3)
+    
+    # Format dates for cleaner display
+    formatted_examples <- paste0(
+      examples[, deploymentCol], ": ",
+      "start_date = ", as.character(examples$start_date), ", ",
+      "end_date = ", as.character(examples$end_date)
+    )
+    
+    stop(paste0(
+      "Found ", length(invalid_deployments), " deployment(s) where end date is not after start date.\n\n",
+      # "Camera deployments must have end dates after start dates to calculate operation time correctly.\n\n",
+      "Examples of invalid deployments:\n",
+      paste(formatted_examples, collapse = "\n"), 
+      if(length(invalid_deployments) > 3) paste0("\n(and ", length(invalid_deployments) - 3, " more)") else "",
+      "\n\nPlease check your Wildlife Insights data for date inconsistencies (especially in date/time format)."
+    ))
+  }
   
   # Aggregate table (by placename)
   col_types <- sapply(deployments, typeof)
