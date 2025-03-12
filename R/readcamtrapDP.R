@@ -104,6 +104,7 @@
 #' \code{\link[camtrapdp]{check_camtrapdp}} in the 'camtrapdp' package for validating Camtrap DP data
 #' 
 #' @export
+#' @importFrom dplyr bind_rows
 #' 
 readcamtrapDP <- function(
     deployments_file = "deployments.csv", 
