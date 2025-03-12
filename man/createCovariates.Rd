@@ -15,7 +15,10 @@ createCovariates(
   resolution = NULL,
   append = TRUE,
   formats = ".tif",
-  recursive = FALSE
+  recursive = FALSE,
+  download_elevation = FALSE,
+  elevation_zoom = 10,
+  terrain_measures = NULL
 )
 }
 \arguments{
@@ -33,13 +36,19 @@ createCovariates(
 
 \item{raster_template}{SpatRaster. A SpatRaster (as defined in the \code{terra} package) to use as template for the creation of prediction rasters.}
 
-\item{resolution}{numeric. Spatial resolution of prediction rasters. Ignored if \code{raster_template} is provided.}
+\item{resolution}{numeric. Spatial resolution of prediction rasters in the units of the coordinate reference system. Ignored if \code{raster_template} is provided.}
 
 \item{append}{logical. If \code{TRUE}, add the extracted covariates to the existing \code{CTtable}. If \code{FALSE}, return only the extracted covariate values without the existing \code{CTtable}.}
 
-\item{formats}{character. Possible file formats for raster data. Defaults to \code{.tif} files.}
+\item{formats}{character. Possible file formats for raster data (must include the dot). Defaults to \code{.tif} files.}
 
 \item{recursive}{logical. If \code{TRUE}, search for raster files recursively in subdirectories when a directory is provided. Defaults to \code{FALSE}.}
+
+\item{download_elevation}{logical. If \code{TRUE}, download elevation data from AWS. Defaults to \code{FALSE}.}
+
+\item{elevation_zoom}{numeric. Zoom level for elevation data download (6-12). Higher values provide more detail but longer download times. Zoom 12 corresponds to ~20m pixel resolution, 11 to ~40m, 10 to ~80m, and so on (resolution halves with each decrease in zoom level). Defaults to 9.}
+
+\item{terrain_measures}{character. Vector of terrain metrics to calculate from elevation data. Options include "slope" (slope in degrees), "aspect" (compass direction in degrees), "TRI" (Terrain Ruggedness Index, measuring elevation difference between adjacent cells), "TPI" (Topographic Position Index, comparing cell elevation to mean of surrounding cells), and "roughness" (difference between max and min of surrounding cells). Defaults to NULL (no terrain metrics).}
 }
 \value{
 \describe{
@@ -59,7 +68,10 @@ This function extracts covariate values from spatial raster data
  vector specifying the file paths of these covariate rasters. 
  
  Additionally, users can provide parameters to control how covariates are
- extracted, and how they are aggregated to prediction rasters. 
+ extracted, and how they are aggregated to prediction rasters.
+ 
+ The function can also download elevation data and calculate terrain metrics
+ if requested.
  
  The function generates prediction rasters based on a provided template or 
  creates one automatically if no template is provided.
@@ -80,6 +92,19 @@ resampled or reprojected to a consistent coordinate system.
 When \code{recursive = TRUE} and a directory is provided, the function will search
 for raster files in all subdirectories. In this case, the subdirectory names are
 used as covariate names, and only one raster file per subdirectory is allowed.
+
+When \code{download_elevation = TRUE}, the function will download elevation data
+from AWS using the \code{elevatr} package. The \code{elevation_zoom}
+parameter controls the level of detail, with values between 6 and 12.
+Higher zoom levels provide finer resolution but require longer download times and
+may consume significant memory. Approximate resolutions: zoom 12 = ~20m, 
+11 = ~40m, 10 = ~80m, etc.
+
+If \code{terrain_measures} is specified, the function calculates the requested 
+terrain metrics from the elevation data using \code{terra::terrain()} with the 
+default 3x3 neighborhood. Available terrain metrics include "slope", "aspect", 
+"TRI" (Terrain Ruggedness Index), "TPI" (Topographic Position Index), and 
+"roughness".
 }
 \examples{
 
@@ -93,17 +118,34 @@ camtraps_sf <- st_as_sf(camtraps,
                         crs = 32650)
 
 # extract covariates (with 100m buffer around cameras)
+# doesn't run becasue 'directory' is only a placeholder
+
 covariates <- createCovariates(camtraps_sf, 
 "path/to/covariate_rasters", 
 buffer_ct = 100, 
 buffer_aoi = 1000,
 resolution = 100)
 
+
+# extract covariates with elevation data (this code runs)
+
+covariates_elev <- createCovariates(camtraps_sf,
+buffer_ct = 100,
+buffer_aoi = 1000,
+resolution = 100,
+download_elevation = TRUE,
+elevation_zoom = 11,
+terrain_measures = c("slope", "aspect", "TRI"))
+
+note that if local rasters are available they can be extracted alongside
+elevation data in a single 
+
 # camera trap table with extracted covariate values
-camtraps_sf_cov <- covariates$CTtable
+camtraps_sf_cov <- covariates_elev$CTtable
 
 # covariate raster layer
-r_cov <- covariates$predictionRaster
+r_cov <- covariates_elev$predictionRaster
+plot(r_cov)
 
 }
 
