@@ -69,7 +69,7 @@ This function reads the three primary tables from a Camtrap DP dataset:
   \item Media: Information about the media files (images/videos) recorded
 }
 
-The Media table is only read if the 'add_file_path' parameter is set to TRUE. 
+The Media table is only read if the \code{add_file_path} parameter is set to \code{TRUE}. 
 
 The function converts these into two primary camtrapR data structures:
 \itemize{
