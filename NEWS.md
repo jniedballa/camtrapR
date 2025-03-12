@@ -1,6 +1,10 @@
-# camtrapR 2.4.4
+# camtrapR 2.5.0
 
-# new features:
+## new functions
+* readcamtrapDP: convert camtrap DP data format to camtrapR format
+
+## new features
+* createCovariates: allows download of elevation data and calculation of terrain indices
 * speciesAccum: add allowed x_unit "survey_day" and "station_day"
 
 # camtrapR 2.4.3
@@ -13,6 +17,8 @@
 
 ## new functions
 * speciesAccum: create species accumulation curves from camera trapping data with package iNEXT
+
+## new features
 * surveyDashboard: include species accumulation curves
 
 ## bugfixes
