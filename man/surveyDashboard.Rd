@@ -82,17 +82,19 @@ The dashboard includes several major components:
 \itemize{
   \item CSV file import with column mapping
   \item Wildlife Insights data import (zip, CSV, or directory)
-  \item Support for camtrapDP format (coming soon)
-  \item Study area import from shapefiles
+  \item camtrap DP data import
+  \item Study area import from shapefile
   \item Save/restore functionality for app state
+  \item Export functionality to save data from dashboard
 }
 
 \strong{Data Processing:}
 \itemize{
   \item Flexible station filtering with multiple criteria
   \item Temporal record filtering with independence criteria
+  \item Filtering species records by species name
   \item Automated covariate extraction from local rasters or online 
-  elevation models
+  elevation data
   \item Covariate correlation analysis with visualization
   \item Species accumulation curves
 }
@@ -108,8 +110,6 @@ The dashboard includes several major components:
 \strong{Occupancy Modeling:}
 \itemize{
   \item Basic workflow for simple model specification (linear effects)
-  \item Advanced workflow for complex models (linear, quadratic, interaction, 
-  random effects)
   \item Support for both unmarked and ubms packages
   \item Automated detection history creation
   \item Model comparison and selection
@@ -123,7 +123,7 @@ The dashboard includes several major components:
   \item Species-site random effects
   \item Effort handling on detection
   \item MCMC diagnostics and convergence assessment
-  \item Species richness and PAO predictions
+  \item Species occupancy, richness and PAO predictions
 }
 }
 \note{
