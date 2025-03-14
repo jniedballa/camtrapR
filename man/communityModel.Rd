@@ -12,7 +12,7 @@ communityModel(
   detCovs = list(fixed = NULL, ranef = NULL),
   detCovsObservation = list(fixed = NULL, ranef = NULL),
   speciesSiteRandomEffect = list(det = FALSE, occu = FALSE),
-  intercepts = list(det = "fixed", occu = "fixed"),
+  intercepts = list(det = "ranef", occu = "ranef"),
   effortCov = "effort",
   richnessCategories = NULL,
   augmentation = NULL,
