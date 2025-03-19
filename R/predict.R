@@ -206,12 +206,50 @@ if(type != "p_array") {
       }
       # gc()
       
-      # memory warning (if applicable)
-      if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ){
-        ram_usage_estimate <- round(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) / 1e3) # in Gb
-        message(paste("Watch RAM usage. At least", ram_usage_estimate, "Gb will be required"))
-      } 
+      # # memory warning (if applicable)
+      # if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ){
+      #   ram_usage_estimate <- round(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) / 1e3) # in Gb
+      #   message(paste("Watch RAM usage. At least", ram_usage_estimate, "Gb will be required"))
+      # } 
+      # 
       
+      # memory warning and error check
+      if(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) > 4000) { # if estimated RAM usage > 4GB
+        ram_usage_estimate <- round(object.size(out_intercept) / 1e6 * (nrow(cov_info_subset) + 1) / 1e3) # in GB
+        
+        # Get total system memory
+        total_ram <- NA
+        
+        # For Windows
+        if(.Platform$OS.type == "windows") {
+          mem_info <- system("wmic computersystem get totalphysicalmemory", intern = TRUE)
+          if(length(mem_info) > 1) {
+            total_ram <- as.numeric(mem_info[2]) / 1e9  # Convert bytes to GB
+          }
+        } else {
+          # For Unix-like systems (Linux/Mac)
+          if(Sys.info()["sysname"] == "Darwin") {  # macOS
+            mem_info <- system("sysctl hw.memsize", intern = TRUE)
+            if(length(mem_info) > 0) {
+              total_ram <- as.numeric(sub("hw.memsize: ", "", mem_info)) / 1e9  # Convert bytes to GB
+            }
+          } else {  # Linux
+            mem_info <- system("grep MemTotal /proc/meminfo", intern = TRUE)
+            if(length(mem_info) > 0) {
+              total_ram <- as.numeric(gsub("MemTotal:\\s+|\\s+kB", "", mem_info)) / 1e6  # Convert KB to GB
+            }
+          }
+        }
+        
+        message(paste("Watch RAM usage. At least", ram_usage_estimate, "GB will be required"))
+        
+        # Error if we can determine total RAM and it's insufficient
+        if(!is.na(total_ram) && ram_usage_estimate > total_ram) {
+          stop(paste("Operation requires approximately", ram_usage_estimate, 
+                     "GB of RAM, but system only has", round(total_ram, 1), 
+                     "GB total. Please reduce number of draws, predict on fewer cells (e.g. lower resolution), or use a system with more RAM."))
+        }
+      }
       
       out <- list()
       
