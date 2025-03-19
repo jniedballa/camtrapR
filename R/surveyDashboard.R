@@ -411,6 +411,15 @@ surveyDashboard <- function(CTtable = NULL,
                                  shinydashboard::menuSubItem("File Size Control", tabName = "file_size_control")
         ),
         shinydashboard::menuItem("Data Summary", tabName = "Summary", icon = shiny::icon("house"), selected = T),
+        
+        # Add new dedicated Filters section
+        shinydashboard::menuItem("Data Filters", icon = shiny::icon("filter"),
+                                 shinydashboard::menuSubItem("Filter Overview", tabName = "filter_overview"),
+                                 shinydashboard::menuSubItem("Station Filters", tabName = "filterCTData"),
+                                 shinydashboard::menuSubItem("Temporal Filters", tabName = "filterRecords"),
+                                 shinydashboard::menuSubItem("Species Filters", tabName = "filterSpecies")
+        ),
+        
         shinydashboard::menuItem("Tables", icon = shiny::icon("table"),
                                  shinydashboard::menuSubItem("Cameras trap stations", tabName = "camera_table"),
                                  shinydashboard::menuSubItem("Records", tabName = "record_table")
@@ -425,9 +434,9 @@ surveyDashboard <- function(CTtable = NULL,
                                  shinydashboard::menuSubItem("Two-Species activity overlap", tabName = "TwoSpeciesOverlap")
         ),
         shinydashboard::menuItem("Data Processing", icon = shiny::icon("cogs"),
-                                 shinydashboard::menuSubItem("Filter Camera Traps", tabName = "filterCTData"),
-                                 shinydashboard::menuSubItem("Records Temporal Filtering", tabName = "filterRecords"),
-                                 shinydashboard::menuSubItem("Species Filtering", tabName = "filterSpecies"),
+                                 # shinydashboard::menuSubItem("Filter Camera Traps", tabName = "filterCTData"),
+                                 # shinydashboard::menuSubItem("Records Temporal Filtering", tabName = "filterRecords"),
+                                 # shinydashboard::menuSubItem("Species Filtering", tabName = "filterSpecies"),
                                  shinydashboard::menuSubItem("Extract Covariates", tabName = "extract"),
                                  shinydashboard::menuSubItem("Covariate Correlation", tabName = "covariateCorrelation"),
                                  shinydashboard::menuSubItem("Camera operation matrix", tabName = "CameraOperation"),
@@ -447,13 +456,13 @@ surveyDashboard <- function(CTtable = NULL,
           tags$hr(class = "sidebar-divider")
         ),
         
-        # Add Reset All Filters button
-        tags$div(
-          class = "sidebar-button-container",
-          actionButton("resetAllFilters", "Reset All Filters", 
-                       icon = icon("sync"),
-                       class = "btn-danger")
-        ),
+        # # Add Reset All Filters button
+        # tags$div(
+        #   class = "sidebar-button-container",
+        #   actionButton("resetAllFilters", "Reset All Filters", 
+        #                icon = icon("sync"),
+        #                class = "btn-danger")
+        # ),
         
         # Add export button
         tags$div(
@@ -891,6 +900,96 @@ surveyDashboard <- function(CTtable = NULL,
         ),
         
         
+        
+        ## Tab: filter summary ----
+        
+        shinydashboard::tabItem(
+          tabName = "filter_overview",
+          fluidRow(
+            column(12,
+                   shinydashboard::box(
+                     title = "Active Filters Summary", 
+                     width = NULL, 
+                     status = "warning",
+                     solidHeader = TRUE,
+                     
+                     # Summary counts
+                     fluidRow(
+                       column(3, 
+                              valueBoxOutput("summary_stations_filtered", width = NULL)
+                       ),
+                       column(3, 
+                              valueBoxOutput("summary_records_filtered", width = NULL)
+                       ),
+                       column(3, 
+                              valueBoxOutput("summary_species_filtered", width = NULL)
+                       ),
+                       column(3, 
+                              actionButton("resetAllFiltersOverview", "Reset All Filters", 
+                                           icon = icon("sync"), class = "btn-danger btn-block")
+                       )
+                     ) #,
+                     
+                     # # Station filters summary
+                     # fluidRow(
+                     #   column(12,
+                     #          shinydashboard::box(
+                     #            title = "Station Filters", 
+                     #            width = NULL,
+                     #            status = "primary",
+                     #            solidHeader = TRUE,
+                     #            collapsible = TRUE,
+                     #            uiOutput("stationFiltersOverview"),
+                     #            conditionalPanel(
+                     #              condition = "input.hasActiveStationFilters == true",
+                     #              actionButton("goToStationFilters", "Edit Station Filters", 
+                     #                           icon = icon("edit"), class = "btn-info")
+                     #            )
+                     #          )
+                     #   )
+                     # ),
+                     # 
+                     # # Temporal filters summary
+                     # fluidRow(
+                     #   column(12,
+                     #          shinydashboard::box(
+                     #            title = "Temporal Filters", 
+                     #            width = NULL,
+                     #            status = "primary",
+                     #            solidHeader = TRUE,
+                     #            collapsible = TRUE,
+                     #            uiOutput("temporalFiltersOverview"),
+                     #            conditionalPanel(
+                     #              condition = "input.hasActiveTemporalFilters == true",
+                     #              actionButton("goToTemporalFilters", "Edit Temporal Filters", 
+                     #                           icon = icon("edit"), class = "btn-info")
+                     #            )
+                     #          )
+                     #   )
+                     # ),
+                     # 
+                     # # Species filters summary
+                     # fluidRow(
+                     #   column(12,
+                     #          shinydashboard::box(
+                     #            title = "Species Filters", 
+                     #            width = NULL,
+                     #            status = "primary",
+                     #            solidHeader = TRUE,
+                     #            collapsible = TRUE,
+                     #            uiOutput("speciesFiltersOverview"),
+                     #            conditionalPanel(
+                     #              condition = "input.hasActiveSpeciesFilters == true",
+                     #              actionButton("goToSpeciesFilters", "Edit Species Filters", 
+                     #                           icon = icon("edit"), class = "btn-info")
+                     #            )
+                     #          )
+                     #   )
+                     # )
+                   )
+            )
+          )
+        ),
         
         ## Tab: Filter Stations  ----
         
@@ -3331,7 +3430,7 @@ surveyDashboard <- function(CTtable = NULL,
       data$speciesCol <- NULL
       data$recordDateTimeCol <- NULL
       
-      output$filterMap <- leaflet::renderLeaflet(NULL)
+      # output$filterMap <- leaflet::renderLeaflet(NULL)
       
       # if (!is.null(data$recordTable)) {
       original_record_table(data$recordTable)
@@ -3364,7 +3463,8 @@ surveyDashboard <- function(CTtable = NULL,
           data$CTtable <- wi_imported$CTtable
           data$CTtable_sf <- sf::st_as_sf(wi_imported$CTtable, 
                                           coords = c("longitude", "latitude"), 
-                                          crs = 4326)
+                                          crs = 4326, 
+                                          remove = FALSE)
           data$aggregated_CTtable <- wi_imported$CTtable_aggregated
           data$recordTable <- wi_imported$recordTable
           
@@ -4923,6 +5023,87 @@ surveyDashboard <- function(CTtable = NULL,
       return(species_list)
     }
     
+    
+    ## Tab: Filter summary
+    # Add these reactives and observers to the server function
+    
+    # Value boxes for filter summary
+    output$summary_stations_filtered <- renderValueBox({
+      req(original_data()$CTtable_sf, data$CTtable_sf)
+      
+      orig_count <- length(unique(original_data()$CTtable_sf[[data$stationCol]]))
+      current_count <- length(unique(data$CTtable_sf[[data$stationCol]]))
+      removed_count <- orig_count - current_count
+      
+      valueBox(
+        value = paste0(current_count, " / ", orig_count),
+        subtitle = paste0("Stations (", removed_count, " filtered)"),
+        icon = icon("map-marker"),
+        color = if(removed_count > 0) "yellow" else "aqua"
+      )
+    })
+    
+    output$summary_records_filtered <- renderValueBox({
+      req(original_record_table(), data$recordTable)
+      
+      orig_count <- nrow(original_record_table())
+      current_count <- nrow(data$recordTable)
+      removed_count <- orig_count - current_count
+      
+      valueBox(
+        value = paste0(current_count, " / ", orig_count),
+        subtitle = paste0("Records (", removed_count, " filtered)"),
+        icon = icon("camera"),
+        color = if(removed_count > 0) "yellow" else "aqua"
+      )
+    })
+    
+    output$summary_species_filtered <- renderValueBox({
+      req(original_record_table(), data$recordTable, data$speciesCol)
+      
+      orig_species <- length(unique(original_record_table()[[data$speciesCol]]))
+      current_species <- length(unique(data$recordTable[[data$speciesCol]]))
+      removed_species <- orig_species - current_species
+      
+      # Get actual list of filtered species by comparing original and current sets
+      original_species_set <- unique(original_record_table()[[data$speciesCol]])
+      current_species_set <- unique(data$recordTable[[data$speciesCol]])
+      excluded_species <- setdiff(original_species_set, current_species_set)
+      
+      valueBox(
+        value = paste0(current_species, " / ", orig_species),
+        subtitle = paste0("Species (", length(excluded_species), " filtered)"),
+        icon = icon("paw"),
+        color = if(length(excluded_species) > 0) "yellow" else "aqua"
+      )
+    })
+    
+
+   
+    
+    # Mirror the reset all filters functionality
+    observeEvent(input$resetAllFiltersOverview, {
+      # Reset filter state
+      filter_state(list(camera_trap = NULL, temporal = NULL, species = NULL))
+      
+      # Reset to original data
+      orig_data <- isolate(original_data())
+      data$CTtable_sf <- orig_data$CTtable_sf
+      data$CTtable <- sf::st_drop_geometry(orig_data$CTtable_sf)
+      data$recordTable <- orig_data$recordTable
+      data$aggregated_CTtable <- orig_data$aggregated_CTtable
+      
+      # Reset filtered species
+      filtered_species(NULL)
+      
+      # Reset active filters
+      active_filters(list())
+      
+      # Update species inputs
+      update_species_inputs()
+      
+      showNotification("All filters have been reset", type = "message")
+    })
     
     
     
