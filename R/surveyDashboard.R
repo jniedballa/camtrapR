@@ -220,7 +220,7 @@ surveyDashboard <- function(CTtable = NULL,
   # }
   # 
   
-   # For now do aggressive package check until I load functions cleanly with pkg::function()
+  # For now do aggressive package check until I load functions cleanly with pkg::function()
   
   # Load all required packages
   required_packages <- c(
@@ -303,9 +303,9 @@ surveyDashboard <- function(CTtable = NULL,
     if (github_ver > local_ver) {
       return(list(
         text = HTML(paste0("A newer version (", github_ver, ") is available on GitHub. ",
-                      "You are currently using version ", local_ver, ". ",
-                      "Please update to access the latest features and bug fixes:<br>",
-                      "<code>remotes::install_github('jniedballa/camtrapR', ref = 'dev')</code>")),
+                           "You are currently using version ", local_ver, ". ",
+                           "Please update to access the latest features and bug fixes:<br>",
+                           "<code>remotes::install_github('jniedballa/camtrapR', ref = 'dev')</code>")),
         type = "warning"
       ))
     }
@@ -1520,7 +1520,7 @@ surveyDashboard <- function(CTtable = NULL,
                                              class = "btn-primary btn-lg btn-block")
                               )
                      ),
-         
+                     
                      
                      # Species Selection tab
                      tabPanel("Species",
@@ -1854,7 +1854,7 @@ surveyDashboard <- function(CTtable = NULL,
               
               # Basic Results & Diagnostics tab
               tabPanel("Model selection",
-
+                       
                        fluidRow(
                          shinydashboard::box(
                            title = "Model Selection",
@@ -2452,7 +2452,7 @@ surveyDashboard <- function(CTtable = NULL,
                                 )
                        ),
                        
-          
+                       
                        # Modified Goodness of Fit tabPanel
                        tabPanel("Goodness of Fit",
                                 fluidRow(
@@ -2494,9 +2494,9 @@ surveyDashboard <- function(CTtable = NULL,
                                                       div(
                                                         style = "text-align: center; padding: 20px;",
                                                         shiny::h2("Community-level Bayesian p-value",
-                                                           style = "margin-bottom: 20px;"),
+                                                                  style = "margin-bottom: 20px;"),
                                                         shiny::h1(textOutput("gof_community_pvalue", inline = TRUE),
-                                                           style = "font-size: 48px; font-weight: bold;"),
+                                                                  style = "font-size: 48px; font-weight: bold;"),
                                                         tags$div(
                                                           class = "interpretBox",
                                                           style = "margin: 15px; padding: 15px; border-radius: 5px; font-size: 24px;",
@@ -2886,69 +2886,69 @@ surveyDashboard <- function(CTtable = NULL,
     # Initialize reactive values ----
     
     restoration_mode <- reactiveVal(FALSE)  # Tracks if we're currently restoring state
-
+    
     wi_data <- reactiveVal(NULL)  #    Reactive value to store imported Wildlife Insights data
-  
+    
     current_species_list <- reactiveVal()  #  Create a reactive value for the species list
     
     # for camera trap filter
-      # Store original unfiltered data
-      original_data <- reactiveVal(list(
-        CTtable_sf = NULL,
-        recordTable = NULL,
-        aggregated_CTtable = NULL
-      ))
-      
-      
-      # # store the original record table
-      original_record_table <- reactiveVal(NULL)
-      # 
-      # # Initialize filtered data reactive value
-      filtered_data <- reactiveVal(NULL)
-      # 
-      # # Reactive value to store active filters
-      active_filters <- reactiveVal(list())
-      # 
-      # # Store the observer references in a reactive value
-      filter_removal_observers <- reactiveVal(list())
-      # 
-      # # Create reactive value to store filtered species
-      filtered_species <- reactiveVal(NULL)
-      # 
-      # Create reactive value to store selected species
-      # necessary so user doesn't need to open species tab first to run analysis
-      selected_species <- reactiveVal(NULL)
-
-      
-      # container for all active filters
-      filter_state <- reactiveVal(list(
-        camera_trap = NULL,  # Store camera filter parameters
-        temporal = NULL,     # Store temporal filter parameters  
-        species = NULL       # Store species filter parameters
-      ))
+    # Store original unfiltered data
+    original_data <- reactiveVal(list(
+      CTtable_sf = NULL,
+      recordTable = NULL,
+      aggregated_CTtable = NULL
+    ))
     
-      
-      # initialize x_label reactive container (species accumulation)
-      # x_label <- shiny::reactiveVal("")
-      species_accumulation_objects <- reactiveVal(list())
-      
-      # single species occupancy
-        #  reactive values to track models for each workflow
-        basic_model <- reactiveVal(NULL)
-        advanced_model <- reactiveVal(NULL)
-        modelEffects <- reactiveVal(list(detection = list(), occupancy = list()))
-        
-      # community occupancy
-        commOccu_model <- reactiveVal(NULL)
-        consoleOutput <- reactiveVal("")
-        fitted_comm_model <- reactiveVal(NULL)
-        model_summary <- reactiveVal(NULL)
-        effect_plots <- reactiveVal(NULL)
-        coef_plot <- reactiveVal(NULL)
-        gof_results <- reactiveVal(NULL)
-        
-  
-        
+    
+    # # store the original record table
+    original_record_table <- reactiveVal(NULL)
+    # 
+    # # Initialize filtered data reactive value
+    filtered_data <- reactiveVal(NULL)
+    # 
+    # # Reactive value to store active filters
+    active_filters <- reactiveVal(list())
+    # 
+    # # Store the observer references in a reactive value
+    filter_removal_observers <- reactiveVal(list())
+    # 
+    # # Create reactive value to store filtered species
+    filtered_species <- reactiveVal(NULL)
+    # 
+    # Create reactive value to store selected species
+    # necessary so user doesn't need to open species tab first to run analysis
+    selected_species <- reactiveVal(NULL)
+    
+    
+    # container for all active filters
+    filter_state <- reactiveVal(list(
+      camera_trap = NULL,  # Store camera filter parameters
+      temporal = NULL,     # Store temporal filter parameters  
+      species = NULL       # Store species filter parameters
+    ))
+    
+    
+    # initialize x_label reactive container (species accumulation)
+    # x_label <- shiny::reactiveVal("")
+    species_accumulation_objects <- reactiveVal(list())
+    
+    # single species occupancy
+    #  reactive values to track models for each workflow
+    basic_model <- reactiveVal(NULL)
+    advanced_model <- reactiveVal(NULL)
+    modelEffects <- reactiveVal(list(detection = list(), occupancy = list()))
+    
+    # community occupancy
+    commOccu_model <- reactiveVal(NULL)
+    consoleOutput <- reactiveVal("")
+    fitted_comm_model <- reactiveVal(NULL)
+    model_summary <- reactiveVal(NULL)
+    effect_plots <- reactiveVal(NULL)
+    coef_plot <- reactiveVal(NULL)
+    gof_results <- reactiveVal(NULL)
+    
+    
+    
     data <- shiny::reactiveValues(
       CTtable = CTtable,
       CTtable_sf = NULL,
@@ -3283,7 +3283,7 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     
-
+    
     
     
     ## Import from Wildlife Insights ----
@@ -3334,7 +3334,7 @@ surveyDashboard <- function(CTtable = NULL,
       output$filterMap <- leaflet::renderLeaflet(NULL)
       
       # if (!is.null(data$recordTable)) {
-        original_record_table(data$recordTable)
+      original_record_table(data$recordTable)
       # }
       
       
@@ -3518,7 +3518,7 @@ surveyDashboard <- function(CTtable = NULL,
       return(species_list)
     }
     
-
+    
     
     # Observer to update species inputs when recordTable changes
     observe({
@@ -3586,9 +3586,9 @@ surveyDashboard <- function(CTtable = NULL,
       spatial_coverage <- "Unknown"
       if (!is.null(metadata$spatial)) {
         # if (!is.null(metadata$spatial$description)) {
-          # spatial_coverage <- metadata$spatial$description
+        # spatial_coverage <- metadata$spatial$description
         # } else 
-          if (!is.null(metadata$spatial$bbox)) {
+        if (!is.null(metadata$spatial$bbox)) {
           extent <- metadata$spatial$bbox
           spatial_coverage <- sprintf("Lon: %s to %s, Lat: %s to %s",
                                       extent[1], extent[3], extent[2], extent[4])
@@ -4051,11 +4051,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # reactive expression for CT table as sf object
-    # CTtable_sf <- shiny::reactive({
-    #   req(data$CTtable, data$xcol, data$ycol, data$crs)
-    #   sf::st_as_sf(data$CTtable, coords = c(data$xcol, data$ycol), crs = data$crs, remove = FALSE)
-    # })
-    
+
     CTtable_sf <- shiny::reactive({
       req(data$CTtable, data$xcol, data$ycol, data$crs)
       
@@ -4066,7 +4062,10 @@ surveyDashboard <- function(CTtable = NULL,
         return(NULL)
       }
       
-      sf::st_as_sf(data$CTtable, coords = c(data$xcol, data$ycol), crs = data$crs, remove = FALSE)
+      sf::st_as_sf(data$CTtable, 
+                   coords = c(data$xcol, data$ycol), 
+                   crs = data$crs, 
+                   remove = FALSE)
     })
     
     # Update CTtable_sf when CT table is updated
@@ -4101,7 +4100,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # camera operation matrix ----
     
-
+    
     # # Reactive value for camop
     camop <- shiny::reactiveVal(NULL)
     
@@ -4130,10 +4129,10 @@ surveyDashboard <- function(CTtable = NULL,
                   camerasIndependent = data$camerasIndependent
         )
       }  
-    
+      
       tryCatch({
         result <- do.call(cameraOperation, args)
-
+        
         if (is.null(result) || nrow(result) == 0) {
           warning("cameraOperation returned NULL or empty result")
         }
@@ -4179,7 +4178,7 @@ surveyDashboard <- function(CTtable = NULL,
     #  - camop doesn't exist, or doesn't match camera trap table
     observeEvent(input$tabs, {
       if (input$tabs == "CameraOperation" && is.null(camop())) # ||
-          # input$tabs == "CameraOperation" && nrow(camop() != length(unique(data[, data$stationCol])))) 
+      # input$tabs == "CameraOperation" && nrow(camop() != length(unique(data[, data$stationCol])))) 
       {
         camop(compute_camop())
       }
@@ -4213,7 +4212,7 @@ surveyDashboard <- function(CTtable = NULL,
       # now it calculate the camera operation matrix every time the camera traps are filtered. Acceptable for now.
       
       # if(input$tabName == "CameraOperation") {    # this line causes crash with
-        camop(compute_camop())
+      camop(compute_camop())
       # }
     }, ignoreNULL = TRUE)
     
@@ -4652,7 +4651,8 @@ surveyDashboard <- function(CTtable = NULL,
       sf::st_as_sf(
         detmaps(),
         coords = c(data$xcol, data$ycol),
-        crs = sf::st_crs(data$crs)
+        crs = sf::st_crs(data$crs), 
+        remove = FALSE
       )
     })
     
@@ -4711,23 +4711,23 @@ surveyDashboard <- function(CTtable = NULL,
                              layer.name = "Study Area")
         }
         
-          # add little black dots at stations with detections
-          if (input$species_for_map != "n_species" & !input$scale_size) {
-            map_view <- map_view + mapview::mapview(
-              detmaps_sf_logi,
-              xcol = data$xcol,
-              ycol = data$ycol,
-              zcol = species_tmp,
-              label = FALSE,
-              popup = FALSE,
-              legend = FALSE,
-              color = "black",
-              col.regions = "black",
-              alpha.regions = 1,
-              cex = 2,
-              layer.name = "Stations with detections"
-            )
-          }
+        # add little black dots at stations with detections
+        if (input$species_for_map != "n_species" & !input$scale_size) {
+          map_view <- map_view + mapview::mapview(
+            detmaps_sf_logi,
+            xcol = data$xcol,
+            ycol = data$ycol,
+            zcol = species_tmp,
+            label = FALSE,
+            popup = FALSE,
+            legend = FALSE,
+            color = "black",
+            col.regions = "black",
+            alpha.regions = 1,
+            cex = 2,
+            layer.name = "Stations with detections"
+          )
+        }
         
         map_view@map
       })
@@ -4735,7 +4735,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Helper functions ----
-
+    
     applyAllFilters <- function() {
       # Start with original data
       if (is.null(isolate(original_data())$CTtable_sf) || is.null(isolate(original_data())$recordTable)) {
@@ -4832,7 +4832,8 @@ surveyDashboard <- function(CTtable = NULL,
             data$aggregated_CTtable_sf <- sf::st_as_sf(
               data$aggregated_CTtable,
               coords = c(data$xcol, data$ycol),
-              crs = sf::st_crs(filtered_CT)
+              crs = sf::st_crs(filtered_CT), 
+              remove = FALSE
             )
           }
         }
@@ -4923,7 +4924,7 @@ surveyDashboard <- function(CTtable = NULL,
     }
     
     
-   
+    
     
     # Tab: Filter Stations ####
     
@@ -5108,15 +5109,15 @@ surveyDashboard <- function(CTtable = NULL,
     # Clear camera trap filters
     observeEvent(input$clearAllFilters, {
       active_filters(list())
-
+      
       # Update filter state
       current_filters <- filter_state()
       current_filters$camera_trap <- NULL
       filter_state(current_filters)
-
+      
       # Apply all filters
       applyAllFilters()
-
+      
       showNotification("Camera trap filters cleared", type = "message")
     })
     
@@ -5167,7 +5168,7 @@ surveyDashboard <- function(CTtable = NULL,
       )
     })
     
-
+    
     
     # # Handle individual filter removal
     createFilterRemovalObservers <- function() {
@@ -5177,7 +5178,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Get existing observer names
       existing_observers <- names(filter_removal_observers())
-
+      
       # Remove observers for filters that don't exist anymore
       observers_to_keep <- filter_removal_observers()[names(filter_removal_observers()) %in% current_filter_names]
       
@@ -5234,7 +5235,7 @@ surveyDashboard <- function(CTtable = NULL,
     # Filter summary
     output$filterSummary <- renderUI({
       req(data$CTtable_sf, data$recordTable, original_data())
-
+      
       orig <- original_data()
       curr_stations <- length(unique(data$CTtable_sf[[data$stationCol]])) #nrow(data$CTtable_sf)
       orig_stations <- length(unique(orig$CTtable_sf[[data$stationCol]])) #nrow(orig$CTtable_sf)
@@ -5244,20 +5245,20 @@ surveyDashboard <- function(CTtable = NULL,
       # Calculate filtered out counts
       filtered_stations <- orig_stations - curr_stations
       filtered_records <- orig_records - curr_records
-
+      
       # Safety check for valid percentages
       station_percent <- if(orig_stations > 0) {
         sprintf(" (%.1f%%)", curr_stations/orig_stations * 100)
       } else {
         " (N/A)"
       }
-
+      
       record_percent <- if(orig_records > 0) {
         sprintf(" (%.1f%%)", curr_records/orig_records * 100)
       } else {
         " (N/A)"
       }
-
+      
       div(
         class = "well",
         tags$p(
@@ -5326,7 +5327,7 @@ surveyDashboard <- function(CTtable = NULL,
             group = "Included stations"
           )
       }
-
+      
       # Add layer control
       map <- map %>% addLayersControl(
         overlayGroups = c("Included stations", "Excluded stations"),
@@ -5388,7 +5389,7 @@ surveyDashboard <- function(CTtable = NULL,
         original_record_table(data$recordTable)
       }
     })
-
+    
     
     # # Handle the restore button click
     observeEvent(input$restoreOriginalRecordTable, {
@@ -5408,7 +5409,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
-  
+    
     
     # Temporal Filtering
     observeEvent(input$runTemporalFilter, {
@@ -5577,16 +5578,16 @@ surveyDashboard <- function(CTtable = NULL,
     
     output$temporalFilterTable <- DT::renderDT({
       req(data$recordTable, original_record_table(), data$speciesCol)
-
+      
       # Count records per species in original data
       original_counts <- table(original_record_table()[[data$speciesCol]])
-
+      
       # Count records per species in filtered data
       filtered_counts <- table(data$recordTable[[data$speciesCol]])
-
+      
       # Get all species from both tables
       species_names <- sort(unique(c(names(original_counts), names(filtered_counts))))
-
+      
       # Create summary dataframe
       summary_df <- data.frame(
         Species = species_names,
@@ -5597,7 +5598,7 @@ surveyDashboard <- function(CTtable = NULL,
           if(sp %in% names(filtered_counts)) as.vector(filtered_counts[sp]) else 0
         })
       )
-
+      
       # Calculate removed records and percentages
       summary_df$Removed_Records <- summary_df$Original_Records - summary_df$Filtered_Records
       summary_df$Percent_Retained <- ifelse(
@@ -5605,10 +5606,10 @@ surveyDashboard <- function(CTtable = NULL,
         round(summary_df$Filtered_Records / summary_df$Original_Records * 100, 1),
         NA
       )
-
+      
       # Sort by original record count
       summary_df <- summary_df[order(-summary_df$Original_Records), ]
-
+      
       # Create datatable
       DT::datatable(
         summary_df,
@@ -5628,7 +5629,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Tab: Species filter ####
     
-
+    
     
     # Initialize filtered species when data changes
     observe({
@@ -5794,7 +5795,7 @@ surveyDashboard <- function(CTtable = NULL,
       )
     })
     
-
+    
     # Species Filtering - Keep selected species
     observeEvent(input$keepSelectedSpecies, {
       req(species_summary_for_filter(), input$speciesFilterTable_rows_selected)
@@ -5894,7 +5895,8 @@ surveyDashboard <- function(CTtable = NULL,
       req(data$aggregated_CTtable, data$xcol, data$ycol, data$CTtable_sf)
       sf::st_as_sf(data$aggregated_CTtable, 
                    coords = c(data$xcol, data$ycol), 
-                   crs = sf::st_crs(data$CTtable_sf))
+                   crs = sf::st_crs(data$CTtable_sf), 
+                   remove = FALSE)
     })
     
     
@@ -5909,7 +5911,7 @@ surveyDashboard <- function(CTtable = NULL,
         FALSE
       })
     }
-
+    
     
     # Function to render raster map
     render_raster_map <- function(raster, raster_name, is_prediction = FALSE) {
@@ -6904,7 +6906,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Basic scatter plot matrix using base R
     create_base_pairs_plot <- function(data) {
-    
+      
       # First set up the plotting parameters
       old_par <- par(no.readonly = TRUE)
       on.exit(par(old_par))
@@ -6945,7 +6947,7 @@ surveyDashboard <- function(CTtable = NULL,
       )
     }
     
- 
+    
     # Calculate correlations and update outputs
     observe({
       req(data$CTtable_sf, input$correlationThreshold, input$correlationMethod)
@@ -7130,7 +7132,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Tab: species accumulation curves  ----
     
-  
+    
     # Species table for accumulation curves
     output$acc_speciesTable <- DT::renderDT({
       
@@ -7216,7 +7218,7 @@ surveyDashboard <- function(CTtable = NULL,
     }
     
     
-
+    
     
     # Initialize selected species when data loads
     observe({
@@ -7239,8 +7241,8 @@ surveyDashboard <- function(CTtable = NULL,
       selected_species(species_summary[[data$speciesCol]][input$acc_speciesTable_rows_selected])
     })
     
-
-
+    
+    
     # Run accumulation analysis
     observeEvent(input$runAccumulation, {
       
@@ -7269,7 +7271,7 @@ surveyDashboard <- function(CTtable = NULL,
           current_objects$x_label <- "Number of sampling days (survey)"
         }
       }
-   
+      
       # Get selected species
       species_summary <- data$recordTable %>%
         dplyr::group_by(!!sym(data$speciesCol)) %>%
@@ -7307,7 +7309,7 @@ surveyDashboard <- function(CTtable = NULL,
           
           # Generate plots
           output$acc_rarefaction_plot <- renderPlot({
-
+            
             iNEXT::ggiNEXT(current_objects$results, type = 1, color.var= "Order.q") +
               theme_bw() +
               theme(
@@ -7325,7 +7327,7 @@ surveyDashboard <- function(CTtable = NULL,
           })
           
           output$acc_coverage_plot <- renderPlot({
-         
+            
             iNEXT::ggiNEXT(current_objects$results, type = 2, color.var="Order.q") +
               theme_bw() +
               theme(
@@ -7468,7 +7470,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       # x_label("")  # Reset the x-axis label
       species_accumulation_objects <- reactiveVal(list())
-       
+      
       # showNotification("Species accumulation plots cleared due to data changes", type = "warning")
     })
     
@@ -8086,7 +8088,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Generate formula for the model
     generateFormula <- function(effects, package = "unmarked") {
-
+      
       # Helper function to generate term
       generate_term <- function(effect) {
         if(effect$type == "random") {
@@ -8480,7 +8482,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
-
+    
     observeEvent(input$runAdvancedModel, {
       req(umf(), modelEffects())
       
@@ -8630,6 +8632,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Response plots - Basic workflow
+    # Response plots - Basic workflow
     output$basic_response_plot <- renderPlot({
       req(basic_model())
       
@@ -8695,15 +8698,28 @@ surveyDashboard <- function(CTtable = NULL,
           p
         })
         
-        # Arrange plots
-        # do.call(gridExtra::grid.arrange, c(plots, ncol = 2))
-        Reduce("+", plots)
+        # Return the plot(s)
+        if (length(plots) == 1) {
+          # If only one covariate, return the single plot
+          plots[[1]]
+        } else if (length(plots) > 1) {
+          # For multiple covariates, use patchwork if available
+          if (!requireNamespace("patchwork", quietly = TRUE)) {
+            warning("Package 'patchwork' is required to display multiple plots. Please install it with install.packages('patchwork')")
+            return(NULL)
+          }
+          # Arrange in a single row
+          patchwork::wrap_plots(plots, ncol = length(plots))
+        } else {
+          # No plots (shouldn't happen given the req() above)
+          NULL
+        }
         
       } else {
         # For ubms models, use built-in plotting
         submodel <- if(is_detection) "det" else "state"
         ubms::plot_marginal(model, 
-                      submodel = submodel)
+                            submodel = submodel)
       }
     })
     
@@ -8734,8 +8750,8 @@ surveyDashboard <- function(CTtable = NULL,
       } else {
         # For ubms models
         ubms::plot_marginal(model, 
-                      submodel = tolower(input$adv_plot_submodel),
-                      param = effect)
+                            submodel = tolower(input$adv_plot_submodel),
+                            param = effect)
       }
     })
     
@@ -8978,7 +8994,7 @@ surveyDashboard <- function(CTtable = NULL,
     }
     
     
-
+    
     
     # observer for scaling data when aggregated_CTtable changes
     observe({
@@ -9086,7 +9102,7 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     
-  
+    
     
     # Observer to create commOccu object
     observeEvent(input$createCommunityModel, {
@@ -9551,7 +9567,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     ## Goodness of fit (community models) ----
-        
+    
     
     
     # Run GOF test
@@ -9641,7 +9657,7 @@ surveyDashboard <- function(CTtable = NULL,
     }
     
     
-
+    
     
     # Render species table
     output$gof_species_table <- DT::renderDT({
@@ -9695,25 +9711,25 @@ surveyDashboard <- function(CTtable = NULL,
     # # Render residual plot
     output$gof_residual_plot <- renderPlot({
       req(gof_results())
-
+      
       # Create plot data
       plot_data <- data.frame()
-
+      
       for (species in names(gof_results()$residuals)) {
         species_data <- gof_results()$residuals[[species]]
-
+        
         plot_data <- rbind(plot_data, data.frame(
           Species = species,
           Observed = apply(species_data$res.obs, 2, mean),
           Predicted = apply(species_data$res.new, 2, mean)
         ))
       }
-
-
+      
+      
       # Calculate base sizes scaled by input
       base_size <- 12 * input$gof_plot_scale
-
-
+      
+      
       # Create plot
       p <- ggplot(plot_data, aes(x = Observed, y = Predicted)) +
         geom_point(alpha = 0.6) +
@@ -9735,7 +9751,7 @@ surveyDashboard <- function(CTtable = NULL,
           title = "Observed vs. Predicted Residuals by Species",
           subtitle = sprintf("Using %s residuals", input$gof_residual_type)
         )
-
+      
       print(p)
     }, height = function()   input$gof_plot_height
     )
@@ -10149,8 +10165,8 @@ surveyDashboard <- function(CTtable = NULL,
       predictions = NULL,
       community_models = NULL
     ))
-
-   
+    
+    
     # Function to export data tables
     export_table <- function(data, name, format = "csv", dir = ".") {
       if (inherits(data, "sf")) {
@@ -10722,7 +10738,7 @@ surveyDashboard <- function(CTtable = NULL,
         gof_results = gof_results(),
         consoleOutput = consoleOutput(),
         
-
+        
         
         # For species accumulation:
         species_accumulation_objects = species_accumulation_objects,
