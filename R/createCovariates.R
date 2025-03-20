@@ -247,6 +247,7 @@ createCovariates <- function(CTtable,
   
   # Process local raster files if directory or filenames are provided
   if (hasArg(directory) || hasArg(filenames)) {
+    # browser()
     if (hasArg(directory)) {
       if(length(directory) != 1) stop("The 'directory' parameter should be a single directory path.")
       
@@ -254,9 +255,12 @@ createCovariates <- function(CTtable,
       lf_covariates <- list.files(directory, recursive = recursive, pattern = paste0(formats, "$"), full.names = TRUE)
       if(length(lf_covariates) == 0) stop(paste("No files with suffix", paste(formats, collapse = "/"), "found in", directory))
       
+      # Always use the file names (not directory names) as the base name
+      covariate_names <- tools::file_path_sans_ext(basename(lf_covariates))
+      
       if(recursive) {
         # Use directory names as covariate names when recursive is TRUE
-        covariate_names <- basename(dirname(lf_covariates))
+        # covariate_names <- basename(dirname(lf_covariates))
         
         # Check for subdirectories with depth > 1
         dir_depth <- sapply(lf_covariates, function(x) length(strsplit(x, .Platform$file.sep)[[1]]))
@@ -277,7 +281,7 @@ createCovariates <- function(CTtable,
         }
       } else {
         # Use file names as covariate names when recursive is FALSE
-        covariate_names <- tools::file_path_sans_ext(basename(lf_covariates))
+        # covariate_names <- tools::file_path_sans_ext(basename(lf_covariates))
       }
       
       local_r_cov <- lapply(lf_covariates, terra::rast)
@@ -294,7 +298,7 @@ createCovariates <- function(CTtable,
       
       # Extract covariate names and file paths from parameter 'filenames'
       if(!is.null(names(filenames))) {
-        covariate_names <- names(filenames)
+        covariate_names <- names(filenames)  # use names if available
       } else {
         covariate_names <- tools::file_path_sans_ext(basename(filenames))
       }
@@ -387,7 +391,8 @@ createCovariates <- function(CTtable,
     # Handle multi-band rasters
     if(terra::nlyr(list_r_cov[[i]]) > 1) {
       layer_names <- names(list_r_cov[[i]])
-      colnames(extracted)[-1] <- paste(names(list_r_cov)[i], layer_names, sep = "_")
+      base_name <- names(list_r_cov)[i]
+      colnames(extracted)[-1] <- paste(base_name, layer_names, sep = "_")
     } else {
       colnames(extracted)[-1] <- names(list_r_cov)[i]
     }
@@ -442,10 +447,21 @@ createCovariates <- function(CTtable,
                            
                            crs_template <- sf::st_crs(raster_template)
                            
+                           # Process the raster
                            if(current_crs == crs_template) {
                              out <- terra::resample(list_r_cov_c[[i]], raster_template)
                            } else {
                              out <- terra::project(list_r_cov_c[[i]], raster_template)
+                           }
+                           
+                           # Ensure consistent naming for multi-band rasters
+                           if(terra::nlyr(list_r_cov_c[[i]]) > 1) {
+                             base_name <- names(list_r_cov)[i]
+                             layer_names <- names(list_r_cov_c[[i]])
+                             new_names <- paste(base_name, layer_names, sep = "_")
+                             names(out) <- new_names
+                           } else {
+                             names(out) <- names(list_r_cov)[i]
                            }
                            
                            return(out)
