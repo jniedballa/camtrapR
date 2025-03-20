@@ -4212,6 +4212,29 @@ surveyDashboard <- function(CTtable = NULL,
       id <- showNotification("Computing camera operation matrix...", type = "message", duration = NULL)
       on.exit(removeNotification(id), add = TRUE)
       
+      # Check if the CTtable has the required columns
+      required_cols <- c(data$setupCol, data$retrievalCol, data$stationCol)
+      missing_cols <- required_cols[!required_cols %in% names(data$CTtable)]
+      
+      if (length(missing_cols) > 0) {
+        showNotification(
+          paste("Cannot compute camera operation: Missing columns:", paste(missing_cols, collapse = ", ")),
+          type = "error",
+          duration = NULL
+        )
+        return(NULL)
+      }
+      
+      # Check if there's enough data to compute camera operation
+      if (nrow(data$CTtable) == 0) {
+        showNotification(
+          "Cannot compute camera operation: No data available after filtering",
+          type = "error",
+          duration = NULL
+        )
+        return(NULL)
+      }
+      
       args <- list(
         CTtable = data$CTtable,
         setupCol = data$setupCol,
@@ -4233,13 +4256,20 @@ surveyDashboard <- function(CTtable = NULL,
       tryCatch({
         result <- do.call(cameraOperation, args)
         
-        if (is.null(result) || nrow(result) == 0) {
-          warning("cameraOperation returned NULL or empty result")
+        if (is.null(result)) {
+          warning("cameraOperation returned NULL")
+          return(NULL)
+        } else if (nrow(result) == 0) {
+          warning("cameraOperation returned empty matrix")
+          return(NULL)
         }
-        result
+        
+        return(result)
+        
       }, error = function(e) {
+        showNotification(paste("Error in cameraOperation:", e$message), type = "error", duration = NULL)
         warning(paste("Error in cameraOperation:", e$message))
-        NULL
+        return(NULL)
       })
     }
     
@@ -4940,6 +4970,9 @@ surveyDashboard <- function(CTtable = NULL,
       }, error = function(e) {
         showNotification(paste("Error creating aggregated table:", e$message), type = "error")
       })
+      
+      # Re-trigger camop computation after filtering
+      camop(compute_camop())
       
       # Update species inputs after filtering
       update_species_inputs()
@@ -6095,7 +6128,9 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Function to render raster map
-    render_raster_map <- function(raster, raster_name, is_prediction = FALSE) {
+    render_raster_map <- function(raster, 
+                                  raster_name, 
+                                  is_prediction = FALSE) {
       req(raster)
       
       # Check if raster is too large to safely process
@@ -6148,6 +6183,7 @@ surveyDashboard <- function(CTtable = NULL,
         }
         
         breaks <- seq(value_range[1], value_range[2], length.out = length(colors))
+        
         
         m <- mapview::mapview(raster, 
                               layer.name = raster_name,
@@ -6226,7 +6262,9 @@ surveyDashboard <- function(CTtable = NULL,
     output$predictionRasterPlot <- leaflet::renderLeaflet({
       req(data$prediction_raster, input$predictionRasterBand)
       selected_raster <- data$prediction_raster[[input$predictionRasterBand]]
-      render_raster_map(selected_raster, input$predictionRasterBand, is_prediction = TRUE)
+      render_raster_map(raster = selected_raster, 
+                        raster_name = input$predictionRasterBand, 
+                        is_prediction = TRUE)
     })
     
     # Observers to re-render maps when relevant inputs change
@@ -6481,6 +6519,7 @@ surveyDashboard <- function(CTtable = NULL,
               buffer = input$bufferPrediction
             )
           } else NULL
+          
           
           # 1. Handle CTtable updates
           if (!is.null(covariates_extract_list$CTtable)) {
