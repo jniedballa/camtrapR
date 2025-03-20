@@ -247,7 +247,7 @@ createCovariates <- function(CTtable,
   
   # Process local raster files if directory or filenames are provided
   if (hasArg(directory) || hasArg(filenames)) {
-    # browser()
+    
     if (hasArg(directory)) {
       if(length(directory) != 1) stop("The 'directory' parameter should be a single directory path.")
       
@@ -392,9 +392,11 @@ createCovariates <- function(CTtable,
     if(terra::nlyr(list_r_cov[[i]]) > 1) {
       layer_names <- names(list_r_cov[[i]])
       base_name <- names(list_r_cov)[i]
-      colnames(extracted)[-1] <- paste(base_name, layer_names, sep = "_")
+      
+      # Apply make.names to ensure column names match R's sanitization rules
+      colnames(extracted)[-1] <- make.names(paste(base_name, layer_names, sep = "_"), unique = FALSE)
     } else {
-      colnames(extracted)[-1] <- names(list_r_cov)[i]
+      colnames(extracted)[-1] <- make.names(names(list_r_cov)[i], unique = FALSE)
     }
     
     return(extracted[, -1, drop = FALSE])
@@ -438,6 +440,7 @@ createCovariates <- function(CTtable,
                          })
   names(list_r_cov_c) <- names(list_r_cov)
   
+    
   if(create_raster){
     # resample rasters according to template
     r_cov_list <- lapply(1:length(list_r_cov_c),
@@ -458,10 +461,11 @@ createCovariates <- function(CTtable,
                            if(terra::nlyr(list_r_cov_c[[i]]) > 1) {
                              base_name <- names(list_r_cov)[i]
                              layer_names <- names(list_r_cov_c[[i]])
-                             new_names <- paste(base_name, layer_names, sep = "_")
-                             names(out) <- new_names
+                             # Make the raster names match the sanitized column names
+                             names(out) <- make.names(paste(base_name, layer_names, sep = "_"), unique = FALSE)
+                             
                            } else {
-                             names(out) <- names(list_r_cov)[i]
+                             names(out) <- make.names(names(list_r_cov)[i], unique = FALSE)
                            }
                            
                            return(out)
