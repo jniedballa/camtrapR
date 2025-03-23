@@ -916,16 +916,16 @@ surveyDashboard <- function(CTtable = NULL,
                      # Summary counts
                      fluidRow(
                        column(3, 
-                              valueBoxOutput("summary_stations_filtered", width = NULL)
+                              shinydashboard::valueBoxOutput("summary_stations_filtered", width = NULL)
                        ),
                        column(3, 
-                              valueBoxOutput("summary_records_filtered", width = NULL)
+                              shinydashboard::valueBoxOutput("summary_records_filtered", width = NULL)
                        ),
                        column(3, 
-                              valueBoxOutput("summary_species_filtered", width = NULL)
+                              shinydashboard::valueBoxOutput("summary_species_filtered", width = NULL)
                        ),
                        column(3, 
-                              actionButton("resetAllFiltersOverview", "Reset All Filters", 
+                              shiny::actionButton("resetAllFiltersOverview", "Reset All Filters", 
                                            icon = icon("sync"), class = "btn-danger btn-block")
                        )
                      ) #,
@@ -1935,23 +1935,24 @@ surveyDashboard <- function(CTtable = NULL,
                                   )
                                 ),
                                 
-                                # Model Selection below
-                                fluidRow(
-                                  column(width = 12,
-                                         shinydashboard::box(
-                                           title = "Model Selection",
-                                           status = "info",
-                                           width = NULL,
-                                           solidHeader = TRUE,
-                                           tableOutput("basic_model_selection")
-                                         )
-                                  )
-                                )
+                                # # Model Selection below
+                                # edit: moved to separate tab
+                                # fluidRow(
+                                #   column(width = 12,
+                                #          shinydashboard::box(
+                                #            title = "Model Selection",
+                                #            status = "info",
+                                #            width = NULL,
+                                #            solidHeader = TRUE,
+                                #            tableOutput("basic_model_selection")
+                                #          )
+                                #   )
+                                # )
                          )
                        )
               ),
               
-              # Basic Results & Diagnostics tab
+              # Model selection tab
               tabPanel("Model selection",
                        
                        fluidRow(
@@ -5061,14 +5062,14 @@ surveyDashboard <- function(CTtable = NULL,
     # Add these reactives and observers to the server function
     
     # Value boxes for filter summary
-    output$summary_stations_filtered <- renderValueBox({
+    output$summary_stations_filtered <- shinydashboard::renderValueBox({
       req(original_data()$CTtable_sf, data$CTtable_sf)
       
       orig_count <- length(unique(original_data()$CTtable_sf[[data$stationCol]]))
       current_count <- length(unique(data$CTtable_sf[[data$stationCol]]))
       removed_count <- orig_count - current_count
       
-      valueBox(
+      shinydashboard::valueBox(
         value = paste0(current_count, " / ", orig_count),
         subtitle = paste0("Stations (", removed_count, " filtered)"),
         icon = icon("map-marker"),
@@ -5076,14 +5077,14 @@ surveyDashboard <- function(CTtable = NULL,
       )
     })
     
-    output$summary_records_filtered <- renderValueBox({
+    output$summary_records_filtered <- shinydashboard::renderValueBox({
       req(original_record_table(), data$recordTable)
       
       orig_count <- nrow(original_record_table())
       current_count <- nrow(data$recordTable)
       removed_count <- orig_count - current_count
       
-      valueBox(
+      shinydashboard::valueBox(
         value = paste0(current_count, " / ", orig_count),
         subtitle = paste0("Records (", removed_count, " filtered)"),
         icon = icon("camera"),
@@ -5091,7 +5092,7 @@ surveyDashboard <- function(CTtable = NULL,
       )
     })
     
-    output$summary_species_filtered <- renderValueBox({
+    output$summary_species_filtered <- shinydashboard::renderValueBox({
       req(original_record_table(), data$recordTable, data$speciesCol)
       
       orig_species <- length(unique(original_record_table()[[data$speciesCol]]))
@@ -5103,7 +5104,7 @@ surveyDashboard <- function(CTtable = NULL,
       current_species_set <- unique(data$recordTable[[data$speciesCol]])
       excluded_species <- setdiff(original_species_set, current_species_set)
       
-      valueBox(
+      shinydashboard::valueBox(
         value = paste0(current_species, " / ", orig_species),
         subtitle = paste0("Species (", length(excluded_species), " filtered)"),
         icon = icon("paw"),
@@ -8753,7 +8754,8 @@ surveyDashboard <- function(CTtable = NULL,
     output$basic_model_summary <- renderPrint({
       req(basic_model())
       if (input$basic_model_package == "unmarked") {
-        summary(basic_model())
+        # print(summary(basic_model()))
+        print(basic_model())
       } else {
         print(basic_model())
       }
