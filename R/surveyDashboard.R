@@ -245,10 +245,18 @@ surveyDashboard <- function(CTtable = NULL,
     "ubms"
   )
   
-  for (pkg in required_packages) {
-    if (!requireNamespace(pkg, quietly = TRUE)) {
-      stop(paste("Package", pkg, "is required but not installed"))
-    }
+  # Check which packages are missing
+  missing_packages <- required_packages[!sapply(required_packages, requireNamespace, quietly = TRUE)]
+  
+  # If any packages are missing, stop with installation command
+  if(length(missing_packages) > 0) {
+    install_cmd <- paste0("install.packages(c('", paste(missing_packages, collapse = "', '"), "'))")
+    stop("Missing packages: ", paste(missing_packages, collapse = ", "), 
+         "\nRun: ", install_cmd)
+  }
+  
+  # Load all packages (only executes if no packages are missing)
+  for(pkg in required_packages) {
     library(pkg, character.only = TRUE)
   }
   
