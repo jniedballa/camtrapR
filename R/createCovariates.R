@@ -368,6 +368,7 @@ createCovariates <- function(CTtable,
   # Set extraction method based on bilinear parameter
   extract_method <- if(bilinear) "bilinear" else "simple"
   
+  
   # Extract values from all rasters
   cov_value_list <- lapply(1:length(list_r_cov), FUN = function(i) {
     current_crs <- sf::st_crs(list_r_cov[[i]])$wkt
@@ -476,6 +477,9 @@ createCovariates <- function(CTtable,
   } else {
     r_cov <- NULL
   }
+  
+  # ensure the output has correct layer names (rast doesn't preserve names of multi-band raster bands)
+  names(r_cov) <- unlist(sapply(r_cov_list, names))
   
   return(list(CTtable = df_covariates_out,
               predictionRaster = r_cov,
