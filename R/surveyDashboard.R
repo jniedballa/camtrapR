@@ -143,9 +143,25 @@
 #' @importFrom sf st_buffer st_convex_hull st_drop_geometry st_intersection st_transform st_union st_make_valid
 #' @importFrom terra rast vect project resample nlyr values<- mask
 #' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
-#' @importFrom ggplot2 theme_update element_text element_rect geom_violin geom_boxplot geom_point geom_abline
+#' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline
 #' 
 #' @export
+
+# TO DO ----
+
+# - detection maps: species resets to first species
+# elevation file crs mismatch
+# extracted names of prediction rasters (local) not found (not matching covariate)
+
+# covariate extraction:
+# - plotting original covariates: if it is a multi-band raster, the band selection shows only the name of the raster object, not the bands. So it doesn't plot
+# - when first extracting local raster (in UTM), then elevation (in latlong), I get:
+# Failed to clip rasters: [crop] extents do not overlap
+# Warning: [rast] CRS do not match
+
+# # community model
+# - community responses: x axis backtransform. x values are scaled, not unscaled (original values)
+
 
 
 
@@ -434,7 +450,7 @@ surveyDashboard <- function(CTtable = NULL,
         ),
         shinydashboard::menuItem("Maps", icon = shiny::icon("map"),
                                  shinydashboard::menuSubItem("Overview map", tabName = "overview_map"),
-                                 shinydashboard::menuSubItem("Species detection maps", tabName = "Maps")
+                                 shinydashboard::menuSubItem("Species detection maps", tabName = "detection_maps")
         ),
         
         shinydashboard::menuItem("Species Activity", icon = shiny::icon("chart-area"),
@@ -832,7 +848,7 @@ surveyDashboard <- function(CTtable = NULL,
         shinydashboard::tabItem(
           
           
-          tabName = "Maps",
+          tabName = "detection_maps",
           shiny::fluidRow(
             shiny::column(
               width = 3,
@@ -2663,7 +2679,7 @@ surveyDashboard <- function(CTtable = NULL,
             
             
             
-            # In the UI part of the Effect Plots tab
+            # Effect Plots tab
             tabPanel("Effect Plots",
                      fluidRow(
                        # Left panel with controls
@@ -2715,11 +2731,7 @@ surveyDashboard <- function(CTtable = NULL,
                                     numericInput("plotScale", "Plot Size Scale", 
                                                  value = 1.5, min = 0.5, max = 3, step = 0.1),
                                     checkboxInput("orderByEffect", "Order by Effect Size", value = TRUE)
-                                  ),
-                                  
-                                  numericInput("plotDraws", "Number of Draws", 
-                                               value = 1000, min = 100),
-                                  checkboxInput("orderByEffect", "Order by Effect Size", value = TRUE)
+                                  )
                                 ),
                                 
                                 # Update button
@@ -3589,43 +3601,6 @@ surveyDashboard <- function(CTtable = NULL,
       updateTextInput(session, "CTdateFormat", value = "ymd HMS")
       updateTextInput(session, "recordDateTimeFormat", value = "ymd HMS")
     })
-    
-    
-    
-    update_species_inputs <- function() {
-      req(data$recordTable, data$speciesCol)
-      
-      species_list <- sort(unique(data$recordTable[[data$speciesCol]]))
-      if (!is.null(data$exclude)) {
-        species_list <- species_list[!species_list %in% data$exclude]
-      }
-      if (length(species_list) == 0) {
-        species_list <- character(0)  # Return empty character vector
-      }
-      
-      # Update species list for species detection maps
-      updateSelectInput(session, "species_for_map", 
-                        choices = c("n_species", species_list),
-                        selected = "n_species")
-      
-      # Update species selection for activity plots
-      updateSelectInput(session, "ad_species", 
-                        choices = species_list,
-                        selected = species_list[1])
-      updateSelectInput(session, "speciesA", 
-                        choices = species_list,
-                        selected = species_list[1])
-      updateSelectInput(session, "speciesB", 
-                        choices = species_list,
-                        selected = species_list[min(2, length(species_list))])
-      
-      # Update species selection for single species occupancy models
-      updateSelectInput(session, "species_dethist", 
-                        choices = species_list,
-                        selected = if(length(species_list) > 0) species_list[1] else NULL)
-      
-      return(species_list)
-    }
     
     
     
@@ -4654,7 +4629,8 @@ surveyDashboard <- function(CTtable = NULL,
       DT::datatable(
         sf::st_drop_geometry(data$CTtable_sf),
         # data$CTtable,
-        options = list(pageLength = 10, scrollX = TRUE)
+        options = list(pageLength = 10, 
+                       scrollX = TRUE)
       )
     })
     
@@ -4665,7 +4641,8 @@ surveyDashboard <- function(CTtable = NULL,
       req(data$aggregated_CTtable)
       DT::datatable(
         sf::st_drop_geometry(data$aggregated_CTtable),
-        options = list(pageLength = 10, scrollX = TRUE)
+        options = list(pageLength = 10, 
+                       scrollX = TRUE)
       )
     })
     
@@ -6387,6 +6364,15 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Tab: Elevation & terrain data ----
     
+    ask_to_debug <- function() {
+      response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
+      if (tolower(response) == "y" || tolower(response) == "yes") {
+        message("Entering browser mode...")
+        browser()
+      } else {
+        message("Continuing execution...")
+      }
+    }
     
     # Helper function to clip/mask prediction rasters
     clip_prediction_rasters <- function(rasters, prediction_extent) {
@@ -6401,6 +6387,7 @@ surveyDashboard <- function(CTtable = NULL,
         # Check if we're transforming between geographic and projected systems
         is_raster_geo <- grepl("\\+proj=longlat", raster_crs) || grepl("geographic", raster_crs, ignore.case = TRUE)
         is_extent_geo <- grepl("\\+proj=longlat", extent_crs$proj4string) || grepl("geographic", extent_crs$input, ignore.case = TRUE)
+        
         
         # Special handling for transformation between geographic and projected systems
         if (is_raster_geo != is_extent_geo) {
@@ -6432,6 +6419,7 @@ surveyDashboard <- function(CTtable = NULL,
           
           # Create an extent object for cropping
           crop_ext <- terra::ext(t_bbox["xmin"], t_bbox["xmax"], t_bbox["ymin"], t_bbox["ymax"])
+
           
           # Crop using the bbox extent
           return(terra::crop(rasters, crop_ext))
@@ -6443,6 +6431,7 @@ surveyDashboard <- function(CTtable = NULL,
           
           # Convert to a terra vector object for cropping and masking
           extent_vect <- terra::vect(extent_transformed)
+          
           
           # First crop to bounding box for efficiency
           rasters_cropped <- terra::crop(rasters, extent_vect)
@@ -7275,7 +7264,8 @@ surveyDashboard <- function(CTtable = NULL,
           output$correlationTable <- DT::renderDT({
             DT::datatable(cor_pairs,
                           options = list(pageLength = 10,
-                                         order = list(list(2, 'desc'))),
+                                         order = list(list(2, 'desc')),
+                                         scrollX = TRUE),
                           rownames = FALSE)
           })
           
@@ -9000,6 +8990,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       
       # Get prediction raster
+      # should probably be replaced with get_prediction_raster()
       pred_raster <- if (input$basic_pred_source == "extracted") {
         req(data$prediction_raster, 
             message = "No extracted covariates available. Please extract covariates first.")
@@ -9764,7 +9755,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Get the plot and modify its theme
       plot <- effect_plots()[[input$selectedPlot]] +
-        theme_update(
+        theme(
           text = element_text(size = 12 * input$plotScale),
           axis.text = element_text(size = 11 * input$plotScale),
           axis.title = element_text(size = 12 * input$plotScale),
@@ -9782,7 +9773,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Get the plot and modify its theme
       plot <- coef_plot()[[input$selectedPlot]] +
-        theme_update(
+        theme(
           text = element_text(size = 12 * input$plotScale),
           axis.text = element_text(size = 11 * input$plotScale),
           axis.title = element_text(size = 12 * input$plotScale),
@@ -10042,9 +10033,9 @@ surveyDashboard <- function(CTtable = NULL,
             draws = input$predictionDraws,
             level = input$predictionLevel,
             interval = "confidence",
-            x = get_covariate_raster(),
+            x = prediction_raster_scaled,    # model input is scaled  #get_covariate_raster(),
             batch = if(input$predictionBatch) input$batchSize else FALSE,
-            seed = input$predictionSeed
+            seed = if(is.null(input$predictionSeed)) input$predictionSeed else NULL
           )
           
           # Store predictions
@@ -10070,7 +10061,7 @@ surveyDashboard <- function(CTtable = NULL,
             draws = input$predictionDraws,
             level = input$predictionLevel,
             interval = "confidence",
-            x = get_covariate_raster(),
+            x = prediction_raster_scaled,   # get_covariate_raster(),
             batch = if(input$predictionBatch) input$batchSize else FALSE,
             seed = input$predictionSeed
           )
@@ -10097,7 +10088,7 @@ surveyDashboard <- function(CTtable = NULL,
             type = "pao",
             draws = input$predictionDraws,
             level = input$predictionLevel,
-            x = get_covariate_raster(),
+            x = prediction_raster_scaled,      # get_covariate_raster(),
             batch = if(input$predictionBatch) input$batchSize else FALSE,
             seed = input$predictionSeed
           )
