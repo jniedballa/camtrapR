@@ -149,15 +149,14 @@
 
 # TO DO ----
 
-# - detection maps: species resets to first species
 # elevation file crs mismatch
 # extracted names of prediction rasters (local) not found (not matching covariate)
 
 # covariate extraction:
-# - plotting original covariates: if it is a multi-band raster, the band selection shows only the name of the raster object, not the bands. So it doesn't plot
 # - when first extracting local raster (in UTM), then elevation (in latlong), I get:
 # Failed to clip rasters: [crop] extents do not overlap
 # Warning: [rast] CRS do not match
+# elevation prediction rasters is all NA then
 
 # # community model
 # - community responses: x axis backtransform. x values are scaled, not unscaled (original values)
@@ -1287,6 +1286,97 @@ surveyDashboard <- function(CTtable = NULL,
                                                   ),
                                                   
                                                   # Data sources box
+                                                  # fluidRow(
+                                                  #   shinydashboard::box(
+                                                  #     title = "Data Sources",
+                                                  #     status = "info",
+                                                  #     solidHeader = TRUE,
+                                                  #     width = 12,
+                                                  #     
+                                                  #     tabsetPanel(
+                                                  #       # Local Rasters tab
+                                                  #       tabPanel("Local Rasters",
+                                                  #                fluidRow(
+                                                  #                  column(6,
+                                                  #                         radioButtons("inputType", "Choose input type:",
+                                                  #                                      choices = c("Directory" = "directory", 
+                                                  #                                                  "Filenames" = "filenames")),
+                                                  #                         
+                                                  #                         conditionalPanel(
+                                                  #                           condition = "input.inputType == 'directory'",
+                                                  #                           textInput("directory", "Directory", 
+                                                  #                                     placeholder = "Path to covariate rasters"),
+                                                  #                           checkboxInput("recursive", "Search recursively", 
+                                                  #                                         value = FALSE)
+                                                  #                         ),
+                                                  #                         
+                                                  #                         conditionalPanel(
+                                                  #                           condition = "input.inputType == 'filenames'",
+                                                  #                           textInput("filenames", "Filenames", 
+                                                  #                                     placeholder = "Comma-separated file paths")
+                                                  #                         ),
+                                                  #                         
+                                                  #                         textInput("formats", "Formats", value = ".tif")
+                                                  #                  )
+                                                  #                )
+                                                  #       ),
+                                                  #       
+                                                  #       # Elevation & Terrain tab
+                                                  #       tabPanel("Elevation & Terrain",
+                                                  #                div(
+                                                  #                  class = "alert alert-info",
+                                                  #                  "Elevation data from AWS Terrain Tiles"
+                                                  #                ),
+                                                  #                
+                                                  #                fluidRow(
+                                                  #                  column(6,
+                                                  #                         checkboxGroupInput("terrainMeasures", 
+                                                  #                                            "Select Terrain Indices:",
+                                                  #                                            choices = c(
+                                                  #                                              "Slope" = "slope", 
+                                                  #                                              "Aspect" = "aspect", 
+                                                  #                                              "TRI (Terrain Ruggedness Index)" = "TRI", 
+                                                  #                                              "TPI (Topographic Position Index)" = "TPI", 
+                                                  #                                              "Roughness" = "roughness"
+                                                  #                                            ),
+                                                  #                                            selected = c("slope", "TRI"))
+                                                  #                  ),
+                                                  #                  column(6,
+                                                  #                         radioButtons("elevationZoom", "Resolution:", 
+                                                  #                                      choices = c(
+                                                  #                                        "Zoom 12 (~20m)" = 12,
+                                                  #                                        "Zoom 11 (~40m)" = 11,
+                                                  #                                        "Zoom 10 (~80m)" = 10,
+                                                  #                                        "Zoom 9 (~160m)" = 9
+                                                  #                                      ),
+                                                  #                                      selected = 11) #,
+                                                  #                         
+                                                  #                  )
+                                                  #                )
+                                                  #       )
+                                                  #     )
+                                                  #   )
+                                                  # ),
+                                                  # 
+                                                  # # Action buttons
+                                                  # fluidRow(
+                                                  #   column(12,
+                                                  #          div(
+                                                  #            style = "margin: 20px 0;",
+                                                  #            shiny::actionButton("processLocalRasters", 
+                                                  #                                "Process Local Rasters", 
+                                                  #                                class = "btn-primary btn-lg"),
+                                                  #            shiny::actionButton("processElevation", 
+                                                  #                                "Process Elevation Data", 
+                                                  #                                class = "btn-primary btn-lg"),
+                                                  #            shiny::actionButton("clearAllCovariates", 
+                                                  #                                "Clear All Covariates", 
+                                                  #                                class = "btn-danger btn-lg pull-right")
+                                                  #          )
+                                                  #   )
+                                                  # )
+                                                  
+                                                  # Replace the 'Data Sources' tabsetPanel with this single box:
                                                   fluidRow(
                                                     shinydashboard::box(
                                                       title = "Data Sources",
@@ -1294,88 +1384,72 @@ surveyDashboard <- function(CTtable = NULL,
                                                       solidHeader = TRUE,
                                                       width = 12,
                                                       
-                                                      tabsetPanel(
-                                                        # Local Rasters tab
-                                                        tabPanel("Local Rasters",
-                                                                 fluidRow(
-                                                                   column(6,
-                                                                          radioButtons("inputType", "Choose input type:",
-                                                                                       choices = c("Directory" = "directory", 
-                                                                                                   "Filenames" = "filenames")),
-                                                                          
-                                                                          conditionalPanel(
-                                                                            condition = "input.inputType == 'directory'",
-                                                                            textInput("directory", "Directory", 
-                                                                                      placeholder = "Path to covariate rasters"),
-                                                                            checkboxInput("recursive", "Search recursively", 
-                                                                                          value = FALSE)
-                                                                          ),
-                                                                          
-                                                                          conditionalPanel(
-                                                                            condition = "input.inputType == 'filenames'",
-                                                                            textInput("filenames", "Filenames", 
-                                                                                      placeholder = "Comma-separated file paths")
-                                                                          ),
-                                                                          
-                                                                          textInput("formats", "Formats", value = ".tif")
-                                                                   )
-                                                                 )
-                                                        ),
-                                                        
-                                                        # Elevation & Terrain tab
-                                                        tabPanel("Elevation & Terrain",
-                                                                 div(
-                                                                   class = "alert alert-info",
-                                                                   "Elevation data from AWS Terrain Tiles"
+                                                      fluidRow(
+                                                        # --- Local Rasters Section ---
+                                                        column(6,
+                                                               h4("Local Rasters (Optional)"),
+                                                               checkboxInput("use_local_rasters", "Process Local Raster Files", value = FALSE),
+                                                               conditionalPanel(
+                                                                 condition = "input.use_local_rasters == true",
+                                                                 radioButtons("inputType", "Input type:",
+                                                                              choices = c("Directory" = "directory",
+                                                                                          "Filenames" = "filenames")),
+                                                                 conditionalPanel(
+                                                                   condition = "input.inputType == 'directory'",
+                                                                   textInput("directory", "Directory Path",
+                                                                             placeholder = "Path to covariate rasters"),
+                                                                   checkboxInput("recursive", "Search recursively", value = FALSE)
                                                                  ),
-                                                                 
-                                                                 fluidRow(
-                                                                   column(6,
-                                                                          checkboxGroupInput("terrainMeasures", 
-                                                                                             "Select Terrain Indices:",
-                                                                                             choices = c(
-                                                                                               "Slope" = "slope", 
-                                                                                               "Aspect" = "aspect", 
-                                                                                               "TRI (Terrain Ruggedness Index)" = "TRI", 
-                                                                                               "TPI (Topographic Position Index)" = "TPI", 
-                                                                                               "Roughness" = "roughness"
-                                                                                             ),
-                                                                                             selected = c("slope", "TRI"))
-                                                                   ),
-                                                                   column(6,
-                                                                          radioButtons("elevationZoom", "Resolution:", 
-                                                                                       choices = c(
-                                                                                         "Zoom 12 (~20m)" = 12,
-                                                                                         "Zoom 11 (~40m)" = 11,
-                                                                                         "Zoom 10 (~80m)" = 10,
-                                                                                         "Zoom 9 (~160m)" = 9
-                                                                                       ),
-                                                                                       selected = 11) #,
-                                                                          
-                                                                   )
-                                                                 )
-                                                        )
-                                                      )
-                                                    )
-                                                  ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.inputType == 'filenames'",
+                                                                   textInput("filenames", "Filenames",
+                                                                             placeholder = "Comma-separated file paths")
+                                                                 ),
+                                                                 textInput("formats", "File Formats (e.g., .tif,.grd)", value = ".tif")
+                                                               ) # end conditionalPanel for use_local_rasters
+                                                        ), # end column for Local Rasters
+                                                        
+                                                        # --- Elevation & Terrain Section ---
+                                                        column(6,
+                                                               h4("Elevation & Terrain (Optional)"),
+                                                               checkboxInput("use_elevation", "Download Elevation Data (AWS)", value = FALSE),
+                                                               conditionalPanel(
+                                                                 condition = "input.use_elevation == true",
+                                                                 checkboxGroupInput("terrainMeasures",
+                                                                                    "Select Terrain Indices:",
+                                                                                    choices = c("Slope" = "slope",
+                                                                                                "Aspect" = "aspect",
+                                                                                                "TRI" = "TRI",
+                                                                                                "TPI" = "TPI",
+                                                                                                "Roughness" = "roughness"),
+                                                                                    selected = c("slope", "TRI")),
+                                                                 radioButtons("elevationZoom", "Resolution (Zoom Level):",
+                                                                              choices = c("12 (~20m)" = 12, "11 (~40m)" = 11,
+                                                                                          "10 (~80m)" = 10, "9 (~160m)" = 9),
+                                                                              selected = 11)
+                                                               ) # end conditionalPanel for use_elevation
+                                                        ) # end column for Elevation
+                                                      ) # end fluidRow for Data Sources content
+                                                    ) # end box for Data Sources
+                                                  ), # end fluidRow containing the Data Sources box
                                                   
-                                                  # Action buttons
+                                                  # --- Action Buttons ---
                                                   fluidRow(
                                                     column(12,
                                                            div(
                                                              style = "margin: 20px 0;",
-                                                             shiny::actionButton("processLocalRasters", 
-                                                                                 "Process Local Rasters", 
+                                                             # *** Single new button ***
+                                                             shiny::actionButton("run_covariate_extraction",
+                                                                                 "Extract Covariates",
                                                                                  class = "btn-primary btn-lg"),
-                                                             shiny::actionButton("processElevation", 
-                                                                                 "Process Elevation Data", 
-                                                                                 class = "btn-primary btn-lg"),
-                                                             shiny::actionButton("clearAllCovariates", 
-                                                                                 "Clear All Covariates", 
+                                                             # *** Keep the clear button ***
+                                                             shiny::actionButton("clearAllCovariates",
+                                                                                 "Clear All Covariates",
                                                                                  class = "btn-danger btn-lg pull-right")
                                                            )
                                                     )
-                                                  )
+                                                  ) # end fluidRow for Action Buttons
+                                                  
                                   ),
                                   
                                   
@@ -6234,12 +6308,68 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Update choices for original raster band selection
     observe({
-      if (is.null(data$original_rasters)) {
-        updateSelectInput(session, "rasterBand", choices = NULL)
-      } else {
-        updateSelectInput(session, "rasterBand", choices = names(data$original_rasters))
+      # Ensure original rasters is a list and not empty
+      if (is.null(data$original_rasters) || !is.list(data$original_rasters) || length(data$original_rasters) == 0) {
+        updateSelectInput(session, "rasterBand", choices = NULL, selected = NULL)
+        return() # Exit early if no valid rasters
       }
+      
+      # Initialize an empty named vector for final choices
+      final_choices <- c()
+      
+      # Iterate through each raster object in the list
+      for (raster_name in names(data$original_rasters)) {
+        raster_obj <- data$original_rasters[[raster_name]]
+        
+        # Check if it's a valid SpatRaster
+        if (inherits(raster_obj, "SpatRaster")) {
+          num_layers <- terra::nlyr(raster_obj)
+          
+          if (num_layers > 1) {
+            # Multi-band raster
+            band_names <- names(raster_obj)
+            # Create values like "RasterName_BandName"
+            choice_values <- paste(raster_name, band_names, sep = "_")
+            # Create display names like "RasterName - BandName"
+            choice_names <- paste(raster_name, "-", band_names)
+            # Create a named vector for this raster's bands
+            choices_for_raster <- setNames(choice_values, choice_names)
+            # Append to the final choices vector
+            final_choices <- c(final_choices, choices_for_raster)
+          } else if (num_layers == 1) {
+            # Single-band raster
+            choice_value <- raster_name # Value is just the raster name
+            choice_name <- raster_name  # Display name is also the raster name
+            # Create a named vector for this single band
+            choice_for_raster <- setNames(choice_value, choice_name)
+            # Append to the final choices vector
+            final_choices <- c(final_choices, choice_for_raster)
+          }
+          # Ignore if num_layers is 0 (empty raster)
+        } else {
+          warning(paste("Item", raster_name, "in data$original_rasters is not a SpatRaster. Skipping."))
+        }
+      }
+      
+      # Check if final_choices is empty after processing
+      if (length(final_choices) == 0) {
+        updateSelectInput(session, "rasterBand", choices = NULL, selected = NULL)
+        return()
+      }
+      
+      # Preserve selection if possible
+      current_selection <- input$rasterBand
+      selected_value <- if (!is.null(current_selection) && current_selection %in% final_choices) {
+        current_selection
+      } else {
+        final_choices[1] # Default to first choice if selection invalid or null
+      }
+      
+      # Update the selectInput with the correctly named vector
+      updateSelectInput(session, "rasterBand", choices = final_choices, selected = selected_value)
+      
     })
+    
     
     # Update choices for prediction raster band selection
     observe({
@@ -6250,17 +6380,56 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
-    # Render original covariate raster map
-    output$originalCovariatePlot <- leaflet::renderLeaflet({
+    # # Render original covariate raster map
+    # output$originalCovariatePlot <- leaflet::renderLeaflet({
+    #   req(data$original_rasters, input$rasterBand)
+    #   selected_raster <- data$original_rasters[[input$rasterBand]]
+    #   render_raster_map(selected_raster, input$rasterBand, is_prediction = FALSE)
+    # })
+     output$originalCovariatePlot <- leaflet::renderLeaflet({
       req(data$original_rasters, input$rasterBand)
-      selected_raster <- data$original_rasters[[input$rasterBand]]
-      render_raster_map(selected_raster, input$rasterBand, is_prediction = FALSE)
+
+      selected_input <- input$rasterBand
+
+      # Find which raster object and band correspond to the selection
+      selected_raster <- NULL
+      raster_display_name <- selected_input # Default display name
+
+      for (raster_name in names(data$original_rasters)) {
+         raster_obj <- data$original_rasters[[raster_name]]
+         if (inherits(raster_obj, "SpatRaster")) {
+           if (terra::nlyr(raster_obj) > 1) {
+              band_names <- names(raster_obj)
+              combined_names <- paste(raster_name, band_names, sep = "_")
+              match_index <- match(selected_input, combined_names)
+              if (!is.na(match_index)) {
+                 selected_raster <- raster_obj[[band_names[match_index]]]
+                 raster_display_name <- paste(raster_name, "-", band_names[match_index])
+                 break
+              }
+           } else {
+              if (selected_input == raster_name) {
+                 selected_raster <- raster_obj
+                 raster_display_name <- raster_name
+                 break
+              }
+           }
+         }
+      }
+
+      # Ensure a raster was found
+      req(selected_raster, inherits(selected_raster, "SpatRaster"))
+
+      # Render the map using the selected single-band raster
+      render_raster_map(selected_raster, raster_display_name, is_prediction = FALSE)
     })
     
     # Render prediction raster map
     output$predictionRasterPlot <- leaflet::renderLeaflet({
       req(data$prediction_raster, input$predictionRasterBand)
       selected_raster <- data$prediction_raster[[input$predictionRasterBand]]
+      # print(str(data$prediction_raster))
+      
       render_raster_map(raster = selected_raster, 
                         raster_name = input$predictionRasterBand, 
                         is_prediction = TRUE)
@@ -6388,80 +6557,161 @@ surveyDashboard <- function(CTtable = NULL,
     }
     
     # Helper function to clip/mask prediction rasters
+    # clip_prediction_rasters <- function(rasters, prediction_extent) {
+    #   if (is.null(prediction_extent)) return(rasters)
+    #   
+    #   # Safely handle transformations and clipping
+    #   tryCatch({
+    #     # Get CRS information
+    #     raster_crs <- terra::crs(rasters)
+    #     extent_crs <- sf::st_crs(prediction_extent)
+    #     
+    #     # Check if we're transforming between geographic and projected systems
+    #     is_raster_geo <- grepl("\\+proj=longlat", raster_crs) || grepl("geographic", raster_crs, ignore.case = TRUE)
+    #     is_extent_geo <- grepl("\\+proj=longlat", extent_crs$proj4string) || grepl("geographic", extent_crs$input, ignore.case = TRUE)
+    #     
+    #     
+    #     # Special handling for transformation between geographic and projected systems
+    #     if (is_raster_geo != is_extent_geo) {
+    #       # Create a temporary buffer around the extent in its own CRS
+    #       # This helps ensure overlap after transformation
+    #       prediction_extent_buffered <- sf::st_buffer(prediction_extent, dist = if(is_extent_geo) 0.1 else 10000)
+    #       
+    #       # Get the bounding box of the prediction extent
+    #       bbox <- sf::st_bbox(prediction_extent_buffered)
+    #       bbox_poly <- sf::st_as_sfc(bbox, crs = extent_crs)
+    #       
+    #       # Safety check: ensure coordinates are reasonable
+    #       bbox_coords <- sf::st_coordinates(bbox_poly)[,1:2]
+    #       if (any(!is.finite(bbox_coords))) {
+    #         return(rasters)  # Return original rasters if coordinates invalid
+    #       }
+    #       
+    #       # Transform the bbox to raster CRS
+    #       bbox_transformed <- sf::st_transform(bbox_poly, raster_crs)
+    #       
+    #       # Check for valid transformation
+    #       transformed_coords <- sf::st_coordinates(bbox_transformed)[,1:2]
+    #       if (any(!is.finite(transformed_coords))) {
+    #         return(rasters)  # Return original rasters if transformation failed
+    #       }
+    #       
+    #       # Extract the bbox from the transformed geometry
+    #       t_bbox <- sf::st_bbox(bbox_transformed)
+    #       
+    #       # Create an extent object for cropping
+    #       crop_ext <- terra::ext(t_bbox["xmin"], t_bbox["xmax"], t_bbox["ymin"], t_bbox["ymax"])
+    # 
+    #       
+    #       # Crop using the bbox extent
+    #       return(terra::crop(rasters, crop_ext))
+    #       
+    #     } else {
+    #       # Standard approach when both are in similar coordinate systems
+    #       # Transform the prediction extent to match the raster's CRS
+    #       extent_transformed <- sf::st_transform(prediction_extent, raster_crs)
+    #       
+    #       # Convert to a terra vector object for cropping and masking
+    #       extent_vect <- terra::vect(extent_transformed)
+    #       
+    #       
+    #       # First crop to bounding box for efficiency
+    #       rasters_cropped <- terra::crop(rasters, extent_vect)
+    #       
+    #       # Then mask to actual polygon shape
+    #       return(terra::mask(rasters_cropped, extent_vect))
+    #     }
+    #   }, error = function(e) {
+    #     # If clipping fails, return original rasters
+    #     warning(paste("Failed to clip rasters:", e$message))
+    #     return(rasters)
+    #   })
+    # }
+    
     clip_prediction_rasters <- function(rasters, prediction_extent) {
-      if (is.null(prediction_extent)) return(rasters)
+      if (is.null(prediction_extent) || !inherits(prediction_extent, "sf")) return(rasters)
+      if (!inherits(rasters, "SpatRaster")) return(rasters)
       
-      # Safely handle transformations and clipping
+      response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
+      if (tolower(response) == "y" || tolower(response) == "yes") {
+        message("Entering browser mode...")
+        browser()
+      }
+      
       tryCatch({
+        # Ensure prediction_extent is valid
+        prediction_extent <- sf::st_make_valid(prediction_extent)
+        if (!sf::st_is_valid(prediction_extent)) {
+          warning("Prediction extent geometry is invalid after st_make_valid.")
+          return(rasters) # Return original if extent is invalid
+        }
+        
         # Get CRS information
-        raster_crs <- terra::crs(rasters)
+        raster_crs_str <- terra::crs(rasters, proj = TRUE)
         extent_crs <- sf::st_crs(prediction_extent)
         
-        # Check if we're transforming between geographic and projected systems
-        is_raster_geo <- grepl("\\+proj=longlat", raster_crs) || grepl("geographic", raster_crs, ignore.case = TRUE)
-        is_extent_geo <- grepl("\\+proj=longlat", extent_crs$proj4string) || grepl("geographic", extent_crs$input, ignore.case = TRUE)
-        
-        
-        # Special handling for transformation between geographic and projected systems
-        if (is_raster_geo != is_extent_geo) {
-          # Create a temporary buffer around the extent in its own CRS
-          # This helps ensure overlap after transformation
-          prediction_extent_buffered <- sf::st_buffer(prediction_extent, dist = if(is_extent_geo) 0.1 else 10000)
-          
-          # Get the bounding box of the prediction extent
-          bbox <- sf::st_bbox(prediction_extent_buffered)
-          bbox_poly <- sf::st_as_sfc(bbox, crs = extent_crs)
-          
-          # Safety check: ensure coordinates are reasonable
-          bbox_coords <- sf::st_coordinates(bbox_poly)[,1:2]
-          if (any(!is.finite(bbox_coords))) {
-            return(rasters)  # Return original rasters if coordinates invalid
-          }
-          
-          # Transform the bbox to raster CRS
-          bbox_transformed <- sf::st_transform(bbox_poly, raster_crs)
-          
-          # Check for valid transformation
-          transformed_coords <- sf::st_coordinates(bbox_transformed)[,1:2]
-          if (any(!is.finite(transformed_coords))) {
-            return(rasters)  # Return original rasters if transformation failed
-          }
-          
-          # Extract the bbox from the transformed geometry
-          t_bbox <- sf::st_bbox(bbox_transformed)
-          
-          # Create an extent object for cropping
-          crop_ext <- terra::ext(t_bbox["xmin"], t_bbox["xmax"], t_bbox["ymin"], t_bbox["ymax"])
-
-          
-          # Crop using the bbox extent
-          return(terra::crop(rasters, crop_ext))
-          
+        # Transform prediction_extent to match raster CRS *if* they are different
+        extent_transformed_sf <- if (raster_crs_str != extent_crs$proj4string) {
+          sf::st_transform(prediction_extent, raster_crs_str)
         } else {
-          # Standard approach when both are in similar coordinate systems
-          # Transform the prediction extent to match the raster's CRS
-          extent_transformed <- sf::st_transform(prediction_extent, raster_crs)
-          
-          # Convert to a terra vector object for cropping and masking
-          extent_vect <- terra::vect(extent_transformed)
-          
-          
-          # First crop to bounding box for efficiency
-          rasters_cropped <- terra::crop(rasters, extent_vect)
-          
-          # Then mask to actual polygon shape
-          return(terra::mask(rasters_cropped, extent_vect))
+          prediction_extent
         }
+        
+        # Check validity again after potential transformation
+        if (!sf::st_is_valid(extent_transformed_sf)) {
+          warning("Prediction extent geometry became invalid after transformation.")
+          extent_transformed_sf <- sf::st_make_valid(extent_transformed_sf)
+          if (!sf::st_is_valid(extent_transformed_sf)){
+            warning("Could not repair transformed prediction extent geometry.")
+            return(rasters)
+          }
+        }
+        
+        # Convert sf object to terra SpatVector
+        extent_vect <- terra::vect(extent_transformed_sf)
+        
+        # Check if extents overlap *after* transformation
+        # Create extents for comparison
+        raster_extent_obj <- terra::ext(rasters)
+        extent_vect_obj <- terra::ext(extent_vect)
+        
+        if (!terra::relate(raster_extent_obj, extent_vect_obj, "intersects")) {
+          warning("[clip_prediction_rasters] Extents do not overlap after transformation.")
+          return(rasters) # Return original if they don't overlap
+        }
+        
+        # First crop to the bounding box of the transformed extent for efficiency
+        rasters_cropped <- tryCatch(
+          terra::crop(rasters, extent_vect),
+          error = function(e) {
+            warning(paste("[clip_prediction_rasters] Cropping failed:", e$message))
+            return(NULL) # Indicate failure
+          }
+        )
+        
+        if (is.null(rasters_cropped)) return(rasters) # Return original if crop failed
+        
+        # Then mask using the actual polygon geometry
+        rasters_masked <- tryCatch(
+          terra::mask(rasters_cropped, extent_vect),
+          error = function(e) {
+            warning(paste("[clip_prediction_rasters] Masking failed:", e$message))
+            return(rasters_cropped) # Return cropped if mask failed
+          }
+        )
+        
+        
+        return(rasters_masked)
+        
       }, error = function(e) {
-        # If clipping fails, return original rasters
-        warning(paste("Failed to clip rasters:", e$message))
-        return(rasters)
+        warning(paste("Error during clip/mask operation:", e$message))
+        return(rasters) # Fallback to original rasters on any error
       })
     }
     
     
     
-    # notify user is study area is not available
+    # notify user if study area is not available
     observeEvent(input$predictionExtent, {
       if (input$predictionExtent %in% c("study_area", "intersection") & is.null(data$study_area)) {
         showNotification(
@@ -6484,46 +6734,94 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     
-    
-    # Observer for processing local rasters
-    observeEvent(input$processLocalRasters, {
+    # New Single Observer for Covariate Extraction
+    observeEvent(input$run_covariate_extraction, {
       req(data$CTtable_sf)
       
-      withProgress(message = 'Processing local rasters...', value = 0, {
+      # Check if at least one source is selected
+      if (!input$use_local_rasters && !input$use_elevation) {
+        showNotification("Please select at least one data source (Local Rasters or Elevation).", type = "warning")
+        return()
+      }
+      
+      withProgress(message = 'Extracting covariates...', value = 0, {
         tryCatch({
-          # Prepare basic parameters for createCovariates
-          covariate_args <- list(
+          # --- Assemble arguments for createCovariates ---
+          args_list <- list(
             CTtable = data$CTtable_sf,
             buffer_ct = input$bufferCT,
-            bilinear = input$bilinear
+            bilinear = input$bilinear,
+            buffer_aoi = input$bufferPrediction, # Use the prediction buffer setting
+            append = TRUE, # Assuming always append in dashboard context
+            download_elevation = FALSE # Default, will be overridden if checkbox is TRUE
           )
           
-          # Add input source parameters
-          if (input$inputType == "directory") {
-            req(input$directory)
-            # Normalize directory path to use forward slashes
-            covariate_args$directory <- gsub("\\", "/", input$directory, fixed = TRUE)
-            covariate_args$recursive <- input$recursive
-          } else {
-            req(input$filenames)
-            # Split by comma and optional whitespace, then normalize each path
-            raw_filenames <- unlist(strsplit(input$filenames, ",\\s*"))
-            covariate_args$filenames <- gsub("\\", "/", raw_filenames, fixed = TRUE)
-          }
-          
-          # Handle raster template/resolution
+          # --- Add Raster Template or Resolution ---
           if (!is.null(input$rasterTemplate) && !is.null(input$rasterTemplate$datapath)) {
-            covariate_args$raster_template <- terra::rast(input$rasterTemplate$datapath)
+            # Validate raster template file
+            tryCatch({
+              args_list$raster_template <- terra::rast(input$rasterTemplate$datapath)
+            }, error = function(e){
+              showNotification(paste("Error reading raster template:", e$message), type = "error")
+              stop("Invalid raster template file.") # Stop execution
+            })
           } else if (!is.null(input$resolution) && !is.na(input$resolution) && input$resolution > 0) {
-            covariate_args$resolution <- input$resolution
+            args_list$resolution <- input$resolution
+          } else {
+            # Decide if a warning or default resolution is needed if neither is provided
+            warning("Neither raster template nor resolution specified. Prediction raster creation might be limited.")
           }
           
-          # Extract covariates
-          covariates_extract_list <- do.call(createCovariates, covariate_args)
           
-          # Get prediction extent if clipping is requested
+          # --- Add Local Raster Arguments (if selected) ---
+          if (input$use_local_rasters) {
+            if (input$inputType == "directory") {
+              req(input$directory, message = "Please provide a directory path for local rasters.")
+              if (!dir.exists(input$directory)){
+                showNotification(paste("Directory not found:", input$directory), type = "error")
+                stop("Invalid directory path.") # Stop execution
+              }
+              args_list$directory <- gsub("\\", "/", input$directory, fixed = TRUE) # Normalize path
+              args_list$recursive <- input$recursive
+              args_list$formats <- input$formats # Pass formats
+            } else { # filenames
+              req(input$filenames, message = "Please provide filenames for local rasters.")
+              raw_filenames <- unlist(strsplit(input$filenames, ",\\s*"))
+              # Validate filenames
+              files_exist <- file.exists(raw_filenames)
+              if (!all(files_exist)){
+                showNotification(paste("File(s) not found:", paste(raw_filenames[!files_exist], collapse=", ")), type = "error")
+                stop("One or more specified files do not exist.") # Stop execution
+              }
+              args_list$filenames <- gsub("\\", "/", raw_filenames, fixed = TRUE) # Normalize paths
+              # formats argument is typically used with directory, might not be needed here but pass anyway
+              args_list$formats <- input$formats
+            }
+          }
+          
+          # --- Add Elevation Arguments (if selected) ---
+          if (input$use_elevation) {
+            args_list$download_elevation <- TRUE
+            args_list$elevation_zoom <- as.numeric(input$elevationZoom)
+            if (length(input$terrainMeasures) > 0) {
+              args_list$terrain_measures <- input$terrainMeasures
+            }
+          }
+          
+          # --- Call the unified createCovariates function ---
+          incProgress(0.2, detail = "Calling createCovariates...")
+          # print("Arguments passed to createCovariates:") # Debugging
+          # print(str(args_list))                        # Debugging
+          covariates_extract_list <- do.call(camtrapR::createCovariates, args_list)
+          incProgress(0.6, detail = "Processing results...")
+          
+          
+          # --- Process the results ---
+          
+          # Get prediction extent if clipping is requested (this seems redundant if createCovariates handles it internally based on buffer_aoi?)
+          # Keep it for now in case createCovariates doesn't clip internally
           prediction_extent <- if (input$predictionExtent != "none") {
-            get_prediction_extent(
+            get_prediction_extent( # Ensure this helper function still works or adapt it
               points_sf = data$CTtable_sf,
               study_area = data$study_area,
               extent_type = input$predictionExtent,
@@ -6531,58 +6829,45 @@ surveyDashboard <- function(CTtable = NULL,
             )
           } else NULL
           
+          # Store original columns if not already stored
+          if (is.null(data$original_columns)) {
+            original_cols_tmp <- names(data$CTtable_sf)
+            data$original_columns <- original_cols_tmp[!grepl("geometry", original_cols_tmp)]
+          }
+          
           
           # 1. Handle CTtable updates
           if (!is.null(covariates_extract_list$CTtable)) {
-            # Identify new covariate columns by comparing with original columns
-            original_cols <- data$original_columns
-            new_cols <- setdiff(names(sf::st_drop_geometry(covariates_extract_list$CTtable)), original_cols)
-            
-            # Find columns that already exist in the current table
+            # Identify new covariate columns
+            new_cols <- setdiff(names(sf::st_drop_geometry(covariates_extract_list$CTtable)), data$original_columns)
+            # Find columns that already exist
             existing_cols <- intersect(names(data$CTtable_sf), new_cols)
             
             if (length(existing_cols) > 0) {
-              # Notify user about replacement
-              showNotification(
-                paste("Replacing existing covariate columns:", paste(existing_cols, collapse=", ")),
-                type = "warning",
-                duration = 10
-              )
-              
-              # Remove existing covariate columns
+              showNotification(paste("Replacing existing covariate columns:", paste(existing_cols, collapse=", ")), type = "warning", duration = 7)
               data$CTtable_sf <- data$CTtable_sf[, !names(data$CTtable_sf) %in% existing_cols]
             }
-            
-            # Add new covariate columns
-            data$CTtable_sf <- cbind(data$CTtable_sf, 
-                                     sf::st_drop_geometry(covariates_extract_list$CTtable)[, new_cols, drop = FALSE])
+            # Add new/updated covariate columns safely
+            new_data_to_add <- sf::st_drop_geometry(covariates_extract_list$CTtable)[, new_cols, drop = FALSE]
+            if(nrow(new_data_to_add) == nrow(data$CTtable_sf)){
+              data$CTtable_sf <- cbind(data$CTtable_sf, new_data_to_add)
+            } else {
+              warning("Row mismatch when adding covariates to CTtable_sf. Covariates not added.")
+              showNotification("Error adding covariates: Row mismatch.", type="error")
+            }
           }
           
           # 2. Handle original rasters
           if (!is.null(covariates_extract_list$originalRaster)) {
             new_orig_rasters <- covariates_extract_list$originalRaster
-            
             if (!is.null(data$original_rasters)) {
-              # Get names from existing and new rasters
               existing_orig_names <- names(data$original_rasters)
               new_orig_names <- names(new_orig_rasters)
-              
-              # Identify overlapping names
               overlapping_orig_names <- intersect(existing_orig_names, new_orig_names)
-              
               if (length(overlapping_orig_names) > 0) {
-                # Notify user about replacement
-                showNotification(
-                  paste("Replacing existing original rasters:", paste(overlapping_orig_names, collapse=", ")),
-                  type = "warning",
-                  duration = 10
-                )
-                
-                # Remove overlapping rasters from existing list
+                showNotification(paste("Replacing original rasters:", paste(overlapping_orig_names, collapse=", ")), type = "warning", duration = 7)
                 data$original_rasters <- data$original_rasters[!names(data$original_rasters) %in% overlapping_orig_names]
               }
-              
-              # Combine lists (non-overlapping existing + all new)
               data$original_rasters <- c(data$original_rasters, new_orig_rasters)
             } else {
               data$original_rasters <- new_orig_rasters
@@ -6591,42 +6876,43 @@ surveyDashboard <- function(CTtable = NULL,
           
           # 3. Handle prediction rasters
           if (!is.null(covariates_extract_list$predictionRaster)) {
-            # Apply clipping if requested
-            pred_rasts <- if (input$predictionExtent != "none" && !is.null(prediction_extent)) {
-              clip_prediction_rasters(covariates_extract_list$predictionRaster, 
-                                      prediction_extent)
-            } else {
-              covariates_extract_list$predictionRaster
-            }
+            # Apply final clipping based on UI extent choice IF createCovariates didn't already do it based on buffer_aoi
+            # Assuming createCovariates handles internal consistency and projection to template
+            pred_rasts <- covariates_extract_list$predictionRaster
+            
+            # This clipping step might be redundant if createCovariates handles buffer_aoi correctly.
+            # If createCovariates *does* clip based on buffer_aoi, this extra clip might cause issues if CRSs differ.
+            # Consider removing this if createCovariates is confirmed to handle extent correctly.
+            # --- Potential Redundant Clipping Start ---
+            # if (!is.null(prediction_extent)) {
+            #    pred_rasts_clipped <- clip_prediction_rasters(pred_rasts, prediction_extent)
+            #    if(!identical(pred_rasts_clipped, pred_rasts)){ # Check if clipping actually happened
+            #         pred_rasts <- pred_rasts_clipped
+            #         showNotification("Applying final clip to prediction rasters based on Prediction Area settings.", type="info")
+            #    }
+            # }
+            # --- Potential Redundant Clipping End ---
             
             if (!is.null(data$prediction_raster)) {
-              # Get names from existing and new rasters
               existing_pred_names <- names(data$prediction_raster)
               new_pred_names <- names(pred_rasts)
-              
-              # Find overlapping layers
               overlapping_pred_names <- intersect(existing_pred_names, new_pred_names)
-              
               if (length(overlapping_pred_names) > 0) {
-                # Notify user about replacement
-                showNotification(
-                  paste("Replacing existing prediction layers:", paste(overlapping_pred_names, collapse=", ")),
-                  type = "warning",
-                  duration = 10
-                )
-                
-                # Keep only non-overlapping layers from existing raster
-                keep_layers <- which(!existing_pred_names %in% new_pred_names)
-                
+                showNotification(paste("Replacing prediction layers:", paste(overlapping_pred_names, collapse=", ")), type = "warning", duration = 7)
+                keep_layers <- which(!existing_pred_names %in% overlapping_pred_names)
                 if (length(keep_layers) > 0) {
-                  # Combine non-overlapping existing layers with new layers
-                  data$prediction_raster <- c(data$prediction_raster[[keep_layers]], pred_rasts)
+                  # Ensure subsetting is valid before combining
+                  existing_subset <- try(data$prediction_raster[[keep_layers]], silent = TRUE)
+                  if(!inherits(existing_subset, "try-error")){
+                    data$prediction_raster <- c(existing_subset, pred_rasts)
+                  } else {
+                    data$prediction_raster <- pred_rasts # Fallback if subset fails
+                    warning("Could not subset existing prediction raster, replacing entirely.")
+                  }
                 } else {
-                  # If all existing layers overlap, just use new layers
                   data$prediction_raster <- pred_rasts
                 }
               } else {
-                # No overlap, just combine
                 data$prediction_raster <- c(data$prediction_raster, pred_rasts)
               }
             } else {
@@ -6634,211 +6920,21 @@ surveyDashboard <- function(CTtable = NULL,
             }
           }
           
-          showNotification("Local rasters processed successfully", type = "message")
-        }, error = function(e) {
-          showNotification(paste("Error processing local rasters:", e$message), type = "error")
-        })
-      })
-    })
-    
-    
-    
-    # Observer for processing elevation data
-    observeEvent(input$processElevation, {
-      req(data$CTtable_sf)
-      
-      withProgress(message = 'Processing elevation data...', value = 0, {
-        tryCatch({
-          # Create buffered polygon from points
-          buffered_sf <- sf::st_buffer(data$CTtable_sf, dist = input$bufferPrediction)
+          incProgress(0.2, detail = "Updating tables and maps...")
+          # Update aggregated table *after* CTtable_sf is updated
+          data$aggregated_CTtable <- aggregateCTtableByStation(data$CTtable_sf, data$stationCol)
           
-          # Get bounding box and transform to EPSG:4326 if needed
-          if (sf::st_crs(buffered_sf) != sf::st_crs(4326)) {
-            buffered_sf_4326 <- sf::st_transform(buffered_sf, 4326)
-          } else {
-            buffered_sf_4326 <- buffered_sf
-          }
-          
-          elevation_rast <- elevatr::get_elev_raster(
-            locations = buffered_sf_4326,
-            z = as.numeric(input$elevationZoom),
-            source = "aws",
-            clip = "bbox"
-          )
-          
-          if(inherits(elevation_rast, "RasterLayer")) elevation_rast <- terra::rast(elevation_rast)
-          
-          # Calculate terrain indices on original resolution data
-          terrain_rasts <- list(elevation = elevation_rast)
-          
-          if ("slope" %in% input$terrainMeasures) {
-            terrain_rasts$slope <- terra::terrain(elevation_rast, "slope", unit = "degrees")
-          }
-          if ("aspect" %in% input$terrainMeasures) {
-            terrain_rasts$aspect <- terra::terrain(elevation_rast, "aspect", unit = "degrees")
-          }
-          if ("TRI" %in% input$terrainMeasures) {
-            terrain_rasts$TRI <- terra::terrain(elevation_rast, "TRI")
-          }
-          if ("TPI" %in% input$terrainMeasures) {
-            terrain_rasts$TPI <- terra::terrain(elevation_rast, "TPI")
-          }
-          if ("roughness" %in% input$terrainMeasures) {
-            terrain_rasts$roughness <- terra::terrain(elevation_rast, "roughness")
-          }
-          
-          # Extract values from original resolution rasters
-          terrain_values <- terra::extract(
-            terra::rast(terrain_rasts),
-            sf::st_transform(data$CTtable_sf, terra::crs(elevation_rast))
-          )
-          
-          # Get names of new terrain columns
-          new_terrain_cols <- names(terrain_values)[-1]  # Exclude ID column
-          
-          # 1. Handle CTtable updates - check for existing columns
-          existing_cols <- intersect(names(data$CTtable_sf), new_terrain_cols)
-          if (length(existing_cols) > 0) {
-            # Notify user about replacement
-            showNotification(
-              paste("Replacing existing terrain columns:", paste(existing_cols, collapse=", ")),
-              type = "warning",
-              duration = 10
-            )
-            
-            # Remove existing terrain columns
-            data$CTtable_sf <- data$CTtable_sf[, !names(data$CTtable_sf) %in% existing_cols]
-          }
-          
-          # Add new terrain columns
-          data$CTtable_sf <- cbind(data$CTtable_sf, terrain_values[, -1, drop = FALSE])
-          
-          # Get the median location of cameras as representative point
-          center_lat <- stats::median(st_coordinates(buffered_sf_4326)[, "Y"]) 
-          center_lon <- stats::median(st_coordinates(buffered_sf_4326)[, "X"]) 
-          
-          # derive UTM zone
-          utm_epsg <- ifelse(center_lat > 0,
-                             32600 + floor((center_lon + 180)/6) + 1,  # Northern
-                             32700 + floor((center_lon + 180)/6) + 1)  # Southern
-          
-          elevation_rast_utm <- terra::project(elevation_rast, paste0("EPSG:", utm_epsg))
-          
-          # 2. Handle original rasters
-          if (!is.null(data$original_rasters)) {
-            # Get names from existing and new rasters
-            existing_orig_names <- names(data$original_rasters)
-            new_orig_names <- names(terrain_rasts)
-            
-            # Identify overlapping names
-            overlapping_orig_names <- intersect(existing_orig_names, new_orig_names)
-            
-            if (length(overlapping_orig_names) > 0) {
-              # Notify user about replacement
-              showNotification(
-                paste("Replacing existing terrain rasters:", paste(overlapping_orig_names, collapse=", ")),
-                type = "warning",
-                duration = 10
-              )
-              
-              # Remove overlapping rasters from existing list
-              data$original_rasters <- data$original_rasters[!names(data$original_rasters) %in% overlapping_orig_names]
-            }
-            
-            # Combine lists (non-overlapping existing + all new)
-            data$original_rasters <- c(data$original_rasters, terrain_rasts)
-          } else {
-            data$original_rasters <- terrain_rasts
-          }
-          
-          # 3. Now handle prediction rasters separately
-          # Create prediction rasters based on template or settings
-          prediction_rasts <- if (!is.null(input$rasterTemplate) && !is.null(input$rasterTemplate$datapath)) {
-            # Use provided template
-            template <- terra::rast(input$rasterTemplate$datapath)
-            resample(rast(terrain_rasts), template)
-            
-          } else if (!is.null(data$prediction_raster)) {
-            # Use existing prediction rasters as template
-            resample(rast(terrain_rasts), data$prediction_raster)
-            
-          } else if (!is.null(input$resolution) && !is.na(input$resolution) && input$resolution > 0) {
-            # Create new rasters with specified resolution in corresponding UTM zone
-            template <- terra::rast(
-              extent = terra::ext(elevation_rast_utm),
-              resolution = input$resolution,
-              crs = terra::crs(elevation_rast_utm)
-            )
-            project(rast(terrain_rasts), template)
-            
-          } else {
-            # Use elevation raster properties as is - not a good idea, may result in very large rasters eating RAM
-            # rast(terrain_rasts)
-            
-            template <- terra::rast(
-              extent = terra::ext(elevation_rast_utm),
-              resolution = input$resolution,
-              crs = terra::crs(elevation_rast_utm)
-            )
-            project(rast(terrain_rasts), template)
-            
-          }
-          
-          # Handle clipping if requested
-          if (input$predictionExtent != "none") {
-            prediction_extent <- get_prediction_extent(
-              points_sf = data$CTtable_sf,
-              study_area = data$study_area,
-              extent_type = input$predictionExtent,
-              buffer = input$bufferPrediction
-            )
-            
-            prediction_rasts <- clip_prediction_rasters(prediction_rasts, 
-                                                        prediction_extent)
-          }
-          
-          # Handle prediction raster updates
-          if (!is.null(data$prediction_raster)) {
-            # Get names from existing and new rasters
-            existing_pred_names <- names(data$prediction_raster)
-            new_pred_names <- names(prediction_rasts)
-            
-            # Find overlapping layers
-            overlapping_pred_names <- intersect(existing_pred_names, new_pred_names)
-            
-            if (length(overlapping_pred_names) > 0) {
-              # Notify user about replacement
-              showNotification(
-                paste("Replacing existing terrain prediction layers:", paste(overlapping_pred_names, collapse=", ")),
-                type = "warning",
-                duration = 10
-              )
-              
-              # Keep only non-overlapping layers from existing raster
-              keep_layers <- which(!existing_pred_names %in% overlapping_pred_names)
-              
-              if (length(keep_layers) > 0) {
-                # Combine non-overlapping existing layers with new layers
-                data$prediction_raster <- c(data$prediction_raster[[keep_layers]], prediction_rasts)
-              } else {
-                # If all existing layers overlap, just use new layers
-                data$prediction_raster <- prediction_rasts
-              }
-            } else {
-              # No overlap, just combine
-              data$prediction_raster <- c(data$prediction_raster, prediction_rasts)
-            }
-          } else {
-            data$prediction_raster <- prediction_rasts
-          }
-          
-          showNotification("Elevation data processed successfully", type = "message")
+          showNotification("Covariate extraction completed successfully", type = "message")
           
         }, error = function(e) {
-          showNotification(paste("Error processing elevation data:", e$message), type = "error")
-        })
-      })
-    })
+          showNotification(paste("Error during covariate extraction:", e$message), type = "error", duration = NULL)
+          # Print detailed error to console for debugging
+          print(paste("Detailed error in run_covariate_extraction:", e))
+        }) # end tryCatch
+      }) # end withProgress
+    }) # end observeEvent
+    
+
     
     
     # Helper function to get prediction extent
