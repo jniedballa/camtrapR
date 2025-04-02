@@ -4998,10 +4998,23 @@ surveyDashboard <- function(CTtable = NULL,
         species_list <- species_list[!species_list %in% data$exclude]
       }
       
-      # Update species list for species detection maps
-      updateSelectInput(session, "species_for_map", 
+      # # Update species list for species detection maps
+
+      # Check if the current selection is still valid
+      current_selection_valid <- !is.null(input$species_for_map) &&
+        input$species_for_map %in% c("n_species", species_list)
+      
+      updateSelectInput(session, "species_for_map",
                         choices = c("n_species", species_list),
-                        selected = if("n_species" %in% input$species_for_map) "n_species" else species_list[1])
+                        # Preserve selection if valid, otherwise default to n_species or first species
+                        selected = if(current_selection_valid) {
+                          input$species_for_map
+                        } else if (length(species_list) > 0) {
+                          "n_species" # Default back to n_species
+                        } else {
+                          "n_species" # Default if list is empty
+                        }
+      )
       
       # Update species selection for activity plots
       updateSelectInput(session, "ad_species", 
