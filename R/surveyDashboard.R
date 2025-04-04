@@ -147,22 +147,6 @@
 #' 
 #' @export
 
-# TO DO ----
-
-# elevation file crs mismatch
-# extracted names of prediction rasters (local) not found (not matching covariate)
-
-# covariate extraction:
-# - when first extracting local raster (in UTM), then elevation (in latlong), I get:
-# Failed to clip rasters: [crop] extents do not overlap
-# Warning: [rast] CRS do not match
-# elevation prediction rasters is all NA then
-
-# # community model
-# - community responses: x axis backtransform. x values are scaled, not unscaled (original values)
-
-
-
 
 
 surveyDashboard <- function(CTtable = NULL,
@@ -6809,11 +6793,11 @@ surveyDashboard <- function(CTtable = NULL,
           }
           
           # --- Call the unified createCovariates function ---
-          incProgress(0.2, detail = "Calling createCovariates...")
+          incProgress(0.2)
           # print("Arguments passed to createCovariates:") # Debugging
           # print(str(args_list))                        # Debugging
           covariates_extract_list <- do.call(camtrapR::createCovariates, args_list)
-          incProgress(0.6, detail = "Processing results...")
+          incProgress(0.6)
           
           
           # --- Process the results ---
@@ -9858,23 +9842,133 @@ surveyDashboard <- function(CTtable = NULL,
                         choices = covariate_names,
                         selected = if(length(covariate_names) > 0) covariate_names[1] else NULL)
     })
+    
+    
     # Render the selected response curve plot
     output$responseCurvePlot <- renderPlot({
       req(effect_plots(), input$selectedPlot)
       
-      # Get the plot and modify its theme
-      plot <- effect_plots()[[input$selectedPlot]] +
-        theme(
-          text = element_text(size = 12 * input$plotScale),
-          axis.text = element_text(size = 11 * input$plotScale),
-          axis.title = element_text(size = 12 * input$plotScale),
-          strip.text = element_text(size = 12 * input$plotScale),
-          legend.text = element_text(size = 11 * input$plotScale),
-          legend.title = element_text(size = 12 * input$plotScale)
-        )
+      plot_orig <- effect_plots()[[input$selectedPlot]]
       
-      print(plot)
-    })
+      # Define the theme modification function (avoids repetition)
+      apply_theme_scaling <- function(plot_obj) {
+        # Ensure plot_obj is a ggplot object before applying theme
+        if (!inherits(plot_obj, "ggplot")) {
+          warning("Object passed to apply_theme_scaling is not a ggplot object.")
+          # Return a blank plot or handle error appropriately
+          return(ggplot() + theme_void() + ggtitle("Error: Invalid plot object"))
+        }
+        plot_obj +
+          theme(
+            text = element_text(size = 12 * input$plotScale),
+            axis.text = element_text(size = 11 * input$plotScale),
+            axis.title = element_text(size = 12 * input$plotScale),
+            strip.text = element_text(size = 12 * input$plotScale),
+            legend.text = element_text(size = 11 * input$plotScale),
+            legend.title = element_text(size = 12 * input$plotScale)
+          )
+      }
+      
+      # --- Axis Relabeling Logic ---
+      # The tryCatch block now directly returns the final, themed plot object
+      plot_to_render <- tryCatch({
+        covariate_name <- input$selectedPlot
+        model_cov_info <- attributes(commOccu_model())$covariate_info
+        this_cov_info <- model_cov_info[model_cov_info$param  == "param" &
+                                          model_cov_info$covariate == covariate_name &
+                                          model_cov_info$submodel == input$plotSubmodel, ]
+        
+        is_continuous <- !is.null(this_cov_info) && nrow(this_cov_info) > 0 &&
+          !is.na(this_cov_info$data_type[1]) &&
+          this_cov_info$data_type[1] == "cont"
+        
+        has_scaling_params <- !is.null(data$scaling_params) &&
+          !is.null(data$scaling_params$means) &&
+          !is.na(covariate_name) &&
+          covariate_name %in% names(data$scaling_params$means)
+        
+        if (is_continuous && has_scaling_params) {
+          mean_val <- data$scaling_params$means[[covariate_name]]
+          sd_val <- data$scaling_params$sds[[covariate_name]]
+          
+          scaling_params_valid <- !is.null(mean_val) && !is.null(sd_val) &&
+            is.numeric(mean_val) && is.numeric(sd_val) &&
+            !is.na(mean_val) && !is.na(sd_val) &&
+            isTRUE(sd_val > 0)
+          
+          if (scaling_params_valid) {
+            # --- Get Scaled Data Range Directly from Plot Data ---
+            scaled_data_in_plot <- NULL
+            if (!is.null(plot_orig$data) && covariate_name %in% names(plot_orig$data)) {
+              scaled_data_in_plot <- plot_orig$data[[covariate_name]]
+            } else {
+              aes_mapping_x <- try(as.character(rlang::get_expr(plot_orig$mapping$x)), silent = TRUE)
+              if(!inherits(aes_mapping_x, "try-error") && !is.null(plot_orig$data) && aes_mapping_x %in% names(plot_orig$data)) {
+                scaled_data_in_plot <- plot_orig$data[[aes_mapping_x]]
+              }
+            }
+            
+            if (!is.null(scaled_data_in_plot) && is.numeric(scaled_data_in_plot)) {
+              scaled_limits <- range(scaled_data_in_plot, na.rm = TRUE)
+            } else {
+              warning(paste("Could not extract numeric scaled data for", covariate_name, "from plot object - using original plot."))
+              return(apply_theme_scaling(plot_orig))
+            }
+            
+            scaled_limits <- scaled_limits[is.finite(scaled_limits)]
+            if(length(scaled_limits) != 2 || diff(scaled_limits) <= 0) { # Check diff > 0 for valid range
+              warning(paste("Invalid or zero-width scaled data range for", covariate_name, "- using original plot."))
+              return(apply_theme_scaling(plot_orig))
+            }
+            # --- End Data Range Extraction ---
+            
+            # --- Calculate Pretty Breaks ---
+            unscaled_limits <- scaled_limits * sd_val + mean_val
+            unscaled_breaks_nice <- pretty(unscaled_limits, n = 5)
+            unscaled_breaks_nice <- unscaled_breaks_nice[unscaled_breaks_nice >= min(unscaled_limits) & unscaled_breaks_nice <= max(unscaled_limits)]
+            
+            if(length(unscaled_breaks_nice) < 2) {
+              unscaled_breaks_nice <- pretty(unscaled_limits, n=2)
+              unscaled_breaks_nice <- unscaled_breaks_nice[unscaled_breaks_nice >= min(unscaled_limits) & unscaled_breaks_nice <= max(unscaled_limits)]
+            }
+            
+            if(length(unscaled_breaks_nice) >= 2) {
+              scaled_breaks_for_nice_unscaled <- (unscaled_breaks_nice - mean_val) / sd_val
+              unscaled_labels_nice <- formatC(unscaled_breaks_nice, format = "fg", digits = 2, flag = "#")
+              
+              plot_relabelled <- suppressMessages({
+                plot_orig +
+                  scale_x_continuous(
+                    name = covariate_name,
+                    breaks = scaled_breaks_for_nice_unscaled,
+                    labels = unscaled_labels_nice,
+                    limits = scaled_limits
+                  )
+              })
+              return(apply_theme_scaling(plot_relabelled)) # Apply theme and return
+            } else {
+              warning(paste("Could not determine suitable 'pretty' breaks for", covariate_name, "- using original plot axes."))
+              return(apply_theme_scaling(plot_orig)) # Apply theme and return original
+            }
+            # --- End Pretty Breaks ---
+          } else {
+            warning(paste("Invalid scaling parameters (sd=", sd_val, ") for covariate", covariate_name, "- using original plot."))
+            return(apply_theme_scaling(plot_orig)) # Apply theme and return original
+          }
+        } else {
+          return(apply_theme_scaling(plot_orig)) # Apply theme and return original
+        }
+      }, error = function(e) {
+        warning(paste("Error during axis relabeling for plot", input$selectedPlot, ":", e$message))
+        return(apply_theme_scaling(plot_orig)) # Apply theme and return original in case of error
+      }) # end tryCatch
+      # --- End Axis Relabeling Logic ---
+      
+      # Return the final plot object for renderPlot
+      plot_to_render
+      
+    }) # end renderPlot
+    
     
     # Render the coefficient plot
     output$coefficientPlot <- renderPlot({
@@ -10142,7 +10236,7 @@ surveyDashboard <- function(CTtable = NULL,
             draws = input$predictionDraws,
             level = input$predictionLevel,
             interval = "confidence",
-            x = prediction_raster_scaled,    # model input is scaled  #get_covariate_raster(),
+            x = data$prediction_raster_scaled,    # model input is scaled  #get_covariate_raster(),
             batch = if(input$predictionBatch) input$batchSize else FALSE,
             seed = if(is.null(input$predictionSeed)) input$predictionSeed else NULL
           )
@@ -10170,9 +10264,9 @@ surveyDashboard <- function(CTtable = NULL,
             draws = input$predictionDraws,
             level = input$predictionLevel,
             interval = "confidence",
-            x = prediction_raster_scaled,   # get_covariate_raster(),
+            x = data$prediction_raster_scaled,   # get_covariate_raster(),
             batch = if(input$predictionBatch) input$batchSize else FALSE,
-            seed = input$predictionSeed
+            seed = if(is.null(input$predictionSeed)) input$predictionSeed else NULL
           )
           
           # Store predictions
@@ -10197,9 +10291,9 @@ surveyDashboard <- function(CTtable = NULL,
             type = "pao",
             draws = input$predictionDraws,
             level = input$predictionLevel,
-            x = prediction_raster_scaled,      # get_covariate_raster(),
+            x = data$prediction_raster_scaled,      # get_covariate_raster(),
             batch = if(input$predictionBatch) input$batchSize else FALSE,
-            seed = input$predictionSeed
+            seed = if(is.null(input$predictionSeed)) input$predictionSeed else NULL
           )
           
           # Store predictions
