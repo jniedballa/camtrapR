@@ -36,6 +36,7 @@
 #' @param download_elevation logical. If \code{TRUE}, download elevation data from AWS. Defaults to \code{FALSE}.
 #' @param elevation_zoom numeric. Zoom level for elevation data download (6-12). Higher values provide more detail but longer download times. Zoom 12 corresponds to ~20m pixel resolution, 11 to ~40m, 10 to ~80m, and so on (resolution halves with each decrease in zoom level). Defaults to 9.
 #' @param terrain_measures character. Vector of terrain metrics to calculate from elevation data. Options include "slope" (slope in degrees), "aspect" (compass direction in degrees), "TRI" (Terrain Ruggedness Index, measuring elevation difference between adjacent cells), "TPI" (Topographic Position Index, comparing cell elevation to mean of surrounding cells), and "roughness" (difference between max and min of surrounding cells). Defaults to NULL (no terrain metrics).
+#' @param standardize_na logical. Logical. If \code{TRUE}, ensures all layers in the prediction raster have identical NA patterns by setting a cell to NA in all bands if it's NA in any band. This creates consistency for spatial predictions across covariates.
 #'
 #' @details
 #' 
@@ -129,7 +130,8 @@ createCovariates <- function(CTtable,
                              recursive = FALSE,
                              download_elevation = FALSE,
                              elevation_zoom = 10,
-                             terrain_measures = NULL)
+                             terrain_measures = NULL,
+                             standardize_na = TRUE)
 {
   if(!inherits(CTtable, "sf")){ 
     stop("CTtable is not an sf object.")
@@ -480,6 +482,17 @@ createCovariates <- function(CTtable,
   
   # ensure the output has correct layer names (rast doesn't preserve names of multi-band raster bands)
   names(r_cov) <- unlist(sapply(r_cov_list, names))
+  
+  # Standardize NA patterns across all layers if requested
+  if(standardize_na && !is.null(r_cov) && terra::nlyr(r_cov) > 1) {
+    r_cov <- terra::mask(x = r_cov,                  # update this layer
+                         mask = any(is.na(r_cov)),   # where any band is NA
+                         maskvalues = 1,             # (coded as "1" in any(is.na()))
+                         updatevalue = NA)           # replace cells where any band is 1 in the mask with NA
+  }
+
+  
+  
   
   return(list(CTtable = df_covariates_out,
               predictionRaster = r_cov,

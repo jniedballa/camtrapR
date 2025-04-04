@@ -18,7 +18,8 @@ createCovariates(
   recursive = FALSE,
   download_elevation = FALSE,
   elevation_zoom = 10,
-  terrain_measures = NULL
+  terrain_measures = NULL,
+  standardize_na = TRUE
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ createCovariates(
 \item{elevation_zoom}{numeric. Zoom level for elevation data download (6-12). Higher values provide more detail but longer download times. Zoom 12 corresponds to ~20m pixel resolution, 11 to ~40m, 10 to ~80m, and so on (resolution halves with each decrease in zoom level). Defaults to 9.}
 
 \item{terrain_measures}{character. Vector of terrain metrics to calculate from elevation data. Options include "slope" (slope in degrees), "aspect" (compass direction in degrees), "TRI" (Terrain Ruggedness Index, measuring elevation difference between adjacent cells), "TPI" (Topographic Position Index, comparing cell elevation to mean of surrounding cells), and "roughness" (difference between max and min of surrounding cells). Defaults to NULL (no terrain metrics).}
+
+\item{standardize_na}{logical. Logical. If \code{TRUE}, ensures all layers in the prediction raster have identical NA patterns by setting a cell to NA in all bands if it's NA in any band. This creates consistency for spatial predictions across covariates.}
 }
 \value{
 \describe{
