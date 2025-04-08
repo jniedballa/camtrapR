@@ -143,7 +143,7 @@
 #' @importFrom sf st_buffer st_convex_hull st_drop_geometry st_intersection st_transform st_union st_make_valid
 #' @importFrom terra rast vect project resample nlyr values<- mask
 #' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
-#' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline
+#' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline theme_void scale_x_continuous
 #' 
 #' @export
 
@@ -2585,7 +2585,7 @@ surveyDashboard <- function(CTtable = NULL,
                            column(3, numericInput("nchains", "Number of Chains", value = 3, min = 1))
                          ),
                          shiny::actionButton("fitCommunityModel", "Fit Model", class = "btn-primary"),
-                         shiny::actionButton("fitCommunityModel_background", "Fit Model (Background)", class = "btn-primary")
+                         # shiny::actionButton("fitCommunityModel_background", "Fit Model (Background)", class = "btn-primary")
                        )
                      ),
                      fluidRow(
@@ -2635,7 +2635,7 @@ surveyDashboard <- function(CTtable = NULL,
                        ),
                        
                        
-                       # Modified Goodness of Fit tabPanel
+                       # Goodness of Fit tabPanel
                        tabPanel("Goodness of Fit",
                                 fluidRow(
                                   # Settings panel - stays fixed on the left
@@ -2648,16 +2648,17 @@ surveyDashboard <- function(CTtable = NULL,
                                                          value = TRUE),
                                            selectInput("gof_residual_type", "Residual type:",
                                                        choices = c("Freeman-Tukey" = "FT",
-                                                                   "Pearson Chi-squared" = "PearChi2",
-                                                                   "Deviance" = "Deviance"),
+                                                                   "Pearson Chi-squared" = "PearChi2" #,
+                                                                   # "Deviance" = "Deviance"
+                                                                   ),
                                                        selected = "FT"),
                                            tags$div(
                                              style = "margin-top: 20px;",
                                              actionButton("run_gof", "Run Goodness of Fit Test", 
                                                           class = "btn-primary btn-lg btn-block"),
-                                             actionButton("run_gof_background", "Run in Background",
-                                                          class = "btn-info btn-block",
-                                                          style = "margin-top: 10px;")
+                                             # actionButton("run_gof_background", "Run in Background",
+                                             #              class = "btn-info btn-block",
+                                             #              style = "margin-top: 10px;")
                                            )
                                          )
                                   ),
@@ -2665,6 +2666,18 @@ surveyDashboard <- function(CTtable = NULL,
                                   # Results area with tabs on the right
                                   column(width = 9,
                                          tabsetPanel(
+                                           selected = "Model Fit Results",
+                                           tabPanel("Instructions",
+                                                           fluidRow(
+                                                             shinydashboard::box(
+                                                               title = "Instructions", 
+                                                               width = 12, 
+                                                               status = "info",
+                                                               shiny::HTML(paste(help_text("goodnessOfFit_help.html"), collapse = "\n"))
+                                                             )
+                                                           )
+                                           ),
+                                           
                                            # Model Fit Results tab
                                            tabPanel("Model Fit Results",
                                                     # Overall fit box
@@ -2707,21 +2720,27 @@ surveyDashboard <- function(CTtable = NULL,
                                                       
                                                       # Plot controls
                                                       fluidRow(
-                                                        column(4,
+                                                        column(3,
                                                                numericInput("gof_plot_columns", 
                                                                             "Number of columns:", 
                                                                             value = 3, min = 1, max = 5)
                                                         ),
-                                                        column(4,
-                                                               checkboxInput("gof_plot_free_scales", 
-                                                                             "Use free scales", 
-                                                                             value = FALSE)
+                                                        column(3,
+                                                               numericInput("gof_plot_height", 
+                                                                            "Plot height:", 
+                                                                            value = 400, min = 400, max = 3000, 
+                                                                            step = 100)
                                                         ),
-                                                        column(4,
+                                                        column(3,
                                                                numericInput("gof_plot_scale", 
                                                                             "Plot size scale:", 
                                                                             value = 1.5, min = 0.5, max = 3, 
                                                                             step = 0.1)
+                                                        ),
+                                                        column(3,
+                                                               checkboxInput("gof_plot_free_scales", 
+                                                                             "Use free scales", 
+                                                                             value = FALSE)
                                                         )
                                                       ),
                                                       
@@ -6793,11 +6812,10 @@ surveyDashboard <- function(CTtable = NULL,
           }
           
           # --- Call the unified createCovariates function ---
-          incProgress(0.2)
           # print("Arguments passed to createCovariates:") # Debugging
           # print(str(args_list))                        # Debugging
           covariates_extract_list <- do.call(camtrapR::createCovariates, args_list)
-          incProgress(0.6)
+
           
           
           # --- Process the results ---
@@ -6904,7 +6922,6 @@ surveyDashboard <- function(CTtable = NULL,
             }
           }
           
-          incProgress(0.2, detail = "Updating tables and maps...")
           # Update aggregated table *after* CTtable_sf is updated
           data$aggregated_CTtable <- aggregateCTtableByStation(data$CTtable_sf, data$stationCol)
           
@@ -8563,7 +8580,7 @@ surveyDashboard <- function(CTtable = NULL,
       switch(effect$type,
              "linear" = effect$covariates[1],
              "quadratic" = paste0(effect$covariates[1], " + I(", effect$covariates[1], "^2)"),
-             "interaction" = paste(effect$covariates, collapse = " × "),
+             "interaction" = paste(effect$covariates, collapse = " * "),
              "random" = paste0(effect$covariates[1], " + (1|", effect$covariates[2], ")")
       )
     }
@@ -8629,7 +8646,7 @@ surveyDashboard <- function(CTtable = NULL,
             ),
             actionButton(
               inputId = makeRemovalButtonId("Det", i),
-              label = "×",
+              label = "*",
               class = "btn-danger btn-xs",
               style = "padding: 0px 6px;"
             )
@@ -8656,7 +8673,7 @@ surveyDashboard <- function(CTtable = NULL,
             ),
             actionButton(
               inputId = makeRemovalButtonId("Occu", i),
-              label = "×",
+              label = "*",
               class = "btn-danger btn-xs",
               style = "padding: 0px 6px;"
             )
@@ -9578,60 +9595,63 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
+    # 
+    # observeEvent(input$fitCommunityModel_background, {
+    #   req(commOccu_model())
+    #   
+    #   # Show a notification that the model is running
+    #   showNotification("Model fitting has started. This may take a while...", 
+    #                    type = "message", duration = NULL, id = "fitting")
+    #   
+    #   # Define the function to run in the background
+    #   fit_func <- function() {
+    #     fit(commOccu_model(),
+    #         n.iter = input$niter,
+    #         thin = input$nthin,
+    #         n.burnin = input$nburn,
+    #         chains = input$nchains)
+    #   }
+    #   
+    #   # Run the fit function in the background
+    #   bg_process <- callr::r_bg(
+    #     func = fit_func,
+    #     args = list(),
+    #     package = TRUE  # This ensures the function environment is preserved
+    #   )
+    #   
+    #   # Set up a repeating timer to check process status
+    #   timer <- reactiveTimer(1000)  # Check every second
+    #   
+    #   observe({
+    #     timer()
+    #     if (!bg_process$is_alive()) {
+    #       # Process has finished
+    #       removeNotification("fitting")
+    #       tryCatch({
+    #         fitted_model <- bg_process$get_result()
+    #         
+    #         # Store the fitted model in a reactive value
+    #         fitted_comm_model(fitted_model)
+    #         
+    #         # Calculate and store the summary
+    #         model_summary(summary(fitted_model))
+    #         
+    #         consoleOutput(paste(consoleOutput(), "Model run completed successfully.\n", sep = "\n"))
+    #         showNotification("Model run completed", type = "message")
+    #       }, error = function(e) {
+    #         consoleOutput(paste(consoleOutput(), "Error fitting model:", e$message, sep = "\n"))
+    #         showNotification(paste("Error fitting model:", e$message), type = "error")
+    #       })
+    #       
+    #       # Stop the timer
+    #       timer$destroy()    # causes error: 
+    #                          Warning: Error in $: object of type 'closure' is not subsettable
+    #     }
+    #   })
+    # })
+    # 
     
-    observeEvent(input$fitCommunityModel_background, {
-      req(commOccu_model())
-      
-      # Show a notification that the model is running
-      showNotification("Model fitting has started. This may take a while...", 
-                       type = "message", duration = NULL, id = "fitting")
-      
-      # Define the function to run in the background
-      fit_func <- function() {
-        fit(commOccu_model(),
-            n.iter = input$niter,
-            thin = input$nthin,
-            n.burnin = input$nburn,
-            chains = input$nchains)
-      }
-      
-      # Run the fit function in the background
-      bg_process <- callr::r_bg(
-        func = fit_func,
-        args = list(),
-        package = TRUE  # This ensures the function environment is preserved
-      )
-      
-      # Set up a repeating timer to check process status
-      timer <- reactiveTimer(1000)  # Check every second
-      
-      observe({
-        timer()
-        if (!bg_process$is_alive()) {
-          # Process has finished
-          removeNotification("fitting")
-          tryCatch({
-            fitted_model <- bg_process$get_result()
-            
-            # Store the fitted model in a reactive value
-            fitted_comm_model(fitted_model)
-            
-            # Calculate and store the summary
-            model_summary(summary(fitted_model))
-            
-            consoleOutput(paste(consoleOutput(), "Model run completed successfully.\n", sep = "\n"))
-            showNotification("Model run completed", type = "message")
-          }, error = function(e) {
-            consoleOutput(paste(consoleOutput(), "Error fitting model:", e$message, sep = "\n"))
-            showNotification(paste("Error fitting model:", e$message), type = "error")
-          })
-          
-          # Stop the timer
-          timer$destroy()
-        }
-      })
-    })
-    
+   
     
     # Render parameter estimates
     output$parameterEstimates <- DT::renderDT({
@@ -9856,7 +9876,9 @@ surveyDashboard <- function(CTtable = NULL,
         if (!inherits(plot_obj, "ggplot")) {
           warning("Object passed to apply_theme_scaling is not a ggplot object.")
           # Return a blank plot or handle error appropriately
-          return(ggplot() + theme_void() + ggtitle("Error: Invalid plot object"))
+          return(ggplot() + 
+                   theme_void() + 
+                   ggtitle("Error: Invalid plot object"))
         }
         plot_obj +
           theme(
@@ -9897,22 +9919,42 @@ surveyDashboard <- function(CTtable = NULL,
             isTRUE(sd_val > 0)
           
           if (scaling_params_valid) {
+            
+            
             # --- Get Scaled Data Range Directly from Plot Data ---
             scaled_data_in_plot <- NULL
+            aes_mapping_x_var <- NULL # Variable to store the extracted aesthetic name
+            
+            # First, try accessing data using the covariate_name directly
             if (!is.null(plot_orig$data) && covariate_name %in% names(plot_orig$data)) {
               scaled_data_in_plot <- plot_orig$data[[covariate_name]]
-            } else {
-              aes_mapping_x <- try(as.character(rlang::get_expr(plot_orig$mapping$x)), silent = TRUE)
-              if(!inherits(aes_mapping_x, "try-error") && !is.null(plot_orig$data) && aes_mapping_x %in% names(plot_orig$data)) {
-                scaled_data_in_plot <- plot_orig$data[[aes_mapping_x]]
+              aes_mapping_x_var <- covariate_name # Assume direct match initially
+            }
+            
+            # If direct match failed or data was NULL, try extracting from mapping
+            if (is.null(scaled_data_in_plot)) {
+              # Check if mapping$x exists and is a language object (symbol or call)
+              if (!is.null(plot_orig$mapping$x) && (is.symbol(plot_orig$mapping$x) || is.call(plot_orig$mapping$x))) {
+                # Use as.character() to get the name of the symbol/variable
+                # For simple symbols (like `aes(x=elevation)`), this works directly
+                potential_x_var <- try(as.character(plot_orig$mapping$x), silent = TRUE)
+                
+                if (!inherits(potential_x_var, "try-error") && length(potential_x_var) == 1) {
+                  # Check if this extracted name exists in the data
+                  if (!is.null(plot_orig$data) && potential_x_var %in% names(plot_orig$data)) {
+                    scaled_data_in_plot <- plot_orig$data[[potential_x_var]]
+                    aes_mapping_x_var <- potential_x_var # Store the actual variable name used
+                  }
+                }
               }
             }
             
+            # Proceed only if we successfully extracted numeric data
             if (!is.null(scaled_data_in_plot) && is.numeric(scaled_data_in_plot)) {
               scaled_limits <- range(scaled_data_in_plot, na.rm = TRUE)
             } else {
-              warning(paste("Could not extract numeric scaled data for", covariate_name, "from plot object - using original plot."))
-              return(apply_theme_scaling(plot_orig))
+              warning(paste("Could not extract numeric scaled data for aesthetic mapped to x-axis for", covariate_name, "- using original plot."))
+              return(apply_theme_scaling(plot_orig)) # Fallback
             }
             
             scaled_limits <- scaled_limits[is.finite(scaled_limits)]
@@ -9934,7 +9976,7 @@ surveyDashboard <- function(CTtable = NULL,
             
             if(length(unscaled_breaks_nice) >= 2) {
               scaled_breaks_for_nice_unscaled <- (unscaled_breaks_nice - mean_val) / sd_val
-              unscaled_labels_nice <- formatC(unscaled_breaks_nice, format = "fg", digits = 2, flag = "#")
+              unscaled_labels_nice <- formatC(unscaled_breaks_nice, format = "fg", digits = 2)
               
               plot_relabelled <- suppressMessages({
                 plot_orig +
@@ -10043,6 +10085,17 @@ surveyDashboard <- function(CTtable = NULL,
       })
     })
     
+    # Reset gof_results when input changes
+    observeEvent(c(input$gof_draws, input$gof_z_cond, input$gof_residual_type,
+                   # Also reset if the underlying fitted model changes
+                   fitted_comm_model()), {
+                     
+                     # Check if gof_results actually exists and has content before clearing
+                     if (!is.null(gof_results())) {
+                       gof_results(NULL) # Set the reactive value to NULL
+                       }
+                   }, ignoreNULL = TRUE, ignoreInit = TRUE) # ignoreNULL/Init prevent reset on startup
+    
     # Render community p-value
     output$gof_community_pvalue <- renderText({
       req(gof_results())
@@ -10136,6 +10189,15 @@ surveyDashboard <- function(CTtable = NULL,
     output$gof_residual_plot <- renderPlot({
       req(gof_results())
       
+      
+      # Check if residuals component exists and is a list
+      if (is.null(gof_results()$residuals) || !is.list(gof_results()$residuals) || length(gof_results()$residuals) == 0) {
+        warning("gof_results()$residuals is missing, not a list, or empty.")
+        # Return an informative empty plot
+        return(ggplot() + theme_void() + ggtitle("No residual data available to plot."))
+      }
+      
+      
       # Create plot data
       plot_data <- data.frame()
       
@@ -10160,7 +10222,7 @@ surveyDashboard <- function(CTtable = NULL,
         geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
         facet_wrap(~Species,
                    ncol = input$gof_plot_columns,
-                   scales = if(input$gof_plot_free_scales) "free" else "fixed") +
+                   scales = if(isTRUE(input$gof_plot_free_scales)) "free" else "fixed") +
         theme_bw(base_size = base_size) +
         theme(
           strip.background = element_rect(fill = "lightgray"),
