@@ -1,0 +1,80 @@
+<!-- Instructions Tab Content -->
+<div style="padding: 15px;">
+  <h2 style="color: #2c3e50; margin-bottom: 20px;">Assessing Community Model Goodness-of-Fit</h2>
+
+  <p>Goodness-of-fit (GoF) tests help determine how well your fitted community occupancy model represents the observed detection patterns in your data. This involves comparing your actual data to new datasets simulated from the model's estimated parameters.</p>
+
+  <h4>Step-by-Step Guide to GoF Testing</h4>
+  <ol>
+      <li>
+        <strong>Configure Settings</strong>
+        <ul>
+            <li><strong>Number of posterior draws:</strong> Select how many samples from the model's posterior distribution to use for simulating new datasets. More draws increase precision but take longer. 1000 is often a reasonable starting point.</li>
+		<li><strong>Condition on occupancy (z):</strong> 
+	  <ul>
+		<li>If TRUE, the simulation conditions on the estimated occupancy state (z) for each species at each site. Tests only the detection component of the model, fixing occupancy/abundance to estimates from the model, rather than generating them anew
+		</li>
+		<li>If FALSE, the test "generates new z for each posterior sample (testing complete model, including detection and occupancy submodels)." This simulates new occupancy states based on your occupancy submodel parameters before simulating detection data, providing a more comprehensive test of the entire model structure. 
+		</li>
+		<li>A two-step approach can be informative: first test with conditioning (TRUE) to isolate detection fit issues, then test without conditioning (FALSE) to evaluate the complete model if detection fit is adequate.
+		</li>
+	  </ul>
+</li>
+            <li><strong>Residual type:</strong> Choose the metric for comparing observed and predicted data. Freeman-Tukey ("FT") residuals are often recommended. Pearson Chi-squared residuals are offered as an alternative.</li>
+        </ul>
+      </li>
+	  
+      <li>
+        <strong>Run the Test</strong>
+        <ul>
+            <li>Click "Run Goodness of Fit Test" to perform the calculations. This can take some time, especially with many draws or species.</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Interpret Results</strong>
+        <ul>
+            <li><strong>Overall Model Fit (Community p-value):</strong> This value indicates the overall fit across all species. It's the proportion of simulations where the discrepancy (sum of residuals) was greater than or equal to the discrepancy in your observed data.
+                <ul>
+                    <li>Values near 0.5 suggest a good fit.</li>
+                    <li>Values < 0.1 or > 0.9 indicate potential lack of fit (model doesn't capture data patterns well).</li>
+                    <li>Values < 0.1 might suggest the model predicts more variation than observed (underdispersion).</li>
+                    <li>Values > 0.9 might suggest the model predicts less variation than observed (overdispersion).</li>
+                </ul>
+            </li>
+            <li><strong>Species-level Results:</strong> This table shows the Bayesian p-value for each individual species, helping identify which species might be poorly fit even if the overall fit seems adequate. Interpretation follows the same principles as the overall p-value. The table also includes an interpretation category ("Excellent", "Good", "Moderate", "Lack of fit") and dispersion pattern indication.</li>
+            <li>
+                <strong>Residual Plots:</strong> These plots provide a visual check of model fit for each species by comparing observed vs. predicted residuals.
+                <ul>
+                    <li>Each point typically represents the average residual (discrepancy) for a specific site.</li>
+                    <li>The <strong>X-axis</strong> shows the residual calculated from your <em>actual observed data</em>.</li>
+                    <li>The <strong>Y-axis</strong> shows the residual calculated from <em>new data simulated by the fitted model</em>.</li>
+                    <li>The dashed <strong>red line (y=x)</strong> indicates perfect agreement.</li>
+                    <li><strong>Good Fit:</strong> Points should scatter closely and randomly around the red line. This means the model simulates data with similar discrepancy patterns as your real data.</li>
+                    <li><strong>Poor Fit (Predicted > Observed):</strong> Points consistently fall <em>above</em> the red line. This suggests the model predicts more variation/structure than observed (potentially related to underdispersion in data or model misspecification) and often corresponds to a <em>low Bayesian p-value</em> (< 0.1).</li>
+                    <li><strong>Poor Fit (Observed > Predicted):</strong> Points consistently fall <em>below</em> the red line. This suggests the model fails to capture variation/structure present in the observed data (potentially related to overdispersion in data or model misspecification) and often corresponds to a <em>high Bayesian p-value</em> (> 0.9).</li>
+                    <li><strong>Wide Scatter:</strong> Points are widely spread far from the red line, indicating inconsistent model performance.</li>
+                </ul>
+                These plots help visualize why a species might show lack of fit based on its p-value.
+            </li>
+        </ul>
+      </li>
+  </ol>
+
+  <h4>Important Notes:</h4>
+  <ul>
+      <li>Goodness-of-fit should ideally be assessed <strong>after</strong> confirming model convergence (using MCMC diagnostics).</li>
+      <li>A good overall fit might mask poor fit for specific species. Always check the species-level results.</li>
+      <li>GoF tests assess the chosen model structure; they don't necessarily mean the ecological inferences are perfect.</li>
+      <li>The interpretation of p-values (e.g., thresholds like 0.1/0.9) is a guideline, not an absolute rule. Consider the context of your study.</li>
+  </ul>
+
+  <h4>Tips if Fit is Poor:</h4>
+  <ul>
+      <li>Revisit model convergence diagnostics.</li>
+      <li>Consider adding relevant covariates you might have missed (for occupancy or detection).</li>
+      <li>Investigate the structure of random effects (e.g., species-site interactions).</li>
+      <li>Check for issues in the raw data (e.g., misidentified species, incorrect dates).</li>
+      <li>Try a different residual type for the GoF test to see if results are consistent.</li>
+      <li>Consider if the chosen model type (Occupancy vs. RN) is appropriate for your system.</li>
+  </ul>
+</div>
