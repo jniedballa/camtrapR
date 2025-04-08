@@ -97,6 +97,8 @@ These plots are generated from the record table and the camera trap table.
 \code{\link{summary,commOccu-method}}   \tab Summarize community occupancy model \cr
 \code{\link{plot_coef}}             \tab Plot effect sizes of covariates in community occupancy model \cr
 \code{\link{plot_effects}}          \tab Plot Marginal Effects of Covariates \cr
+\code{\link{PPC.residuals}}         \tab Calculate residuals from MCMC output of occupancy models \cr
+\code{\link{PPC.community}}         \tab Calculate community-level posterior predictive checks for occupancy models \cr
 }
 }
 
