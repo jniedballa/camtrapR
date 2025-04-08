@@ -1,3 +1,8 @@
+# camtrapR 2.5.1
+
+## new functions:
+* add PPC.residuals() and PPC.community() for calculating posterior predictive checks for community models 
+
 # camtrapR 2.5.0
 
 ## new functions
