@@ -296,6 +296,115 @@ communityModel <- function(data_list,
   # detection parameters = alpha
   # ...0 -> intercept, ...1-n -> covariates
   
+  
+    # Check parameter names ====
+  # 1. Check occuCovs
+  if(!is.list(occuCovs)) stop("occuCovs must be a list")
+  if(!all(names(occuCovs) %in% c("fixed", "independent", "ranef"))) {
+    invalid_names <- names(occuCovs)[!names(occuCovs) %in% c("fixed", "independent", "ranef")]
+    stop(paste("Invalid names in occuCovs:", paste(invalid_names, collapse=", "), 
+               ". Only 'fixed', 'independent', and 'ranef' are allowed."))
+  }
+  
+  # 2. Check detCovs
+  if(!is.list(detCovs)) stop("detCovs must be a list")
+  if(!all(names(detCovs) %in% c("fixed", "independent", "ranef"))) {
+    invalid_names <- names(detCovs)[!names(detCovs) %in% c("fixed", "independent", "ranef")]
+    stop(paste("Invalid names in detCovs:", paste(invalid_names, collapse=", "), 
+               ". Only 'fixed', 'independent', and 'ranef' are allowed."))
+  }
+  
+  # 3. Check detCovsObservation
+  if(!is.list(detCovsObservation)) stop("detCovsObservation must be a list")
+  if(!all(names(detCovsObservation) %in% c("fixed", "ranef"))) {
+    invalid_names <- names(detCovsObservation)[!names(detCovsObservation) %in% c("fixed", "ranef")]
+    stop(paste("Invalid names in detCovsObservation:", paste(invalid_names, collapse=", "), 
+               ". Only 'fixed' and 'ranef' are allowed."))
+  }
+  
+  # 4. Check speciesSiteRandomEffect
+  if(!is.list(speciesSiteRandomEffect)) stop("speciesSiteRandomEffect must be a list")
+  if(!all(names(speciesSiteRandomEffect) %in% c("det", "occu"))) {
+    invalid_names <- names(speciesSiteRandomEffect)[!names(speciesSiteRandomEffect) %in% c("det", "occu")]
+    stop(paste("Invalid names in speciesSiteRandomEffect:", paste(invalid_names, collapse=", "), 
+               ". Only 'det' and 'occu' are allowed."))
+  }
+  
+  # 5. Check intercepts
+  if(!is.list(intercepts)) stop("intercepts must be a list")
+  if(!all(names(intercepts) %in% c("det", "occu"))) {
+    invalid_names <- names(intercepts)[!names(intercepts) %in% c("det", "occu")]
+    stop(paste("Invalid names in intercepts:", paste(invalid_names, collapse=", "), 
+               ". Only 'det' and 'occu' are allowed."))
+  }
+  
+  # Check covariate existence ====
+  
+  # 1. Check site covariates exist in data_list$siteCovs
+  if(exists("siteCovs", where = data_list)) {
+    # Collect all site covariates from parameter lists
+    all_site_covs <- unique(c(
+      unlist(occuCovs), 
+      unlist(detCovs),
+      richnessCategories
+    ))
+    
+    # Remove any NULL values
+    all_site_covs <- all_site_covs[!is.null(all_site_covs)]
+    
+    # Check for piped covariate names (e.g., "cov1|cov2")
+    # Extract the first part (actual covariate name) for those
+    has_pipe <- grepl("\\|", all_site_covs)
+    if(any(has_pipe)) {
+      piped_covs <- all_site_covs[has_pipe]
+      first_parts <- sapply(strsplit(piped_covs, "\\|"), function(x) x[1])
+      all_site_covs <- c(all_site_covs[!has_pipe], first_parts)
+    }
+    
+    # Get rid of "+Species" suffix used for nested random effects
+    all_site_covs <- gsub("\\+Species", "", all_site_covs)
+    
+    # Remove quadratic suffixes
+    all_site_covs <- gsub(keyword_quadratic, "", all_site_covs)
+    
+    # Check if these covariates exist in data_list$siteCovs
+    if(length(all_site_covs) > 0) {
+      missing_covs <- all_site_covs[!all_site_covs %in% colnames(data_list$siteCovs)]
+      if(length(missing_covs) > 0) {
+        stop(paste("The following site covariates are specified but not found in data_list$siteCovs:",
+                   paste(missing_covs, collapse=", ")))
+      }
+    }
+  } else if(length(unlist(c(occuCovs, detCovs))) > 0 || !is.null(richnessCategories)) {
+    stop("Site covariates are specified, but data_list$siteCovs is missing.")
+  }
+  
+  # 2. Check observation covariates exist in data_list$obsCovs
+  if(exists("obsCovs", where = data_list)) {
+    # Collect all observation covariates from parameter lists
+    all_obs_covs <- unique(unlist(detCovsObservation))
+    
+    # Remove any NULL values
+    all_obs_covs <- all_obs_covs[!is.null(all_obs_covs)]
+    
+    # Check if these covariates exist in data_list$obsCovs
+    if(length(all_obs_covs) > 0) {
+      missing_covs <- all_obs_covs[!all_obs_covs %in% names(data_list$obsCovs)]
+      if(length(missing_covs) > 0) {
+        stop(paste("The following observation covariates are specified but not found in data_list$obsCovs:",
+                   paste(missing_covs, collapse=", ")))
+      }
+    }
+  } else if(length(unlist(detCovsObservation)) > 0) {
+    stop("Observation covariates are specified, but data_list$obsCovs is missing.")
+  }
+  
+  # 3. Make sure effortCov exists
+  if(!effortCov %in% names(data_list$obsCovs)) {
+    stop(paste0("effortCov '", effortCov, "' is not found in data_list$obsCovs."))
+  }
+  
+  
   # define prior distributions to be used throughout (maybe make it an argument later)
   prior_list <- list(dnorm = "dnorm(0, 0.05)",
                      dgamma = "dgamma(0.1, 0.1)")
@@ -2002,35 +2111,138 @@ setMethod("fit", signature(object = "commOccu"),
 # summary method ####
 
 summary.commOccu <- function(object, ...) {
-  
+  # Model type determination
   if(object@model == "RN")        model_type <- "Royle-Nichols community occupancy model"
   if(object@model == "Occupancy") model_type <- "community occupancy model"
   
-  cat(paste0("commOccu object for ", model_type, " (in ", ifelse(object@nimble, "Nimble", "JAGS"), ")\n\n"))
+  # Check for data augmentation by looking for unnamed elements in the input data
+  data_aug <- "none"
+  
+  if(length(object@input$ylist) > 0) {
+    species_names <- names(object@input$ylist)
+    
+    # Check if any species are unnamed (empty string) or if names is NULL
+    has_unnamed <- is.null(species_names) || any(species_names == "")
+    
+    # Count augmented species (those without names)
+    augmented_count <- sum(species_names == "") + sum(is.null(species_names))
+    
+    if(has_unnamed || augmented_count > 0) {
+      total_species <- length(object@input$ylist)
+      data_aug <- paste0("yes (", total_species, " potential species)")
+    }
+  }
+  
+  # MODEL SPECIFICATION section
+  cat("=== Community Occupancy Model Summary ===\n\n")
+  cat("MODEL SPECIFICATION\n")
+  cat(sprintf("  Model type:        %s\n", model_type))
+  cat(sprintf("  Platform:          %s\n", ifelse(object@nimble, "Nimble", "JAGS")))
+  cat(sprintf("  Data augmentation: %s\n\n", data_aug))
+  
+  # DIMENSIONS section
   dims <- dim(object@data$y)
-  cat(paste(dims[1], "species, ",
-            dims[2], "stations, ", 
-            dims[3], "occasions\n"))
+  n_species <- dims[1]
+  n_stations <- dims[2]
+  n_occasions <- dims[3]
+  n_effort <- sum(object@data$effort_binary, na.rm = TRUE)
   
-  cat(paste(sum(object@data$effort_binary, na.rm = T), "occasions with effort\n"))
+  cat("DIMENSIONS\n")
+  cat(sprintf("  Species:   %d\n", n_species))
+  cat(sprintf("  Stations:  %d\n", n_stations))
+  cat(sprintf("  Occasions: %d\n", n_occasions))
+  cat(sprintf("  Effort:    %d occasions with effort\n\n", n_effort))
   
-  cat(paste("Number of detections (by species):", paste(range(apply(object@data$y, 1, sum, na.rm =T)), collapse = " - "), "\n\n"))
+  # DETECTIONS section
+  detections_by_species <- apply(object@data$y, 1, sum, na.rm = TRUE)
+  total_detections <- sum(detections_by_species)
   
-  if(exists("siteCovs", object@input)){
-    
-    cat(paste("Available site covariates:\n", paste(colnames(object@input$siteCovs), collapse = ", "), "\n\n"))
+  cat("DETECTIONS\n")
+  cat(sprintf("  By species: %d - %d (min - max)\n", min(detections_by_species), max(detections_by_species)))
+  cat(sprintf("  Total:      %d\n\n", total_detections))
   
-    cat(paste("Used site covariates:\n", paste(colnames(object@input$siteCovs) [attr(object@input$siteCovs, "in_model")], collapse = ", "), "\n\n"))
+  # COVARIATE STRUCTURE section
+  cat("COVARIATE STRUCTURE\n")
+  
+  # Get covariate info
+  cov_info <- object@covariate_info
+  
+  # Define a function to print a section of the covariate table
+  print_covariate_table <- function(section_name, section_data) {
+    if (nrow(section_data) > 0) {
+      cat(sprintf("  %s:\n", section_name))
+      
+      # Prepare data for display
+      covariate_names <- character(nrow(section_data))
+      levels <- character(nrow(section_data))
+      effect_types <- character(nrow(section_data))
+      
+      for (i in 1:nrow(section_data)) {
+        # Check for independent effects first, then random effects
+        if (section_data$independent[i]) {
+          effect_types[i] <- "Independent"
+        } else if (section_data$ranef[i]) {
+          effect_types[i] <- "Random"
+        } else {
+          effect_types[i] <- "Fixed"
+        }
+        
+        levels[i] <- ifelse(section_data$covariate_type[i] == "obsCovs", "Observation", "Site")
+        
+        # For intercepts, use [Intercept] as name and always Site level
+        if (section_data$param[i] == "intercept") {
+          covariate_names[i] <- "[Intercept]"
+          levels[i] <- "Site"
+        } else {
+          covariate_names[i] <- as.character(section_data$covariate[i])
+          
+          # Add ^2 symbol for quadratic effects
+          if (section_data$is_quadratic[i]) {
+            covariate_names[i] <- paste0(covariate_names[i], "^2")
+          }
+        }
+      }
+      
+      # Calculate column widths (max length + padding)
+      cov_width <- max(nchar("Covariate"), max(nchar(covariate_names)) + 2)
+      level_width <- max(nchar("Level"), max(nchar(levels)) + 2)
+      effect_width <- max(nchar("Effect Type"), max(nchar(effect_types)) + 2)
+      
+      # Create format string for header and data rows
+      header_fmt <- paste0("    %-", cov_width, "s %-", level_width, "s %-", effect_width, "s\n")
+      
+      # Print header
+      cat(sprintf(header_fmt, "Covariate", "Level", "Effect Type"))
+      
+      # Print separator
+      separator <- paste(rep("-", cov_width + level_width + effect_width + 2), collapse="")
+      cat(paste0("    ", separator, "\n"))
+      
+      # Print data rows
+      for (i in 1:length(covariate_names)) {
+        cat(sprintf(header_fmt, covariate_names[i], levels[i], effect_types[i]))
+      }
+      cat("\n")
+    }
   }
   
-  if(exists("obsCovs", object@input)) {
-    cat(paste("Available site-occasion covariates:\n", paste(names(object@input$obsCovs), collapse = ", "), "\n\n"))
-    
-    # doesn't work yet - need an indicator somewhere for what obs covs are used by model
-    #cat(paste("Used site-occasion covariates:\n", paste(names(object@input$obsCovs), collapse = ", "), "\n\n"))
+  # Detection covariates
+  detection_covs <- cov_info[cov_info$submodel == "det", ]
+  print_covariate_table("Detection Covariates", detection_covs)
+  
+  # Occupancy covariates 
+  occupancy_covs <- cov_info[cov_info$submodel == "state", ]
+  print_covariate_table("Occupancy Covariates", occupancy_covs)
+  
+  # Check for species-site random effects (look for alpha.speciesstation in params)
+  has_species_site_ranef_det <- any(grepl("alpha.speciesstation", object@params, fixed = TRUE))
+  
+  if (has_species_site_ranef_det) {
+    cat("SPECIES-SITE RANDOM EFFECT\n")
+    cat("  Detection: TRUE\n")
+    cat("  Occupancy: FALSE\n")  # Currently only implemented for detection
+    cat("\n")
   }
-  
-  
 }
 
 
