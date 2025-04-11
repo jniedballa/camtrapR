@@ -230,6 +230,7 @@ surveyDashboard <- function(CTtable = NULL,
     "dplyr",
     "sf",
     "terra",
+    "stars",   # not needed by itself but needed by mapview
     "leaflet",
     "ggplot2",
     "plotly",
@@ -2587,13 +2588,15 @@ surveyDashboard <- function(CTtable = NULL,
                          shiny::actionButton("fitCommunityModel", "Fit Model", class = "btn-primary"),
                          # shiny::actionButton("fitCommunityModel_background", "Fit Model (Background)", class = "btn-primary")
                        )
-                     ),
-                     fluidRow(
-                       shinydashboard::box(
-                         title = "Console output", width = 12, status = "info",
-                         verbatimTextOutput("consoleOutput")
-                       )
-                     )
+                     ) 
+                     # printing console output (model progress) doesn't work with code below - remove for now
+                     #,
+                     # fluidRow(
+                     #   shinydashboard::box(
+                     #     title = "Console output", width = 12, status = "info",
+                     #     verbatimTextOutput("consoleOutput")
+                     #   )
+                     # )
             ),
             tabPanel("Results",
                      tabsetPanel(
@@ -7579,7 +7582,7 @@ surveyDashboard <- function(CTtable = NULL,
       # Check for iNEXT package
       if (!requireNamespace("iNEXT", quietly = TRUE)) {
         showNotification(
-          "Package 'iNEXT' is required. Please install it with: install.packages('iNEXT')", 
+          "Package 'iNEXT' is required for species accumulation curves. Please install it with: install.packages('iNEXT')", 
           type = "error",
           duration = NULL
         )
