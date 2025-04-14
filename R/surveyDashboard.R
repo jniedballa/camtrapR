@@ -144,7 +144,7 @@
 #' @importFrom terra rast vect project resample nlyr values<- mask
 #' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
 #' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline theme_void scale_x_continuous
-#' 
+#' @importFrom shinyBS bsTooltip
 #' @export
 
 
@@ -393,11 +393,23 @@ surveyDashboard <- function(CTtable = NULL,
   "))
   )
   
-  
+
   
   # Create flag indicating if data was provided via parameters
   has_params <- !is.null(CTtable) && !is.null(recordTable)
   
+  # Helper function for standard tooltips in the dashboard
+  add_tooltip <- function(id, 
+                          title, 
+                          placement = "bottom", 
+                          trigger = "hover",
+                          options = list(container = "body")) {
+    shinyBS::bsTooltip(id = id, 
+                       title = title,
+                       placement = placement, 
+                       trigger = trigger, 
+                       options = options)
+  }
   
   # UI definition ####
   ui <- shinydashboard::dashboardPage(
@@ -410,7 +422,9 @@ surveyDashboard <- function(CTtable = NULL,
     
     shinydashboard::dashboardSidebar(
       shinydashboard::sidebarMenu(
-        # shinydashboard::menuItem("Import Data", tabName = "import_data", icon = shiny::icon("upload")),
+        # Add shinyBS init here - this dummy tooltip helps ensure library loads if no other tooltips are immediately visible.
+        add_tooltip(id = "sidebarMenu_init", title = ""), # Optional dummy tooltip
+        
         shinydashboard::menuItem("Import Data", tabName = "import_data", icon = shiny::icon("upload"),
                                  shinydashboard::menuSubItem("From CSV", tabName = "import_csv"),
                                  shinydashboard::menuSubItem("Wildlife Insights", tabName = "import_wi"),
@@ -418,7 +432,10 @@ surveyDashboard <- function(CTtable = NULL,
                                  shinydashboard::menuSubItem("Import area of interest", tabName = "import_aoi"),
                                  shinydashboard::menuSubItem("File Size Control", tabName = "file_size_control")
         ),
+        add_tooltip(id = "import_data", title = "Import camera trap data from various sources.", placement = "right"),
+        
         shinydashboard::menuItem("Data Summary", tabName = "Summary", icon = shiny::icon("house"), selected = T),
+        add_tooltip(id = "Summary", title = "View overall summary statistics of your survey.", placement = "right"),
         
         # Add new dedicated Filters section
         shinydashboard::menuItem("Data Filters", icon = shiny::icon("filter"),
@@ -427,62 +444,61 @@ surveyDashboard <- function(CTtable = NULL,
                                  shinydashboard::menuSubItem("Temporal Filters", tabName = "filterRecords"),
                                  shinydashboard::menuSubItem("Species Filters", tabName = "filterSpecies")
         ),
+        add_tooltip(id = "Data Filters", title = "Apply filters to refine the dataset used for analysis.", placement = "right"),
         
         shinydashboard::menuItem("Tables", icon = shiny::icon("table"),
                                  shinydashboard::menuSubItem("Cameras trap stations", tabName = "camera_table"),
                                  shinydashboard::menuSubItem("Records", tabName = "record_table")
         ),
+        add_tooltip(id = "Tables", title = "View the raw camera station and species record tables.", placement = "right"),
+        
         shinydashboard::menuItem("Maps", icon = shiny::icon("map"),
                                  shinydashboard::menuSubItem("Overview map", tabName = "overview_map"),
                                  shinydashboard::menuSubItem("Species detection maps", tabName = "detection_maps")
         ),
+        add_tooltip(id = "Maps", title = "Visualize camera locations and species detections spatially.", placement = "right"),
         
         shinydashboard::menuItem("Species Activity", icon = shiny::icon("chart-area"),
                                  shinydashboard::menuSubItem("Single species activity density", tabName = "ActivityDensity"),
                                  shinydashboard::menuSubItem("Two-Species activity overlap", tabName = "TwoSpeciesOverlap")
         ),
+        add_tooltip(id = "Species Activity", title = "Analyze daily activity patterns of species.", placement = "right"),
+        
         shinydashboard::menuItem("Data Processing", icon = shiny::icon("cogs"),
-                                 # shinydashboard::menuSubItem("Filter Camera Traps", tabName = "filterCTData"),
-                                 # shinydashboard::menuSubItem("Records Temporal Filtering", tabName = "filterRecords"),
-                                 # shinydashboard::menuSubItem("Species Filtering", tabName = "filterSpecies"),
                                  shinydashboard::menuSubItem("Extract Covariates", tabName = "extract"),
                                  shinydashboard::menuSubItem("Covariate Correlation", tabName = "covariateCorrelation"),
                                  shinydashboard::menuSubItem("Camera operation matrix", tabName = "CameraOperation"),
                                  shinydashboard::menuSubItem("Species Accumulation", tabName = "speciesAccumulation")
         ),
+        add_tooltip(id = "Data Processing", title = "Tools for processing data, like covariate extraction and correlation checks.", placement = "right"),
         
         
         shinydashboard::menuItem("Single-species Occupancy", icon = shiny::icon("calculator"),
                                  shinydashboard::menuSubItem("Detection History", tabName = "DetectionHistory"),
                                  shinydashboard::menuSubItem("Occupancy models", tabName = "Occupancy")
         ),
-        shinydashboard::menuItem("Community Occupancy Models", tabName = "CommunityOccupancy", icon = shiny::icon("users")),
+        add_tooltip(id = "Single-species Occupancy", title = "Create detection histories and fit occupancy models for individual species.", placement = "right"),
         
+        shinydashboard::menuItem("Community Occupancy Models", tabName = "CommunityOccupancy", icon = shiny::icon("users")),
+        add_tooltip(id = "CommunityOccupancy", title = "Fit occupancy models for multiple species simultaneously.", placement = "right"),
         
         # Add the divider
         tags$div(
           tags$hr(class = "sidebar-divider")
         ),
         
-        # # Add Reset All Filters button
-        # tags$div(
-        #   class = "sidebar-button-container",
-        #   actionButton("resetAllFilters", "Reset All Filters", 
-        #                icon = icon("sync"),
-        #                class = "btn-danger")
-        # ),
-        
         # Add export button
         tags$div(
           class = "sidebar-button-container",
-          actionButton("export_all_data", "Export Data", 
-                       icon = icon("download"))
+          actionButton("export_all_data", "Export Data",
+                       icon = icon("download")),
+          add_tooltip(id = "export_all_data", title = "Export processed data, models, and plots.") # Default placement=bottom is fine here
         )
       )
     ),
     shinydashboard::dashboardBody(
-      
-      
+      # Add bsAlert anchor (needed for bsAlerts)
+      shinyBS::bsAlert("alert"),
       shiny::uiOutput("welcome_screen"),
       
       shinydashboard::tabItems(
@@ -494,44 +510,133 @@ surveyDashboard <- function(CTtable = NULL,
         shinydashboard::tabItem(
           tabName = "import_csv",
           shiny::tabsetPanel(
+
             shiny::tabPanel("Camera Trap Data",
                             shinydashboard::box(
                               title = "Import Camera Trap Data",
                               status = "primary",
                               solidHeader = TRUE,
                               width = 12,
-                              shiny::fileInput("ct_file", "Upload Camera Trap CSV", accept = c(".csv")),
+                              
+                              shiny::fileInput("ct_file", 
+                                               # label = "Upload Camera Trap CSV", 
+                                               label = tagList( # Use tagList for label
+                                                 "Upload Camera Trap CSV",
+                                                 # Icon with title attribute
+                                                 span(icon("question-circle"),
+                                                      style = "margin-left: 5px; color: #6c757d; cursor: help;",
+                                                      title = "Upload the CSV file containing camera deployment information (locations, setup/retrieval dates)."
+                                                 )
+                                               ),
+                                               accept = c(".csv")),
+                              add_tooltip(id = "ct_file", title = "Upload the CSV file containing camera deployment information (locations, setup/retrieval dates)."), # Keep bsTooltip for fileInput
+                              
                               shiny::selectInput("stationCol", "Station Column", choices = NULL),
+                              add_tooltip(id = "stationCol", title = "Select the column identifying unique camera trap stations."),
                               shiny::selectInput("cameraCol", "Camera Column (optional)", choices = NULL),
-                              shiny::uiOutput("camerasIndependentImportUI"),
+                              add_tooltip(id = "cameraCol", title = "Optional: Select the column identifying individual cameras within a station (if applicable)."),
+                              shiny::uiOutput("camerasIndependentImportUI"), # Tooltip added via server
                               shiny::selectInput("xcol", "X Coordinate Column", choices = NULL),
+                              add_tooltip(id = "xcol", title = "Select the column containing the X coordinate (e.g., Longitude, UTM Easting)."),
                               shiny::selectInput("ycol", "Y Coordinate Column", choices = NULL),
-                              # shiny::textInput("crs", "Coordinate Reference System (e.g., 'EPSG:4326')"),
-                              shiny::textInput("crs", "Coordinate Reference System",
+                              add_tooltip(id = "ycol", title = "Select the column containing the Y coordinate (e.g., Latitude, UTM Northing)."),
+                              
+                              # --- Coordinate Reference System (Using Icon + HTML title) ---
+                              shiny::textInput("crs",
+                                               label = tagList( # Use tagList for label
+                                                 "Coordinate Reference System",
+                                                 # Icon with title attribute
+                                                 span(icon("question-circle"),
+                                                      style = "margin-left: 5px; color: #6c757d; cursor: help;",
+                                                      title = "Specify the CRS using EPSG codes (e.g., EPSG:4326 for WGS84, EPSG:32650 for UTM Zone 50N). No quotes needed."
+                                                 )
+                                               ),
                                                value = "",
-                                               placeholder = "e.g. EPSG:4326 or EPSG:32648 (no quotes needed)"),
+                                               placeholder = "e.g. EPSG:4326 or EPSG:32648"
+                              ),
+                              
+                              # --- Date Columns ---
                               shiny::selectInput("setupCol", "Setup Date Column", choices = NULL),
+                              add_tooltip(id = "setupCol", title = "Select the column containing the camera setup date (and optionally time)."),
                               shiny::selectInput("retrievalCol", "Retrieval Date Column", choices = NULL),
-                              shiny::textInput("CTdateFormat", "Date Format", value = "ymd"),
-                              shiny::checkboxInput("hasProblems", "Problem columns ('Problem1_from' / 'Problem1_to')?", value = FALSE),
+                              add_tooltip(id = "retrievalCol", title = "Select the column containing the camera retrieval date (and optionally time)."),
+                              
+                              # --- Date Format (Using Icon + HTML title) ---
+                              shiny::textInput("CTdateFormat",
+                                               label = tagList( # Use tagList for label
+                                                 "Date Format",
+                                                 # Icon with title attribute
+                                                 span(icon("question-circle"),
+                                                      style = "margin-left: 5px; color: #6c757d; cursor: help;",
+                                                      title = "Specify date format using lubridate codes (e.g., ymd, dmy HMS, %Y-%m-%d %H:%M:%S)."
+                                                 )
+                                               ),
+                                               value = "ymd"
+                              ),
+                              
+                              # --- Problem Columns Checkbox (Using Icon + HTML title) ---
+                              shiny::checkboxInput("hasProblems",
+                                                   label = tagList( # Use tagList for label
+                                                     "Problem columns ('Problem1_from' / 'Problem1_to')?",
+                                                     # Icon with title attribute
+                                                     span(icon("question-circle"),
+                                                          style = "margin-left: 5px; color: #6c757d; cursor: help;",
+                                                          title = "Check if your data has columns like 'Problem1_from', 'Problem1_to', etc., indicating camera malfunction periods."
+                                                     )
+                                                   ),
+                                                   value = FALSE
+                              ),
+                              
+                              # --- Done Button (Keep bsTooltip) ---
                               shiny::actionButton("ct_done", "Done"),
+                              add_tooltip(id = "ct_done", title = "Confirm camera trap data import and settings."),
+                              
+                              # --- Preview ---
                               shiny::h4("Data Preview"),
                               DT::DTOutput("ct_preview")
-                            )
-            ),
+                            ) # End Box
+            ), # End TabPanel
             shiny::tabPanel("Record Data",
                             shinydashboard::box(
                               title = "Import Record Data",
                               status = "primary",
                               solidHeader = TRUE,
                               width = 12,
-                              shiny::fileInput("record_file", "Upload Record CSV", accept = c(".csv")),
+                              shiny::fileInput("record_file",
+                                               label = tagList(
+                                                 "Upload Record CSV",
+                                                 span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                      title = "Upload the CSV file containing species detection records.")
+                                               ),
+                                               accept = c(".csv")
+                              ),
+                              # add_tooltip(id = "record_file", title = "Upload the CSV file containing species detection records."),
                               shiny::selectInput("speciesCol", "Species Column", choices = NULL),
+                              add_tooltip(id = "speciesCol", title = "Select the column containing the species names (common or scientific)."),
                               shiny::selectInput("recordDateTimeCol", "Date/Time Column", choices = NULL),
-                              shiny::textInput("recordDateTimeFormat", "Date/Time Format", value = "ymd HMS"),
-                              shiny::textInput("timeZone", "Time Zone", value = "UTC"),
+                              add_tooltip(id = "recordDateTimeCol", title = "Select the column containing the date and time of each detection record."),
+                              shiny::textInput("recordDateTimeFormat",
+                                               label = tagList(
+                                                 "Date/Time Format",
+                                                 span(icon("question-circle"), style = "margin-left: 5px; color: #6c757d; cursor: help;",
+                                                      title = "Specify format using lubridate codes (e.g., ymd HMS, %Y-%m-%d %H:%M:%S)." )
+                                               ),
+                                               value = "ymd HMS"
+                              ),
+                              
+                              shiny::textInput("timeZone",
+                                               label = tagList(
+                                                 "Time Zone",
+                                                 span(icon("question-circle"), style = "margin-left: 5px; color: #6c757d; cursor: help;",
+                                                      title = "Specify time zone of record timestamps (e.g., UTC, Asia/Singapore). Use Olson names.")
+                                               ),
+                                               value = "UTC"
+                              ),
+                              # add_tooltip(id = "timeZone", title = "Specify the time zone of the record timestamps (e.g., 'UTC', 'Asia/Singapore', 'America/New_York'). Use Olson names."),
                               shiny::textInput("exclude", "Species to Exclude (comma-separated)"),
+                              add_tooltip(id = "exclude", title = "Enter species names (exactly as they appear in the species column), separated by commas, to exclude them from all analyses."),
                               shiny::actionButton("record_done", "Done"),
+                              add_tooltip(id = "record_done", title = "Confirm record data import and settings."),
                               shiny::h4("Data Preview"),
                               DT::DTOutput("record_preview")
                             )
@@ -551,35 +656,55 @@ surveyDashboard <- function(CTtable = NULL,
               shiny::radioButtons("wi_import_type", "Choose import type:",
                                   choices = c("Zip file" = "zip", "Separate CSV files" = "csv", "Directory" = "directory"),
                                   selected = "zip"),
+              add_tooltip(id = "wi_import_type", title = "Select how you want to provide the Wildlife Insights data files."),
               shiny::conditionalPanel(
                 condition = "input.wi_import_type == 'zip'",
-                shiny::fileInput("wi_zip_file", "Upload Wildlife Insights ZIP file",
-                                 accept = c(".zip"),
-                                 multiple = T)
+                shiny::fileInput("wi_zip_file",
+                                 label = tagList(
+                                   "Upload Wildlife Insights ZIP file",
+                                   span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                        title = "Upload the standard ZIP archive downloaded directly from Wildlife Insights.")
+                                 ),
+                                 accept = c(".zip"), multiple = T
+                ),
+                # add_tooltip(id = "wi_zip_file", title = "Upload the standard ZIP archive downloaded directly from Wildlife Insights.")
               ),
               shiny::conditionalPanel(
                 condition = "input.wi_import_type == 'csv'",
                 shiny::fileInput("wi_deployment_file", "Upload Deployment CSV file",
                                  accept = c(".csv")),
+                add_tooltip(id = "wi_deployment_file", title = "Upload the 'deployments.csv' file."),
                 shiny::fileInput("wi_detection_file", "Upload Detection CSV file",
-                                 accept = c(".csv"))
+                                 accept = c(".csv")),
+                add_tooltip(id = "wi_detection_file", title = "Upload the 'images.csv' (detections) file.")
               ),
               shiny::conditionalPanel(
                 condition = "input.wi_import_type == 'directory'",
                 fluidRow(
                   column(8,
-                         textInput("wi_directory", "Path to Wildlife Insights data directory", 
-                                   placeholder = "C:/path/to/wildlife_insights_directory")
+                         textInput("wi_directory", "Path to Wildlife Insights data directory",
+                                   placeholder = "C:/path/to/wildlife_insights_directory"),
+                         add_tooltip(id = "wi_directory", title = "Enter the path to the folder containing the unzipped Wildlife Insights CSV files (deployments.csv, images.csv).")
                   ),
                   column(4,
                          style = "margin-top: 25px;",
-                         actionButton("browse_wi_directory", "Browse...", 
-                                      icon = icon("folder-open"))
+                         actionButton("browse_wi_directory", "Browse...",
+                                      icon = icon("folder-open")),
+                         add_tooltip(id = "browse_wi_directory", title = "Browse your computer to select the directory.")
                   )
                 )
               ),
-              shiny::checkboxInput("wi_cameras_independent", "Cameras are independent", value = FALSE),
+              shiny::checkboxInput("wi_cameras_independent",
+                                   label = tagList(
+                                     "Cameras are independent",
+                                     span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                          title = "Check if multiple cameras at the same location ('placename') are independent sampling units.")
+                                   ),
+                                   value = FALSE
+              ),
+              # add_tooltip(id = "wi_cameras_independent", title = "Check if multiple cameras deployed at the same location ('placename') should be treated as independent sampling units."),
               shiny::actionButton("wi_import_button", "Import Data", class = "btn-primary btn-lg"),
+              add_tooltip(id = "wi_import_button", title = "Start importing the Wildlife Insights data based on the selected method."),
               shiny::hr(),
               shiny::h4("Import Status"),
               shiny::verbatimTextOutput("wi_import_status"),
@@ -605,13 +730,15 @@ surveyDashboard <- function(CTtable = NULL,
               # Directory selection
               fluidRow(
                 column(8,
-                       textInput("camtrapdp_directory", "Path to camtrapDP Directory:", 
-                                 placeholder = "C:/path/to/camtrapdp_directory")
+                       textInput("camtrapdp_directory", "Path to camtrapDP Directory:",
+                                 placeholder = "C:/path/to/camtrapdp_directory"),
+                       add_tooltip(id = "camtrapdp_directory", title = "Enter the path to the root directory of the camtrapDP dataset (the folder containing 'datapackage.json').")
                 ),
                 column(4,
                        style = "margin-top: 25px;",
-                       actionButton("browse_camtrapdp", "Browse...", 
-                                    icon = icon("folder-open"))
+                       actionButton("browse_camtrapdp", "Browse...",
+                                    icon = icon("folder-open")),
+                       add_tooltip(id = "browse_camtrapdp", title = "Browse your computer to select the camtrapDP directory.")
                 )
               ),
               
@@ -619,27 +746,48 @@ surveyDashboard <- function(CTtable = NULL,
               fluidRow(
                 column(6,
                        h4("Basic Import Options"),
-                       numericInput("camtrapdp_min_gap_hours", 
-                                    "Min. gap for camera interruption (hours)", 
+                       numericInput("camtrapdp_min_gap_hours",
+                                    label = tagList(
+                                      "Min. gap for camera interruption (hours)",
+                                      span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                           title = "Min duration (hours) without observations to mark a deployment interruption.")
+                                    ),
                                     value = 24, min = 1),
-                       radioButtons("camtrapdp_filter_observations", 
-                                    "Filter observations:", 
-                                    choices = c("All observation types" = "none",
-                                                "Animal observations only" = "animals"),
+                       # add_tooltip(id = "camtrapdp_min_gap_hours", title = "Define the minimum duration (in hours) without observations to consider a camera deployment interrupted (used for 'Problem' columns)."),
+                       radioButtons("camtrapdp_filter_observations",
+                                    label = tagList(
+                                      "Filter observations:",
+                                      span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                           title = "Import all records or only those classified as 'animal'.")
+                                    ),
+                                    choices = c("All observation types" = "none", "Animal observations only" = "animals"),
                                     selected = "none"),
-                       checkboxInput("camtrapdp_cameras_independent", 
-                                     "Cameras are independent (applies only if multiple cameras per station exist)",
+                       # add_tooltip(id = "camtrapdp_filter_observations", title = "Choose whether to import all observation records or only those classified as 'animal'."),
+                       checkboxInput("camtrapdp_cameras_independent",
+                                     label = tagList(
+                                       "Cameras are independent",
+                                       span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                            title = "If multiple cameras per location ('locationName'), treat as independent units?")
+                                     ),
                                      value = FALSE),
-                       checkboxInput("camtrapdp_remove_na", 
+                       # add_tooltip(id = "camtrapdp_cameras_independent", title = "If the dataset includes a 'cameraID' and multiple cameras are deployed per 'locationName', check this to treat them as independent units."),
+                       checkboxInput("camtrapdp_remove_na",
                                      "Remove columns with only NA values", value = TRUE),
-                       checkboxInput("camtrapdp_remove_empty", 
-                                     "Remove columns with only empty values", value = TRUE)
+                       add_tooltip(id = "camtrapdp_remove_na", title = "Automatically remove columns from the imported tables if they contain only missing (NA) values."),
+                       checkboxInput("camtrapdp_remove_empty",
+                                     "Remove columns with only empty values", value = TRUE),
+                       add_tooltip(id = "camtrapdp_remove_empty", title = "Automatically remove columns from the imported tables if they contain only empty strings or blanks.")
                 ),
                 column(6,
                        h4("Advanced Options"),
-                       textInput("camtrapdp_custom_filter", 
-                                 "Custom observation types to include (comma-separated):",
+                       textInput("camtrapdp_custom_filter",
+                                 label = tagList(
+                                   "Custom observation types to include (comma-separated):",
+                                   span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                        title = "Enter comma-separated 'observationType' values to keep. Overrides basic filter.")
+                                 ),
                                  placeholder = "e.g., animal,human,vehicle")
+                       # add_tooltip(id = "camtrapdp_custom_filter", title = "Enter a comma-separated list of observation types (from 'observationType' column) to keep. This overrides the basic filter setting.")
                 )
               ),
               
@@ -648,8 +796,9 @@ surveyDashboard <- function(CTtable = NULL,
                 column(12,
                        div(
                          style = "margin-top: 20px;",
-                         actionButton("camtrapdp_import", "Import Data", 
-                                      class = "btn-primary btn-lg")
+                         actionButton("camtrapdp_import", "Import Data",
+                                      class = "btn-primary btn-lg"),
+                         add_tooltip(id = "camtrapdp_import", title = "Start importing the camtrapDP data with the specified options.")
                        )
                 )
               ),
@@ -669,7 +818,7 @@ surveyDashboard <- function(CTtable = NULL,
           fluidRow(
             shinydashboard::box(
               title = "Data Preview",
-              status = "info", 
+              status = "info",
               width = 12,
               tabsetPanel(
                 tabPanel("Project Information", uiOutput("camtrapdp_project_info")),
@@ -686,9 +835,11 @@ surveyDashboard <- function(CTtable = NULL,
           fluidRow(
             shinydashboard::box(
               title = "Study Area Import", width = 12, status = "primary", solidHeader = TRUE,
-              shiny::textInput("aoi_path", "Path to Study Area Shapefile (.shp)", 
+              shiny::textInput("aoi_path", "Path to Study Area Shapefile (.shp)",
                                placeholder = "C:/path/to/shapefile.shp"),
+              add_tooltip(id = "aoi_path", title = "Enter the full path to the polygon shapefile (.shp) representing your study area boundary."),
               shiny::actionButton("aoi_done", "Import Study Area"),
+              add_tooltip(id = "aoi_done", title = "Load the specified shapefile as the study area."),
               hr(),
               h4("Study Area Information"),
               shiny::verbatimTextOutput("aoi_info"),
@@ -707,11 +858,14 @@ surveyDashboard <- function(CTtable = NULL,
             solidHeader = TRUE,
             width = 12,
             shiny::numericInput("max_file_size", "Maximum file size (MB)", value = 10, min = 5, max = 100),
-            shiny::actionButton("update_max_size", "Update Maximum File Size")
+            add_tooltip(id = "max_file_size", title = "Set the maximum size (in Megabytes) for files uploaded to the application."),
+            shiny::actionButton("update_max_size", "Update Maximum File Size"),
+            add_tooltip(id = "update_max_size", title = "Apply the selected maximum file size limit.")
           )
         ),
         
         ## Tab: Summary  ----
+        # (No input elements here)
         shinydashboard::tabItem(
           tabName = "Summary",
           shiny::fluidRow(
@@ -803,45 +957,62 @@ surveyDashboard <- function(CTtable = NULL,
         ),
         
         ## Tab: Overview map  ----
-        shinydashboard::tabItem(tabName = "overview_map", 
+        # (No input elements here)
+        shinydashboard::tabItem(tabName = "overview_map",
                                 leaflet::leafletOutput("overview_map",
                                                        width = NULL,
                                                        height = "800px"
-                                )),
-        
-        
+                                )
+        ),
         
         ## Tab: Camera table  ----
+        # (No input elements here)
         shinydashboard::tabItem(tabName = "camera_table",
                                 shiny::tabsetPanel(
-                                  shiny::tabPanel(title = "Current Camera trap table",     
+                                  shiny::tabPanel(title = "Current Camera trap table",
                                                   DT::DTOutput("current_camera_traps_table")
                                   ),
-                                  shiny::tabPanel(title = "Aggregated Camera trap table", 
+                                  shiny::tabPanel(title = "Aggregated Camera trap table",
                                                   DT::DTOutput("aggregated_camera_traps_table")
                                   )
                                 )
         ),
         
         ## Tab: Record table  ----
-        shinydashboard::tabItem(tabName = "record_table", 
+        # (No input elements here)
+        shinydashboard::tabItem(tabName = "record_table",
                                 DT::dataTableOutput("record_table")),
         
         
         ## Tab: Maps  ----
         shinydashboard::tabItem(
-          
-          
           tabName = "detection_maps",
           shiny::fluidRow(
+            # shiny::column(
+            #   width = 3,
+            #   offset = 1,
+            #   shiny::selectInput(
+            #     inputId = "species_for_map",
+            #     label = "Species",
+            #     choices = NULL, # Dynamically updated
+            #     selected = NULL
+            #   ),
+            #   add_tooltip(id = "species_for_map", title = "Select a species to view its detection locations, or 'n_species' for observed species richness.")
+            # ),
             shiny::column(
-              width = 3,
+              width = 3, # May need slight adjustment
               offset = 1,
-              shiny::selectInput(
+              selectInput(
                 inputId = "species_for_map",
-                label = "Species",
-                choices = c("n_species", 
-                            sort(unique(recordTable[, speciesCol]) [!unique(recordTable[, speciesCol]) %in% exclude])),
+                label = tagList(
+                  "Species",
+                  # Add the title attribute DIRECTLY to the icon's span
+                  span(icon("info-circle"),
+                       style = "margin-left: 5px; color: #007bff; cursor: help;",
+                       title = "Select a species to view its detection locations, or 'n_species' for observed species richness."
+                  )
+                ),
+                choices = NULL,
                 selected = NULL
               )
             ),
@@ -852,11 +1023,13 @@ surveyDashboard <- function(CTtable = NULL,
                 label = "Point size by value",
                 value = TRUE
               ),
+              add_tooltip(id = "scale_size", title = "Scale the size of map points based on the number of detections (for species) or richness (for n_species)."),
               shiny::checkboxInput(
                 inputId = "no_record_more_transparent",
                 label = "Points without records transparent",
                 value = TRUE
-              )
+              ),
+              add_tooltip(id = "no_record_more_transparent", title = "Make points representing stations with no detections for the selected species slightly transparent.")
             )
           ),
           leaflet::leafletOutput("maps",
@@ -870,15 +1043,21 @@ surveyDashboard <- function(CTtable = NULL,
         shinydashboard::tabItem(
           tabName = "ActivityDensity",
           shiny::fluidRow(
-            shiny::column(width = 12, shiny::selectInput("ad_species", 
-                                                         "Species", 
-                                                         choices = sort(unique(recordTable[, speciesCol]) [!unique(recordTable[, speciesCol]) %in% exclude])
+            shiny::column(width = 12, 
+                          selectInput("ad_species",
+                                      label = tagList(
+                                        "Species",
+                                        span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                             title = "Select species to plot activity density.")
+                                      ),
+                                      choices = NULL) # Dynamically updated
             )
-            )
+            # add_tooltip(id = "ad_species", title = "Select the species for which to plot the daily activity density pattern.")
           ),
           shiny::fluidRow(
-            shiny::column(width = 12, shiny::plotOutput("activity_density_plot",
-                                                        height = "600px"))
+            shiny::column(width = 12, 
+                          shiny::plotOutput("activity_density_plot",
+                                            height = "600px"))
           )
         ),
         
@@ -888,17 +1067,27 @@ surveyDashboard <- function(CTtable = NULL,
           shiny::fluidRow(
             shiny::column(
               width = 6,
-              shiny::selectInput("speciesA", "Select species A:",
-                                 choices = sort(unique(recordTable[, speciesCol]) [!unique(recordTable[, speciesCol]) %in% exclude]),
-                                 selected = sort(unique(recordTable[, speciesCol]))[1]
-              )
+              selectInput("speciesA",
+                          label = tagList(
+                            "Select species A:",
+                            span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                 title = "Select the first species for overlap analysis.")
+                          ),
+                          choices = NULL,   # Dynamically updated
+                          selected = NULL),
+              add_tooltip(id = "speciesA", title = "Select the first species for the activity overlap analysis.")
             ),
             shiny::column(
               width = 6,
-              shiny::selectInput("speciesB", "Select species B:",
-                                 choices = sort(unique(recordTable[, speciesCol]) [!unique(recordTable[, speciesCol]) %in% exclude]),
-                                 selected = sort(unique(recordTable[, speciesCol]))[2]
-              )
+              selectInput("speciesB",
+                          label = tagList(
+                            "Select species B:",
+                            span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                 title = "Select the second species for overlap analysis.")
+                          ),
+                          choices = NULL,    # Dynamically updated
+                          selected = NULL),
+              add_tooltip(id = "speciesB", title = "Select the second species for the activity overlap analysis.")
             )
           ),
           shiny::fluidRow(
@@ -910,112 +1099,62 @@ surveyDashboard <- function(CTtable = NULL,
         
         
         ## Tab: filter summary ----
-        
         shinydashboard::tabItem(
           tabName = "filter_overview",
           fluidRow(
             column(12,
                    shinydashboard::box(
-                     title = "Active Filters Summary", 
-                     width = NULL, 
+                     title = "Active Filters Summary",
+                     width = NULL,
                      status = "warning",
                      solidHeader = TRUE,
                      
                      # Summary counts
                      fluidRow(
-                       column(3, 
+                       column(3,
                               shinydashboard::valueBoxOutput("summary_stations_filtered", width = NULL)
                        ),
-                       column(3, 
+                       column(3,
                               shinydashboard::valueBoxOutput("summary_records_filtered", width = NULL)
                        ),
-                       column(3, 
+                       column(3,
                               shinydashboard::valueBoxOutput("summary_species_filtered", width = NULL)
                        ),
-                       column(3, 
-                              shiny::actionButton("resetAllFiltersOverview", "Reset All Filters", 
-                                           icon = icon("sync"), class = "btn-danger btn-block")
+                       column(3,
+                              shiny::actionButton("resetAllFiltersOverview", "Reset All Filters",
+                                                  icon = icon("sync"), class = "btn-danger btn-block"),
+                              add_tooltip("resetAllFiltersOverview", "Click to remove all station, temporal, and species filters.")
                        )
-                     ) #,
-                     
-                     # # Station filters summary
-                     # fluidRow(
-                     #   column(12,
-                     #          shinydashboard::box(
-                     #            title = "Station Filters", 
-                     #            width = NULL,
-                     #            status = "primary",
-                     #            solidHeader = TRUE,
-                     #            collapsible = TRUE,
-                     #            uiOutput("stationFiltersOverview"),
-                     #            conditionalPanel(
-                     #              condition = "input.hasActiveStationFilters == true",
-                     #              actionButton("goToStationFilters", "Edit Station Filters", 
-                     #                           icon = icon("edit"), class = "btn-info")
-                     #            )
-                     #          )
-                     #   )
-                     # ),
-                     # 
-                     # # Temporal filters summary
-                     # fluidRow(
-                     #   column(12,
-                     #          shinydashboard::box(
-                     #            title = "Temporal Filters", 
-                     #            width = NULL,
-                     #            status = "primary",
-                     #            solidHeader = TRUE,
-                     #            collapsible = TRUE,
-                     #            uiOutput("temporalFiltersOverview"),
-                     #            conditionalPanel(
-                     #              condition = "input.hasActiveTemporalFilters == true",
-                     #              actionButton("goToTemporalFilters", "Edit Temporal Filters", 
-                     #                           icon = icon("edit"), class = "btn-info")
-                     #            )
-                     #          )
-                     #   )
-                     # ),
-                     # 
-                     # # Species filters summary
-                     # fluidRow(
-                     #   column(12,
-                     #          shinydashboard::box(
-                     #            title = "Species Filters", 
-                     #            width = NULL,
-                     #            status = "primary",
-                     #            solidHeader = TRUE,
-                     #            collapsible = TRUE,
-                     #            uiOutput("speciesFiltersOverview"),
-                     #            conditionalPanel(
-                     #              condition = "input.hasActiveSpeciesFilters == true",
-                     #              actionButton("goToSpeciesFilters", "Edit Species Filters", 
-                     #                           icon = icon("edit"), class = "btn-info")
-                     #            )
-                     #          )
-                     #   )
-                     # )
+                     )
                    )
             )
           )
         ),
         
         ## Tab: Filter Stations  ----
-        
         shinydashboard::tabItem(
           tabName = "filterCTData",
           fluidRow(
             shinydashboard::box(
-              title = "Filter Camera Trap Data", 
-              width = 12, 
+              title = "Filter Camera Trap Data",
+              width = 12,
               status = "primary",
               solidHeader = TRUE,
               
               # Column selector
               fluidRow(
                 column(4,
-                       selectInput("filterColumn", "Select Column to Filter:", choices = NULL),
-                       uiOutput("filterControls"),
-                       shiny::actionButton("applyFilter", "Apply Filter", class = "btn-primary")
+                       selectInput("filterColumn",
+                                   label = tagList(
+                                     "Select Column to Filter:",
+                                     span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                          title = "Select the camera trap table column to filter by.")
+                                   ),
+                                   choices = NULL),
+                       # add_tooltip(id = "filterColumn", title = "Select the column from the camera trap table to use for filtering stations."),
+                       uiOutput("filterControls"), # Tooltips added dynamically via renderUI
+                       shiny::actionButton("applyFilter", "Apply Filter", class = "btn-primary"),
+                       add_tooltip(id = "applyFilter", title = "Apply the currently defined filter to the camera trap stations.")
                 ),
                 
                 # Active filters display
@@ -1024,21 +1163,18 @@ surveyDashboard <- function(CTtable = NULL,
                          title = "Active Filters",
                          width = NULL,
                          status = "info",
-                         uiOutput("activeFilters"),
-                         shiny::actionButton("clearAllFilters", "Clear All Camera Trap Filters", class = "btn-warning")
+                         uiOutput("activeFilters"), # Dynamic buttons, tooltips added via server
+                         shiny::actionButton("clearAllFilters", "Clear All Camera Trap Filters", class = "btn-warning"),
+                         add_tooltip(id = "clearAllFilters", title = "Remove all active filters applied to the camera trap stations.")
                        )
                 )
               ),
-              
               hr(),
-              
-              
               fluidRow(
                 column(12,
                        uiOutput("filterSummary")
                 )
               ),
-              
               fluidRow(
                 column(12,
                        shinydashboard::box(
@@ -1051,13 +1187,8 @@ surveyDashboard <- function(CTtable = NULL,
                        )
                 )
               ),
-              
-              
-              # # Filtered data table
               fluidRow(
                 column(12,
-                       # h4("Filtered Data"),
-                       # DT::DTOutput("filtered_ct_table")
                        shinydashboard::box(
                          title = "Filtered Data",
                          status = "primary",
@@ -1066,82 +1197,46 @@ surveyDashboard <- function(CTtable = NULL,
                          DT::DTOutput("filtered_ct_table"),
                          collapsible = TRUE
                        )
-                       
                 )
               )
-              
             )
           )
         ),
         
         ## Tab: Filter records temporally ----
-        
-        # shinydashboard::tabItem(
-        #   tabName = "filterRecords",
-        #   fluidRow(
-        #     shinydashboard::box(
-        #       title = "Temporal Filtering Settings", width = 12, status = "primary",
-        #       numericInput("minDeltaTime", "Minimum time difference (minutes)", value = 0, min = 0),
-        #       selectInput("deltaTimeComparedTo", "Compare delta time to:", 
-        #                   choices = c("Last independent record" = "lastIndependentRecord", 
-        #                               "Last record" = "lastRecord")),
-        #       uiOutput("camerasIndependentUI"),  # This will be conditionally rendered
-        #       checkboxInput("removeDuplicateRecords", "Remove duplicate records", value = TRUE),
-        #       shiny::actionButton("runTemporalFilter", "Apply Temporal Filter"),
-        #       shiny::actionButton("restoreOriginalRecordTable", "Restore Original Record Table", class = "btn-warning")
-        #       
-        #     )
-        #   ),
-        #   fluidRow(
-        #     shinydashboard::box(
-        #       title = "Filtered Record Table", width = 12, status = "info",
-        #       DT::dataTableOutput("filteredRecordTable")
-        #     )
-        #   )
-        # ),
         shinydashboard::tabItem(
           tabName = "filterRecords",
           fluidRow(
             shinydashboard::box(
               title = "Temporal Filtering Settings", width = 12, status = "primary",
               numericInput("minDeltaTime", "Minimum time difference (minutes)", value = 0, min = 0),
-              selectInput("deltaTimeComparedTo", "Compare delta time to:", 
-                          choices = c("Last independent record" = "lastIndependentRecord", 
+              add_tooltip(id = "minDeltaTime", title = "Specify the minimum time gap (in minutes) required between consecutive records of the same species at the same location to be considered independent."),
+              selectInput("deltaTimeComparedTo", "Compare delta time to:",
+                          choices = c("Last independent record" = "lastIndependentRecord",
                                       "Last record" = "lastRecord")),
-              uiOutput("camerasIndependentUI"),  # This will be conditionally rendered
+              add_tooltip(id = "deltaTimeComparedTo", title = "Choose whether the time difference is calculated relative to the last record overall or only the last *independent* record."),
+              uiOutput("camerasIndependentUI"), # Tooltip added dynamically via renderUI
               checkboxInput("removeDuplicateRecords", "Remove duplicate records", value = TRUE),
+              add_tooltip(id = "removeDuplicateRecords", title = "Remove records that have the exact same timestamp, species, and station/camera ID."),
               shiny::actionButton("runTemporalFilter", "Apply Temporal Filter"),
-              shiny::actionButton("restoreOriginalRecordTable", "Restore Original Record Table", class = "btn-warning")
+              add_tooltip(id = "runTemporalFilter", title = "Apply the temporal independence filter to the record table."),
+              shiny::actionButton("restoreOriginalRecordTable", "Restore Original Record Table", class = "btn-warning"),
+              add_tooltip(id = "restoreOriginalRecordTable", title = "Remove the temporal filter and revert to the record table prior to temporal filtering (other filters may still apply).")
             )
           ),
-          
-          # Add filter summary box
           fluidRow(
             shinydashboard::box(
               title = "Filter Summary", width = 12, status = "info",
               uiOutput("temporalFilterSummary")
             )
           ),
-          
-          # Add temporal filtering by species table
           fluidRow(
             shinydashboard::box(
               title = "Records by Species", width = 12, status = "info",
               DT::dataTableOutput("temporalFilterTable")
             )
-          ),
-          
-          # # Show filtered record table
-          # doesn't print reliably for whatever reason - remove for now, redundant anyways
-          # fluidRow(
-          #   shinydashboard::box(
-          #     title = "Filtered Record Table", width = 12, status = "info",
-          #     DT::dataTableOutput("filteredRecordTable")
-          #   )
-          # )
+          )
         ),
-        
-        
         
         ## Tab: Species filter ----
         shinydashboard::tabItem(
@@ -1160,18 +1255,20 @@ surveyDashboard <- function(CTtable = NULL,
                        wellPanel(
                          h4("Filtering Actions"),
                          div(class = "btn-group-vertical btn-block",
-                             shiny::actionButton("keepSelectedSpecies", "Keep Selected Species", 
+                             shiny::actionButton("keepSelectedSpecies", "Keep Selected Species",
                                                  class = "btn-success btn-block",
                                                  icon = icon("check")),
-                             shiny::actionButton("removeSelectedSpecies", "Remove Selected Species", 
+                             add_tooltip(id = "keepSelectedSpecies", title = "Keep only the species selected in the table, filtering out all others."),
+                             shiny::actionButton("removeSelectedSpecies", "Remove Selected Species",
                                                  class = "btn-danger btn-block",
                                                  icon = icon("trash")),
+                             add_tooltip(id = "removeSelectedSpecies", title = "Filter out the species selected in the table."),
                              tags$hr(),
-                             shiny::actionButton("resetSpeciesFilter", "Reset All Species", 
+                             shiny::actionButton("resetSpeciesFilter", "Reset All Species",
                                                  class = "btn-warning btn-block",
-                                                 icon = icon("sync"))
+                                                 icon = icon("sync")),
+                             add_tooltip(id = "resetSpeciesFilter", title = "Remove all species filters, restoring all species to the active dataset.")
                          ),
-                         
                          tags$hr(),
                          h4("Filter Summary"),
                          uiOutput("speciesFilterSummary")
@@ -1195,316 +1292,156 @@ surveyDashboard <- function(CTtable = NULL,
                                   shiny::tabPanel("Instructions",
                                                   fluidRow(
                                                     shinydashboard::box(
-                                                      title = "How to Extract Covariates", 
-                                                      width = 12, 
+                                                      title = "How to Extract Covariates",
+                                                      width = 12,
                                                       status = "info",
                                                       shiny::HTML(paste(help_text("covariateExtraction_help.html"), collapse = "\n"))
                                                     )
                                                   )
                                   ),
-                                  
-                                  
-                                  
-                                  # Main extraction tab
                                   shiny::tabPanel("Extract Covariates",
-                                                  # Settings boxes
                                                   fluidRow(
-                                                    # Camera trap extraction settings
                                                     shinydashboard::box(
-                                                      title = "Camera Trap Covariate Settings", 
-                                                      status = "primary", 
-                                                      solidHeader = TRUE,
-                                                      width = 6,
-                                                      
+                                                      title = "Camera Trap Covariate Settings",
+                                                      status = "primary", solidHeader = TRUE, width = 6,
                                                       fluidRow(
                                                         column(6,
-                                                               numericInput("bufferCT", "Buffer around camera traps (meters)", 
-                                                                            value = 0, min = 0),
-                                                               checkboxInput("bilinear", "Use bilinear interpolation", 
-                                                                             value = FALSE)
+                                                               numericInput("bufferCT", "Buffer around camera traps (meters)", value = 0, min = 0),
+                                                               add_tooltip(id = "bufferCT", title = "Specify a distance (in meters) around each camera point. Covariate values will be averaged within this buffer. Set to 0 for point extraction."),
+                                                               checkboxInput("bilinear", "Use bilinear interpolation", value = FALSE),
+                                                               add_tooltip(id = "bilinear", title = "Use bilinear interpolation (smoother averaging of nearby cells) instead of nearest neighbor for extracting values at points (buffer=0).")
                                                         ),
-                                                        column(6,
-                                                               leaflet::leafletOutput("ctBufferPreview", height = "300px")
-                                                        )
+                                                        column(6, leaflet::leafletOutput("ctBufferPreview", height = "300px"))
                                                       )
                                                     ),
-                                                    
-                                                    # Prediction raster settings
                                                     shinydashboard::box(
-                                                      title = "Prediction Raster Settings", 
-                                                      status = "primary", 
-                                                      solidHeader = TRUE,
-                                                      width = 6,
-                                                      
+                                                      title = "Prediction Raster Settings",
+                                                      status = "primary", solidHeader = TRUE, width = 6,
                                                       fluidRow(
                                                         column(6,
-                                                               radioButtons("predictionExtent", "Prediction Area:",
-                                                                            choices = c(
-                                                                              "No clipping" = "none",
-                                                                              "Camera trap grid" = "grid",
-                                                                              "Study area" = "study_area",
-                                                                              "Intersection of both" = "intersection"
+                                                               radioButtons("predictionExtent",
+                                                                            label = tagList(
+                                                                              "Prediction Area:",
+                                                                              span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                                                   title = "Define extent for prediction rasters ('Study area' requires AOI).")
                                                                             ),
-                                                                            selected = "grid"),
-                                                               
-                                                               
+                                                                            choices = c("No clipping" = "none", "Camera trap grid" = "grid", "Study area" = "study_area", "Intersection of both" = "intersection"),
+                                                               ),
+                                                               # radioButtons("predictionExtent", "Prediction Area:",
+                                                               #              choices = c("No clipping" = "none", "Camera trap grid" = "grid", "Study area" = "study_area", "Intersection of both" = "intersection"),
+                                                               #              selected = "grid"),
+                                                               # add_tooltip(id = "predictionExtent", title = "Define the spatial extent for creating prediction rasters. 'Study area' requires an imported AOI."),
                                                                conditionalPanel(
                                                                  condition = "input.predictionExtent !== 'none'",
-                                                                 numericInput("bufferPrediction", "Buffer prediction area (meters)", 
-                                                                              value = 1000, min = 0, step = 100)
+                                                                 numericInput("bufferPrediction", "Buffer prediction area (meters)", value = 1000, min = 0, step = 100),
+                                                                 add_tooltip(id = "bufferPrediction", title = "Specify a buffer distance (in meters) to add around the selected prediction area extent.")
                                                                ),
-                                                               
-                                                               fileInput("rasterTemplate", "Raster Template (optional)", 
+                                                               fileInput("rasterTemplate",
+                                                                         label = tagList(
+                                                                           "Raster Template (optional)",
+                                                                           span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                                                title = "Optional: Upload a .tif template for prediction raster extent/resolution/projection.")
+                                                                         ),
                                                                          accept = c(".tif")),
-                                                               
+                                                               # add_tooltip(id = "rasterTemplate", title = "Optional: Upload a raster file (.tif) to use as a template for the extent, resolution, and projection of the prediction rasters."),
                                                                conditionalPanel(
                                                                  condition = "!input.rasterTemplate",
-                                                                 numericInput("resolution", "Resolution (meters)", 
-                                                                              value = 500, min = 0, step = 10)
+                                                                 numericInput("resolution", "Resolution (meters)", value = 500, min = 0, step = 10),
+                                                                 add_tooltip(id = "resolution", title = "Specify the desired cell resolution (in meters) for the prediction rasters if no template is provided.")
                                                                )
                                                         ),
-                                                        column(6,
-                                                               leaflet::leafletOutput("predictionExtentPreview", height = "300px")
-                                                        )
+                                                        column(6, leaflet::leafletOutput("predictionExtentPreview", height = "300px"))
                                                       )
                                                     )
                                                   ),
-                                                  
-                                                  # Data sources box
-                                                  # fluidRow(
-                                                  #   shinydashboard::box(
-                                                  #     title = "Data Sources",
-                                                  #     status = "info",
-                                                  #     solidHeader = TRUE,
-                                                  #     width = 12,
-                                                  #     
-                                                  #     tabsetPanel(
-                                                  #       # Local Rasters tab
-                                                  #       tabPanel("Local Rasters",
-                                                  #                fluidRow(
-                                                  #                  column(6,
-                                                  #                         radioButtons("inputType", "Choose input type:",
-                                                  #                                      choices = c("Directory" = "directory", 
-                                                  #                                                  "Filenames" = "filenames")),
-                                                  #                         
-                                                  #                         conditionalPanel(
-                                                  #                           condition = "input.inputType == 'directory'",
-                                                  #                           textInput("directory", "Directory", 
-                                                  #                                     placeholder = "Path to covariate rasters"),
-                                                  #                           checkboxInput("recursive", "Search recursively", 
-                                                  #                                         value = FALSE)
-                                                  #                         ),
-                                                  #                         
-                                                  #                         conditionalPanel(
-                                                  #                           condition = "input.inputType == 'filenames'",
-                                                  #                           textInput("filenames", "Filenames", 
-                                                  #                                     placeholder = "Comma-separated file paths")
-                                                  #                         ),
-                                                  #                         
-                                                  #                         textInput("formats", "Formats", value = ".tif")
-                                                  #                  )
-                                                  #                )
-                                                  #       ),
-                                                  #       
-                                                  #       # Elevation & Terrain tab
-                                                  #       tabPanel("Elevation & Terrain",
-                                                  #                div(
-                                                  #                  class = "alert alert-info",
-                                                  #                  "Elevation data from AWS Terrain Tiles"
-                                                  #                ),
-                                                  #                
-                                                  #                fluidRow(
-                                                  #                  column(6,
-                                                  #                         checkboxGroupInput("terrainMeasures", 
-                                                  #                                            "Select Terrain Indices:",
-                                                  #                                            choices = c(
-                                                  #                                              "Slope" = "slope", 
-                                                  #                                              "Aspect" = "aspect", 
-                                                  #                                              "TRI (Terrain Ruggedness Index)" = "TRI", 
-                                                  #                                              "TPI (Topographic Position Index)" = "TPI", 
-                                                  #                                              "Roughness" = "roughness"
-                                                  #                                            ),
-                                                  #                                            selected = c("slope", "TRI"))
-                                                  #                  ),
-                                                  #                  column(6,
-                                                  #                         radioButtons("elevationZoom", "Resolution:", 
-                                                  #                                      choices = c(
-                                                  #                                        "Zoom 12 (~20m)" = 12,
-                                                  #                                        "Zoom 11 (~40m)" = 11,
-                                                  #                                        "Zoom 10 (~80m)" = 10,
-                                                  #                                        "Zoom 9 (~160m)" = 9
-                                                  #                                      ),
-                                                  #                                      selected = 11) #,
-                                                  #                         
-                                                  #                  )
-                                                  #                )
-                                                  #       )
-                                                  #     )
-                                                  #   )
-                                                  # ),
-                                                  # 
-                                                  # # Action buttons
-                                                  # fluidRow(
-                                                  #   column(12,
-                                                  #          div(
-                                                  #            style = "margin: 20px 0;",
-                                                  #            shiny::actionButton("processLocalRasters", 
-                                                  #                                "Process Local Rasters", 
-                                                  #                                class = "btn-primary btn-lg"),
-                                                  #            shiny::actionButton("processElevation", 
-                                                  #                                "Process Elevation Data", 
-                                                  #                                class = "btn-primary btn-lg"),
-                                                  #            shiny::actionButton("clearAllCovariates", 
-                                                  #                                "Clear All Covariates", 
-                                                  #                                class = "btn-danger btn-lg pull-right")
-                                                  #          )
-                                                  #   )
-                                                  # )
-                                                  
-                                                  # Replace the 'Data Sources' tabsetPanel with this single box:
                                                   fluidRow(
                                                     shinydashboard::box(
-                                                      title = "Data Sources",
-                                                      status = "info",
-                                                      solidHeader = TRUE,
-                                                      width = 12,
-                                                      
+                                                      title = "Data Sources", status = "info", solidHeader = TRUE, width = 12,
                                                       fluidRow(
-                                                        # --- Local Rasters Section ---
                                                         column(6,
                                                                h4("Local Rasters (Optional)"),
                                                                checkboxInput("use_local_rasters", "Process Local Raster Files", value = FALSE),
+                                                               add_tooltip(id = "use_local_rasters", title = "Check this box to extract covariates from raster files stored on your computer."),
                                                                conditionalPanel(
                                                                  condition = "input.use_local_rasters == true",
-                                                                 radioButtons("inputType", "Input type:",
-                                                                              choices = c("Directory" = "directory",
-                                                                                          "Filenames" = "filenames")),
+                                                                 radioButtons("inputType", "Input type:", choices = c("Directory" = "directory", "Filenames" = "filenames")),
+                                                                 add_tooltip(id = "inputType", title = "Choose whether to specify a directory containing rasters or list individual file paths."),
                                                                  conditionalPanel(
                                                                    condition = "input.inputType == 'directory'",
-                                                                   textInput("directory", "Directory Path",
-                                                                             placeholder = "Path to covariate rasters"),
-                                                                   checkboxInput("recursive", "Search recursively", value = FALSE)
+                                                                   textInput("directory", "Directory Path", placeholder = "Path to covariate rasters"),
+                                                                   add_tooltip(id = "directory", title = "Enter the path to the folder containing your local raster files."),
+                                                                   checkboxInput("recursive", "Search recursively", value = FALSE),
+                                                                   add_tooltip(id = "recursive", title = "Check to search for raster files within subfolders of the specified directory.")
                                                                  ),
                                                                  conditionalPanel(
                                                                    condition = "input.inputType == 'filenames'",
-                                                                   textInput("filenames", "Filenames",
-                                                                             placeholder = "Comma-separated file paths")
+                                                                   textInput("filenames", "Filenames", placeholder = "Comma-separated file paths"),
+                                                                   add_tooltip(id = "filenames", title = "Enter the full paths to your raster files, separated by commas.")
                                                                  ),
-                                                                 textInput("formats", "File Formats (e.g., .tif,.grd)", value = ".tif")
-                                                               ) # end conditionalPanel for use_local_rasters
-                                                        ), # end column for Local Rasters
-                                                        
-                                                        # --- Elevation & Terrain Section ---
+                                                                 textInput("formats",
+                                                                           label = tagList(
+                                                                             "File Formats (e.g., .tif,.grd)",
+                                                                             span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                                                  title = "Specify file extensions for local rasters (e.g., '.tif', '.grd').")
+                                                                           ),
+                                                                           value = ".tif")
+                                                                 # add_tooltip(id = "formats", title = "Specify the file extensions of the raster files to process (e.g., '.tif', '.grd', '.asc').")
+                                                               )
+                                                        ),
                                                         column(6,
                                                                h4("Elevation & Terrain (Optional)"),
                                                                checkboxInput("use_elevation", "Download Elevation Data (AWS)", value = FALSE),
+                                                               add_tooltip(id = "use_elevation", title = "Check this box to download elevation data from Amazon Web Services Terrain Tiles and calculate terrain indices."),
                                                                conditionalPanel(
                                                                  condition = "input.use_elevation == true",
-                                                                 checkboxGroupInput("terrainMeasures",
-                                                                                    "Select Terrain Indices:",
-                                                                                    choices = c("Slope" = "slope",
-                                                                                                "Aspect" = "aspect",
-                                                                                                "TRI" = "TRI",
-                                                                                                "TPI" = "TPI",
-                                                                                                "Roughness" = "roughness"),
+                                                                 checkboxGroupInput("terrainMeasures", "Select Terrain Indices:",
+                                                                                    choices = c("Slope" = "slope", "Aspect" = "aspect", "TRI" = "TRI", "TPI" = "TPI", "Roughness" = "roughness"),
                                                                                     selected = c("slope", "TRI")),
+                                                                 add_tooltip(id = "terrainMeasures", title = "Select the terrain metrics to calculate from the downloaded elevation data."),
                                                                  radioButtons("elevationZoom", "Resolution (Zoom Level):",
-                                                                              choices = c("12 (~20m)" = 12, "11 (~40m)" = 11,
-                                                                                          "10 (~80m)" = 10, "9 (~160m)" = 9),
-                                                                              selected = 11)
-                                                               ) # end conditionalPanel for use_elevation
-                                                        ) # end column for Elevation
-                                                      ) # end fluidRow for Data Sources content
-                                                    ) # end box for Data Sources
-                                                  ), # end fluidRow containing the Data Sources box
-                                                  
-                                                  # --- Action Buttons ---
-                                                  fluidRow(
-                                                    column(12,
-                                                           div(
-                                                             style = "margin: 20px 0;",
-                                                             # *** Single new button ***
-                                                             shiny::actionButton("run_covariate_extraction",
-                                                                                 "Extract Covariates",
-                                                                                 class = "btn-primary btn-lg"),
-                                                             # *** Keep the clear button ***
-                                                             shiny::actionButton("clearAllCovariates",
-                                                                                 "Clear All Covariates",
-                                                                                 class = "btn-danger btn-lg pull-right")
-                                                           )
-                                                    )
-                                                  ) # end fluidRow for Action Buttons
-                                                  
-                                  ),
-                                  
-                                  
-                                  shiny::tabPanel("Updated CT Table",
-                                                  DT::DTOutput("updatedCTTable")
-                                  ),
-                                  # Original Covariate Rasters tab
-                                  shiny::tabPanel("Original Covariate Rasters",
-                                                  fluidRow(
-                                                    column(3,
-                                                           selectInput("rasterBand", "Select Raster Band", choices = NULL)
-                                                    ),
-                                                    column(3,
-                                                           selectInput("colorPalette", "Color Palette",
-                                                                       choices = c("Terrain", "Viridis", "Plasma", "Inferno", "Rocket"),
-                                                                       selected = "Inferno")
-                                                    ),
-                                                    column(3,
-                                                           checkboxInput("invertColors", "Invert Color Ramp", value = FALSE)
-                                                    ),
-                                                    column(3,
-                                                           selectInput("ctColorBy", "Color Camera Traps By",
-                                                                       choices = c("White" = "white", "Raster Value" = "raster"))
+                                                                              choices = c("12 (~20m)" = 12, "11 (~40m)" = 11, "10 (~80m)" = 10, "9 (~160m)" = 9),
+                                                                              selected = 11),
+                                                                 add_tooltip(id = "elevationZoom", title = "Select the desired resolution (zoom level) for the downloaded elevation data. Higher zoom levels provide finer resolution but require more download time and processing.")
+                                                               )
+                                                        )
+                                                      )
                                                     )
                                                   ),
                                                   fluidRow(
-                                                    column(4,
-                                                           sliderInput("ctPointSize", "Camera Trap Point Size", 
-                                                                       min = 1, max = 20, value = 6, step = 1)
-                                                    ),
-                                                    column(4,
-                                                           sliderInput("maxPixels", "Maximum number of pixels to plot (millions)", 
-                                                                       value = 1, min = 1, max = 100, step = 1, ticks = FALSE)
+                                                    column(12,
+                                                           div(style = "margin: 20px 0;",
+                                                               shiny::actionButton("run_covariate_extraction", "Extract Covariates", class = "btn-primary btn-lg"),
+                                                               add_tooltip(id = "run_covariate_extraction", title = "Start the covariate extraction process based on the selected sources and settings.", placement = "right"),
+                                                               shiny::actionButton("clearAllCovariates", "Clear All Covariates", class = "btn-danger btn-lg pull-right"),
+                                                               add_tooltip(id = "clearAllCovariates", title = "Remove all extracted covariates from the camera trap table and delete all associated raster data stored in the app.", placement = "left")
+                                                           )
                                                     )
+                                                  )
+                                  ),
+                                  shiny::tabPanel("Updated CT Table", DT::DTOutput("updatedCTTable")),
+                                  shiny::tabPanel("Original Covariate Rasters",
+                                                  fluidRow(
+                                                    column(3, selectInput("rasterBand", "Select Raster Band", choices = NULL), add_tooltip(id = "rasterBand", title = "Select the original covariate raster layer to display on the map.")),
+                                                    column(3, selectInput("colorPalette", "Color Palette", choices = c("Terrain", "Viridis", "Plasma", "Inferno", "Rocket"), selected = "Inferno"), add_tooltip(id = "colorPalette", title = "Choose the color scheme for displaying the selected raster layer.")),
+                                                    column(3, checkboxInput("invertColors", "Invert Color Ramp", value = FALSE), add_tooltip(id = "invertColors", title = "Reverse the order of colors in the selected palette.")),
+                                                    column(3, selectInput("ctColorBy", "Color Camera Traps By", choices = c("White" = "white", "Raster Value" = "raster")), add_tooltip(id = "ctColorBy", title = "Choose whether camera trap points are colored white or based on the underlying raster value."))
+                                                  ),
+                                                  fluidRow(
+                                                    column(4, sliderInput("ctPointSize", "Camera Trap Point Size", min = 1, max = 20, value = 6, step = 1), add_tooltip(id = "ctPointSize", title = "Adjust the size of the camera trap points displayed on the map.")),
+                                                    column(4, sliderInput("maxPixels", "Maximum number of pixels to plot (millions)", value = 1, min = 1, max = 100, step = 1, ticks = FALSE), add_tooltip(id = "maxPixels", title = "Set the maximum number of raster cells (in millions) to plot for performance. The raster will be downsampled if this limit is exceeded."))
                                                   ),
                                                   leaflet::leafletOutput("originalCovariatePlot", height = "600px")
                                   ),
-                                  
-                                  # Prediction Rasters tab
                                   shiny::tabPanel("Prediction Rasters",
                                                   fluidRow(
-                                                    column(3,
-                                                           selectInput("predictionRasterBand", "Select Prediction Raster Band", 
-                                                                       choices = NULL)
-                                                    ),
-                                                    column(3,
-                                                           selectInput("colorPalettePrediction", "Color Palette",
-                                                                       choices = c("Terrain", "Viridis", "Plasma", "Inferno", "Rocket"),
-                                                                       selected = "Inferno")
-                                                    ),
-                                                    column(3,
-                                                           checkboxInput("invertColorsPrediction", "Invert Color Ramp", 
-                                                                         value = FALSE)
-                                                    ),
-                                                    column(3,
-                                                           selectInput("ctColorByPrediction", "Color Camera Traps By",
-                                                                       choices = c("White" = "white", "Raster Value" = "raster"))
-                                                    )
+                                                    column(3, selectInput("predictionRasterBand", "Select Prediction Raster Band", choices = NULL), add_tooltip(id = "predictionRasterBand", title = "Select the prediction raster layer (derived from original covariates) to display.")),
+                                                    column(3, selectInput("colorPalettePrediction", "Color Palette", choices = c("Terrain", "Viridis", "Plasma", "Inferno", "Rocket"), selected = "Inferno"), add_tooltip(id = "colorPalettePrediction", title = "Choose the color scheme for the prediction raster map.")),
+                                                    column(3, checkboxInput("invertColorsPrediction", "Invert Color Ramp", value = FALSE), add_tooltip(id = "invertColorsPrediction", title = "Reverse the order of colors in the selected palette for the prediction raster.")),
+                                                    column(3, selectInput("ctColorByPrediction", "Color Camera Traps By", choices = c("White" = "white", "Raster Value" = "raster")), add_tooltip(id = "ctColorByPrediction", title = "Choose how to color camera trap points on the prediction map (white or based on the prediction raster value)."))
                                                   ),
                                                   fluidRow(
-                                                    column(4,
-                                                           sliderInput("ctPointSizePrediction", "Camera Trap Point Size", 
-                                                                       min = 1, max = 20, value = 6, step = 1)
-                                                    ),
-                                                    column(4,
-                                                           sliderInput("maxPixelsPrediction", 
-                                                                       "Maximum number of pixels to plot (millions)", 
-                                                                       value = 1, min = 1, max = 100, step = 1, ticks = FALSE)
-                                                           
-                                                    )
+                                                    column(4, sliderInput("ctPointSizePrediction", "Camera Trap Point Size", min = 1, max = 20, value = 6, step = 1), add_tooltip(id = "ctPointSizePrediction", title = "Adjust the size of camera trap points on the prediction map.")),
+                                                    column(4, sliderInput("maxPixelsPrediction", "Maximum number of pixels to plot (millions)", value = 1, min = 1, max = 100, step = 1, ticks = FALSE), add_tooltip(id = "maxPixelsPrediction", title = "Set the maximum number of prediction raster cells (in millions) to plot. Downsampling occurs if exceeded."))
                                                   ),
                                                   leaflet::leafletOutput("predictionRasterPlot", height = "600px")
                                   )
@@ -1513,8 +1450,6 @@ surveyDashboard <- function(CTtable = NULL,
         
         
         ## Tab: Covariate correlation ----
-        
-        
         shinydashboard::tabItem(
           tabName = "covariateCorrelation",
           shiny::tabsetPanel(
@@ -1522,101 +1457,75 @@ surveyDashboard <- function(CTtable = NULL,
             shiny::tabPanel("Instructions",
                             fluidRow(
                               shinydashboard::box(
-                                title = "How to Use Covariate Correlation Analysis", 
-                                width = 12, 
+                                title = "How to Use Covariate Correlation Analysis",
+                                width = 12,
                                 status = "info",
                                 shiny::HTML(paste(help_text("covariateCorrelation_help.html"), collapse = "\n"))
                               )
                             )
             ),
-            
             shiny::tabPanel("Correlation Analysis",
                             fluidRow(
                               shinydashboard::box(
                                 title = "Settings", width = 12, status = "primary",
                                 fluidRow(
-                                  # Most important settings first
-                                  column(4,
-                                         selectInput("plotType", 
-                                                     "Plot Type:",
-                                                     choices = c("Correlation matrix" = "matrix",
-                                                                 "Scatter plot matrix" = "pairs"),
-                                                     selected = "matrix")
-                                  ),
-                                  column(4,
-                                         selectInput("correlationMethod", 
-                                                     "Correlation Method:",
-                                                     choices = c("pearson", "spearman", "kendall"),
-                                                     selected = "pearson")
-                                  ),
-                                  column(4,
-                                         checkboxInput("excludeNonNumeric", 
-                                                       "Exclude non-numeric covariates", 
-                                                       value = TRUE)
-                                  )
+                                  column(4, 
+                                         selectInput("plotType", "Plot Type:", choices = c("Correlation matrix" = "matrix", "Scatter plot matrix" = "pairs"), selected = "matrix"), 
+                                         add_tooltip(id = "plotType", title = "Choose between a compact correlation matrix or a detailed scatter plot matrix.")),
+                                  column(4, 
+                                         selectInput("correlationMethod", "Correlation Method:", choices = c("pearson", "spearman", "kendall"), selected = "pearson"), 
+                                         add_tooltip(id = "correlationMethod", title = "Select the statistical method for calculating correlations (Pearson for linear, Spearman/Kendall for monotonic).")),
+                                  column(4, 
+                                         checkboxInput("excludeNonNumeric", "Exclude non-numeric covariates", value = TRUE), 
+                                         add_tooltip(id = "excludeNonNumeric", title = "Check to remove non-numeric columns (like character or factor variables) before calculating correlations."))
                                 ),
-                                # Visualization settings in a second row when matrix view is selected
                                 conditionalPanel(
                                   condition = "input.plotType == 'matrix'",
                                   fluidRow(
-                                    column(4,
-                                           selectInput("corrplotMethod", 
-                                                       "Display Style:",
-                                                       choices = c("Color Squares" = "color", 
-                                                                   "Circles" = "circle", 
-                                                                   "Filled Squares" = "square", 
-                                                                   "Ellipses" = "ellipse", 
-                                                                   "Shaded Squares" = "shade", 
-                                                                   "Pie Charts" = "pie"),
-                                                       selected = "color")
+                                    column(4, 
+                                           selectInput("corrplotMethod",
+                                                       label = tagList(
+                                                         "Display Style:",
+                                                         span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                              title = "Visual representation for correlation matrix (requires 'corrplot').")
+                                                       ),
+                                                       choices = c("Color Squares" = "color", "Circles" = "circle", "Filled Squares" = "square", "Ellipses" = "ellipse", "Shaded Squares" = "shade", "Pie Charts" = "pie"), 
+                                                       selected = "color"),
+                                           # add_tooltip(id = "corrplotMethod", title = "Select the visual representation for the correlation matrix (requires 'corrplot' package).")
                                     ),
-                                    column(4,
+                                    column(4, 
                                            selectInput("corrplotOrder",
-                                                       "Variable Ordering:",
-                                                       choices = c("Original Order" = "original",
-                                                                   "Cluster by Similarity" = "hclust",
-                                                                   "Order by First Principal Component" = "FPC",
-                                                                   "Angular Order of Eigenvectors" = "AOE",
-                                                                   "Alphabetical" = "alphabet"),
-                                                       selected = "hclust")
+                                                       label = tagList(
+                                                         "Variable Ordering:",
+                                                         span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                              title = "Method for ordering variables in matrix (requires 'corrplot').")
+                                                       ),
+                                                       choices = c("Original Order" = "original", "Cluster by Similarity" = "hclust", "Order by First Principal Component" = "FPC", "Angular Order of Eigenvectors" = "AOE", "Alphabetical" = "alphabet"),
+                                                       selected = "hclust") 
+                                           # add_tooltip(id = "corrplotOrder", title = "Select the method for ordering variables in the correlation matrix (requires 'corrplot' package).")
                                     )
                                   )
                                 )
                               )
                             ),
                             fluidRow(
-                              # Main correlation plot
+                              shinydashboard::box(title = "Correlation Plot", width = 8, status = "info", plotOutput("correlationPlot", height = "700px")),
                               shinydashboard::box(
-                                title = "Correlation Plot", 
-                                width = 8, 
-                                status = "info",
-                                plotOutput("correlationPlot", height = "700px")
-                              ),
-                              # Highly correlated pairs with threshold control
-                              shinydashboard::box(
-                                title = "Highly Correlated Pairs", 
-                                width = 4, 
-                                status = "warning",
+                                title = "Highly Correlated Pairs", width = 4, status = "warning",
                                 fluidRow(
-                                  column(12,
-                                         sliderInput("correlationThreshold", 
-                                                     "Show pairs with |correlation| >",
-                                                     min = 0, max = 1, value = 0.7, step = 0.05)
-                                  )
+                                  column(12, sliderInput("correlationThreshold", "Show pairs with |correlation| >", min = 0, max = 1, value = 0.7, step = 0.05), add_tooltip(id = "correlationThreshold", title = "Adjust the slider to set the minimum absolute correlation value for pairs to be listed in the table below."))
                                 ),
                                 DT::dataTableOutput("correlationTable"),
-                                tags$div(
-                                  style = "margin-top: 20px;",
-                                  textOutput("correlationWarning")
-                                )
+                                tags$div(style = "margin-top: 20px;", 
+                                         textOutput("correlationWarning"))
                               )
                             )
             )
-            
           )
         ),
         
         ## Tab: Camera operation  ----
+        # (No input elements here)
         shinydashboard::tabItem(
           tabName = "CameraOperation",
           plotly::plotlyOutput("camop",
@@ -1624,165 +1533,86 @@ surveyDashboard <- function(CTtable = NULL,
         ),
         
         ## Tab: Species Accumulation Curves ----
-        
         shinydashboard::tabItem(
           tabName = "speciesAccumulation",
           fluidRow(
-            # Left column with settings and species selection
             column(3,
-                   # Tabs for settings and species selection
                    tabsetPanel(
-                     # Settings tab
                      tabPanel("Settings",
                               wellPanel(
                                 h4("Basic Settings", class = "text-primary"),
-                                
-                                numericInput("acc_q", 
-                                             "Diversity order (q):",
-                                             value = 0,
-                                             min = 0,
-                                             max = 2,
-                                             step = 1
-                                ),
-                                
-                                selectInput("acc_x_unit", 
-                                            "Sampling unit:",
-                                            choices = c(
-                                              "Stations" = "station",
-                                              "Survey Days" = "survey_day",
-                                              "Station Days" = "station_day"
-                                            ),
-                                            selected = "station"
-                                ),
-                                
+                                numericInput("acc_q", "Diversity order (q):", value = 0, min = 0, max = 2, step = 1),
+                                add_tooltip(id = "acc_q", title = "Diversity Order (q=0: richness, q=1: Shannon, q=2: Simpson). Affects sensitivity to species abundance."),
+                                selectInput("acc_x_unit", "Sampling unit:", choices = c("Stations" = "station", "Survey Days" = "survey_day", "Station Days" = "station_day"), selected = "station"),
+                                add_tooltip(id = "acc_x_unit", title = "Unit for measuring sampling effort (Stations, Survey Days, Station Days)."),
                                 hr(),
                                 h4("Curve Settings", class = "text-primary"),
-                                
-                                
-                                numericInput("acc_knots",
-                                             "Number of points on curve:",
-                                             value = 40,
-                                             min = 10,
-                                             max = 100,
-                                             step = 5
-                                ),
-                                
+                                numericInput("acc_knots", "Number of points on curve:", value = 40, min = 10, max = 100, step = 5),
+                                add_tooltip(id = "acc_knots", title = "Number of points to calculate along the rarefaction/extrapolation curve."),
                                 hr(),
                                 h4("Bootstrap Settings", class = "text-primary"),
-                                sliderInput("acc_conf",
-                                            "Confidence level:",
-                                            min = 0.8,
-                                            max = 0.99,
-                                            value = 0.95,
-                                            step = 0.01
-                                ),
-                                
-                                numericInput("acc_nboot",
-                                             "Number of bootstrap replicates:",
-                                             value = 50,
-                                             min = 10,
-                                             max = 200,
-                                             step = 10
-                                ),
-                                
+                                sliderInput("acc_conf", "Confidence level:", min = 0.8, max = 0.99, value = 0.95, step = 0.01),
+                                add_tooltip(id = "acc_conf", title = "Set the confidence level (e.g., 0.95 for 95% CI) for the shaded intervals on the curves."),
+                                numericInput("acc_nboot", "Number of bootstrap replicates:", value = 50, min = 10, max = 200, step = 10),
+                                add_tooltip(id = "acc_nboot", title = "Number of bootstrap samples used to estimate the confidence intervals (higher values increase precision but take longer)."),
                                 hr(),
                                 h4("Plot Settings", class = "text-primary"),
-                                numericInput("acc_plot_scale", 
-                                             "Plot size scale:", 
-                                             value = 1.5, 
-                                             min = 0.5, 
-                                             max = 3, 
-                                             step = 0.1
-                                ),
-                                
+                                numericInput("acc_plot_scale", "Plot size scale:", value = 1.5, min = 0.5, max = 3, step = 0.1),
+                                add_tooltip(id = "acc_plot_scale", title = "Adjust the overall size of text and elements in the output plots for better readability."),
                                 hr(),
-                                
-                                # Run analysis button at the bottom of settings
-                                actionButton("runAccumulation", "Run Analysis", 
-                                             class = "btn-primary btn-lg btn-block")
+                                actionButton("runAccumulation", "Run Analysis", class = "btn-primary btn-lg btn-block"),
+                                add_tooltip(id = "runAccumulation", title = "Run the species accumulation analysis with the current settings and selected species.")
                               )
                      ),
-                     
-                     
-                     # Species Selection tab
                      tabPanel("Species",
                               wellPanel(
                                 h4("Species Selection", class = "text-primary"),
-                                # Species table
                                 DT::dataTableOutput("acc_speciesTable"),
-                                
                                 hr(),
-                                # Selection controls
                                 fluidRow(
-                                  column(6, actionButton("acc_selectAll", "Select All", class = "btn-block")),
-                                  column(6, actionButton("acc_deselectAll", "Deselect All", class = "btn-block"))
+                                  column(6, actionButton("acc_selectAll", "Select All", class = "btn-block")), add_tooltip(id = "acc_selectAll", title = "Select all species listed in the table."),
+                                  column(6, actionButton("acc_deselectAll", "Deselect All", class = "btn-block")), add_tooltip(id = "acc_deselectAll", title = "Deselect all species listed in the table.")
                                 ),
-                                
                                 hr(),
                                 h4("Filtering", class = "text-primary"),
-                                numericInput("acc_minStations", "Min Stations:", value = 1, min = 1),
-                                numericInput("acc_minRecords", "Min Records:", value = 1, min = 1),
+                                numericInput("acc_minStations", "Min Stations:", value = 1, min = 1), add_tooltip(id = "acc_minStations", title = "Minimum number of stations a species must be detected at to be selected."),
+                                numericInput("acc_minRecords", "Min Records:", value = 1, min = 1), add_tooltip(id = "acc_minRecords", title = "Minimum number of records a species must have to be selected."),
                                 fluidRow(
-                                  column(6, actionButton("acc_selectByStations", "By Stations", class = "btn-block")),
-                                  column(6, actionButton("acc_selectByRecords", "By Records", class = "btn-block"))
+                                  column(6, actionButton("acc_selectByStations", "By Stations", class = "btn-block")), add_tooltip(id = "acc_selectByStations", title = "Select species meeting the minimum station requirement."),
+                                  column(6, actionButton("acc_selectByRecords", "By Records", class = "btn-block")), add_tooltip(id = "acc_selectByRecords", title = "Select species meeting the minimum record requirement.")
                                 ),
-                                actionButton("acc_selectByBoth", "Select by Both Criteria", 
-                                             class = "btn-block")
+                                actionButton("acc_selectByBoth", "Select by Both Criteria", class = "btn-block"), add_tooltip(id = "acc_selectByBoth", title = "Select species meeting both the minimum station and minimum record requirements.")
                               )
                      )
                    )
             ),
-            
-            # Right column with output
             column(9,
-                   # Results tabs
                    tabsetPanel(
                      selected = "All Curves",
-                     
                      tabPanel("Instructions",
                               fluidRow(
                                 shinydashboard::box(
-                                  title = "Species Accumulation Curves", 
-                                  width = 12, 
+                                  title = "Species Accumulation Curves",
+                                  width = 12,
                                   status = "info",
                                   shiny::HTML(paste(help_text("speciesAccum_help.html"), collapse = "\n"))
                                 )
                               )
                      ),
-                     
-                     # Add new tab for combined plots view:
                      tabPanel("All Curves",
                               fluidRow(
                                 div(
                                   style = "display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between;",
-                                  div(
-                                    style = "flex: 1; min-width: 300px;",
-                                    plotOutput("acc_rarefaction_plot_combined", height = "600px")
-                                  ),
-                                  div(
-                                    style = "flex: 1; min-width: 300px;",
-                                    plotOutput("acc_coverage_plot_combined", height = "600px")
-                                  ),
-                                  div(
-                                    style = "flex: 1; min-width: 300px;",
-                                    plotOutput("acc_richness_plot_combined", height = "600px")
-                                  )
+                                  div(style = "flex: 1; min-width: 300px;", plotOutput("acc_rarefaction_plot_combined", height = "600px")),
+                                  div(style = "flex: 1; min-width: 300px;", plotOutput("acc_coverage_plot_combined", height = "600px")),
+                                  div(style = "flex: 1; min-width: 300px;", plotOutput("acc_richness_plot_combined", height = "600px"))
                                 )
                               )
                      ),
-                     
-                     tabPanel("Rarefaction/Extrapolation Curve",
-                              plotOutput("acc_rarefaction_plot", height = "600px")
-                     ),
-                     tabPanel("Sample Coverage",
-                              plotOutput("acc_coverage_plot", height = "600px")
-                     ),
-                     tabPanel("Coverage-based Curve",
-                              plotOutput("acc_richness_plot", height = "600px")
-                     ),
-                     tabPanel("Summary Statistics",
-                              DTOutput("acc_summary")
-                     )
+                     tabPanel("Rarefaction/Extrapolation Curve", plotOutput("acc_rarefaction_plot", height = "600px")),
+                     tabPanel("Sample Coverage", plotOutput("acc_coverage_plot", height = "600px")),
+                     tabPanel("Coverage-based Curve", plotOutput("acc_richness_plot", height = "600px")),
+                     tabPanel("Summary Statistics", DTOutput("acc_summary"))
                    )
             )
           )
@@ -1796,326 +1626,195 @@ surveyDashboard <- function(CTtable = NULL,
             shiny::tabPanel("Instructions",
                             fluidRow(
                               shinydashboard::box(
-                                title = "How to Create Detection Histories", 
-                                width = 12, 
+                                title = "How to Create Detection Histories",
+                                width = 12,
                                 status = "info",
                                 shiny::HTML(paste(help_text("detectionHistories_help.html"), collapse = "\n"))
                               )
                             )
             ),
-            
             shiny::tabPanel("Detection History",
                             shiny::fluidRow(
-                              shiny::column(
-                                3,
-                                shiny::selectInput(
-                                  inputId = "species_dethist",
-                                  label = "Species",
-                                  choices = NULL,  # is updated dynamically
-                                  selected = NULL
-                                )
-                              ),
-                              shiny::column(
-                                3,
-                                shiny::sliderInput("occasionLength_single_species", "Occasion Length (in days)",
-                                                   min = 1, max = 20, value = 10,
-                                                   step = 1, ticks = FALSE
-                                )
-                              ),
-                              shiny::column(
-                                3,
-                                shiny::selectInput("outputType", "Output Type", choices = c("binary", "count"), selected = "binary")
-                              ),
-                              shiny::column(
-                                3,
-                                shiny::selectInput("day1", "Day 1", choices = c("survey", "station"), selected = "survey")
-                              )
+                              shiny::column(3, 
+                                            selectInput(inputId = "species_dethist", label = "Species", choices = NULL, selected = NULL), 
+                                            add_tooltip(id = "species_dethist", title = "Select the target species for creating the detection history.")),
+                              shiny::column(3, 
+                                            sliderInput("occasionLength_single_species", "Occasion Length (in days)", min = 1, max = 20, value = 10, step = 1, ticks = FALSE), 
+                                            add_tooltip(id = "occasionLength_single_species", title = "Define the duration (in days) of each sampling occasion.")),
+                              # shiny::column(3, selectInput("outputType", "Output Type", choices = c("binary", "count"), selected = "binary"),  # removed, irrelevant for given model types
+                              shiny::column(3, 
+                                            selectInput("day1",
+                                                        label = tagList(
+                                                          "Day 1",
+                                                          span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                               title = "'survey'=align all to survey start; 'station'=align to station setup date.")
+                                                        ),
+                                                        choices = c("survey", "station"), selected = "survey")
+                              )               
                             ),
-                            
                             shiny::fluidRow(
-                              shinydashboard::box(width = 3,
-                                                  shinydashboard::valueBoxOutput("dethist_n_records",
-                                                                                 width = NULL)
-                              ),
-                              shinydashboard::box(width = 3,
-                                                  shinydashboard::valueBoxOutput("dethist_n_detections",
-                                                                                 width = NULL)
-                              ),
-                              shinydashboard::box(width = 3,
-                                                  shinydashboard::valueBoxOutput("dethist_n_stations",
-                                                                                 width = NULL)
-                              ),
-                              shinydashboard::box(width = 3,
-                                                  shinydashboard::valueBoxOutput("dethist_percent_1s",
-                                                                                 width = NULL)
-                              )
+                              shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_n_records", width = NULL)),
+                              shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_n_detections", width = NULL)),
+                              shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_n_stations", width = NULL)),
+                              shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_percent_1s", width = NULL))
                             ),
-                            shinydashboard::box(
-                              width = 12,
-                              title = "Detection History Plot",
-                              collapsible = TRUE,
-                              collapsed = FALSE,
-                              status = "primary",
-                              solidHeader = TRUE,
-                              plotly::plotlyOutput("detectionHistory")
-                            ),
-                            shinydashboard::box(
-                              width = 12,
-                              title = "unmarkedFrame Summary",
-                              status = "info",
-                              solidHeader = TRUE,
-                              collapsible = TRUE,
-                              collapsed = TRUE,
-                              shiny::verbatimTextOutput("umf_summary")
-                            ),
-                            shiny::actionButton("return_dethist", "Return detection history"),
-                            shiny::actionButton("return_umf", "Return unmarkedFrame")
+                            shinydashboard::box(width = 12, title = "Detection History Plot", collapsible = TRUE, collapsed = FALSE, status = "primary", solidHeader = TRUE, plotly::plotlyOutput("detectionHistory")),
+                            shinydashboard::box(width = 12, title = "unmarkedFrame Summary", status = "info", solidHeader = TRUE, collapsible = TRUE, collapsed = TRUE, shiny::verbatimTextOutput("umf_summary")),
+                            shiny::actionButton("return_dethist", "Return detection history"), add_tooltip(id = "return_dethist", title = "Save the generated detection history list (detections and effort) to your R workspace."),
+                            shiny::actionButton("return_umf", "Return unmarkedFrame"), add_tooltip(id = "return_umf", title = "Save the generated unmarkedFrame object (formatted for modeling) to your R workspace.")
             )
           )
         ),
         
-        
-        
-        ## Tab: Ocupancy (single species) ----
-        
+        ## Tab: Occupancy (single species) ----
         shinydashboard::tabItem(
           tabName = "Occupancy",
           fluidRow(
             column(12,
                    shinydashboard::box(
-                     width = NULL,
-                     status = "primary",
-                     title = "Workflow Selection",
+                     width = NULL, status = "primary", title = "Workflow Selection",
                      radioButtons("occupancy_workflow", "Choose workflow:",
-                                  choices = c(
-                                    "Basic - Simple model specification with standard options" = "basic"  #,
-                                    # "Advanced - Full control over model structure and effects" = "advanced"
-                                  ),
-                                  selected = "basic"
-                     ),
-                     collapsible = TRUE, 
-                     collapsed = TRUE #,
-                     # helpText("Basic workflow is recommended for most analyses. Advanced workflow provides more control but requires deeper understanding of model structure.")
+                                  choices = c("Basic - Simple model specification with standard options" = "basic"),
+                                  selected = "basic"),
+                     add_tooltip(id = "occupancy_workflow", title = "Choose 'Basic' for standard models with linear effects. 'Advanced' (under construction) will allow complex models."),
+                     collapsible = TRUE, collapsed = TRUE
                    )
             )
           ),
-          
-          # Basic Workflow UI
           conditionalPanel(
             condition = "input.occupancy_workflow == 'basic'",
             tabsetPanel(
-              id = "basic_workflow_tabs",
-              selected = "Model Setup",
-              
-              # Instructions tab
+              id = "basic_workflow_tabs", selected = "Model Setup",
               tabPanel("Instructions",
                        fluidRow(
                          shinydashboard::box(
-                           title = "Single-Species Occupancy Models", 
-                           width = 12, 
-                           status = "info",
+                           title = "Single-Species Occupancy Models", width = 12, status = "info",
                            shiny::HTML(paste(help_text("singleSpeciesOccupancy_help.html"), collapse = "\n"))
                          )
                        )
               ),
-              
-              
-              # Model Setup tab
               tabPanel("Model Setup",
                        fluidRow(
-                         # Left Column - All Inputs
                          column(width = 3,
                                 wellPanel(
                                   h4("Model Configuration", class = "text-primary"),
-                                  selectInput("basic_model_package", "Package:",
-                                              choices = c("unmarked", "ubms"),
-                                              selected = "unmarked"),
-                                  selectInput("basic_model_type", "Model type:",
-                                              choices = c("Occupancy", "Royle-Nichols"),
-                                              selected = "Occupancy"),
+                                  selectInput("basic_model_package",
+                                              label = tagList(
+                                                "Package:",
+                                                span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                     title = "Select R package: 'unmarked' (frequentist) or 'ubms' (Bayesian).")
+                                              ),
+                                              choices = c("unmarked", "ubms"), selected = "unmarked"),
+                                  # add_tooltip(id = "basic_model_package", title = "Select the R package for model fitting: 'unmarked' (frequentist, faster) or 'ubms' (Bayesian MCMC)."),
+                                  selectInput("basic_model_type",
+                                              label = tagList(
+                                                "Model type:",
+                                                span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                     title = "'Occupancy' (estimates presence/absence) or 'Royle-Nichols' (links detection to abundance).")
+                                              ),
+                                              choices = c("Occupancy", "Royle-Nichols"), selected = "Occupancy"),
                                   hr(),
-                                  
                                   h4("Covariates", class = "text-primary"),
-                                  varSelectizeInput("basic_det_covs", "Detection covariates",
-                                                    data = NULL, multiple = TRUE,
-                                                    options = list(selectize = TRUE)),
-                                  checkboxInput("basic_effort_on_detection", "Include effort on detection", 
-                                                value = FALSE),
-                                  varSelectizeInput("basic_occ_covs", "Occupancy covariates",
-                                                    data = NULL, multiple = TRUE,
-                                                    options = list(selectize = TRUE)),
-                                  checkboxInput("basic_scale_covariates", "Scale covariates", value = FALSE),
-                                  
-                                  # ubms Settings
+                                  varSelectizeInput("basic_det_covs", "Detection covariates", data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
+                                  add_tooltip(id = "basic_det_covs", title = "Select site-level covariates assumed to influence detection probability."),
+                                  checkboxInput("basic_effort_on_detection", "Include effort on detection", value = FALSE), 
+                                  add_tooltip(id = "basic_effort_on_detection", title = "Check to include camera effort (active days/occasion) as an observation-level covariate influencing detection."),
+                                  varSelectizeInput("basic_occ_covs", "Occupancy covariates", data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
+                                  add_tooltip(id = "basic_occ_covs", title = "Select site-level covariates assumed to influence occupancy probability (or abundance)."),
+                                  checkboxInput("basic_scale_covariates", "Scale covariates", value = FALSE), 
+                                  add_tooltip(id = "basic_scale_covariates", title = "Check to standardize numeric covariates (mean=0, sd=1). Recommended."),
                                   conditionalPanel(
                                     condition = "input.basic_model_package == 'ubms'",
-                                    hr(),
-                                    h4("MCMC Settings", class = "text-primary"),
-                                    numericInput("basic_ubms_chains", "Number of chains:", 
-                                                 value = 3, min = 1),
-                                    numericInput("basic_ubms_iter", "Number of iterations:", 
-                                                 value = 2000, min = 100),
-                                    numericInput("basic_ubms_thin", "Thinning:", 
-                                                 value = 1, min = 1),
-                                    uiOutput("basic_ubms_cores_input")
+                                    hr(), h4("MCMC Settings", class = "text-primary"),
+                                    numericInput("basic_ubms_chains", "Number of chains:", value = 3, min = 1), 
+                                    add_tooltip(id = "basic_ubms_chains", title = "Number of independent Markov chains (min 3 recommended)."),
+                                    numericInput("basic_ubms_iter", "Number of iterations:", value = 2000, min = 100), 
+                                    add_tooltip(id = "basic_ubms_iter", title = "Total MCMC iterations per chain (including warmup)."),
+                                    numericInput("basic_ubms_thin", "Thinning:", value = 1, min = 1), 
+                                    add_tooltip(id = "basic_ubms_thin", title = "Thinning interval for MCMC samples (keep every nth sample)."),
+                                    uiOutput("basic_ubms_cores_input"), # Tooltip added dynamically
                                   ),
-                                  
                                   hr(),
-                                  # Run Model and Add to Model Selection Buttons
                                   div(style = "text-align: center; margin-top: 20px;",
-                                      actionButton("basic_run_model", "Run Model", 
-                                                   class = "btn-primary btn-lg btn-block"),
+                                      actionButton("basic_run_model", "Run Model", class = "btn-primary btn-lg btn-block"), 
+                                      add_tooltip(id = "basic_run_model", title = "Fit the occupancy model with the current specifications."),
                                       div(style = "margin-top: 10px;",
-                                          actionButton("basic_add_to_modsel", "Add to Model Selection", 
-                                                       class = "btn-success btn-block")
+                                          actionButton("basic_add_to_modsel", "Add to Model Selection", class = "btn-success btn-block"), add_tooltip(id = "basic_add_to_modsel", title = "Add the currently fitted model to the model selection table for comparison.")
                                       )
                                   )
                                 )
                          ),
-                         
-                         # Right Column - Results
                          column(width = 9,
                                 fluidRow(
-                                  # Main model summary on left
-                                  column(width = 7,
-                                         shinydashboard::box(
-                                           title = "Model Summary",
-                                           status = "primary",
-                                           width = NULL,
-                                           solidHeader = TRUE,
-                                           collapsible = TRUE,
-                                           height = "500px",
-                                           verbatimTextOutput("basic_model_summary")
-                                         )
-                                  ),
-                                  
-                                  # Parameter estimates on right
+                                  column(width = 7, shinydashboard::box(title = "Model Summary", status = "primary", width = NULL, solidHeader = TRUE, collapsible = TRUE, height = "500px", verbatimTextOutput("basic_model_summary"))),
                                   column(width = 5,
                                          shinydashboard::box(
-                                           title = "Parameter Estimates", 
-                                           status = "primary",
-                                           width = NULL,
-                                           solidHeader = TRUE,
-                                           collapsible = TRUE,
-                                           
-                                           # Confidence interval settings side by side
+                                           title = "Parameter Estimates", status = "primary", width = NULL, solidHeader = TRUE, collapsible = TRUE,
                                            fluidRow(
-                                             column(width = 6,
-                                                    numericInput("basic_pval", "Interval width:", 
-                                                                 min = 0, max = 1, value = 0.95, step = 0.01)
-                                             ),
-                                             column(width = 6,
-                                                    numericInput("basic_digits", "Decimal places:", 
-                                                                 value = 2, min = 0, max = 5, step = 1)
-                                             )
+                                             column(width = 6, numericInput("basic_pval", "Interval width:", min = 0, max = 1, value = 0.95, step = 0.01), 
+                                                    add_tooltip(id = "basic_pval", title = "Set the confidence/credible interval width (e.g., 0.95 for 95%).")),
+                                             column(width = 6, numericInput("basic_digits", "Decimal places:", value = 2, min = 0, max = 5, step = 1), 
+                                                    add_tooltip(id = "basic_digits", title = "Number of decimal places for displaying estimates."))
                                            ),
                                            hr(),
-                                           textOutput("basic_coef_det_header", inline = TRUE),
-                                           verbatimTextOutput("basic_coef_det"),
-                                           textOutput("basic_coef_state_header", inline = TRUE),
-                                           verbatimTextOutput("basic_coef_state")
+                                           textOutput("basic_coef_det_header", inline = TRUE), verbatimTextOutput("basic_coef_det"),
+                                           textOutput("basic_coef_state_header", inline = TRUE), verbatimTextOutput("basic_coef_state")
                                          )
                                   )
-                                ),
-                                
-                                # # Model Selection below
-                                # edit: moved to separate tab
-                                # fluidRow(
-                                #   column(width = 12,
-                                #          shinydashboard::box(
-                                #            title = "Model Selection",
-                                #            status = "info",
-                                #            width = NULL,
-                                #            solidHeader = TRUE,
-                                #            tableOutput("basic_model_selection")
-                                #          )
-                                #   )
-                                # )
+                                )
                          )
                        )
               ),
-              
-              # Model selection tab
               tabPanel("Model selection",
-                       
                        fluidRow(
                          shinydashboard::box(
-                           title = "Model Selection",
-                           status = "info",
-                           width = 12,
+                           title = "Model Selection", status = "info", width = 12,
                            tableOutput("basic_model_selection"),
                            shiny::fluidRow(
-                             shiny::column(
-                               width = 12, 
-                               shiny::actionButton("basic_clear_modsel", "Clear model selection", class = "btn-warning")
-                             )
+                             shiny::column(width = 12, shiny::actionButton("basic_clear_modsel", "Clear model selection", class = "btn-warning"), add_tooltip(id = "basic_clear_modsel", title = "Remove all models from the model selection table."))
                            )
                          )
                        )
               ),
-              
-              # Basic Response Plots tab
               tabPanel("Response Plots",
                        fluidRow(
-                         column(
-                           width = 3,
-                           selectInput("basic_plot_type", "Plot type:",
-                                       choices = c("Detection covariates", "Occupancy covariates")
-                           ),
-                           numericInput("basic_ci_level", "Confidence level:", 
-                                        value = 0.95, min = 0, max = 1, step = 0.01
-                           )
+                         column(width = 3,
+                                selectInput("basic_plot_type", "Plot type:", choices = c("Detection covariates", "Occupancy covariates")), 
+                                add_tooltip(id = "basic_plot_type", title = "Choose whether to display response curves for detection or occupancy/abundance covariates."),
+                                numericInput("basic_ci_level", "Confidence level:", value = 0.95, min = 0, max = 1, step = 0.01), add_tooltip(id = "basic_ci_level", title = "Set the confidence level for the shaded uncertainty intervals on the response curves.")
                          ),
-                         column(
-                           width = 9,
-                           plotOutput("basic_response_plot", height = "600px")
-                         )
+                         column(width = 9, plotOutput("basic_response_plot", height = "600px"))
                        )
               ),
-              
-              # Basic Spatial Predictions tab
               tabPanel("Spatial Predictions",
                        fluidRow(
-                         column(
-                           width = 3,
-                           selectInput("basic_pred_type", "Prediction type:",
-                                       choices = c(
-                                         "Occupancy probability" = "state",
-                                         "Detection probability" = "det"
-                                       )
-                           ),
-                           selectInput("basic_pred_source", "Covariate source:",
-                                       choices = c(
-                                         "Use extracted covariates" = "extracted",
-                                         "Upload custom raster" = "custom"
-                                       )
-                           ),
-                           conditionalPanel(
-                             condition = "input.basic_pred_source == 'custom'",
-                             fileInput("basic_custom_raster", "Upload raster:", accept = c(".tif"))
-                           ),
-                           actionButton("basic_run_prediction", "Generate Predictions", class = "btn-primary"),
-                           
-                           uiOutput("basic_prediction_layer_choices"),
-                           
-                           shiny::selectInput("basic_predictionColorPalette", "Color Palette:",
-                                              choices = c("Viridis", "Plasma", "Inferno",  "Rocket"),
-                                              selected = "Inferno"),
-                           
-                           shiny::checkboxInput("basic_invertPredictionColors", "Invert Color Ramp", value = FALSE),
-                           
-                           # shiny::checkboxInput("basic_raster01", "Clamp raster values to min = 0 / max = 1", value = FALSE)
+                         column(width = 3,
+                                selectInput("basic_pred_type",
+                                            label = tagList(
+                                              "Prediction type:",
+                                              span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                   title = "Predict occupancy/abundance ('state') or detection probability ('det').")
+                                            ),
+                                            choices = c("Occupancy probability" = "state", "Detection probability" = "det")),
+                                # add_tooltip(id = "basic_pred_type", title = "Select whether to predict occupancy/abundance ('state') or detection probability ('det')."),
+                                selectInput("basic_pred_source", "Covariate source:", choices = c("Use extracted covariates" = "extracted", "Upload custom raster" = "custom")), 
+                                add_tooltip(id = "basic_pred_source", title = "Choose whether to use the prediction rasters created during covariate extraction or upload a custom raster stack."),
+                                conditionalPanel(condition = "input.basic_pred_source == 'custom'", 
+                                                 fileInput("basic_custom_raster", "Upload raster:", accept = c(".tif")), 
+                                                 add_tooltip(id = "basic_custom_raster", title = "Upload a multi-layer raster file (.tif) containing all covariates used in the model. Ensure layer names match covariate names.")),
+                                actionButton("basic_run_prediction", "Generate Predictions", class = "btn-primary"), add_tooltip(id = "basic_run_prediction", title = "Generate spatial predictions based on the fitted model and the selected covariate source."),
+                                uiOutput("basic_prediction_layer_choices"), # Tooltip added dynamically
+                                selectInput("basic_predictionColorPalette", "Color Palette:", choices = c("Viridis", "Plasma", "Inferno", "Rocket"), selected = "Inferno"), 
+                                add_tooltip(id = "basic_predictionColorPalette", title = "Choose the color scheme for the prediction map."),
+                                checkboxInput("basic_invertPredictionColors", "Invert Color Ramp", value = FALSE), 
+                                add_tooltip(id = "basic_invertPredictionColors", title = "Reverse the order of colors in the selected palette.")
                          ),
-                         column(
-                           width = 9,
-                           leaflet::leafletOutput("basic_prediction_map", height = "600px")
-                         )
+                         column(width = 9, leaflet::leafletOutput("basic_prediction_map", height = "600px"))
                        )
               )
             )
           ),
           
-          # Advanced Workflow UI
           conditionalPanel(
             condition = "input.occupancy_workflow == 'advanced'",
             tabsetPanel(
@@ -2126,15 +1825,15 @@ surveyDashboard <- function(CTtable = NULL,
               tabPanel("Instructions",
                        fluidRow(
                          shinydashboard::box(
-                           title = "Single-Species Occupancy Models", 
-                           width = 12, 
+                           title = "Single-Species Occupancy Models",
+                           width = 12,
                            status = "info",
                            shiny::HTML(paste(help_text("singleSpeciesOccupancy_help.html"), collapse = "\n"))
                          )
                        )
               ),
               
-              # Advanced Model Setup tab 
+              # Advanced Model Setup tab
               tabPanel("Model Setup",
                        fluidRow(
                          shinydashboard::box(
@@ -2146,19 +1845,23 @@ surveyDashboard <- function(CTtable = NULL,
                                     selectInput("adv_model_package", "Package:",
                                                 choices = c("unmarked", "ubms"),
                                                 selected = "unmarked"
-                                    )
+                                    ),
+                                    add_tooltip(id = "adv_model_package", title = "Select modeling package ('unmarked' or 'ubms'). 'ubms' required for random effects.")
                              ),
                              column(3,
                                     selectInput("adv_model_type", "Model Type:",
                                                 choices = c("Occupancy", "Royle-Nichols"),
                                                 selected = "Occupancy"
-                                    )
+                                    ),
+                                    add_tooltip(id = "adv_model_type", title = "'Occupancy' or 'Royle-Nichols'.")
                              ),
                              column(3,
-                                    checkboxInput("adv_effort_on_detection", "Effort on detection", value = FALSE)
+                                    checkboxInput("adv_effort_on_detection", "Effort on detection", value = FALSE),
+                                    add_tooltip(id = "adv_effort_on_detection", title = "Include camera effort as an observation covariate.")
                              ),
                              column(3,
-                                    checkboxInput("adv_scale_covariates", "Scale covariates", value = FALSE)
+                                    checkboxInput("adv_scale_covariates", "Scale covariates", value = FALSE),
+                                    add_tooltip(id = "adv_scale_covariates", title = "Standardize numeric covariates before modeling.")
                              )
                            )
                          )
@@ -2171,26 +1874,23 @@ surveyDashboard <- function(CTtable = NULL,
                                   title = "Detection Covariates",
                                   status = "primary",
                                   width = NULL,
-                                  uiOutput("detectionCovariatesUI"),
+                                  uiOutput("detectionCovariatesUI"), # Tooltip for selectInput added dynamically
                                   actionButton("addDetectionEffect", "Add Effect", class = "btn-primary"),
+                                  add_tooltip(id = "addDetectionEffect", title = "Click to specify the type and (optional) second covariate for the selected detection effect."),
                                   conditionalPanel(
                                     condition = "input.addDetectionEffect % 2 == 1",
                                     selectInput("detectionEffectType", "Effect Type:",
-                                                choices = c(
-                                                  "Linear" = "linear",
-                                                  "Quadratic" = "quadratic",
-                                                  "Interaction" = "interaction",
-                                                  "Random" = "random"
-                                                )
-                                    ),
+                                                choices = c("Linear" = "linear", "Quadratic" = "quadratic", "Interaction" = "interaction", "Random" = "random")),
+                                    add_tooltip(id = "detectionEffectType", title = "Choose the type of effect: Linear, Quadratic, Interaction, Random ('ubms' only)."),
                                     conditionalPanel(
                                       condition = "input.detectionEffectType == 'interaction' || input.detectionEffectType == 'random'",
-                                      selectInput("detectionSecondCovariate", "Select second covariate:", choices = NULL)
+                                      selectInput("detectionSecondCovariate", "Select second covariate:", choices = NULL), # Tooltip added dynamically
                                     ),
-                                    actionButton("confirmDetectionEffect", "Add", class = "btn-success")
+                                    actionButton("confirmDetectionEffect", "Add", class = "btn-success"),
+                                    add_tooltip(id = "confirmDetectionEffect", title = "Confirm and add the specified detection effect to the model.")
                                   ),
                                   hr(),
-                                  uiOutput("selectedDetectionEffectsUI")
+                                  uiOutput("selectedDetectionEffectsUI") # Dynamic buttons with tooltips
                                 )
                          ),
                          
@@ -2200,231 +1900,78 @@ surveyDashboard <- function(CTtable = NULL,
                                   title = "Occupancy Covariates",
                                   status = "primary",
                                   width = NULL,
-                                  uiOutput("occupancyCovariatesUI"),
+                                  uiOutput("occupancyCovariatesUI"), # Tooltip for selectInput added dynamically
                                   actionButton("addOccupancyEffect", "Add Effect", class = "btn-primary"),
+                                  add_tooltip(id = "addOccupancyEffect", title = "Click to specify the type and (optional) second covariate for the selected occupancy effect."),
                                   conditionalPanel(
                                     condition = "input.addOccupancyEffect % 2 == 1",
                                     selectInput("occupancyEffectType", "Effect Type:",
-                                                choices = c(
-                                                  "Linear" = "linear",
-                                                  "Quadratic" = "quadratic",
-                                                  "Interaction" = "interaction",
-                                                  "Random" = "random"
-                                                )
-                                    ),
+                                                choices = c("Linear" = "linear", "Quadratic" = "quadratic", "Interaction" = "interaction", "Random" = "random")),
+                                    add_tooltip(id = "occupancyEffectType", title = "Choose the type of effect: Linear, Quadratic, Interaction, Random ('ubms' only)."),
                                     conditionalPanel(
                                       condition = "input.occupancyEffectType == 'interaction' || input.occupancyEffectType == 'random'",
-                                      selectInput("occupancySecondCovariate", "Select second covariate:", choices = NULL)
+                                      selectInput("occupancySecondCovariate", "Select second covariate:", choices = NULL) # Tooltip added dynamically
                                     ),
-                                    actionButton("confirmOccupancyEffect", "Add", class = "btn-success")
+                                    actionButton("confirmOccupancyEffect", "Add", class = "btn-success"),
+                                    add_tooltip(id = "confirmOccupancyEffect", title = "Confirm and add the specified occupancy effect to the model.")
                                   ),
                                   hr(),
-                                  uiOutput("selectedOccupancyEffectsUI")
+                                  uiOutput("selectedOccupancyEffectsUI") # Dynamic buttons with tooltips
                                 )
                          )
                        ),
                        
                        # Formula preview
-                       fluidRow(
-                         shinydashboard::box(
-                           title = "Formula Preview",
-                           status = "info",
-                           width = 12,
-                           verbatimTextOutput("formulaPreview")
-                         )
-                       ),
+                       fluidRow(shinydashboard::box(title = "Formula Preview", status = "info", width = 12, verbatimTextOutput("formulaPreview"))),
                        
                        # ubms settings
                        conditionalPanel(
                          condition = "input.adv_model_package == 'ubms'",
                          fluidRow(
                            shinydashboard::box(
-                             title = "UBMS Settings",
-                             status = "primary",
-                             width = 12,
+                             title = "UBMS Settings", status = "primary", width = 12,
                              fluidRow(
-                               column(3,
-                                      numericInput("adv_ubms_chains", "Number of chains:", value = 3, min = 1)
-                               ),
-                               column(3,
-                                      numericInput("adv_ubms_iter", "Number of iterations:", value = 2000, min = 100)
-                               ),
-                               column(3,
-                                      numericInput("adv_ubms_thin", "Thinning:", value = 1, min = 1)
-                               ),
-                               column(3,
-                                      uiOutput("adv_ubms_cores_input")
-                               )
+                               column(3, numericInput("adv_ubms_chains", "Number of chains:", value = 3, min = 1), add_tooltip(id = "adv_ubms_chains", title = "Number of MCMC chains.")),
+                               column(3, numericInput("adv_ubms_iter", "Number of iterations:", value = 2000, min = 100), add_tooltip(id = "adv_ubms_iter", title = "Total MCMC iterations per chain.")),
+                               column(3, numericInput("adv_ubms_thin", "Thinning:", value = 1, min = 1), add_tooltip(id = "adv_ubms_thin", title = "MCMC thinning interval.")),
+                               column(3, uiOutput("adv_ubms_cores_input")) # Tooltip added dynamically
                              )
                            )
                          )
                        ),
                        
                        # Run model button
-                       fluidRow(
-                         column(12,
-                                shinydashboard::box(
-                                  width = NULL,
-                                  actionButton("runAdvancedModel", "Run Model", class = "btn-primary btn-lg btn-block")
-                                )
-                         )
-                       )
+                       fluidRow(column(12, shinydashboard::box(width = NULL, actionButton("runAdvancedModel", "Run Model", class = "btn-primary btn-lg btn-block"), add_tooltip(id = "runAdvancedModel", title = "Fit the occupancy model using the specified advanced configuration."))))
               ),
               
               # Advanced Results & Diagnostics tab
               tabPanel("Results & Diagnostics",
                        fluidRow(
+                         shinydashboard::box(title = "Model Summary", status = "primary", width = 6, verbatimTextOutput("adv_model_summary")),
                          shinydashboard::box(
-                           title = "Model Summary",
-                           status = "primary",
-                           width = 6,
-                           verbatimTextOutput("adv_model_summary")
-                         ),
-                         shinydashboard::box(
-                           title = "Confidence intervals of model coefficients", 
-                           status = "primary",
-                           width = 6,
-                           collapsible = TRUE,
-                           collapsed = FALSE,
+                           title = "Confidence intervals of model coefficients", status = "primary", width = 6, collapsible = TRUE, collapsed = FALSE,
                            shiny::fluidRow(
-                             shiny::column(width = 6, shiny::numericInput("adv_pval", "Interval width:", 
-                                                                          min = 0, max = 1, value = 0.95, step = 0.01)),
-                             shiny::column(width = 6, shiny::numericInput("adv_digits", "Digits:", 
-                                                                          value = 2, min = 0, max = 5, step = 1))
+                             shiny::column(width = 6, shiny::numericInput("adv_pval", "Interval width:", min = 0, max = 1, value = 0.95, step = 0.01), add_tooltip(id = "adv_pval", title = "Confidence level for parameter estimate intervals.")),
+                             shiny::column(width = 6, shiny::numericInput("adv_digits", "Digits:", value = 2, min = 0, max = 5, step = 1), add_tooltip(id = "adv_digits", title = "Decimal places for displaying estimates."))
                            ),
-                           shiny::textOutput("adv_coef_det_header", inline = TRUE),
-                           shiny::verbatimTextOutput("adv_coef_det"),
-                           shiny::textOutput("adv_coef_state_header", inline = TRUE),
-                           shiny::verbatimTextOutput("adv_coef_state")
+                           shiny::textOutput("adv_coef_det_header", inline = TRUE), shiny::verbatimTextOutput("adv_coef_det"),
+                           shiny::textOutput("adv_coef_state_header", inline = TRUE), shiny::verbatimTextOutput("adv_coef_state")
                          )
                        ),
                        fluidRow(
                          shinydashboard::box(
-                           title = "Model Selection",
-                           status = "info",
-                           width = 12,
-                           actionButton("adv_add_to_modsel", "Add to Model Selection", class = "btn-success"),
+                           title = "Model Selection", status = "info", width = 12,
+                           actionButton("adv_add_to_modsel", "Add to Model Selection", class = "btn-success"), add_tooltip(id = "adv_add_to_modsel", title = "Add the currently fitted advanced model to the model selection table."),
                            tableOutput("adv_model_selection")
                          )
-                       ) #,
-                       # fluidRow(
-                       #   shinydashboard::box(
-                       #     title = "MCMC Diagnostics",
-                       #     status = "warning",
-                       #     width = 12,
-                       #     conditionalPanel(
-                       #       condition = "input.adv_model_package == 'ubms'",
-                       #       selectInput("adv_parameter_trace", "Select parameter:",
-                       #                   choices = NULL
-                       #       ),
-                       #       plotOutput("adv_trace_plot")
-                       #     )
-                       #   )
-                       # )
-              ),
-              
-              # Advanced Response Plots tab
-              # tabPanel("Response Plots",
-              #          fluidRow(
-              #            column(
-              #              width = 3,
-              #              selectInput("adv_plot_submodel", "Submodel:",
-              #                          choices = c("Detection", "Occupancy")
-              #              ),
-              #              selectInput("adv_plot_effect", "Effect:",
-              #                          choices = NULL
-              #              ),
-              #              numericInput("adv_ci_level", "Confidence level:",
-              #                           value = 0.95, min = 0, max = 1, step = 0.01
-              #              ),
-              #              checkboxInput("adv_show_data", "Show data points", value = TRUE)
-              #            ),
-              #            column(
-              #              width = 9,
-              #              plotOutput("adv_response_plot", height = "600px")
-              #            )
-              #          )
-              # ),
-              #  Response Plots -  placeholder
-              tabPanel("Response Plots",
-                       fluidRow(
-                         column(
-                           width = 12,
-                           shinydashboard::box(
-                             title = "Effect Plots - Under Construction", 
-                             status = "warning",
-                             solidHeader = TRUE,
-                             width = NULL,
-                             div(
-                               style = "text-align: center; padding: 40px 20px;",
-                               icon("tools", "fa-4x"),
-                               h3("This feature is currently under development"),
-                               p("Response plot functionality for advanced models will be available in the future."),
-                               p("This will allow visualization of complex effects including quadratic terms, interactions, and random effects.")
-                             )
-                           )
-                         )
                        )
               ),
               
-              # # Advanced Spatial Predictions tab
-              # tabPanel("Spatial Predictions",
-              #          fluidRow(
-              #            column(
-              #              width = 3,
-              #              selectInput("adv_pred_type", "Prediction type:",
-              #                          choices = c(
-              #                            "Occupancy probability" = "state",
-              #                            "Detection probability" = "det"
-              #                          )
-              #              ),
-              #              selectInput("adv_pred_source", "Covariate source:",
-              #                          choices = c(
-              #                            "Use extracted covariates" = "extracted",
-              #                            "Upload custom raster" = "custom"
-              #                          )
-              #              ),
-              #              conditionalPanel(
-              #                condition = "input.adv_pred_source == 'custom'",
-              #                fileInput("adv_custom_raster", "Upload raster:", accept = c(".tif"))
-              #              ),
-              #              # MCMC settings for UBMS predictions
-              #              conditionalPanel(
-              #                condition = "input.adv_model_package == 'ubms'",
-              #                numericInput("adv_pred_draws", "Number of draws:", value = 1000, min = 100),
-              #                numericInput("adv_pred_chains", "Number of chains:", value = 3, min = 1)
-              #              ),
-              #              actionButton("adv_run_prediction", "Generate Predictions", class = "btn-primary")
-              #            ),
-              #            column(
-              #              width = 9,
-              #              leaflet::leafletOutput("adv_prediction_map", height = "600px")
-              #            )
-              #          )
-              # )
-              # Replace the current Spatial Predictions tab content with this placeholder
-              tabPanel("Spatial Predictions",
-                       fluidRow(
-                         column(
-                           width = 12,
-                           shinydashboard::box(
-                             title = "Spatial Predictions - Under Construction", 
-                             status = "warning",
-                             solidHeader = TRUE,
-                             width = NULL,
-                             div(
-                               style = "text-align: center; padding: 40px 20px;",
-                               icon("map-marked-alt", "fa-4x"),
-                               h3("This feature is currently under development"),
-                               p("Spatial prediction functionality for advanced models will be available in the future."),
-                               p("This will allow prediction of occupancy patterns across the landscape based on your model.")
-                             )
-                           )
-                         )
-                       )
-              ),
-            )
-          )
+              # Placeholders for advanced plots and predictions
+              tabPanel("Response Plots", fluidRow(column(width = 12, shinydashboard::box(title = "Effect Plots - Under Construction", status = "warning", solidHeader = TRUE, width = NULL, div(style = "text-align: center; padding: 40px 20px;", icon("tools", "fa-4x"), h3("This feature is currently under development"), p("Response plot functionality for advanced models will be available in the future.")))))),
+              tabPanel("Spatial Predictions", fluidRow(column(width = 12, shinydashboard::box(title = "Spatial Predictions - Under Construction", status = "warning", solidHeader = TRUE, width = NULL, div(style = "text-align: center; padding: 40px 20px;", icon("map-marked-alt", "fa-4x"), h3("This feature is currently under development"), p("Spatial prediction functionality for advanced models will be available in the future."))))))
+            ) # end tabsetPanel Advanced
+          ) # end conditionalPanel Advanced
         ),
         
         ## Tab: Community Occupancy ----
@@ -2432,71 +1979,70 @@ surveyDashboard <- function(CTtable = NULL,
           tabName = "CommunityOccupancy",
           tabsetPanel(
             selected = "Species Selection",
-            
-            tabPanel("Instructions",
-                     fluidRow(
-                       shinydashboard::box(
-                         title = "Community Occupancy Model Workflow", 
-                         width = 12, 
-                         status = "info",
-                         shiny::HTML(paste(help_text("communityModels_help.html"), collapse = "\n"))
-                       )
-                     )
-            ),
-            
+            tabPanel("Instructions", 
+                     fluidRow(shinydashboard::box(title = "Community Occupancy Model Workflow", width = 12, status = "info", 
+                                                  shiny::HTML(paste(help_text("communityModels_help.html"), collapse = "\n"))))),
             tabPanel("Species Selection",
                      fluidRow(
                        shinydashboard::box(
                          title = "Species Selection", width = 12, status = "info",
                          fluidRow(
-                           column(8,
-                                  DT::dataTableOutput("speciesTable")
-                           ),
+                           column(8, 
+                                  DT::dataTableOutput("speciesTable")),
                            column(4,
                                   h4("Selection Controls"),
                                   fluidRow(
-                                    column(6, shiny::actionButton("selectAllSpecies", "Select All", class = "btn-block")),
-                                    column(6, shiny::actionButton("deselectAllSpecies", "Deselect All", class = "btn-block"))
+                                    column(6, shiny::actionButton("selectAllSpecies", "Select All", class = "btn-block"), 
+                                           add_tooltip(id = "selectAllSpecies", title = "Select all species in the table.")),
+                                    column(6, shiny::actionButton("deselectAllSpecies", "Deselect All", class = "btn-block"), 
+                                           add_tooltip(id = "deselectAllSpecies", title = "Deselect all species in the table."))
                                   ),
-                                  hr(),
+                                  hr(), 
                                   h4("Filter Controls"),
-                                  numericInput("minStations", "Min Stations:", value = 1, min = 1),
-                                  numericInput("minRecords", "Min Records:", value = 1, min = 1),
+                                  numericInput("minStations", "Min Stations:", value = 1, min = 1), 
+                                  add_tooltip(id = "minStations", title = "Minimum number of stations where a species must be detected."),
+                                  numericInput("minRecords", "Min Records:", value = 1, min = 1), 
+                                  add_tooltip(id = "minRecords", title = "Minimum total number of records a species must have."),
                                   fluidRow(
-                                    column(6, shiny::actionButton("selectByStations", "By Stations", class = "btn-block")),
-                                    column(6, shiny::actionButton("selectByRecords", "By Records", class = "btn-block"))
+                                    column(6, 
+                                           shiny::actionButton("selectByStations", "By Stations", class = "btn-block"), 
+                                           add_tooltip(id = "selectByStations", title = "Select species meeting the minimum station criteria.")),
+                                    column(6, 
+                                           shiny::actionButton("selectByRecords", "By Records", class = "btn-block"), 
+                                           add_tooltip(id = "selectByRecords", title = "Select species meeting the minimum record criteria."))
                                   ),
-                                  shiny::actionButton("selectByBoth", "Select by Both Criteria", class = "btn-block"),
-                                  hr(),
-                                  h4("Selection Summary"),
-                                  textOutput("selectedSpeciesCount"),
+                                  shiny::actionButton("selectByBoth", "Select by Both Criteria", class = "btn-block"), 
+                                  add_tooltip(id = "selectByBoth", title = "Select species meeting both minimum station and record criteria."),
+                                  hr(), 
+                                  h4("Selection Summary"), 
+                                  textOutput("selectedSpeciesCount"), 
                                   verbatimTextOutput("selectedSpeciesVector")
                            )
                          )
                        )
                      )
             ),
-            
-            
             tabPanel("Model Configuration",
                      fluidRow(
                        shinydashboard::box(
                          title = "Basic Settings", width = 12, status = "primary", collapsible = TRUE, collapsed = FALSE,
                          fluidRow(
-                           column(4,
-                                  selectInput("communityModelType", "Model Type:", 
-                                              choices = c("Occupancy" = "Occupancy",   "Royle-Nichols" = "RN"),
-                                              selected = "Occupancy")
-                           ),
                            column(4, 
-                                  # numericInput("occasionLength", "Occasion Length (days)", value = 7, min = 1)
-                                  sliderInput("occasionLength_community", "Occasion Length (days)", 
-                                              min = 1, max = 20, value = 10, 
-                                              step = 1, ticks = FALSE)
-                           ),
+                                  selectInput("communityModelType",
+                                              label = tagList(
+                                                "Model Type:",
+                                                span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                     title = "'Occupancy' (estimates presence/absence) or 'Royle-Nichols' (links detection to abundance).")
+                                              ),
+                                              choices = c("Occupancy" = "Occupancy", "Royle-Nichols" = "RN"), selected = "Occupancy"),
+                                  # add_tooltip(id = "communityModelType", title = "Choose 'Occupancy' for presence/absence or 'RN' for Royle-Nichols abundance model.")
+                                  ),
                            column(4, 
-                                  checkboxInput("useNimble", "Use Nimble", value = FALSE)
-                           )
+                                  sliderInput("occasionLength_community", "Occasion Length (days)", min = 1, max = 20, value = 10, step = 1, ticks = FALSE), 
+                                  add_tooltip(id = "occasionLength_community", title = "Define the length of sampling occasions (in days) for creating detection histories.")),
+                           column(4, 
+                                  checkboxInput("useNimble", "Use Nimble", value = FALSE), 
+                                  add_tooltip(id = "useNimble", title = "Use the NIMBLE package for MCMC fitting instead of JAGS (experimental)."))
                          )
                        )
                      ),
@@ -2504,28 +2050,41 @@ surveyDashboard <- function(CTtable = NULL,
                        shinydashboard::box(
                          title = "Advanced Settings", width = 12, status = "warning", collapsible = TRUE, collapsed = TRUE,
                          fluidRow(
-                           column(4,
-                                  selectInput("augmentationType", "Data Augmentation Type:",
-                                              choices = c("None" = "none", "Max Known" = "maxknown", "Full" = "full"),
-                                              selected = "none")
-                           ),
-                           column(4,
-                                  conditionalPanel(
-                                    condition = "input.augmentationType != 'none'",
-                                    numericInput("augmentationValue", "Number of Potential Species:", value = NULL, min = 1)
+                           column(4, 
+                                  selectInput("augmentationType",
+                                              label = tagList(
+                                                "Data Augmentation Type:",
+                                                span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                     title = "Augmentation for estimating richness ('maxknown' or 'full').")
+                                              ),
+                                              choices = c("None" = "none", "Max Known" = "maxknown", "Full" = "full"), selected = "none")
+                                  # add_tooltip(id = "augmentationType", title = "Select data augmentation type to estimate richness including unobserved species ('maxknown' or 'full').")
+                                  ),
+                           column(4, 
+                                  conditionalPanel(condition = "input.augmentationType != 'none'", 
+                                                   numericInput("augmentationValue", "Number of Potential Species:", value = NULL, min = 1), 
+                                                      add_tooltip(id = "augmentationValue", title = "If using augmentation, specify the total number of potential species (observed + unobserved) in the community."))
+                                  ),
+                           column(4, 
+                                  textInput("richnessCategories", "Richness Categories (optional)", placeholder = "Enter column name"), 
+                                  add_tooltip(id = "richnessCategories", title = "Optional: Provide the name of a column in the site covariates table that defines categories for stratified richness estimation.")
                                   )
-                           ),
-                           column(4,
-                                  textInput("richnessCategories", "Richness Categories (optional)",  placeholder = "Enter column name")
-                           )
                          ),
                          fluidRow(
-                           column(6,
-                                  textInput("keyword_quadratic", "Keyword for Quadratic Effects", value = "_squared")
-                           ),
-                           column(6,
-                                  textInput("modelFile", "Model File Name (optional)", placeholder = "Leave blank for temporary file")
-                           )
+                           column(6, 
+                                  textInput("keyword_quadratic",
+                                            label = tagList(
+                                              "Keyword for Quadratic Effects",
+                                              span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                   title = "Suffix to identify quadratic terms (e.g., 'elevation_squared').")
+                                            ),
+                                            value = "_squared")
+                                  # add_tooltip(id = "keyword_quadratic", title = "Suffix used to automatically identify quadratic terms (e.g., if 'elevation' is selected, a column named 'elevation_squared' will be sought).")
+                                  ),
+                           column(6, 
+                                  textInput("modelFile", "Model File Name (optional)", placeholder = "Leave blank for temporary file"), 
+                                  add_tooltip(id = "modelFile", title = "Optional: Specify a file path to save the generated JAGS or NIMBLE model code.")
+                                  )
                          )
                        )
                      ),
@@ -2535,218 +2094,139 @@ surveyDashboard <- function(CTtable = NULL,
                          fluidRow(
                            column(6,
                                   h4("Detection Covariates"),
-                                  selectInput("detIntercept", "Detection Intercept:", 
-                                              choices = c("fixed", "ranef", "independent"),
-                                              selected = "ranef"),
-                                  varSelectizeInput("detCovFixed", "Fixed Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)),
-                                  varSelectizeInput("detCovRanef", "Species Random Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)),
-                                  varSelectizeInput("detCovIndep", "Independent Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)),
-                                  checkboxInput("speciesSiteRandomEffectDet", "Species-Site Random Effect on Detection", value = FALSE),
+                                  # selectInput("detIntercept", "Detection Intercept:", choices = c("fixed", "ranef", "independent"), selected = "ranef"), 
+                                  selectInput("detIntercept",
+                                              label = tagList(
+                                                "Detection Intercept:",
+                                                span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                     title = "Model detection intercept: 'fixed', 'ranef', or 'independent'.")
+                                              ),
+                                              choices = c("fixed", "ranef", "independent"), selected = "ranef"),
+                                  # add_tooltip(id = "detIntercept", title = "Model detection intercept: 'fixed' (same for all species), 'ranef' (species-specific, related), 'independent' (species-specific, unrelated)."),
+                                  varSelectizeInput("detCovFixed", "Fixed Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
+                                  add_tooltip(id = "detCovFixed", title = "Select covariates with a single effect across all species on detection."),
+                                  varSelectizeInput("detCovRanef", "Species Random Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
+                                  add_tooltip(id = "detCovRanef", title = "Select covariates with species-specific but related effects on detection (drawn from a common distribution)."),
+                                  varSelectizeInput("detCovIndep", "Independent Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
+                                  add_tooltip(id = "detCovIndep", title = "Select covariates with completely independent effects for each species on detection."),
+                                  checkboxInput("speciesSiteRandomEffectDet", "Species-Site Random Effect on Detection", value = FALSE), 
+                                  add_tooltip(id = "speciesSiteRandomEffectDet", title = "Include a random effect term for each species at each specific site to account for unexplained variation in detection."),
                                   h4("Effort as Detection Covariate"),
-                                  checkboxInput("useEffortAsDetCov", "Use Effort as Detection Covariate", value = FALSE),
-                                  conditionalPanel(
-                                    condition = "input.useEffortAsDetCov == true",
-                                    radioButtons("effortDetCovType", "Effort Effect Type:",
-                                                 choices = c("Fixed (contant across species)" = "fixed", "Species random effect" = "ranef"),
-                                                 selected = "fixed")
-                                  )
+                                  checkboxInput("useEffortAsDetCov", "Use Effort as Detection Covariate", value = FALSE), 
+                                  add_tooltip(id = "useEffortAsDetCov", title = "Include camera trap effort (scaled trap days per occasion) as an observation-level covariate influencing detection."),
+                                  conditionalPanel(condition = "input.useEffortAsDetCov == true", 
+                                                   radioButtons("effortDetCovType", "Effort Effect Type:", 
+                                                                choices = c("Fixed (contant across species)" = "fixed", "Species random effect" = "ranef"), selected = "fixed"),
+                                                   add_tooltip(id = "effortDetCovType", title = "Choose how the effort effect is modeled: 'Fixed' (same effect for all species) or 'Species random effect' (species-specific related effects)."))
                            ),
                            column(6,
                                   h4("Occupancy Covariates"),
-                                  selectInput("occuIntercept", "Occupancy Intercept:", 
-                                              choices = c("fixed", "ranef", "independent"),
-                                              selected = "ranef"),
-                                  varSelectizeInput("occuCovFixed", "Fixed Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)),
-                                  varSelectizeInput("occuCovRanef", "Species Random Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)),
-                                  varSelectizeInput("occuCovIndep", "Independent Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE))
+                                  # selectInput("occuIntercept", "Occupancy Intercept:", choices = c("fixed", "ranef", "independent"), selected = "ranef"), 
+                                  selectInput("occuIntercept",
+                                              label = tagList(
+                                                "Occupancy Intercept:",
+                                                span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                     title = "Model occupancy/abundance intercept: 'fixed', 'ranef', or 'independent'.")
+                                              ),
+                                              choices = c("fixed", "ranef", "independent"), selected = "ranef"),
+                                  # add_tooltip(id = "occuIntercept", title = "Model occupancy/abundance intercept: 'fixed' (same for all species), 'ranef' (species-specific, related), 'independent' (species-specific, unrelated)."),
+                                  varSelectizeInput("occuCovFixed", "Fixed Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
+                                  add_tooltip(id = "occuCovFixed", title = "Select covariates with a single effect across all species on occupancy/abundance."),
+                                  varSelectizeInput("occuCovRanef", "Species Random Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
+                                  add_tooltip(id = "occuCovRanef", title = "Select covariates with species-specific but related effects on occupancy/abundance."),
+                                  varSelectizeInput("occuCovIndep", "Independent Effects", data = NULL, multiple = TRUE, options = list(selectize = TRUE)),
+                                  add_tooltip(id = "occuCovIndep", title = "Select covariates with completely independent effects for each species on occupancy/abundance.")
                            )
                          )
                        )
                      ),
-                     fluidRow(
-                       column(12, align = "left",
-                              shiny::actionButton("createCommunityModel", "Create Model", class = "btn-primary btn-lg")
-                       )
-                     ),
-                     fluidRow(
-                       shinydashboard::box(
-                         title = "Model Summary", width = 12, status = "success",
-                         verbatimTextOutput("communityModelSummary")
-                       )
-                     )
+                     fluidRow(column(12, align = "left", 
+                                     shiny::actionButton("createCommunityModel", "Create Model", class = "btn-primary btn-lg"), 
+                                     add_tooltip(id = "createCommunityModel", title = "Generate the community model structure based on the specified configuration. Does not fit the model yet."))
+                              ),
+                     fluidRow(shinydashboard::box(title = "Model Summary", width = 12, status = "success", 
+                                                  verbatimTextOutput("communityModelSummary"))
+                              )
             ),
             tabPanel("Model Fitting",
                      fluidRow(
                        shinydashboard::box(
                          title = "MCMC Settings", width = 12, status = "warning",
                          fluidRow(
-                           column(3, numericInput("niter", "Number of Iterations", value = 1000, min = 100)),
-                           column(3, numericInput("nburn", "Burn-in", value = 500, min = 0)),
-                           column(3, numericInput("nthin", "Thinning", value = 1, min = 1)),
-                           column(3, numericInput("nchains", "Number of Chains", value = 3, min = 1))
+                           column(3, 
+                                  numericInput("niter", "Number of Iterations", value = 1000, min = 100), 
+                                  add_tooltip(id = "niter", title = "Total number of MCMC iterations per chain (including burn-in).")),
+                           column(3, 
+                                  numericInput("nburn", "Burn-in", value = 500, min = 0), 
+                                  add_tooltip(id = "nburn", title = "Number of initial iterations to discard as burn-in.")),
+                           column(3, 
+                                  numericInput("nthin", "Thinning", value = 1, min = 1), 
+                                  add_tooltip(id = "nthin", title = "Thinning interval (keep every nth sample) to reduce autocorrelation.")),
+                           column(3, 
+                                  numericInput("nchains", "Number of Chains", value = 3, min = 1), 
+                                  add_tooltip(id = "nchains", title = "Number of independent MCMC chains to run (minimum 3 recommended).")) # Adjusted column width to 3
                          ),
-                         shiny::actionButton("fitCommunityModel", "Fit Model", class = "btn-primary"),
-                         # shiny::actionButton("fitCommunityModel_background", "Fit Model (Background)", class = "btn-primary")
+                         shiny::actionButton("fitCommunityModel", "Fit Model", class = "btn-primary"), 
+                         add_tooltip(id = "fitCommunityModel", title = "Start fitting the community model using the specified MCMC settings. This may take a significant amount of time.")
                        )
-                     ) 
-                     # printing console output (model progress) doesn't work with code below - remove for now
-                     #,
-                     # fluidRow(
-                     #   shinydashboard::box(
-                     #     title = "Console output", width = 12, status = "info",
-                     #     verbatimTextOutput("consoleOutput")
-                     #   )
-                     # )
-            ),
-            tabPanel("Results",
-                     tabsetPanel(
-                       tabPanel("Parameter Estimates", DT::dataTableOutput("parameterEstimates")),
-                       tabPanel("Parameter Quantiles", DT::dataTableOutput("parameterQuantiles")),
-                       type = "pills"
                      )
             ),
-            
+            tabPanel("Results", tabsetPanel(tabPanel("Parameter Estimates", 
+                                                     DT::dataTableOutput("parameterEstimates")), 
+                                            tabPanel("Parameter Quantiles", 
+                                                     DT::dataTableOutput("parameterQuantiles")), 
+                                            type = "pills")),
             tabPanel("Diagnostics",
                      tabsetPanel(
-                       # Convergence Diagnostics Tab
                        tabPanel("Convergence",
-                                fluidRow(
-                                  shinydashboard::box(
-                                    title = "Convergence Summary", 
-                                    width = 12, 
-                                    status = "primary",
-                                    verbatimTextOutput("convergenceDiagnostics")
-                                  )
-                                ),
-                                fluidRow(
-                                  shinydashboard::box(
-                                    title = "Parameter-Specific Diagnostics", 
-                                    width = 12, 
-                                    status = "info",
-                                    DT::dataTableOutput("gelman_diagnostics_table")
-                                  )
-                                ),
-                                fluidRow(
-                                  shinydashboard::box(
-                                    title = "Trace Plots", 
-                                    width = 12, 
-                                    status = "warning",
-                                    selectInput("trace_parameter", "Select Parameter:", choices = NULL),
-                                    plotOutput("trace_plot", height = "400px")
-                                  )
-                                )
+                                fluidRow(shinydashboard::box(title = "Convergence Summary", width = 12, status = "primary", verbatimTextOutput("convergenceDiagnostics"))),
+                                fluidRow(shinydashboard::box(title = "Parameter-Specific Diagnostics", width = 12, status = "info", DT::dataTableOutput("gelman_diagnostics_table"))),
+                                fluidRow(shinydashboard::box(title = "Trace Plots", width = 12, status = "warning", selectInput("trace_parameter", "Select Parameter:", choices = NULL), add_tooltip(id = "trace_parameter", title = "Select a model parameter to view its MCMC trace plot across all chains."), plotOutput("trace_plot", height = "400px")))
                        ),
-                       
-                       
-                       # Goodness of Fit tabPanel
                        tabPanel("Goodness of Fit",
                                 fluidRow(
-                                  # Settings panel - stays fixed on the left
                                   column(width = 3,
                                          wellPanel(
                                            h4("GoF Settings", class = "text-primary"),
-                                           numericInput("gof_draws", "Number of posterior draws:", 
-                                                        value = 1000, min = 100, max = 10000, step = 100),
-                                           checkboxInput("gof_z_cond", "Condition on occupancy (z)", 
-                                                         value = TRUE),
-                                           selectInput("gof_residual_type", "Residual type:",
-                                                       choices = c("Freeman-Tukey" = "FT",
-                                                                   "Pearson Chi-squared" = "PearChi2" #,
-                                                                   # "Deviance" = "Deviance"
-                                                                   ),
-                                                       selected = "FT"),
-                                           tags$div(
-                                             style = "margin-top: 20px;",
-                                             actionButton("run_gof", "Run Goodness of Fit Test", 
-                                                          class = "btn-primary btn-lg btn-block"),
-                                             # actionButton("run_gof_background", "Run in Background",
-                                             #              class = "btn-info btn-block",
-                                             #              style = "margin-top: 10px;")
-                                           )
+                                           numericInput("gof_draws", "Number of posterior draws:", value = 1000, min = 100, max = 10000, step = 100), add_tooltip(id = "gof_draws", title = "Number of posterior samples used to simulate new datasets for comparison."),
+                                           checkboxInput("gof_z_cond", "Condition on occupancy (z)", value = TRUE), add_tooltip(id = "gof_z_cond", title = "If checked, tests detection fit conditional on estimated occupancy. If unchecked, tests the full model."),
+                                           selectInput("gof_residual_type", "Residual type:", choices = c("Freeman-Tukey" = "FT", "Pearson Chi-squared" = "PearChi2"), selected = "FT"), add_tooltip(id = "gof_residual_type", title = "Metric used to calculate discrepancy between observed and simulated data."),
+                                           tags$div(style = "margin-top: 20px;", actionButton("run_gof", "Run Goodness of Fit Test", class = "btn-primary btn-lg btn-block"), add_tooltip(id = "run_gof", title = "Perform the Bayesian Goodness-of-Fit test using posterior predictive checks."))
                                          )
                                   ),
-                                  
-                                  # Results area with tabs on the right
                                   column(width = 9,
                                          tabsetPanel(
                                            selected = "Model Fit Results",
-                                           tabPanel("Instructions",
-                                                           fluidRow(
-                                                             shinydashboard::box(
-                                                               title = "Instructions", 
-                                                               width = 12, 
-                                                               status = "info",
-                                                               shiny::HTML(paste(help_text("goodnessOfFit_help.html"), collapse = "\n"))
-                                                             )
-                                                           )
-                                           ),
-                                           
-                                           # Model Fit Results tab
+                                           tabPanel("Instructions", fluidRow(shinydashboard::box(title = "Instructions", width = 12, status = "info", shiny::HTML(paste(help_text("goodnessOfFit_help.html"), collapse = "\n"))))),
                                            tabPanel("Model Fit Results",
-                                                    # Overall fit box
-                                                    shinydashboard::box(
-                                                      title = "Overall Model Fit",
-                                                      width = NULL,
-                                                      status = "primary",
-                                                      solidHeader = TRUE,
-                                                      div(
-                                                        style = "text-align: center; padding: 20px;",
-                                                        shiny::h2("Community-level Bayesian p-value",
-                                                                  style = "margin-bottom: 20px;"),
-                                                        shiny::h1(textOutput("gof_community_pvalue", inline = TRUE),
-                                                                  style = "font-size: 48px; font-weight: bold;"),
-                                                        tags$div(
-                                                          class = "interpretBox",
-                                                          style = "margin: 15px; padding: 15px; border-radius: 5px; font-size: 24px;",
-                                                          uiOutput("gof_interpretation")
-                                                        )
-                                                      )
-                                                    ),
-                                                    
-                                                    # Species-level results
-                                                    shinydashboard::box(
-                                                      title = "Species-level Results",
-                                                      width = NULL,
-                                                      status = "info",
-                                                      solidHeader = TRUE,
-                                                      DT::dataTableOutput("gof_species_table")
-                                                    )
+                                                    shinydashboard::box(title = "Overall Model Fit", width = NULL, status = "primary", solidHeader = TRUE, div(style = "text-align: center; padding: 20px;", shiny::h2("Community-level Bayesian p-value", style = "margin-bottom: 20px;"), shiny::h1(textOutput("gof_community_pvalue", inline = TRUE), style = "font-size: 48px; font-weight: bold;"), tags$div(class = "interpretBox", style = "margin: 15px; padding: 15px; border-radius: 5px; font-size: 24px;", uiOutput("gof_interpretation")))),
+                                                    shinydashboard::box(title = "Species-level Results", width = NULL, status = "info", solidHeader = TRUE, DT::dataTableOutput("gof_species_table"))
                                            ),
-                                           
-                                           # Residual Plots tab
                                            tabPanel("Residual Plots",
                                                     shinydashboard::box(
-                                                      title = "Residual Plots",
-                                                      width = NULL,
-                                                      status = "primary",
-                                                      solidHeader = TRUE,
-                                                      
-                                                      # Plot controls
+                                                      title = "Residual Plots", width = NULL, status = "primary", solidHeader = TRUE,
                                                       fluidRow(
-                                                        column(3,
-                                                               numericInput("gof_plot_columns", 
-                                                                            "Number of columns:", 
-                                                                            value = 3, min = 1, max = 5)
-                                                        ),
-                                                        column(3,
-                                                               numericInput("gof_plot_height", 
-                                                                            "Plot height:", 
-                                                                            value = 400, min = 400, max = 3000, 
-                                                                            step = 100)
-                                                        ),
-                                                        column(3,
-                                                               numericInput("gof_plot_scale", 
-                                                                            "Plot size scale:", 
-                                                                            value = 1.5, min = 0.5, max = 3, 
-                                                                            step = 0.1)
-                                                        ),
-                                                        column(3,
-                                                               checkboxInput("gof_plot_free_scales", 
-                                                                             "Use free scales", 
-                                                                             value = FALSE)
+                                                        column(3, 
+                                                               numericInput("gof_plot_columns", "Number of columns:", value = 3, min = 1, max = 5),
+                                                               add_tooltip(id = "gof_plot_columns", title = "Number of columns for arranging the species-specific residual plots.")),
+                                                        column(3, 
+                                                               numericInput("gof_plot_height", "Plot height:", value = 400, min = 400, max = 3000, step = 100), 
+                                                               add_tooltip(id = "gof_plot_height", title = "Adjust the total height (in pixels) allocated for the residual plots panel.")),
+                                                        column(3, 
+                                                               numericInput("gof_plot_scale", "Plot size scale:", value = 1.5, min = 0.5, max = 3, step = 0.1), 
+                                                               add_tooltip(id = "gof_plot_scale", title = "Adjust the overall size of text and elements in the residual plots.")),
+                                                        column(3, 
+                                                               # checkboxInput("gof_plot_free_scales", "Use free scales", value = FALSE), 
+                                                               checkboxInput("gof_plot_free_scales",
+                                                                             label = tagList(
+                                                                               "Use free scales",
+                                                                               span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                                                    title = "Allow axes scales to vary between species residual plots?")
+                                                                             ),
+                                                                             value = FALSE),
+                                                               # add_tooltip(id = "gof_plot_free_scales", title = "Allow the x and y axes scales to vary between species plots ('free') or keep them the same ('fixed').")
                                                         )
                                                       ),
-                                                      
                                                       plotOutput("gof_residual_plot", height = "auto")
                                                     )
                                            )
@@ -2756,177 +2236,105 @@ surveyDashboard <- function(CTtable = NULL,
                        )
                      )
             ),
-            
-            
-            
-            # Effect Plots tab
             tabPanel("Effect Plots",
                      fluidRow(
-                       # Left panel with controls
                        column(3,
                               wellPanel(
-                                # Group 1: Basic Settings
+                                tags$div(class = "settings-group", 
+                                         h4("Basic Settings"), 
+                                         selectInput("plotSubmodel", "Submodel:", choices = c(Occupancy = "state", Detection = "det")), 
+                                         add_tooltip(id = "plotSubmodel", title = "Select the submodel ('state' for occupancy/abundance, 'det' for detection) to plot effects for.")),
+                                conditionalPanel(condition = "input.communityModelType == 'RN' && input.plotSubmodel == 'state'", 
+                                                 selectInput("plotResponse", "Response:", choices = c("occupancy", "abundance")), 
+                                                 add_tooltip(id = "plotResponse", title = "For Royle-Nichols models, choose whether to plot effects on occupancy probability or expected abundance.")),
+                                tags$div(class = "settings-group", style = "margin-top: 20px;", h4("Species Selection"), 
+                                         selectInput("plotSpeciesSubset", "Select Species:", choices = NULL, multiple = TRUE, selectize = TRUE), 
+                                         add_tooltip(id = "plotSpeciesSubset", title = "Select specific species to include in the plots (leave blank to include all modeled species).")),
                                 tags$div(
-                                  class = "settings-group",
-                                  h4("Basic Settings"),
-                                  selectInput("plotSubmodel", "Submodel:", 
-                                              choices = c("state", "det")),
-                                  
-                                  # Response selector only shows for RN models with state submodel
-                                  conditionalPanel(
-                                    condition = "input.communityModelType == 'RN' && input.plotSubmodel == 'state'",
-                                    selectInput("plotResponse", "Response:", 
-                                                choices = c("occupancy", "abundance"))
-                                  )
-                                ),
-                                
-                                # Group 2: Species Selection
-                                tags$div(
-                                  class = "settings-group",
-                                  style = "margin-top: 20px;",
-                                  h4("Species Selection"),
-                                  selectInput("plotSpeciesSubset", "Select Species:", 
-                                              choices = NULL,
-                                              multiple = TRUE,
-                                              selectize = TRUE)
-                                ),
-                                
-                                # Group 3: Plot Selection & Settings
-                                tags$div(
-                                  class = "settings-group",
-                                  style = "margin-top: 20px;",
-                                  
+                                  class = "settings-group", style = "margin-top: 20px;",
                                   tags$div(
-                                    class = "settings-group",
-                                    style = "margin-top: 20px;",
-                                    h4("Plot Settings"),
-                                    selectInput("selectedPlot", "Select Effect:", 
-                                                choices = NULL),  # Will be updated dynamically
-                                    numericInput("plotDraws", "Number of Draws", 
-                                                 value = 1000, min = 100),
-                                    numericInput("plotLevelOuter", "Confidence Level", 
-                                                 value = 0.95, min = 0, max = 1, step = 0.01),
-                                    numericInput("plotLevelInner", "Inner Confidence Level", 
-                                                 value = 0.75, min = 0, max = 1, step = 0.01),
-                                    numericInput("plotScale", "Plot Size Scale", 
-                                                 value = 1.5, min = 0.5, max = 3, step = 0.1),
-                                    checkboxInput("orderByEffect", "Order by Effect Size", value = TRUE)
+                                    class = "settings-group", style = "margin-top: 20px;", h4("Plot Settings"),
+                                    selectInput("selectedPlot", "Select Effect:", choices = NULL), 
+                                    add_tooltip(id = "selectedPlot", title = "Select the specific covariate effect to visualize in the plots."),
+                                    numericInput("plotDraws", "Number of Draws", value = 1000, min = 100), 
+                                    add_tooltip(id = "plotDraws", title = "Number of posterior draws used to calculate uncertainty intervals for the effect plots."),
+                                    numericInput("plotLevelOuter", "Confidence Level", value = 0.95, min = 0, max = 1, step = 0.01), 
+                                    add_tooltip(id = "plotLevelOuter", title = "Set the confidence level for the outer uncertainty interval (e.g., 0.95 for 95% CI)."),
+                                    numericInput("plotLevelInner", "Inner Confidence Level", value = 0.75, min = 0, max = 1, step = 0.01), 
+                                    add_tooltip(id = "plotLevelInner", title = "Set the confidence level for the inner uncertainty interval (e.g., 0.75 for 75% CI)."),
+                                    numericInput("plotScale", "Plot Size Scale", value = 1.5, min = 0.5, max = 3, step = 0.1), 
+                                    add_tooltip(id = "plotScale", title = "Adjust the overall size of text and elements in the effect plots."),
+                                    # checkboxInput("orderByEffect", "Order by Effect Size", value = TRUE), 
+                                    checkboxInput("orderByEffect",
+                                                  label = tagList(
+                                                    "Order by Effect Size",
+                                                    span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                         title = "Order species by effect magnitude in 'Effect Sizes' plot?")
+                                                  ),
+                                                  value = TRUE),
+                                    # add_tooltip(id = "orderByEffect", title = "In the 'Effect Sizes' plot, order species based on the magnitude of their estimated effect coefficient.")
                                   )
                                 ),
-                                
-                                # Update button
-                                shiny::actionButton("updatePlotSettings", "Update Plot", 
-                                                    class = "btn-primary btn-block",
-                                                    style = "margin-top: 20px;")
+                                shiny::actionButton("updatePlotSettings", "Update Plot", class = "btn-primary btn-block", style = "margin-top: 20px;"), 
+                                add_tooltip(id = "updatePlotSettings", title = "Generate or update the effect plots based on the current settings.")
                               )
                        ),
-                       
-                       # Right panel with plots
-                       column(9,
-                              tabsetPanel(
-                                tabPanel("Response Curves",
-                                         plotOutput("responseCurvePlot", height = "800px")),
-                                tabPanel("Effect Sizes",
-                                         plotOutput("coefficientPlot", height = "800px"))
-                              )
-                       )
+                       column(9, 
+                              tabsetPanel(tabPanel("Response Curves", 
+                                                   plotOutput("responseCurvePlot", height = "800px")), 
+                                          tabPanel("Effect Sizes", 
+                                                   plotOutput("coefficientPlot", height = "800px"))))
                      )
             ),
-            
-            
             tabPanel("Spatial Predictions",
                      fluidRow(
-                       # Left sidebar with global settings
                        column(3,
                               wellPanel(
                                 h4("Input Settings", class = "text-primary"),
-                                
-                                # Input source selection with help text
-                                selectInput("prediction_raster_source", 
-                                            "Prediction Surface:", 
-                                            choices = c(
-                                              "Use extracted covariates" = "extracted",
-                                              "Upload custom raster" = "custom"
-                                            )
-                                ),
-                                helpText("Use covariates extracted earlier or upload custom raster"),
-                                
-                                # Conditional panel for custom raster upload
-                                conditionalPanel(
-                                  condition = "input.prediction_raster_source == 'custom'",
-                                  fileInput("covariate_raster", "Upload Raster:", accept = c(".tif"))
-                                ),
-                                
+                                selectInput("prediction_raster_source", "Prediction Surface:", choices = c("Use extracted covariates" = "extracted", "Upload custom raster" = "custom")), 
+                                add_tooltip(id = "prediction_raster_source", title = "Choose the source for the covariate rasters needed for prediction."),
+                                conditionalPanel(condition = "input.prediction_raster_source == 'custom'", fileInput("covariate_raster", "Upload Raster:", accept = c(".tif")), 
+                                                 add_tooltip(id = "covariate_raster", title = "Upload a multi-layer raster file (.tif) containing all necessary covariates. Layer names must match model covariates.")),
                                 hr(),
-                                
-                                # Common MCMC settings
                                 h4("MCMC Settings", class = "text-primary"),
-                                numericInput("predictionDraws", "Posterior Draws:", 
-                                             value = 1000, min = 100),
-                                numericInput("predictionLevel", "Confidence Level:", 
-                                             value = 0.95, min = 0, max = 1, step = 0.01),
-                                
+                                numericInput("predictionDraws", "Posterior Draws:", value = 1000, min = 100), 
+                                add_tooltip(id = "predictionDraws", title = "Number of posterior samples to use for generating predictions and uncertainty."),
+                                numericInput("predictionLevel", "Confidence Level:", value = 0.95, min = 0, max = 1, step = 0.01), 
+                                add_tooltip(id = "predictionLevel", title = "Confidence level for calculating prediction intervals (e.g., 0.95 for 95% CI)."),
                                 hr(),
-                                
-                                # Performance settings
                                 h4("Performance Settings", class = "text-primary"),
-                                checkboxInput("predictionBatch", "Use Batch Processing", value = FALSE),
-                                conditionalPanel(
-                                  condition = "input.predictionBatch == true",
-                                  numericInput("batchSize", "Batch Size:", value = 1000, min = 100)
-                                ),
-                                numericInput("predictionSeed", "Random Seed (optional):", 
-                                             value = NULL)
+                                checkboxInput("predictionBatch", "Use Batch Processing", value = FALSE), 
+                                add_tooltip(id = "predictionBatch", title = "Process predictions in smaller batches to reduce memory usage."),
+                                conditionalPanel(condition = "input.predictionBatch == true",
+                                                 numericInput("batchSize", "Batch Size:", value = 1000, min = 100), 
+                                                 add_tooltip(id = "batchSize", title = "Number of raster cells to process in each batch.")),
+                                numericInput("predictionSeed", "Random Seed (optional):", value = NULL), 
+                                add_tooltip(id = "predictionSeed", title = "Set a specific random seed for reproducible MCMC-based predictions (leave blank for non-reproducible).")
                               )
                        ),
-                       
-                       # Main content area with tabs
                        column(9,
                               tabsetPanel(
-                                id = "predictionTabs",
-                                type = "pills",
-                                
-                                # Species Occupancy tab
+                                id = "predictionTabs", type = "pills",
                                 tabPanel("Species Occupancy",
                                          fluidRow(
-                                           column(12, 
+                                           column(12,
                                                   div(class = "panel panel-default",
                                                       div(class = "panel-heading d-flex justify-content-between align-items-center",
                                                           div(
                                                             style = "display: flex; gap: 10px; align-items: center;",
-                                                            shiny::actionButton("runOccupancyPrediction", "Generate Predictions",
-                                                                                class = "btn-primary",
-                                                                                icon = icon("calculator")),
-                                                            selectInput("occupancySpecies", "Select Species:", 
-                                                                        choices = NULL, width = "300px"),
-                                                            selectInput("occupancyMapType", "Display:", 
-                                                                        choices = c(
-                                                                          "Mean Occupancy" = "mean",
-                                                                          "Standard Deviation" = "sd",
-                                                                          "Lower CI" = "lower",
-                                                                          "Upper CI" = "upper"
-                                                                        ),
-                                                                        selected = "mean",
-                                                                        width = "200px"
-                                                            ),
-                                                            
-                                                            selectInput("occupancyColorPalette", "Color Palette:",
-                                                                        choices = c("Viridis", "Plasma", "Inferno", "Rocket"),
-                                                                        selected = "Viridis",
-                                                                        width = "200px"),
-                                                            checkboxInput("invertOccupancyColors", "Invert Color Ramp", value = FALSE)
+                                                            shiny::actionButton("runOccupancyPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), add_tooltip(id = "runOccupancyPrediction", title = "Generate spatial predictions for species occupancy probabilities."),
+                                                            selectInput("occupancySpecies", "Select Species:", choices = NULL, width = "300px"), 
+                                                            add_tooltip(id = "occupancySpecies", title = "Select the species for which to display the occupancy map."),
+                                                            selectInput("occupancyMapType", "Display:", choices = c("Mean Occupancy" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), add_tooltip(id = "occupancyMapType", title = "Choose which layer to display: Mean prediction, Standard Deviation, or Confidence Interval bounds."),
+                                                            selectInput("occupancyColorPalette", "Color Palette:", choices = c("Viridis", "Plasma", "Inferno", "Rocket"), selected = "Viridis", width = "200px"), add_tooltip(id = "occupancyColorPalette", title = "Select the color scheme for the occupancy map."),
+                                                            checkboxInput("invertOccupancyColors", "Invert Color Ramp", value = FALSE), add_tooltip(id = "invertOccupancyColors", title = "Reverse the selected color palette.")
                                                           )
                                                       ),
-                                                      div(class = "panel-body",
-                                                          leaflet::leafletOutput("occupancyMap", height = "600px"),
-                                                          uiOutput("occupancyStats")
-                                                      )
+                                                      div(class = "panel-body", leaflet::leafletOutput("occupancyMap", height = "600px"), uiOutput("occupancyStats"))
                                                   )
                                            )
                                          )
                                 ),
-                                
-                                # Species Richness tab
                                 tabPanel("Species Richness",
                                          fluidRow(
                                            column(12,
@@ -2934,52 +2342,24 @@ surveyDashboard <- function(CTtable = NULL,
                                                       div(class = "panel-heading d-flex justify-content-between align-items-center",
                                                           div(
                                                             style = "display: flex; gap: 10px; align-items: center;",
-                                                            shiny::actionButton("runRichnessPrediction", "Generate Predictions",
-                                                                                class = "btn-primary",
-                                                                                icon = icon("calculator")),
-                                                            selectInput("richnessType", "Display:", 
-                                                                        choices = c(
-                                                                          "Mean Richness" = "mean",
-                                                                          "Standard Deviation" = "sd",
-                                                                          "Lower CI" = "lower",
-                                                                          "Upper CI" = "upper"
-                                                                        ),
-                                                                        selected = "mean",
-                                                                        width = "200px"
-                                                            ),
-                                                            selectInput("richnessColorPalette", "Color Palette:",
-                                                                        choices = c("Viridis", "Plasma", "Inferno", "Rocket"),
-                                                                        selected = "Viridis",
-                                                                        width = "200px"),
-                                                            checkboxInput("invertRichnessColors", "Invert Color Ramp", value = FALSE)
+                                                            shiny::actionButton("runRichnessPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), add_tooltip(id = "runRichnessPrediction", title = "Generate spatial predictions for species richness."),
+                                                            selectInput("richnessType", "Display:", choices = c("Mean Richness" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), add_tooltip(id = "richnessType", title = "Choose which richness layer to display: Mean, Standard Deviation, or Confidence Interval bounds."),
+                                                            selectInput("richnessColorPalette", "Color Palette:", choices = c("Viridis", "Plasma", "Inferno", "Rocket"), selected = "Viridis", width = "200px"), add_tooltip(id = "richnessColorPalette", title = "Select the color scheme for the richness map."),
+                                                            checkboxInput("invertRichnessColors", "Invert Color Ramp", value = FALSE), add_tooltip(id = "invertRichnessColors", title = "Reverse the selected color palette.")
                                                           )
                                                       ),
-                                                      div(class = "panel-body",
-                                                          leaflet::leafletOutput("richnessMap", height = "600px"),
-                                                          uiOutput("richnessStats")
-                                                      )
+                                                      div(class = "panel-body", leaflet::leafletOutput("richnessMap", height = "600px"), uiOutput("richnessStats"))
                                                   )
                                            )
                                          )
                                 ),
-                                
-                                # PAO Analysis tab
                                 tabPanel("Percentage of Area Occupied (PAO)",
                                          fluidRow(
                                            column(12,
                                                   div(class = "panel panel-default",
                                                       div(class = "panel-heading d-flex justify-content-between align-items-center",
-                                                          div(
-                                                            style = "display: flex; gap: 10px; align-items: center;",
-                                                            shiny::actionButton("runPAOPrediction", "Generate Predictions",
-                                                                                class = "btn-primary",
-                                                                                icon = icon("calculator"))
-                                                          )
-                                                      ),
-                                                      div(class = "panel-body",
-                                                          plotOutput("paoPlot", height = "500px"),
-                                                          DT::dataTableOutput("paoTable")
-                                                      )
+                                                          div(style = "display: flex; gap: 10px; align-items: center;", shiny::actionButton("runPAOPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), add_tooltip(id = "runPAOPrediction", title = "Calculate the Percentage of Area Occupied (PAO) for each species based on the prediction surface."))),
+                                                      div(class = "panel-body", plotOutput("paoPlot", height = "500px"), DT::dataTableOutput("paoTable"))
                                                   )
                                            )
                                          )
@@ -2987,18 +2367,8 @@ surveyDashboard <- function(CTtable = NULL,
                               )
                        )
                      ),
-                     
-                     # Footer with memory usage warning
-                     fluidRow(
-                       column(12,
-                              div(class = "alert alert-info mt-3",
-                                  icon("info-circle"),
-                                  "Predictions can be memory-intensive. Use batch processing for large datasets or if you encounter memory issues."
-                              )
-                       )
-                     )
+                     fluidRow(column(12, div(class = "alert alert-info mt-3", icon("info-circle"), "Predictions can be memory-intensive. Use batch processing for large datasets or if you encounter memory issues. Alternatively use a lower resolution for prediction rasters or less posterior samples.")))
             )
-            
           )
         )
       )
@@ -3007,8 +2377,9 @@ surveyDashboard <- function(CTtable = NULL,
   
   
   
+  
   server <- function(input, output, session) { 
-    
+
     #  version check
     observe({
       version_info <- check_version()
@@ -3319,21 +2690,40 @@ surveyDashboard <- function(CTtable = NULL,
     #     }
     #   }
     # })
+    
+    # output$camerasIndependentUI <- renderUI({
+    #   if (!is.null(data$cameraCol) && data$cameraCol != "") {
+    #     # Show a warning if camerasIndependent is not defined in data
+    #     if (is.null(data$camerasIndependent)) {
+    #       tagList(
+    #         checkboxInput("camerasIndependent", "Cameras are independent", value = FALSE),
+    #         div(
+    #           class = "alert alert-warning",
+    #           style = "padding: 5px 10px; margin-top: 5px;",
+    #           icon("exclamation-triangle"), 
+    #           "This setting is required when using camera ID column."
+    #         )
+    #       )
+    #     } else {
+    #       checkboxInput("camerasIndependent", "Cameras are independent", value = data$camerasIndependent)
+    #     }
+    #   }
+    # })
+    
+    # renderUI for camerasIndependentUI (Temporal Filter)
     output$camerasIndependentUI <- renderUI({
       if (!is.null(data$cameraCol) && data$cameraCol != "") {
-        # Show a warning if camerasIndependent is not defined in data
         if (is.null(data$camerasIndependent)) {
           tagList(
             checkboxInput("camerasIndependent", "Cameras are independent", value = FALSE),
-            div(
-              class = "alert alert-warning",
-              style = "padding: 5px 10px; margin-top: 5px;",
-              icon("exclamation-triangle"), 
-              "This setting is required when using camera ID column."
-            )
+            add_tooltip(id = "camerasIndependent", title = "Check if multiple cameras at the same station are independent for temporal filtering."),
+            div(class = "alert alert-warning", style = "padding: 5px 10px; margin-top: 5px;", icon("exclamation-triangle"), "Required when using camera ID.")
           )
         } else {
-          checkboxInput("camerasIndependent", "Cameras are independent", value = data$camerasIndependent)
+          tagList(
+            checkboxInput("camerasIndependent", "Cameras are independent", value = data$camerasIndependent),
+            add_tooltip(id = "camerasIndependent", title = "Check if multiple cameras at the same station are independent for temporal filtering.")
+          )
         }
       }
     })
@@ -5094,6 +4484,7 @@ surveyDashboard <- function(CTtable = NULL,
                         } else {
                           "n_species" # Default if list is empty
                         }
+                          
       )
       
       # Update species selection for activity plots
@@ -5257,48 +4648,31 @@ surveyDashboard <- function(CTtable = NULL,
       column_data <- data$CTtable_sf[[input$filterColumn]]
       
       if (is.numeric(column_data)) {
-        # Numeric filter controls
         tagList(
-          selectInput("numericOperator", "Condition:",
-                      choices = c(
-                        "Greater than" = "gt",
-                        "Less than" = "lt",
-                        "Equal to" = "eq",
-                        "Between" = "between"
-                      )
-          ),
+          selectInput("numericOperator", "Condition:", choices = c("Greater than" = "gt", "Less than" = "lt", "Equal to" = "eq", "Between" = "between")),
+          add_tooltip(id = "numericOperator", title = "Select the comparison operator for numeric filtering."),
           conditionalPanel(
             condition = "input.numericOperator != 'between'",
-            numericInput("numericValue", "Value:", 
-                         value = round(mean(column_data, na.rm = TRUE)),
-                         min = min(column_data, na.rm = TRUE),
-                         max = max(column_data, na.rm = TRUE)
-            )
+            numericInput("numericValue", "Value:", value = round(mean(column_data, na.rm = TRUE)), min = min(column_data, na.rm = TRUE), max = max(column_data, na.rm = TRUE)),
+            add_tooltip(id = "numericValue", title = "Enter the value for the comparison.")
           ),
           conditionalPanel(
             condition = "input.numericOperator == 'between'",
-            numericInput("numericValueMin", "Minimum:", 
-                         value = round(min(column_data, na.rm = TRUE)),
-                         min = min(column_data, na.rm = TRUE),
-                         max = max(column_data, na.rm = TRUE)
-            ),
-            numericInput("numericValueMax", "Maximum:", 
-                         value = round(max(column_data, na.rm = TRUE)),
-                         min = min(column_data, na.rm = TRUE),
-                         max = max(column_data, na.rm = TRUE)
-            )
+            numericInput("numericValueMin", "Minimum:", value = round(min(column_data, na.rm = TRUE)), min = min(column_data, na.rm = TRUE), max = max(column_data, na.rm = TRUE)),
+            add_tooltip(id = "numericValueMin", title = "Enter the minimum value for the 'between' range."),
+            numericInput("numericValueMax", "Maximum:", value = round(max(column_data, na.rm = TRUE)), min = min(column_data, na.rm = TRUE), max = max(column_data, na.rm = TRUE)),
+            add_tooltip(id = "numericValueMax", title = "Enter the maximum value for the 'between' range.")
           )
         )
       } else {
-        # Categorical filter controls
         unique_values <- sort(unique(as.character(column_data)))
         tagList(
-          checkboxGroupInput("categoryValues", "Select values:",
-                             choices = unique_values,
-                             selected = unique_values
-          ),
+          checkboxGroupInput("categoryValues", "Select values:", choices = unique_values, selected = unique_values),
+          add_tooltip(id = "categoryValues", title = "Select the categorical values to keep."),
           shiny::actionButton("selectAllCat", "Select All"),
-          shiny::actionButton("deselectAllCat", "Deselect All")
+          add_tooltip(id = "selectAllCat", title = "Select all available categories for the chosen column."),
+          shiny::actionButton("deselectAllCat", "Deselect All"),
+          add_tooltip(id = "deselectAllCat", title = "Deselect all categories.")
         )
       }
     })
@@ -7815,7 +7189,8 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     detection_hist <- reactive({
-      req(input$species_dethist, input$occasionLength_single_species, input$outputType, input$day1)
+      req(input$species_dethist, input$occasionLength_single_species, #input$outputType, 
+          input$day1)
       
       # Check if current_species_list() is valid
       if (!is.vector(current_species_list()) || length(current_species_list()) == 0) {
@@ -7844,7 +7219,7 @@ surveyDashboard <- function(CTtable = NULL,
           species = input$species_dethist,
           occasionLength = input$occasionLength_single_species,
           day1 = input$day1,
-          output = input$outputType,
+          # output = input$outputType,
           scaleEffort = FALSE,
           timeZone = data$timeZone,
           stationCol = data$stationCol,
@@ -7958,7 +7333,7 @@ surveyDashboard <- function(CTtable = NULL,
       object_name <- paste0("dethist", "_", 
                             gsub(" ", "_", input$species_dethist), "_",
                             input$occasionLength_single_species, "d", "_", 
-                            input$outputType, "_",
+                            # input$outputType, "_",
                             "day1_", input$day1)
       
       assign_to_global_dh <- function(pos=1) {
@@ -8018,22 +7393,22 @@ surveyDashboard <- function(CTtable = NULL,
     
     output$basic_ubms_cores_input <- renderUI({
       max_cores <- min(parallel::detectCores() - 1, 7)
-      safe_cores <- min(max_cores, input$basic_ubms_chains)
-      
-      numericInput("basic_ubms_cores", "Number of cores:", 
-                   value = safe_cores,
-                   min = 1, 
-                   max = safe_cores)
+      safe_cores <- min(max_cores, input$basic_ubms_chains %||% 1) # Use %||% for safety
+      tagList(
+        numericInput("basic_ubms_cores", "Number of cores:",
+                     value = safe_cores, min = 1, max = max_cores),
+        add_tooltip(id = "basic_ubms_cores", title = "Number of CPU cores to use for parallel chain execution (max limited by available cores).")
+      )
     })
     
     output$adv_ubms_cores_input <- renderUI({
       max_cores <- min(parallel::detectCores() - 1, 7)
-      safe_cores <- min(max_cores, input$adv_ubms_chains)
-      
-      numericInput("adv_ubms_cores", "Number of cores:", 
-                   value = safe_cores,
-                   min = 1, 
-                   max = safe_cores)
+      safe_cores <- min(max_cores, input$adv_ubms_chains %||% 1) # Use %||% for safety
+      tagList(
+        numericInput("adv_ubms_cores", "Number of cores:",
+                     value = safe_cores, min = 1, max = max_cores),
+        add_tooltip(id = "adv_ubms_cores", title = "Number of CPU cores for parallel chains.")
+      )
     })
     
     
@@ -8068,7 +7443,7 @@ surveyDashboard <- function(CTtable = NULL,
       object_name <- paste0("umf", "_", 
                             gsub(" ", "_", input$species_dethist), "_",
                             input$occasionLength_single_species, "d", "_", 
-                            input$outputType, "_",
+                            # input$outputType, "_",
                             "day1_", input$day1)
       
       assign_to_global_umf <- function(pos=1) {
@@ -8103,76 +7478,62 @@ surveyDashboard <- function(CTtable = NULL,
     # create UI elements for covariate choice
     output$detectionCovariatesUI <- renderUI({
       covariate_choices <- getAvailableCovariates(
-        data = data$CTtable_sf,
-        stationCol = data$stationCol,
+        data = data$CTtable_sf, 
+        stationCol = data$stationCol, 
         cameraCol = data$cameraCol,
-        setupCol = data$setupCol,
+        setupCol = data$setupCol, 
         retrievalCol = data$retrievalCol
       )
-      
-      selectInput("detectionCovariate", 
-                  "Select covariate:", 
-                  choices = c("Choose covariate" = "", covariate_choices),
-                  selected = ""
+      tagList(
+        selectInput("detectionCovariate", "Select covariate:", choices = c("Choose covariate" = "", covariate_choices), selected = ""),
+        add_tooltip(id = "detectionCovariate", title = "Select the primary covariate for the detection effect.")
       )
     })
     
     
     output$occupancyCovariatesUI <- renderUI({
       covariate_choices <- getAvailableCovariates(
-        data = data$CTtable_sf,
-        stationCol = data$stationCol,
-        cameraCol = data$cameraCol,
-        setupCol = data$setupCol,
-        retrievalCol = data$retrievalCol
+        data = data$CTtable_sf, stationCol = data$stationCol, cameraCol = data$cameraCol,
+        setupCol = data$setupCol, retrievalCol = data$retrievalCol
       )
-      
-      selectInput("occupancyCovariate", 
-                  "Select covariate:", 
-                  choices = c("Choose covariate" = "", covariate_choices),
-                  selected = ""
+      tagList(
+        selectInput("occupancyCovariate", "Select covariate:", choices = c("Choose covariate" = "", covariate_choices), selected = ""),
+        add_tooltip(id = "occupancyCovariate", title = "Select the primary covariate for the occupancy/abundance effect.")
       )
     })
+    
     
     
     # dynamically set the layer names to plot in the UI
     output$basic_prediction_layer_choices <- renderUI({
       layer_choices <- if(input$basic_model_package == "unmarked") {
-        c("Occupancy probability" = "Predicted",
-          "Standard error" = "SE",
-          "Lower CI" = "lower",
+        c("Occupancy probability" = "Predicted", 
+          "Standard error" = "SE", 
+          "Lower CI" = "lower", 
           "Upper CI" = "upper")
       } else {
-        c("Occupancy probability" = "Predicted",
-          "Standard deviation" = "SD",  # we keep "SE" as internal value for consistency
-          "Lower CI" = "Lower",
+        c("Occupancy probability" = "Predicted", 
+          "Standard deviation" = "SD", 
+          "Lower CI" = "Lower", 
           "Upper CI" = "Upper")
       }
-      
-      selectInput("basic_prediction_layer", 
-                  "Select prediction layer:",
-                  choices = layer_choices,
-                  selected = "Predicted")
+      tagList(
+        selectInput("basic_prediction_layer", "Select prediction layer:", choices = layer_choices, selected = "Predicted"),
+        add_tooltip(id = "basic_prediction_layer", title = "Select the specific prediction layer (e.g., mean, SE/SD, CI bounds) to display on the map.")
+      )
     })
     
     # dynamically set the layer names to plot in the UI
     output$adv_prediction_layer_choices <- renderUI({
       layer_choices <- if(input$adv_model_package == "unmarked") {
-        c("Occupancy probability" = "Predicted",
-          "Standard error" = "SE",
-          "Lower CI" = "lower",
-          "Upper CI" = "upper")
+        c("Occupancy probability" = "Predicted", "Standard error" = "SE", "Lower CI" = "lower", "Upper CI" = "upper")
       } else {
-        c("Occupancy probability" = "Predicted",
-          "Standard deviation" = "SE",  # we keep "SE" as internal value for consistency
-          "Lower CI" = "lower",
-          "Upper CI" = "upper")
+        c("Occupancy probability" = "Predicted", "Standard deviation" = "SD", "Lower CI" = "lower", "Upper CI" = "upper")
       }
-      
-      selectInput("adv_prediction_layer", 
-                  "Select prediction layer:",
-                  choices = layer_choices,
-                  selected = "Predicted")
+      tagList(
+        selectInput("adv_prediction_layer", "Select prediction layer:", choices = layer_choices, selected = "Predicted"),
+        add_tooltip(id = "adv_prediction_layer", title = "Select the prediction layer to display (feature under construction).")
+      )
     })
     
     
@@ -8243,8 +7604,8 @@ surveyDashboard <- function(CTtable = NULL,
       input$basic_model_type,
       input$species_dethist,
       input$occasionLength_single_species,
-      input$day1,
-      input$outputType
+      input$day1 #,
+      # input$outputType
     ), {
       
       # Skip if we're in restoration mode
@@ -8268,8 +7629,8 @@ surveyDashboard <- function(CTtable = NULL,
       input$adv_model_type,
       input$species_dethist,
       input$occasionLength_single_species,
-      input$day1,
-      input$outputType
+      input$day1 #,
+      # input$outputType
     ), {
       
       # Skip if we're in restoration mode
@@ -11255,7 +10616,7 @@ surveyDashboard <- function(CTtable = NULL,
             single_species = input$occasionLength_single_species,
             community = input$occasionLength_community
           ),
-          output_type = input$outputType,
+          # output_type = input$outputType,
           day1 = input$day1,
           camera_settings = list(
             minDeltaTime = input$minDeltaTime,
@@ -11443,8 +10804,8 @@ surveyDashboard <- function(CTtable = NULL,
             updateSliderInput(session, "occasionLength_community",
                               value = saved_state$ui_state$occasion_length$community)
             
-            updateSelectInput(session, "outputType",
-                              selected = saved_state$ui_state$output_type)
+            # updateSelectInput(session, "outputType",
+            #                   selected = saved_state$ui_state$output_type)
             
             updateSelectInput(session, "day1",
                               selected = saved_state$ui_state$day1)
