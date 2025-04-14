@@ -8,6 +8,7 @@ createCovariates(
   CTtable,
   directory,
   filenames,
+  rasters,
   buffer_ct = 0,
   bilinear = FALSE,
   buffer_aoi = 1000,
@@ -19,7 +20,8 @@ createCovariates(
   download_elevation = FALSE,
   elevation_zoom = 10,
   terrain_measures = NULL,
-  standardize_na = TRUE
+  standardize_na = FALSE,
+  scale_covariates = FALSE
 )
 }
 \arguments{
@@ -28,6 +30,8 @@ createCovariates(
 \item{directory}{character. The directory containing the covariate rasters.}
 
 \item{filenames}{character (optionally named). A vector of file paths of covariate rasters. If it is named the covariates will be named according to the names. If unnamed the file names will be used as covariate names.}
+
+\item{rasters}{SpatRaster object or list of SpatRaster objects. Direct input of rasters from the terra package instead of reading from disk.}
 
 \item{buffer_ct}{numeric. A value (in meters) by which to buffer the point locations in \code{CTtable} for extraction of covariate values.}
 
@@ -51,14 +55,24 @@ createCovariates(
 
 \item{terrain_measures}{character. Vector of terrain metrics to calculate from elevation data. Options include "slope" (slope in degrees), "aspect" (compass direction in degrees), "TRI" (Terrain Ruggedness Index, measuring elevation difference between adjacent cells), "TPI" (Topographic Position Index, comparing cell elevation to mean of surrounding cells), and "roughness" (difference between max and min of surrounding cells). Defaults to NULL (no terrain metrics).}
 
-\item{standardize_na}{logical. Logical. If \code{TRUE}, ensures all layers in the prediction raster have identical NA patterns by setting a cell to NA in all bands if it's NA in any band. This creates consistency for spatial predictions across covariates.}
+\item{standardize_na}{logical. Logical. If \code{TRUE}, ensures all layers in the prediction raster have identical NA patterns by setting a cell to NA in all bands if it's NA in any band. This creates consistency for spatial predictions across covariates but may lose data in covariates.}
+
+\item{scale_covariates}{logical. If \code{TRUE}, scale numeric covariates and return both original and scaled versions of data and prediction rasters. Scaling is performed using R's \code{scale} function. Defaults to \code{FALSE}.}
 }
 \value{
 \describe{
-A list containing three elements:
+When \code{scale_covariates = FALSE}, a list containing three elements:
   \item{CTtable}{An \code{sf} object representing the camera trap data frame with extracted covariate values.}
   \item{predictionRaster}{A \code{SpatRaster} object containing covariate raster layers}
   \item{originalRaster}{A list of the original input rasters}
+
+When \code{scale_covariates = TRUE}, a list containing six elements:
+  \item{CTtable}{The original \code{sf} object with unscaled covariate values}
+  \item{CTtable_scaled}{The \code{sf} object with scaled numeric covariate values}
+  \item{predictionRaster}{The original unscaled prediction raster}
+  \item{predictionRaster_scaled}{The prediction raster with scaled numeric layers}
+  \item{originalRaster}{A list of the original input rasters}
+  \item{scaling_params}{A list containing center and scale information of numeric covariates}
 }
 }
 \description{
@@ -67,8 +81,9 @@ This function extracts covariate values from spatial raster data
  spatial predictions. 
  
  It accepts a camera trap table containing spatial information, 
- along with either a directory containing covariate raster files or a character 
- vector specifying the file paths of these covariate rasters. 
+ along with either a directory containing covariate raster files, a character 
+ vector specifying the file paths of these covariate rasters, or direct
+ SpatRaster objects from the terra package.
  
  Additionally, users can provide parameters to control how covariates are
  extracted, and how they are aggregated to prediction rasters.
@@ -108,6 +123,30 @@ terrain metrics from the elevation data using \code{terra::terrain()} with the
 default 3x3 neighborhood. Available terrain metrics include "slope", "aspect", 
 "TRI" (Terrain Ruggedness Index), "TPI" (Topographic Position Index), and 
 "roughness".
+
+When using \code{scale_covariates = TRUE}, the function returns both original and
+scaled versions of the data and prediction rasters. #' The function uses R's 
+\code{scale()} function to perform centering and scaling, and
+includes the scaling parameters in the returned metadata.
+
+\subsection{Warning about Categorical Covariates}{
+This function does not explicitly handle categorical rasters. All raster values are
+treated as numeric, which can be problematic when scaling is applied. The function
+attempts to identify "likely categorical" variables (numeric variables with few unique
+integer values) and will provide warnings, but it cannot automatically handle them
+correctly for scaling.
+
+When using scaled covariates with categorical variables in models:
+\itemize{
+  \item Use \code{CTtable_scaled} for numeric predictors
+  \item Use \code{CTtable} (original) for categorical predictors
+  \item Similarly, use \code{predictionRaster_scaled} for numeric predictors in spatial predictions
+  \item Use \code{predictionRaster} for categorical predictors in spatial predictions
+}
+
+Future versions may implement proper categorical raster handling with RAT (Raster
+Attribute Table) support.
+}
 }
 \examples{
 
@@ -121,7 +160,7 @@ camtraps_sf <- st_as_sf(camtraps,
                         crs = 32650)
 
 # extract covariates (with 100m buffer around cameras)
-# doesn't run becasue 'directory' is only a placeholder
+# doesn't run because 'directory' is only a placeholder
 
 covariates <- createCovariates(camtraps_sf, 
 "path/to/covariate_rasters", 
@@ -140,8 +179,8 @@ download_elevation = TRUE,
 elevation_zoom = 11,
 terrain_measures = c("slope", "aspect", "TRI"))
 
-note that if local rasters are available they can be extracted alongside
-elevation data in a single 
+# Note that if local rasters are available they can be extracted alongside
+# elevation data in a single function call
 
 # camera trap table with extracted covariate values
 camtraps_sf_cov <- covariates_elev$CTtable
@@ -150,6 +189,42 @@ camtraps_sf_cov <- covariates_elev$CTtable
 r_cov <- covariates_elev$predictionRaster
 plot(r_cov)
 
+# Use SpatRaster objects directly as input
+r1 <- rast("elevation.tif")
+r2 <- rast("landcover.tif")
+raster_list <- list(elevation = r1, landcover = r2)
+
+covariates_direct <- createCovariates(camtraps_sf,
+                                      rasters = raster_list,
+                                      buffer_ct = 100,
+                                      resolution = 100)
+
+# Scale numeric covariates for modeling
+covariates_scaled <- createCovariates(camtraps_sf,
+                                      rasters = raster_list,
+                                      buffer_ct = 100,
+                                      resolution = 100,
+                                      scale_covariates = TRUE)
+
+# Use scaled data with categorical variables
+# Mix and match from original and scaled outputs for tabular data
+model_data <- covariates_scaled$CTtable_scaled  # Use scaled numeric covariates
+model_data$landcover <- covariates_direct$CTtable$landcover  # Use original categorical covariate
+
+# Mix and match for prediction rasters
+# Create a combined prediction raster with scaled numeric variables and original categorical variables
+# Extract scaled elevation layer
+elev_scaled <- covariates_scaled$predictionRaster_scaled$elevation
+
+# Extract original landcover layer (categorical)
+landcover_orig <- covariates_direct$predictionRaster$landcover
+
+# Combine into a new SpatRaster for predictions
+prediction_raster <- c(elev_scaled, landcover_orig)
+names(prediction_raster) <- c("elevation", "landcover")
+
+# Use this combined raster for spatial predictions
+plot(prediction_raster)
 }
 
 }

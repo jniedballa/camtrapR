@@ -6,8 +6,9 @@
 #'  spatial predictions. 
 #'  
 #'  It accepts a camera trap table containing spatial information, 
-#'  along with either a directory containing covariate raster files or a character 
-#'  vector specifying the file paths of these covariate rasters. 
+#'  along with either a directory containing covariate raster files, a character 
+#'  vector specifying the file paths of these covariate rasters, or direct
+#'  SpatRaster objects from the terra package.
 #'  
 #'  Additionally, users can provide parameters to control how covariates are
 #'  extracted, and how they are aggregated to prediction rasters.
@@ -25,6 +26,7 @@
 #' @param CTtable sf object as defined by the \code{sf} package. Essentially a camera trap data frame with spatial information.
 #' @param directory character. The directory containing the covariate rasters.
 #' @param filenames character (optionally named). A vector of file paths of covariate rasters. If it is named the covariates will be named according to the names. If unnamed the file names will be used as covariate names.
+#' @param rasters SpatRaster object or list of SpatRaster objects. Direct input of rasters from the terra package instead of reading from disk.
 #' @param buffer_ct numeric. A value (in meters) by which to buffer the point locations in \code{CTtable} for extraction of covariate values. 
 #' @param bilinear logical. If \code{TRUE}, extract covariate values with bilinear interpolation (nearest 4 raster cells). If \code{FALSE}, extract value at the cell the point falls in. Only relevant if \code{buffer_ct} is 0.
 #' @param buffer_aoi numeric. A value (in meters) by which to buffer the overall camera trapping grid to ensure that prediction rasters are larger than the camera trapping grid.
@@ -36,7 +38,8 @@
 #' @param download_elevation logical. If \code{TRUE}, download elevation data from AWS. Defaults to \code{FALSE}.
 #' @param elevation_zoom numeric. Zoom level for elevation data download (6-12). Higher values provide more detail but longer download times. Zoom 12 corresponds to ~20m pixel resolution, 11 to ~40m, 10 to ~80m, and so on (resolution halves with each decrease in zoom level). Defaults to 9.
 #' @param terrain_measures character. Vector of terrain metrics to calculate from elevation data. Options include "slope" (slope in degrees), "aspect" (compass direction in degrees), "TRI" (Terrain Ruggedness Index, measuring elevation difference between adjacent cells), "TPI" (Topographic Position Index, comparing cell elevation to mean of surrounding cells), and "roughness" (difference between max and min of surrounding cells). Defaults to NULL (no terrain metrics).
-#' @param standardize_na logical. Logical. If \code{TRUE}, ensures all layers in the prediction raster have identical NA patterns by setting a cell to NA in all bands if it's NA in any band. This creates consistency for spatial predictions across covariates.
+#' @param standardize_na logical. Logical. If \code{TRUE}, ensures all layers in the prediction raster have identical NA patterns by setting a cell to NA in all bands if it's NA in any band. This creates consistency for spatial predictions across covariates but may lose data in covariates.
+#' @param scale_covariates logical. If \code{TRUE}, scale numeric covariates and return both original and scaled versions of data and prediction rasters. Scaling is performed using R's \code{scale} function. Defaults to \code{FALSE}.
 #'
 #' @details
 #' 
@@ -65,12 +68,44 @@
 #' "TRI" (Terrain Ruggedness Index), "TPI" (Topographic Position Index), and 
 #' "roughness".
 #' 
+#' When using \code{scale_covariates = TRUE}, the function returns both original and
+#' scaled versions of the data and prediction rasters. #' The function uses R's 
+#' \code{scale()} function to perform centering and scaling, and
+#' includes the scaling parameters in the returned metadata.
+#' 
+#' \subsection{Warning about Categorical Covariates}{
+#' This function does not explicitly handle categorical rasters. All raster values are
+#' treated as numeric, which can be problematic when scaling is applied. The function
+#' attempts to identify "likely categorical" variables (numeric variables with few unique
+#' integer values) and will provide warnings, but it cannot automatically handle them
+#' correctly for scaling.
+#' 
+#' When using scaled covariates with categorical variables in models:
+#' \itemize{
+#'   \item Use \code{CTtable_scaled} for numeric predictors
+#'   \item Use \code{CTtable} (original) for categorical predictors
+#'   \item Similarly, use \code{predictionRaster_scaled} for numeric predictors in spatial predictions
+#'   \item Use \code{predictionRaster} for categorical predictors in spatial predictions
+#' }
+#' 
+#' Future versions may implement proper categorical raster handling with RAT (Raster
+#' Attribute Table) support.
+#' }
+#' 
 #' @return
 #' \describe{
-#' A list containing three elements:
+#' When \code{scale_covariates = FALSE}, a list containing three elements:
 #'   \item{CTtable}{An \code{sf} object representing the camera trap data frame with extracted covariate values.}
 #'   \item{predictionRaster}{A \code{SpatRaster} object containing covariate raster layers}
 #'   \item{originalRaster}{A list of the original input rasters}
+#' 
+#' When \code{scale_covariates = TRUE}, a list containing six elements:
+#'   \item{CTtable}{The original \code{sf} object with unscaled covariate values}
+#'   \item{CTtable_scaled}{The \code{sf} object with scaled numeric covariate values}
+#'   \item{predictionRaster}{The original unscaled prediction raster}
+#'   \item{predictionRaster_scaled}{The prediction raster with scaled numeric layers}
+#'   \item{originalRaster}{A list of the original input rasters}
+#'   \item{scaling_params}{A list containing center and scale information of numeric covariates}
 #' }
 #' @export
 #'
@@ -86,7 +121,7 @@
 #'                         crs = 32650)
 #' 
 #' # extract covariates (with 100m buffer around cameras)
-#' # doesn't run becasue 'directory' is only a placeholder
+#' # doesn't run because 'directory' is only a placeholder
 #' 
 #' covariates <- createCovariates(camtraps_sf, 
 #' "path/to/covariate_rasters", 
@@ -105,8 +140,8 @@
 #' elevation_zoom = 11,
 #' terrain_measures = c("slope", "aspect", "TRI"))
 #' 
-#' note that if local rasters are available they can be extracted alongside
-#' elevation data in a single 
+#' # Note that if local rasters are available they can be extracted alongside
+#' # elevation data in a single function call
 #' 
 #' # camera trap table with extracted covariate values
 #' camtraps_sf_cov <- covariates_elev$CTtable
@@ -115,11 +150,49 @@
 #' r_cov <- covariates_elev$predictionRaster
 #' plot(r_cov)
 #' 
+#' # Use SpatRaster objects directly as input
+#' r1 <- rast("elevation.tif")
+#' r2 <- rast("landcover.tif")
+#' raster_list <- list(elevation = r1, landcover = r2)
+#' 
+#' covariates_direct <- createCovariates(camtraps_sf,
+#'                                       rasters = raster_list,
+#'                                       buffer_ct = 100,
+#'                                       resolution = 100)
+#'
+#' # Scale numeric covariates for modeling
+#' covariates_scaled <- createCovariates(camtraps_sf,
+#'                                       rasters = raster_list,
+#'                                       buffer_ct = 100,
+#'                                       resolution = 100,
+#'                                       scale_covariates = TRUE)
+#'
+#' # Use scaled data with categorical variables
+#' # Mix and match from original and scaled outputs for tabular data
+#' model_data <- covariates_scaled$CTtable_scaled  # Use scaled numeric covariates
+#' model_data$landcover <- covariates_direct$CTtable$landcover  # Use original categorical covariate
+#' 
+#' # Mix and match for prediction rasters
+#' # Create a combined prediction raster with scaled numeric variables and original categorical variables
+#' # Extract scaled elevation layer
+#' elev_scaled <- covariates_scaled$predictionRaster_scaled$elevation
+#' 
+#' # Extract original landcover layer (categorical)
+#' landcover_orig <- covariates_direct$predictionRaster$landcover
+#' 
+#' # Combine into a new SpatRaster for predictions
+#' prediction_raster <- c(elev_scaled, landcover_orig)
+#' names(prediction_raster) <- c("elevation", "landcover")
+#' 
+#' # Use this combined raster for spatial predictions
+#' plot(prediction_raster)
 #' }
 #' 
+
 createCovariates <- function(CTtable,
                              directory,
-                             filenames, 
+                             filenames,
+                             rasters,
                              buffer_ct = 0,
                              bilinear = FALSE,
                              buffer_aoi = 1000,
@@ -131,7 +204,8 @@ createCovariates <- function(CTtable,
                              download_elevation = FALSE,
                              elevation_zoom = 10,
                              terrain_measures = NULL,
-                             standardize_na = TRUE)
+                             standardize_na = FALSE,
+                             scale_covariates = FALSE)
 {
   if(!inherits(CTtable, "sf")){ 
     stop("CTtable is not an sf object.")
@@ -142,14 +216,22 @@ createCovariates <- function(CTtable,
     stop("The 'CTtable' is empty.")
   }
   
+  # Count how many input sources are provided
+  input_sources <- sum(
+    hasArg(directory),
+    hasArg(filenames),
+    hasArg(rasters),
+    download_elevation
+  )
   
   # Check if any input source is provided
-  if (!hasArg(directory) && !hasArg(filenames) && !download_elevation) {
-    stop("Please provide either 'directory', 'filenames', or set 'download_elevation = TRUE'.")
+  if (input_sources == 0) {
+    stop("Please provide one of 'directory', 'filenames', 'rasters', or set 'download_elevation = TRUE'.")
   }
   
-  if (hasArg(directory) && hasArg(filenames)) {
-    stop("Provide either 'directory' or 'filenames', not both.")
+  # Check that only one of directory, filenames, or rasters is provided
+  if (sum(hasArg(directory), hasArg(filenames), hasArg(rasters)) > 1) {
+    stop("Provide only one of 'directory', 'filenames', or 'rasters'.")
   }
   
   # Validate formats
@@ -261,9 +343,6 @@ createCovariates <- function(CTtable,
       covariate_names <- tools::file_path_sans_ext(basename(lf_covariates))
       
       if(recursive) {
-        # Use directory names as covariate names when recursive is TRUE
-        # covariate_names <- basename(dirname(lf_covariates))
-        
         # Check for subdirectories with depth > 1
         dir_depth <- sapply(lf_covariates, function(x) length(strsplit(x, .Platform$file.sep)[[1]]))
         if(any(dir_depth > length(strsplit(directory, .Platform$file.sep)[[1]]) + 2)) {
@@ -281,9 +360,6 @@ createCovariates <- function(CTtable,
                      paste(multi_file_covs, collapse = ", "), 
                      ". Ensure only one raster file per covariate directory."))
         }
-      } else {
-        # Use file names as covariate names when recursive is FALSE
-        # covariate_names <- tools::file_path_sans_ext(basename(lf_covariates))
       }
       
       local_r_cov <- lapply(lf_covariates, terra::rast)
@@ -310,6 +386,46 @@ createCovariates <- function(CTtable,
     
     # Add local rasters to the master list
     list_r_cov <- c(list_r_cov, local_r_cov)
+  }
+  
+  # Process provided SpatRaster objects
+  if (hasArg(rasters)) {
+    if (inherits(rasters, "SpatRaster")) {
+      # Single SpatRaster object
+      if (terra::nlyr(rasters) == 1) {
+        # Single layer raster
+        if (is.null(names(rasters)) || names(rasters) == "") {
+          # No name provided, assign default name
+          warning("No name provided for input raster. Using 'layer1' as name.", call. = F, immediate. = T)
+          names(rasters) <- "layer1"
+        }
+        spat_r_cov <- list(rasters)
+        names(spat_r_cov) <- names(rasters)
+      } else {
+        # Multi-layer raster - handle as a single multi-band raster
+        spat_r_cov <- list(rasters)
+        names(spat_r_cov) <- "raster"
+      }
+    } else if (is.list(rasters)) {
+      # List of SpatRaster objects
+      if (!all(sapply(rasters, inherits, "SpatRaster"))) {
+        stop("All elements in 'rasters' must be SpatRaster objects.")
+      }
+      
+      # Check for and assign names to rasters
+      if (is.null(names(rasters))) {
+        # No names provided, assign default names
+        warning("No names provided for input rasters. Using 'layer1', 'layer2', ... as names.", call. = F, immediate. = T)
+        names(rasters) <- paste0("layer", 1:length(rasters))
+      }
+      
+      spat_r_cov <- rasters
+    } else {
+      stop("'rasters' must be a SpatRaster object or a list of SpatRaster objects.")
+    }
+    
+    # Add spatial rasters to the master list
+    list_r_cov <- c(list_r_cov, spat_r_cov)
   }
   
   # Download elevation data and calculate terrain metrics if requested
@@ -407,11 +523,41 @@ createCovariates <- function(CTtable,
   
   df_covariates <- do.call(cbind, cov_value_list)
   
+  # Check for NAs in extracted covariates
+  na_counts <- sapply(df_covariates, function(x) sum(is.na(x)))
+  if(any(na_counts > 0)) {
+    na_cols <- names(na_counts[na_counts > 0])
+    na_percent <- na_counts[na_counts > 0] / nrow(df_covariates) * 100
+    
+    # Format the warning message
+    warning_msg <- "NAs found in extracted covariates:\n"
+    for(i in seq_along(na_cols)) {
+      warning_msg <- paste0(warning_msg, "  ", na_cols[i], ": ", na_counts[na_cols[i]],
+                            " NAs (", round(na_percent[i], 1), "%)\n")
+    }
+    warning(warning_msg, call. = FALSE, immediate. = TRUE)
+  }
+  
   # cbind to input camera trap table, if requested
   if(append) {
     df_covariates_out <- cbind(CTtable, df_covariates)
   } else {
     df_covariates_out <- df_covariates
+  }
+  
+  # Identify which columns are covariates (needed for scaling later)
+  if(append) {
+    # Get the names of the columns that were added as covariates
+    if(inherits(df_covariates_out, "sf")) {
+      geom_col <- attr(df_covariates_out, "sf_column")
+      original_cols <- setdiff(names(CTtable), geom_col)
+    } else {
+      original_cols <- names(CTtable)
+    }
+    covariate_cols <- setdiff(names(df_covariates_out), original_cols)
+  } else {
+    # All columns are covariates if append=FALSE
+    covariate_cols <- names(df_covariates_out)
   }
   
   # clip rasters to desired extent (in their original CRS)
@@ -443,7 +589,7 @@ createCovariates <- function(CTtable,
                          })
   names(list_r_cov_c) <- names(list_r_cov)
   
-    
+  
   if(create_raster){
     # resample rasters according to template
     r_cov_list <- lapply(1:length(list_r_cov_c),
@@ -481,7 +627,9 @@ createCovariates <- function(CTtable,
   }
   
   # ensure the output has correct layer names (rast doesn't preserve names of multi-band raster bands)
-  names(r_cov) <- unlist(sapply(r_cov_list, names))
+  if (!is.null(r_cov)) {
+    names(r_cov) <- unlist(sapply(r_cov_list, names))
+  }
   
   # Standardize NA patterns across all layers if requested
   if(standardize_na && !is.null(r_cov) && terra::nlyr(r_cov) > 1) {
@@ -490,11 +638,85 @@ createCovariates <- function(CTtable,
                          maskvalues = 1,             # (coded as "1" in any(is.na()))
                          updatevalue = NA)           # replace cells where any band is 1 in the mask with NA
   }
-
   
+  # Scale covariates if requested
+  if(scale_covariates && length(covariate_cols) > 0) {
+    # Check which columns are numeric and can be scaled
+    is_numeric <- sapply(df_covariates_out[covariate_cols], is.numeric)
+    numeric_covariate_cols <- covariate_cols[is_numeric]
+    
+    if(length(numeric_covariate_cols) > 0) {
+      # Handle sf objects for scaling
+      is_sf <- inherits(df_covariates_out, "sf")
+      if(is_sf) {
+        df_temp <- sf::st_drop_geometry(df_covariates_out)
+      } else {
+        df_temp <- df_covariates_out
+      }
+      
+      # Scale numeric covariates
+      scaled_data <- scale(df_temp[numeric_covariate_cols])
+      center_values <- attr(scaled_data, "scaled:center")
+      scale_values <- attr(scaled_data, "scaled:scale")
+      names(center_values) <- numeric_covariate_cols
+      names(scale_values) <- numeric_covariate_cols
+      
+      # Create scaled dataframe
+      df_scaled <- df_temp
+      df_scaled[numeric_covariate_cols] <- scaled_data
+      
+      # Restore geometry if needed
+      if(is_sf) {
+        geom_col <- attr(df_covariates_out, "sf_column")
+        geometry <- sf::st_geometry(df_covariates_out)
+        df_scaled <- sf::st_sf(df_scaled, geometry = geometry)
+      }
+      
+      # Create scaled raster if prediction raster exists
+      r_cov_scaled <- NULL
+      if(!is.null(r_cov) && terra::nlyr(r_cov) > 0) {
+        r_cov_scaled <- r_cov
+        
+        # Scale applicable layers
+        for(col in numeric_covariate_cols) {
+          if(col %in% names(r_cov_scaled)) {
+            r_cov_scaled[[col]] <- (r_cov_scaled[[col]] - center_values[col]) / scale_values[col]
+          } else {
+            # warning if covariate in df_scaled but not in prediction stack
+            warning(paste(col, "is not in prediction raster"), call. = F, immediate. = T)
+          }
+        }
+      }
+      
+      # Print summary message
+      message(paste0("Scaled ", length(numeric_covariate_cols), " numeric covariates."))
+      
+      # Prepare full output with both original and scaled data
+      result <- list(
+        CTtable = df_covariates_out,
+        CTtable_scaled = df_scaled,
+        predictionRaster = r_cov,
+        predictionRaster_scaled = r_cov_scaled,
+        originalRaster = list_r_cov,
+        scaling_params = list(center = center_values, scale = scale_values)
+      )
+    } else {
+      warning("No numeric covariates found to scale.", call. = F, immediate. = T)
+      # Return unscaled data if no numeric covariates
+      result <- list(
+        CTtable = df_covariates_out,
+        predictionRaster = r_cov,
+        originalRaster = list_r_cov
+      )
+    }
+  } else {
+    # Return standard output without scaling
+    result <- list(
+      CTtable = df_covariates_out,
+      predictionRaster = r_cov,
+      originalRaster = list_r_cov
+    )
+  }
   
-  
-  return(list(CTtable = df_covariates_out,
-              predictionRaster = r_cov,
-              originalRaster = list_r_cov))
+  return(result)
 }
