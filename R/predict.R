@@ -121,7 +121,7 @@ rast(YourRaster)")
     if(is.data.frame(x)) {
       values_to_predict_all <- x
     } else {
-      stop("x must be a data.frame")
+      stop("x must be a SpatRaster, data.frame, or NULL")
     }
   }
 
