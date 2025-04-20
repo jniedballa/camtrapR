@@ -817,7 +817,7 @@ detectionHistory <- function(recordTable,
   # Multi-species case ----
 
   # Check if all species are in the record table
-  species_not_found <- species[!species %in% recordTable[, speciesCol]]
+  species_not_found <- species[!species %in% recordTable[[speciesCol]]]
   if(length(species_not_found) > 0) {
     stop(paste("The following species were not found in recordTable:", 
                paste(species_not_found, collapse = ", ")), call. = FALSE)
