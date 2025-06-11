@@ -233,6 +233,7 @@ surveyDashboard <- function(CTtable = NULL,
     "terra",
     "stars",   # not needed by itself but needed by mapview
     "leaflet",
+    "mapview",
     "ggplot2",
     "plotly",
     "lubridate",
@@ -2568,7 +2569,7 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
-    
+    # check column specification of input tables
     observe({
       # Only run this when we have both tables
       req(data$CTtable, data$recordTable)
@@ -3804,6 +3805,12 @@ surveyDashboard <- function(CTtable = NULL,
     
     # define function for aggregating by station (collapsing cameras at station)
     aggregateCTtableByStation <- function(df, stationCol) {
+      
+      if (!stationCol %in% names(df)) {
+        stop(paste("Error in aggregateCTtableByStation: station column '", stationCol, 
+                   "' not found in input data frame. Available columns are:", 
+                   paste(names(df), collapse = ", ")))
+      }
       
       if(inherits(df, "sf")) df <- sf::st_drop_geometry(df)
       
