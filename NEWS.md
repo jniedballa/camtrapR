@@ -1,3 +1,14 @@
+# camtrapR 2.5.3
+## bugfixes: 
+* save app state 
+
+# camtrapR 2.5.2
+
+## new features:
+* createCovariates: direct raster import, new parameters "standardize_na" and "scale_covariates" 
+* surveyDashboard: tooltips for all UI elements
+* communityModel: better summary() method
+
 # camtrapR 2.5.1
 
 ## new functions:
