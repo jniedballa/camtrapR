@@ -204,8 +204,6 @@ create_incidence_matrix <- function(records_subset,
                                     by_station) {    # only relevant if temporal = T
 
   if(temporal) {
-    # avoid CRAN check notes
-    survey_date <- survey_day <- survey_day_by_station <- station_setup_date <- NULL
     
     # For temporal analysis (days)
     records_subset <- records_subset %>%
