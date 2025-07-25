@@ -10584,8 +10584,8 @@ surveyDashboard <- function(CTtable = NULL,
         advanced_model = advanced_model(),
         # basic_modList = single_species_occu_objects$basic_modList,
         # adv_modList = single_species_occu_objects$adv_modList,
-        single_species_occu_objects = single_species_occu_objects(),
         
+        single_species_occu_objects = single_species_occu_objects,
         
         commOccu_model = commOccu_model(),
         fitted_comm_model = fitted_comm_model(),
