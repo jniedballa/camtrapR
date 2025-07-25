@@ -10572,8 +10572,13 @@ surveyDashboard <- function(CTtable = NULL,
         filtered_species = filtered_species(),
         
         # Raster data
-        prediction_raster = data$prediction_raster,
-        original_rasters = data$original_rasters,
+        # these can't be saved directly in rds file, 
+        # hence save file and store path here
+        prediction_raster = NULL,
+        original_rasters = NULL, 
+        prediction_raster_filepath = "prediction_raster.tif",
+        original_rasters_filepath = NULL,   # would be excessively large for export, don't include for now.
+        
         
         # Detection history
         detection_hist_data = if (!is.null(try(detection_hist(), silent = TRUE))) detection_hist() else NULL,
@@ -10586,6 +10591,7 @@ surveyDashboard <- function(CTtable = NULL,
         # adv_modList = single_species_occu_objects$adv_modList,
         
         single_species_occu_objects = single_species_occu_objects,
+        
         
         commOccu_model = commOccu_model(),
         fitted_comm_model = fitted_comm_model(),
@@ -10603,8 +10609,12 @@ surveyDashboard <- function(CTtable = NULL,
         # x_label = x_label(),
         
         # Spatial predictions
-        occupancy_predictions = spatial_predictions_community$occupancy,
-        richness_predictions = spatial_predictions_community$richness,
+        # occupancy_predictions = spatial_predictions_community$occupancy,
+        # richness_predictions = spatial_predictions_community$richness,
+        occupancy_predictions = NULL,   # restore from file when loading
+        richness_predictions = NULL,
+        occupancy_predictions_filepath = "community_prediction_occu.tif",
+        richness_predictions_filepath = "community_prediction_richness.tif",
         pao_predictions = spatial_predictions_community$pao,
         
         # Study area
@@ -10639,7 +10649,8 @@ surveyDashboard <- function(CTtable = NULL,
         # Covariate and scaling data
         scaling_params = data$scaling_params,
         aggregated_CTtable_scaled = data$aggregated_CTtable_scaled,
-        prediction_raster_scaled = data$prediction_raster_scaled,
+        # prediction_raster_scaled = data$prediction_raster_scaled,
+        prediction_raster_scaled = NULL,  # restore from file when loading
         original_columns = data$original_columns,
         
         # Additional settings
@@ -10870,7 +10881,9 @@ surveyDashboard <- function(CTtable = NULL,
     # Observers for saving and loading app state
     
     observeEvent(input$saveState, {
-      suggested_filename <- paste0("app_state_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds")
+      suggested_filename <- paste0("app_state_", format(Sys.time(), "%Y%m%d_%H%M%S"), 
+                                   # ".rds")
+                                   ".zip")
       showModal(modalDialog(
         title = "Save App State",
         textInput("stateFileName", "File name:", value = suggested_filename),
@@ -10886,8 +10899,9 @@ surveyDashboard <- function(CTtable = NULL,
     observeEvent(input$confirmSave, {
       removeModal()
       
-      # Collect current state without requiring parameters
+      # Collect current state
       app_state <- collectAppState()
+      
       
       # Use system file dialog with suggested name and default extension
       if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
@@ -10895,7 +10909,7 @@ surveyDashboard <- function(CTtable = NULL,
           caption = "Save App State",
           label = "Save",
           existing = FALSE,
-          filter = "R Data Files (*.rds)",
+          filter = "zip files (*.zip)",
           path = input$stateFileName
         )
       } else {
@@ -10903,13 +10917,80 @@ surveyDashboard <- function(CTtable = NULL,
       }
       
       if (!is.null(file_path)) {
-        # Ensure .rds extension
-        if (!grepl("\\.rds$", file_path, ignore.case = TRUE)) {
-          file_path <- paste0(file_path, ".rds")
+        # Ensure .zip extension
+        if (!grepl("\\.zip$", file_path, ignore.case = TRUE)) {
+          file_path <- paste0(file_path, ".zip")
         }
         
-        # Save state
-        saveRDS(app_state, file = file_path)
+        # Save state to temporary location
+        folder_timestamp <- round(Sys.time())
+        folder_timestamp <- gsub(":", "-", folder_timestamp)
+        path_tmp <- file.path(tempdir(), paste0("export_", folder_timestamp))
+        dir.create(path_tmp)
+        
+        saveRDS(app_state, file = file.path(path_tmp, "app_state.rds"))
+        if(!is.null(data$prediction_raster)) terra::writeRaster(data$prediction_raster, 
+                                                                filename = file.path(path_tmp, 
+                                                                                     "prediction_raster.tif"))
+        if(!is.null(data$prediction_raster_scaled)) terra::writeRaster(data$prediction_raster_scaled, 
+                                                                filename = file.path(path_tmp, 
+                                                                                     "prediction_raster_scaled.tif"))
+        
+        if(!is.null(spatial_predictions_community$occupancy)) {
+          occupancy_dir <- file.path(path_tmp, "occupancy")
+          dir.create(occupancy_dir)
+          
+          terra::writeRaster(spatial_predictions_community$occupancy$mean, 
+                             file.path(occupancy_dir, "mean.tif"), overwrite = TRUE)
+          terra::writeRaster(spatial_predictions_community$occupancy$sd, 
+                             file.path(occupancy_dir, "sd.tif"), overwrite = TRUE)
+          terra::writeRaster(spatial_predictions_community$occupancy$lower, 
+                             file.path(occupancy_dir, "lower.tif"), overwrite = TRUE)
+          terra::writeRaster(spatial_predictions_community$occupancy$upper, 
+                             file.path(occupancy_dir, "upper.tif"), overwrite = TRUE)
+          
+        }
+
+        if(!is.null(spatial_predictions_community$richness)) {
+          richness_dir <- file.path(path_tmp, "richness")
+          dir.create(richness_dir, recursive = TRUE)
+          
+          terra::writeRaster(spatial_predictions_community$richness$mean, 
+                             file.path(richness_dir, "mean.tif"), overwrite = TRUE)
+          terra::writeRaster(spatial_predictions_community$richness$sd, 
+                             file.path(richness_dir, "sd.tif"), overwrite = TRUE)
+          terra::writeRaster(spatial_predictions_community$richness$lower, 
+                             file.path(richness_dir, "lower.tif"), overwrite = TRUE)
+          terra::writeRaster(spatial_predictions_community$richness$upper, 
+                             file.path(richness_dir, "upper.tif"), overwrite = TRUE)
+          
+        } 
+        
+        # gather files to zip
+        files_to_include <- file.path(#path_tmp,
+                                      c("app_state.rds",
+                                        "prediction_raster.tif",
+                                        "prediction_raster_scaled.tif")
+                                      )
+        files_to_include <- c(files_to_include, file.path("occupancy", c("mean.tif", "sd.tif", "lower.tif", "upper.tif")))
+        files_to_include <- c(files_to_include, file.path("richness", c("mean.tif", "sd.tif", "lower.tif", "upper.tif")))
+        
+         
+
+
+        # zip
+        old_wd <- getwd()
+        on.exit(setwd(old_wd))
+        setwd(path_tmp)
+        
+        
+        files_to_include <- files_to_include[file.exists(files_to_include)]
+        
+        
+        zip::zip(zipfile = file_path,
+                 files_to_include)
+        
+        # notify user
         showNotification(paste("App state saved to", file_path), type = "message", duration = 5)
         showNotification("Single species occupancy models and results will not be restored.", type = "message", duration = 5)
       }
