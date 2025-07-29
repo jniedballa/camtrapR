@@ -10577,6 +10577,7 @@ surveyDashboard <- function(CTtable = NULL,
         prediction_raster = NULL,
         original_rasters = NULL, 
         prediction_raster_filepath = "prediction_raster.tif",
+        prediction_raster_scaled_filepath = "prediction_raster_scaled.tif",
         original_rasters_filepath = NULL,   # would be excessively large for export, don't include for now.
         
         
@@ -10613,9 +10614,8 @@ surveyDashboard <- function(CTtable = NULL,
         # richness_predictions = spatial_predictions_community$richness,
         occupancy_predictions = NULL,   # restore from file when loading
         richness_predictions = NULL,
-        occupancy_predictions_filepath = "community_prediction_occu.tif",
-        richness_predictions_filepath = "community_prediction_richness.tif",
         pao_predictions = spatial_predictions_community$pao,
+        occupancy_predictions_species_names = names(spatial_predictions_community$occupancy$mean),
         
         # Study area
         study_area = data$study_area,
@@ -10753,8 +10753,15 @@ surveyDashboard <- function(CTtable = NULL,
           
           # 6. Restore spatial predictions
           
-          if (!is.null(saved_state$occupancy_predictions)) 
+          if (!is.null(saved_state$occupancy_predictions)) {
             spatial_predictions_community$occupancy <- saved_state$occupancy_predictions
+            # restor species names (often not saved correctly in raster)
+            names(spatial_predictions_community$occupancy$mean)  <- saved_state$occupancy_predictions_species_names
+            names(spatial_predictions_community$occupancy$sd)    <- saved_state$occupancy_predictions_species_names
+            names(spatial_predictions_community$occupancy$lower) <- saved_state$occupancy_predictions_species_names
+            names(spatial_predictions_community$occupancy$upper) <- saved_state$occupancy_predictions_species_names
+          }
+          
           if (!is.null(saved_state$richness_predictions)) 
             spatial_predictions_community$richness <- saved_state$richness_predictions
           if (!is.null(saved_state$pao_predictions)) 
@@ -11002,7 +11009,8 @@ surveyDashboard <- function(CTtable = NULL,
         file_path <- rstudioapi::selectFile(
           caption = "Load App State",
           label = "Load",
-          filter = "R Data Files (*.rds)"
+          # filter = "R Data Files (*.rds)"
+          filter = "zip files (*.zip)"
         )
       } else {
         file_path <- file.choose(new = FALSE)
@@ -11015,7 +11023,46 @@ surveyDashboard <- function(CTtable = NULL,
         
         tryCatch({
           # Load state
-          saved_state <- readRDS(file_path)
+          # old: load rds file
+          # saved_state <- readRDS(file_path)
+          
+          # new: unzip to temporary directory, readRDS and read rasters
+          
+          # 1. Define a new temporary directory to extract the files into
+          extract_dir <- file.path(tempdir(), paste0("extracted_state", gsub(":", "", round(Sys.time()))))
+          if (!dir.exists(extract_dir)) dir.create(extract_dir)
+          
+          # 2. Unzip the uploaded file
+          unzip(file_path, exdir = extract_dir)
+          
+          # 3. Load the files from the extraction directory
+          rds_filepath <- file.path(extract_dir, "app_state.rds")
+          saved_state  <- readRDS(rds_filepath)
+          
+          prediction_raster_filepath <- file.path(extract_dir, saved_state$prediction_raster_filepath)
+          if(!is.null(prediction_raster_filepath)) saved_state$prediction_raster <- terra::rast(prediction_raster_filepath)
+          
+          prediction_raster_scaled_filepath <- file.path(extract_dir, saved_state$prediction_raster_scaled_filepath)
+          if(!is.null(prediction_raster_scaled_filepath)) saved_state$prediction_raster_scaled <- terra::rast(prediction_raster_scaled_filepath)
+          
+          community_occupancy_raster_filepaths <- file.path(extract_dir, "occupancy", c("mean.tif", "sd.tif", "lower.tif", "upper.tif"))
+          if(all(file.exists(community_occupancy_raster_filepaths))){
+            saved_state$occupancy_predictions <- rast(community_occupancy_raster_filepaths)
+          }
+          
+          community_richness_raster_filepaths <- file.path(extract_dir, "richness", c("mean.tif", "sd.tif", "lower.tif", "upper.tif"))
+          if(all(file.exists(community_richness_raster_filepaths))){
+            saved_state$richness_predictions <- rast(community_richness_raster_filepaths)
+          }
+          
+          
+          # Clean up the path variables
+          
+          saved_state$prediction_raster_path <- NULL
+          prediction_raster_scaled_filepath <- NULL
+          community_richness_raster_filepaths <- NULL
+          community_occupancy_raster_filepaths <- NULL
+          
           
           # Validate basic structure of saved state
           required_components <- c("CTtable", "recordTable", "stationCol", "speciesCol")
