@@ -1645,7 +1645,7 @@ surveyDashboard <- function(CTtable = NULL,
                                             add_tooltip(id = "occasionLength_single_species", title = "Define the duration (in days) of each sampling occasion.")),
                               # shiny::column(3, selectInput("outputType", "Output Type", choices = c("binary", "count"), selected = "binary"),  # removed, irrelevant for given model types
                               shiny::column(3, 
-                                            selectInput("day1",
+                                            selectInput("day1_single_species",
                                                         label = tagList(
                                                           "Day 1",
                                                           span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
@@ -2029,7 +2029,7 @@ surveyDashboard <- function(CTtable = NULL,
                        shinydashboard::box(
                          title = "Basic Settings", width = 12, status = "primary", collapsible = TRUE, collapsed = FALSE,
                          fluidRow(
-                           column(4, 
+                           column(3, 
                                   selectInput("communityModelType",
                                               label = tagList(
                                                 "Model Type:",
@@ -2039,10 +2039,18 @@ surveyDashboard <- function(CTtable = NULL,
                                               choices = c("Occupancy" = "Occupancy", "Royle-Nichols" = "RN"), selected = "Occupancy"),
                                   # add_tooltip(id = "communityModelType", title = "Choose 'Occupancy' for presence/absence or 'RN' for Royle-Nichols abundance model.")
                                   ),
-                           column(4, 
+                           column(3, 
                                   sliderInput("occasionLength_community", "Occasion Length (days)", min = 1, max = 20, value = 10, step = 1, ticks = FALSE), 
                                   add_tooltip(id = "occasionLength_community", title = "Define the length of sampling occasions (in days) for creating detection histories.")),
-                           column(4, 
+                           column(3, 
+                                  selectInput("day1_community",
+                                              label = tagList(
+                                                "Day 1",
+                                                span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                     title = "'survey'=align all to survey start; 'station'=align to station setup date.")
+                                              ),
+                                              choices = c("survey", "station"), selected = "survey")),
+                           column(3, 
                                   checkboxInput("useNimble", "Use Nimble", value = FALSE), 
                                   add_tooltip(id = "useNimble", title = "Use the NIMBLE package for MCMC fitting instead of JAGS (experimental)."))
                          )
@@ -7198,7 +7206,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     detection_hist <- reactive({
       req(input$species_dethist, input$occasionLength_single_species, #input$outputType, 
-          input$day1)
+          input$day1_single_species)
       
       # Check if current_species_list() is valid
       if (!is.vector(current_species_list()) || length(current_species_list()) == 0) {
@@ -7226,7 +7234,7 @@ surveyDashboard <- function(CTtable = NULL,
           camOp = camop(),
           species = input$species_dethist,
           occasionLength = input$occasionLength_single_species,
-          day1 = input$day1,
+          day1 = input$day1_single_species,
           # output = input$outputType,
           scaleEffort = FALSE,
           timeZone = data$timeZone,
@@ -7342,7 +7350,7 @@ surveyDashboard <- function(CTtable = NULL,
                             gsub(" ", "_", input$species_dethist), "_",
                             input$occasionLength_single_species, "d", "_", 
                             # input$outputType, "_",
-                            "day1_", input$day1)
+                            "day1_", input$day1_single_species)
       
       assign_to_global_dh <- function(pos=1) {
         assign(object_name, detection_hist(), envir=as.environment(pos))
@@ -7452,7 +7460,7 @@ surveyDashboard <- function(CTtable = NULL,
                             gsub(" ", "_", input$species_dethist), "_",
                             input$occasionLength_single_species, "d", "_", 
                             # input$outputType, "_",
-                            "day1_", input$day1)
+                            "day1_", input$day1_single_species)
       
       assign_to_global_umf <- function(pos=1) {
         umf_export <- umf()
@@ -7612,7 +7620,7 @@ surveyDashboard <- function(CTtable = NULL,
       input$basic_model_type,
       input$species_dethist,
       input$occasionLength_single_species,
-      input$day1 #,
+      input$day1_single_species #,
       # input$outputType
     ), {
       
@@ -7637,7 +7645,7 @@ surveyDashboard <- function(CTtable = NULL,
       input$adv_model_type,
       input$species_dethist,
       input$occasionLength_single_species,
-      input$day1 #,
+      input$day1_single_species #,
       # input$outputType
     ), {
       
@@ -8839,7 +8847,7 @@ surveyDashboard <- function(CTtable = NULL,
           recordDateTimeCol = data$recordDateTimeCol,
           species = sp,
           occasionLength = input$occasionLength_community,
-          day1 = "survey",
+          day1 = input$day1_community, #"survey",
           datesAsOccasionNames = FALSE,
           includeEffort = TRUE,
           scaleEffort = TRUE,
@@ -10635,7 +10643,8 @@ surveyDashboard <- function(CTtable = NULL,
             community = input$occasionLength_community
           ),
           # output_type = input$outputType,
-          day1 = input$day1,
+          day1_single_species = input$day1_single_species,
+          day1_community = input$day1_community,
           camera_settings = list(
             minDeltaTime = input$minDeltaTime,
             deltaTimeComparedTo = input$deltaTimeComparedTo,
@@ -10830,11 +10839,14 @@ surveyDashboard <- function(CTtable = NULL,
             updateSliderInput(session, "occasionLength_community",
                               value = saved_state$ui_state$occasion_length$community)
             
+            updateSelectInput(session, "day1_community",
+                              selected = saved_state$ui_state$day1_community)
+            
             # updateSelectInput(session, "outputType",
             #                   selected = saved_state$ui_state$output_type)
             
-            updateSelectInput(session, "day1",
-                              selected = saved_state$ui_state$day1)
+            updateSelectInput(session, "day1_single_species",
+                              selected = saved_state$ui_state$day1_single_species)
             
             # Camera settings
             if (!is.null(saved_state$ui_state$camera_settings)) {
