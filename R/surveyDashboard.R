@@ -8902,8 +8902,10 @@ surveyDashboard <- function(CTtable = NULL,
           NULL
         },
         modelFile = if (input$modelFile == "") tempfile(fileext = ".txt") else input$modelFile,
-        nimble = input$useNimble
+        nimble = input$useNimble,
+        keyword_quadratic = input$keyword_quadratic
       )
+      
       # Add effort as detection covariate if selected
       if (input$useEffortAsDetCov) {
         if (input$effortDetCovType == "fixed") {
