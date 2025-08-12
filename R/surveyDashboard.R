@@ -9506,9 +9506,9 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Get dispersion pattern 
     get_dispersion_pattern <- function(bp) {
-      if (bp >= 0.35 && bp <= 0.65) {
-        ""  # Empty for good/excellent fit
-      } else if (bp < 0.35) {
+      if (bp >= 0.1 && bp <= 0.9) {
+        ""  # Empty for acceptable fit
+      } else if (bp < 0.1) {
         "Underdispersed"
       } else {
         "Overdispersed"
