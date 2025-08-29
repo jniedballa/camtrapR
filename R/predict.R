@@ -1040,7 +1040,7 @@ if(type == "p_array") {
 #' Create (spatial) predictions of species occupancy and species richness from community occupancy models and spatial rasters or covariate data frames.
 #'
 #' @param object \code{commOccu} object
-#' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
+#' @param mcmc.list  mcmc.list. Output of \code{fit} called on a \code{commOccu} object
 #' @param type character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array. For Royle-Nichols models, "abundance" for species abundance, or "lambda_array" for raw species abundance estimates in an array. "p_array" for raw detection probabilities in an array.
 #' @param draws  Number of draws from the posterior to use when generating the plots. If fewer than draws are available, they are all used
 #' @param level  Probability mass to include in the uncertainty interval

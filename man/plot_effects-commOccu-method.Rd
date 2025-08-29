@@ -21,7 +21,7 @@
 \arguments{
 \item{object}{\code{commOccu} object}
 
-\item{mcmc.list}{mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object}
+\item{mcmc.list}{mcmc.list. Output of \code{fit} called on a \code{commOccu} object}
 
 \item{submodel}{character. Submodel to get plots for. Can be \code{"det"} (detection submodel) or \code{"state"} (occupancy submodel)}
 

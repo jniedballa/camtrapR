@@ -396,7 +396,7 @@ plot_effects_commOccu <- function(object,
   #'
   #' @aliases plot_effects
   #' @param object \code{commOccu} object
-  #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
+  #' @param mcmc.list  mcmc.list. Output of \code{fit} called on a \code{commOccu} object
   #' @param submodel  character. Submodel to get plots for. Can be \code{"det"} (detection submodel) or \code{"state"} (occupancy submodel)
   #' @param response character. response type on y axis. Only relevant for \code{submodel = "state"}. Default is \code{"occupancy"}, can be set to \code{"abundance"} for Royle-Nichols models
   #' @param speciesSubset  character. Species to include in effect plots.
@@ -868,7 +868,7 @@ plot_coef_commOccu <- function(object,
   #'
   #' @aliases plot_coef
   #' @param object \code{commOccu} object
-  #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
+  #' @param mcmc.list  mcmc.list. Output of \code{fit} called on a \code{commOccu} object
   #' @param submodel  character. Submodel to get plots for. Can be \code{"det"} or \code{"state"}
   #' @param speciesSubset  character. Species to include in coefficient plots.
   #' @param ordered logical. Order species in plot by median effect (TRUE) or by species name (FALSE)
