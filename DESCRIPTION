@@ -14,7 +14,7 @@ Authors@R: c(
         person("Seth Timothy", "Wong", role = "ctb",
                 comment = c(ORCID = "0000-0001-8083-9268")),
         person("An The Truong", "Nguyen", role = "ctb",
-                comment = c(ORCID = "0000-0003-0456-3866")),
+                comment = c(ORCID = "0009-0000-2861-2672")),
         person("Azlan bin", "Mohamed", role = "ctb",
                 comment = c(ORCID = "0000-0003-3788-4383")),
         person("Andrew", "Tilker", role = "ctb",
@@ -27,7 +27,7 @@ Authors@R: c(
                 comment = c(ORCID = "0000-0001-5073-9186"))
         )
 Depends: 
-        R (>= 3.1.0)
+        R (>= 4.1.0)
 Imports: 
         data.table,
         dplyr,
@@ -93,4 +93,4 @@ URL: https://github.com/jniedballa/camtrapR, https://jniedballa.github.io/camtra
 BugReports: https://groups.google.com/forum/#!forum/camtrapr
 Encoding: UTF-8
 License: GPL (>= 2)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
