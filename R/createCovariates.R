@@ -173,7 +173,7 @@
 #' model_data$landcover <- covariates_direct$CTtable$landcover  # Use original categorical covariate
 #' 
 #' # Mix and match for prediction rasters
-#' # Create a combined prediction raster with scaled numeric variables and original categorical variables
+#' # Create combined prediction raster (scaled numeric variables & original categorical variables)
 #' # Extract scaled elevation layer
 #' elev_scaled <- covariates_scaled$predictionRaster_scaled$elevation
 #' 
