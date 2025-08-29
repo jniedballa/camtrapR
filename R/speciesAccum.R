@@ -201,9 +201,15 @@ create_incidence_matrix <- function(records_subset,
                                     speciesCol,
                                     species_list, 
                                     temporal = FALSE,
-                                    by_station) {    # only relevant if temporal = T
+                                    by_station)         # only relevant if temporal = T) 
+  {
 
   if(temporal) {
+    
+    # avoid CRAN notes
+    survey_date <- NULL
+    station_setup_date <- NULL
+    
     
     # For temporal analysis (days)
     records_subset <- records_subset %>%
