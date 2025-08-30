@@ -10,7 +10,10 @@ globalVariables(c(
   "create_species_detections_sf",
   "all_models",
   "p",
-  ".data"
+  ".data",
+  
+  # speciesAccum:
+  "survey_date",  "survey_day",  "survey_day_by_station", "station_setup_date"
   
   
 ))
