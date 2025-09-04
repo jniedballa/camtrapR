@@ -1,8 +1,8 @@
 Package: camtrapR
 Type: Package
 Title: Camera Trap Data Management and Preparation of Occupancy and Spatial Capture-Recapture Analyses
-Version: 2.3.0
-Date: 2024-02-24
+Version: 2.3.1
+Date: 2025-08-31
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
                 comment = c(ORCID = "0000-0002-9187-2116")),
@@ -14,7 +14,7 @@ Authors@R: c(
         person("Seth Timothy", "Wong", role = "ctb",
                 comment = c(ORCID = "0000-0001-8083-9268")),
         person("An The Truong", "Nguyen", role = "ctb",
-                comment = c(ORCID = "0000-0003-0456-3866")),
+                comment = c(ORCID = "0009-0000-2861-2672")),
         person("Azlan bin", "Mohamed", role = "ctb",
                 comment = c(ORCID = "0000-0003-3788-4383")),
         person("Andrew", "Tilker", role = "ctb",
@@ -73,4 +73,4 @@ URL: https://github.com/jniedballa/camtrapR, https://jniedballa.github.io/camtra
 BugReports: https://groups.google.com/forum/#!forum/camtrapr
 Encoding: UTF-8
 License: GPL (>= 2)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
