@@ -22,7 +22,7 @@
 \arguments{
 \item{object}{\code{commOccu} object}
 
-\item{mcmc.list}{mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object}
+\item{mcmc.list}{mcmc.list. Output of \code{fit} called on a \code{commOccu} object}
 
 \item{type}{character. "psi" for species occupancy estimates, "richness" for species richness estimates, "pao" for percentage of area occupied (by species), "psi_array" for raw occupancy probabilities in an array. For Royle-Nichols models, "abundance" for species abundance, or "lambda_array" for raw species abundance estimates in an array.}
 

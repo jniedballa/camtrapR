@@ -385,7 +385,7 @@ plot_effects_commOccu <- function(object,
   #'
   #' @aliases plot_effects
   #' @param object \code{commOccu} object
-  #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
+  #' @param mcmc.list  mcmc.list. Output of \code{fit} called on a \code{commOccu} object
   #' @param submodel  character. Submodel to get plots for. Can be \code{"det"} (detection submodel) or \code{"state"} (occupancy submodel)
   #' @param response character. response type on y axis. Only relevant for \code{submodel = "state"}. Default is \code{"occupancy"}, can be set to \code{"abundance"} for Royle-Nichols models
   #' @param draws  integer. Number of draws from the posterior to use when generating the plots. If fewer posterior samples than specified in \code{draws} are available, all posterior samples are used.
@@ -872,7 +872,7 @@ plot_coef_commOccu <- function(object,
   #'
   #' @aliases plot_coef
   #' @param object \code{commOccu} object
-  #' @param mcmc.list  mcmc.list. Output of \code{\link{fit}} called on a \code{commOccu} object
+  #' @param mcmc.list  mcmc.list. Output of \code{fit} called on a \code{commOccu} object
   #' @param submodel  character. Submodel to get plots for. Can be \code{"det"} or \code{"state"}
   #' @param ordered logical. Order species in plot by median effect (TRUE) or by species name (FALSE)
   #' @param combine logical. Combine multiple plots into one plot (via facets)?
