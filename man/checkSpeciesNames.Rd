@@ -28,7 +28,7 @@ TSNs (taxonomic serial numbers) and ITIS urls.
 }
 \description{
 The function checks species names (common or scientific names) provided by
-the user with the ITIS taxonomic database (\url{http://www.itis.gov/}) via
+the user with the ITIS taxonomic database (\url{https://www.itis.gov/}) via
 functions from the package \pkg{taxize}. It returns both common and
 scientific names, the taxon authors, taxon rank name and status, the TSN
 (taxonomic serial numbers) and ITIS urls.
@@ -79,7 +79,7 @@ species.names.check3
 
 }
 \references{
-\url{http://www.itis.gov/}
+\url{https://www.itis.gov/}
 }
 \author{
 Juergen Niedballa
