@@ -1676,7 +1676,9 @@ surveyDashboard <- function(CTtable = NULL,
                    shinydashboard::box(
                      width = NULL, status = "primary", title = "Workflow Selection",
                      radioButtons("occupancy_workflow", "Choose workflow:",
-                                  choices = c("Basic - Simple model specification with standard options" = "basic"),
+                                  choices = c("Basic - Simple model specification with standard options" = "basic" #,
+                                              # "Advanced - Full control over model structure and effects" = "advanced"
+                                  ),
                                   selected = "basic"),
                      add_tooltip(id = "occupancy_workflow", title = "Choose 'Basic' for standard models with linear effects. 'Advanced' (under construction) will allow complex models."),
                      collapsible = TRUE, collapsed = TRUE
