@@ -1,92 +1,47 @@
-# camtrapR 2.5.3
-## bugfixes: 
-* save app state 
+# camtrapR 3.0.0
 
-# camtrapR 2.5.2
+## Important note:
+* This version requires R 4.1 or higher (previously 3.1)
 
-## new features:
-* createCovariates: direct raster import, new parameters "standardize_na" and "scale_covariates" 
-* surveyDashboard: tooltips for all UI elements
-* communityModel: better summary() method
+## New functions
+* createCovariates: Extract and prepare spatial covariates for predictions from local and online data
+* PPC.residuals() and PPC.community(): Posterior predictive checks for community models
+* readWildlifeInsights: Import data directly from WildlifeInsights
+* readcamtrapDP: Convert camtrap DP data format to camtrapR format
+* speciesAccum: Create species accumulation curves using iNEXT
+* aggregateStations: Aggregate camera trap table to station level
 
-# camtrapR 2.5.1
+## New features:
+* surveyDashboard: Major update with covariate extraction, community models, improved visualization, tooltips, help files, and more.
+* detectionHistory: Vectorized species input for community models
+* predict: New "p_array" output option
+* plot_coef/plot_effects: "subsetSpecies" argument added
 
-## new functions:
-* add PPC.residuals() and PPC.community() for calculating posterior predictive checks for community models 
-
-# camtrapR 2.5.0
-
-## new functions
-* readcamtrapDP: convert camtrap DP data format to camtrapR format
-
-## new features
-* createCovariates: allows download of elevation data and calculation of terrain indices
-* speciesAccum: add allowed x_unit "survey_day" and "station_day"
-
-# camtrapR 2.4.3
-
-## new features
-* detectionHistory: allow vectorized input for parameter "species" (creates input for communityModel)
-
-
-# camtrapR 2.4.2
-
-## new functions
-* speciesAccum: create species accumulation curves from camera trapping data with package iNEXT
-
-## new features
-* surveyDashboard: include species accumulation curves
-
-## bugfixes
-* readWildlifeInsights: allow date/time format "dmy HM"
-
-
-# camtrapR 2.4.1
-
-## bugfixes
-* surveyDashboard: improved checks for available packages
-
-
-# camtrapR 2.4.0
-
-## new functions
-* readWildlifeInsights: import data directly from WildlifeInsights
-
-
-## new features
-* surveyDashboard: big update with many new functionalities (covariates, community models, visualization, etc.)
-* predict: allow type = "p_array" (4D array of detection probabilities)
-* createCovariates: added parameter "recursive", returns original rasters
 
 # camtrapR 2.3.1
 
-## new functions
-* createCovariates: Extract covariate values from spatial rasters and prepare rasters for spatial predictions
-
-## new features
-* plot_coef / plot_effects: new argument "subsetSpecies" to show only desired species in plots
-
+* maintenance release, no user-visible changes
 
 # camtrapR 2.3.0
 
-## new functions
+## New functions
 * surveyDashboard: Shiny dashboard for summarizing and analyzing camera trap survey data
 * filterRecordTable: filter existing record table for temporal independence between records
 * addToPath: replacement for exiftoolPath with identical functionality
 
-## new features
+## New features
 * communityModel: new argument "model" allows Royle-Nichols models
 * fit, predict, plot_effects, plot_coef also support Royle-Nichols models
 * predict: now accepts type = "pao" (for percentage of area occupied, by species), "psi_array" (raw occupancy probabilities), "abundance" (abundance statistics, for Royle-Nichols model) and "lambda_array" (raw abundances from Royle-Nichols model)
 * predict: new argument "batch" to allow memory-friendly processing in batches
 * communityModel: returns species richness at sampling locations (only in JAGS models)
 
-## bugfixes
+## Bugfixes
 * cameraOperation: last occasions is 0 (not NA) when occasionStartTime = 12 and retrieval time is 12 noon (to prevent dropping of records on last day)
 * cameraOperation: allows any number of ProblemX_from/to columns (was previously limited to 9). Reported by Nicolas Deere.
 * predict / plot_effects: fixed wrong assignment of intercept estimates to posterior draws
 
-## Other
+## Other changes
 * migrated functions from raster/sp to terra/sf, removed rgdal
 * modified plot titles in activityRadial().
 * package "overlap" in Suggests, not Depends
@@ -96,24 +51,24 @@
 
 # camtrapR 2.2.0
 
-## new functions
+## New functions
 * communityModel: create community occupancy models for JAGS and Nimble. Comes with summary(), fit(), and predict() methods
 * plot_effects(): for plotting marginal effect plots (response curves) from community models
 * plot_coef(): for plotting coefficient estimates from community models
 
-## bugfixes
+## Bugfixes
 * reading digiKam database now works for Mac + Linux systems
 
-## other changes
+## Other changes
 * cameraOperation: warning instead of error if problem columns are empty and hasProblems = TRUE
 
 # camtrapR 2.1.0
 
-## new functions
+## New functions
 * OCRdataFields: allows automatic reading of text from data fields in images via optical character recognition (OCR), requires magick and tesseract packages
 * writeDateTimeOriginal: Write values to DateTimeOriginal tag to image metadata
 
-## new features
+## New features
 * cameraOperation: setup/ retrieval / problem columns can be interpreted as date-time format, then computes effort as fraction of day. (Thank you to Zoe Siegel for the suggestion, Fridolin Zimmermann and the Department of Ecology & Evolution from the University of Lausanne for funding the development of the feature)
 * cameraOperation: gained argument occasionStartTime (deprecated in detectionHistory / spatialDetectionHistory)
 * function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument "lattice", which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)
@@ -121,7 +76,7 @@
 * timeShiftImages / addCopyrightTag: added argument "ignoreMinorErrors", set it to TRUE if functions fails due to bad MakerNotes (reported by An Nguyen)
 * detectionMaps uses package sf instead of sp and rgdal
 
-## bugfixes
+## Bugfixes
 * cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character (reported by David Nicholls)
 * recordTable: supports extraction of metadata tags from video files in camera subdirectories, and allows duplicate video file names in different camera subdirectories (reported by Sian Green)
 * recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata, reported by Sian Green)
@@ -129,27 +84,27 @@
 * detectionHistory: fixed a bug that caused errors when using multiple sessions and non-standard date/time formats (reported by Daniele Barcelos)
 * checkSpeciesNames: fixed error due to change in taxize::get_tsn (reported by Ivonne Oddoy)
 
-## other changes
+## Other changes
 * lubridate is a dependency now (for cameraOperation)
 * additional Suggests: magick and tesseract (for OCRdataFields), lattice (for camopPlot)
 * roxygen2 documentation
 
 # camtrapR 2.0.3
 
-## bugfixes
+## Bugfixes
 * fixed error messages if date or date/time columns contain blank values or NA
 * fixed DH_error2 in detectionHistory() with output = "count" (reported by Maddy Uetrecht)
 * cameraOperation failed if setupCol or retrievalCol were of class "Date". Now being converted to character.
 * imageRename: fixed camera IDs being assigned incorrectly in very rare cases on Mac (reported by Camille Coudrat)
 * recordTable: fixed error when videos had metadata tags that were not in tag groups
 
-## other changes
+## Other changes
 * recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with "L" for Latin character set, everything else will most likely break the code, suggested by Saloni Salaria)
 * improved error messages in recordTable/recordTableIndividual and detectionHistory/spatialDetectionHistory functions
 
 # camtrapR 2.0.2
 
-## bugfixes
+## Bugfixes
 
 * vignette creation conditional on availability of Exiftool (for CRAN checks)
 * tests with testthat conditional on availability of Exiftool (for CRAN checks)
@@ -158,18 +113,18 @@
 
 # camtrapR 2.0.1
 
-## bugfixes
+## Bugfixes
 
 * exifTagNames: doesn't return tag description, it caused an error on some systems
 
-## other changes
+## Other changes
 
 * included tests with testthat
 
 
 # camtrapR 2.0.0
 
-## new features
+## New features
 
 * recordTable / recordTableIndividual: video support via new argument "video" (requires package "RSQLite", thanks to Ana Gracanin for a crucial tip that made date/time extraction possible)
 * exifTagNames returns a data frame containing all relevant information at once: tag group names, tag descriptions, tag names and values. Arguments returnMetadata and returnTagGroup are ignored now.
@@ -178,7 +133,7 @@
 * cameraOperation: detailed error messages if duplicate station / camera / session names
 
 
-## bugfixes
+## Bugfixes
 
 * detectionHistory: when recordDateTimeCol is a date without time, function assigns a time to avoid calculating occasion 0 for records taken on the camera setup day (with a warning)
 * error message in functions that call Exiftool when inDir is empty (no subdirectories)
@@ -186,7 +141,7 @@
 * special characters in directory names now supported (but still best avoided; requires ExifTool 9.79 or later)
 * detectionMaps: fixed error when trying to plot backgroundPolygon (reported by Oliver Wearn)
 
-## other changes
+## Other changes
 
 * vignette filenames changed, document type changed to html_document, added floating table of contents
 * added ORCID for authors
@@ -197,7 +152,7 @@
 # camtrapR 1.2.3
 
 
-## other changes
+## Other changes
 
 * checkSpeciesNames: no error when ITIS server is not available
 * minor fixes in vignettes
@@ -207,12 +162,12 @@
 # camtrapR 1.2.2
 
 
-## bugfixes
+## Bugfixes
 
 * recordTable: fixed error: cameraID must be of class 'character' when it is character
 * recordTable: fixed error: metadataSpeciesTag must be of class 'character' when it is character
 
-## other changes
+## Other changes
 
 * cameraOperation: warning if date can be interpreted but is likely wrong (due to incorrectly set dateFormat argument)
   
@@ -220,29 +175,29 @@
 # camtrapR 1.2.1
 
 
-## bugfixes
+## Bugfixes
 
 * recordTable: fixed error: metadataSpeciesTag must be of class 'character' when it is character and IDfrom = "metadata"
 * recordTable: fixed: 'Error in `[.data.frame`(intable, , match(colnames(record.table), colnames(intable))) :
   undefined columns selected' (when additionalMetadataTags are defined)
   
-## new features
+## New features
 
 * multi-season sample data sets: camtrapsMultiSeason, recordTableSampleMultiSeason, recordTableIndividualSampleMultiSeason
   
-## other changes
+## Other changes
 
-* package "data.table" is a dependency now (for more reliable assembly of record table when additionalMetadataTags are defined, see ## bugfixes)
+* package "data.table" is a dependency now (for more reliable assembly of record table when additionalMetadataTags are defined, see ## Bugfixes)
 
 
 # camtrapR 1.2
 
 
-## bugfixes
+## Bugfixes
 
 * imageRename: fixed bug where fileExistsAlready in output table was FALSE when it should be TRUE
 
-## new features
+## New features
 
 * detectionHistory: support multi-season input and create detection histories for unmarkedFrameMult (from where users can create multi-season occupancy models with unmarked::colext), new argument "unmarkedFrameMultInput" (developed with support from Kirsten Weingarth)
 * cameraOperation: new argument: sessionCol, to specify trapping sessions / seasons (with some changes to the row names in camera operation matrices if there are session and / or camera information)
@@ -255,7 +210,7 @@
 * progress bar in console for all functions that extract image metadata
 * exifTagNames: more flexible, users can define subdirectories by name and give desired file names
   
-## other changes
+## Other changes
 
 * detectionHistory / spatialDetectionHistory: improved error message if date/time values are not readable (correct row in original recordTable is returned)
 * detectionMaps: new error message when XCol or YCol are not numeric
@@ -267,18 +222,18 @@
 # camtrapR 1.1
 
 
-## bugfixes
+## Bugfixes
 
 * appendSpeciesNames / checkSpeciesIdentification / getSpeciesImages: fixed error 'argument "returnFileNamesMissingTags" is missing, with no default'
 * recordTableIndividual: fixed multiple individuals from same image being removed (except for one) when removeDuplicates = TRUE
 
-## new features
+## New features
 
 * detectionHistory can return counts of records per occasion (new argument "output")
 * activityOverlap can return different overlap estimators (new argument "overlapEstimator")
 * detectionHistory / spatialDetectionHistory: improved error messages when records fall outside camera trap operation range
 
-## other changes
+## Other changes
 
 * added citation (see: citation("camtrapR"))
 * added URLs to description
@@ -287,13 +242,13 @@
 # camtrapR 1.0
 
 
-## bugfixes
+## Bugfixes
 
 * activityDensity: fixed problem with argument allSpecies = TRUE that caused output list to return values for one species only (reported by Sally Soo).
 * appendSpeciesNames, checkSpeciesIdentification,getSpeciesImages, recordTableIndividual: fixed error in extracting species IDs from image metadata in directories in which no images are tagged. These stations are now skipped with a warning.
 * detectionHistory / spatialDetectionHistory: fixed error with detection histories and effort matrix full of NAs arising if camera operation matrix had values > 2 (after argument camerasIndependent = TRUE in cameraOperation)
 
-## other changes
+## Other changes
 
 * imageRename: meaningful error message if no DateTimeOriginal tag was readable (e.g. all cameras were Reconyx HC500)
 * recordTable/ recordTableIndividual: new argument: returnFileNamesMissingTags: file name of images with missing species tag are returned if TRUE (default = FALSE)
@@ -304,17 +259,17 @@
 # camtrapR 0.99.9
 
 
-## bugfixes
+## Bugfixes
 
 * camera operation: fixed bug with empty entries in cameraCol when cameraCol is defined (reported by Partha Sarathi Ghose)
 * recordTable / recordTableIndividual: verbose warnings and better handling of situations in which date/time is unreadable (empty Exif:DateTimeOriginal metadata tag)
 
-## new features
+## New features
 
 * detectionHistory / activity plot functions: if date/time is unreadable function returns row IDs to facilitate checks
 * activityDensity: warning instead of error if bandwidth estimation fails and argument allSpecies = TRUE (problem occurred with single records, or few records at similar time of day)
 
-## other changes
+## Other changes
 
 * exifTagNames: returns name of image from which metadata were extracted as a message
 
@@ -322,11 +277,11 @@
 # camtrapR 0.99.8
 
 
-## bugfixes
+## Bugfixes
 
 * recordTable / recordTableIndividual: column "HierarchicalSubject" (containing digiKam metadata tags in their native format) was called "record.table3[, col_to_move]" by mistake (thanks to Ross Pitman for reporting)
 
-## other changes
+## Other changes
 
 * improved checks that function input has correct class (to make sure data.frames are provided where the functions expect them)
 
@@ -334,17 +289,17 @@
 # camtrapR 0.99.7
 
 
-## bugfixes
+## Bugfixes
 
 * recordTable: returned station ID as camera ID if IDfrom = "metadata" and cameraID = "directory"
  
-## new features
+## New features
 
 * detectionMaps: gained argument 'backgroundPolgygon' for plotting a SpatialPolygon object in the background of the maps
 * imageRename: new argument 'createEmptyDirectories' to control whether empty directories should be copied or not
 * imageRename: if outDir contains images already, the function will not stop with an error, but asks you whether or not to copy new images (useful if data come in over time)
   
-## other changes
+## Other changes
 
 * recordTable / recordTableIndividual: improved handling and reporting of stations without images (warning instead of error)
 * recordTable / recordTableIndividual: improved handling and reporting of stations where all images lack species/individual metadata tags (only if using metadata ID, functions will throw warning instead of error, reported by Aditya Malgaonkar)
@@ -354,20 +309,20 @@
 # camtrapR 0.99.6
 
 
-## bugfixes
+## Bugfixes
 
 * fixed crash in cameraOperation function caused by underscores in station / camera IDs (reported by Wyatt Petersen)
 
-## new functions
+## New functions
 
 * fixDateTimeOriginal: Makes DateTimeOriginal Exif metadata tag in Reconyx Hyperfire cameras readable 
 
-## new features
+## New features
 
 * spatialDetectionHistory: argument 'sessionCol' can now create multi-session capthist objects by either assigning individuals to different sessions or assigning stations to different sessions
 * exifTagNames: gained argument 'returnTagGroup', and now by default returns metadata tag group in addition to metadata tag names (to unambiguously address specific metadata tags)
 
-## other changes
+## Other changes
 
 * new dependency: "ritis" - this is because parts of package taxize (used internally by function "checkSpeciesNames") were migrated to ritis
 * detectionHistory / spatialDetectionHistory: occasionLength can be any value between 1 and the number of columns in camOp (not half the number of columns in camOp as before)
@@ -378,18 +333,18 @@
 # camtrapR 0.99.5
 
 
-## bugfixes
+## Bugfixes
 
 * recordTable/recordTableIndividual: give warning if Exif DateTimeOriginal tag of images is unreadable (error if all tags of a station are unreadable). May happen if images files are corrupted due to camera malfunctioning.
 * recordTable/recordTableIndividual: 2 records of the same species at the same station and same time by different cameras are not collapsed into one record if camerasIndependent = TRUE
 * all functions using Exiftool: JPG files beginning with "._" are now ignored with a warning (these are hidden, uninformative system files created on Macs and were quite capable of messing up function calls)
   
-## new features
+## New features
 
 * getSpeciesImages can now also read image file paths from a record table provided by the user instead of reading species IDs anew in every function call. It gained 3 new arguments for that purpose.
 * recordTable and recordTableIndividual both gained an argument (removeDuplicateRecords) to control whether duplicate records (same station, same species, exactly same time) should be collapsed into one record (former versions did that without asking)
   
-## other changes
+## Other changes
 
 * imageRename will first check all directories before actually renaming anything. So the function won't break halfway through, leaving you with a half-full directory of renamed images if something goes wrong (e.g. unreadable date/time tags).
   
@@ -397,16 +352,16 @@
 # camtrapR 0.99.4
 
 
-## bugfixes
+## Bugfixes
 
 * spatialDetectionHistory: trap usage now codes malfunctioning cameras and cameras that were not set up as 0 instead of NA (as expected by the secr package)
 * spatialDetectionHistory: argument "scaleEffort" can only be FALSE now (to avoid negative trapping effort values, which secr does not accept)
   
-## new features
+## New features
 
 * spatialDetectionHistory gained argument "sessionCol". It can be used to split data (i.e., create a list with multiple capthist objects) if captures come from different sessions).
   
-## other changes
+## Other changes
 
 * package shows startup message and checks automatically if local package version is up to date
 
@@ -414,17 +369,17 @@
 # camtrapR 0.99.3
 
 
-## new functions
+## New functions
 
 * addCopyrightTag: Write a copyright tag into image Exif metadata
 
-## bugfixes
+## Bugfixes
 
 * detectionHistory: malfunctioning cameras (0 in camera operation matrix) did not cause detection history matrix cells to be NA (even if includeEffort = FALSE; reported by Hsiang Ling Chen)
 * detectionHistory: if the last occasion is shorter than occasionLength, the corresponding detection history matrix cells will now be NA if includeEffort = FALSE
 * surveyReport: species column names other than "Species" are now supported, i.e. argument "speciesCol" is now respected (thanks to Valentine Herrmann and Stefano Anile for reporting)
 
-## new features
+## New features
 
 * detectionHistory gained argument "minActiveDaysPerOccasion". It can be used to define the minimum number of active trap days per occasion for that occasion be included (0/1 instead of NA)
   
@@ -433,12 +388,12 @@
 # camtrapR 0.99.2
 
 
-## bugfixes
+## Bugfixes
 
 * recordTable: fixed problem with appending camera IDs
 * cameraOperation: improved messages to user
 
-## other changes
+## Other changes
 
 * added section about defining date formats in camera station table to vignette 1 (Image Organisation)
 
@@ -447,13 +402,13 @@
 # camtrapR 0.99.1
 
 
-## bugfixes
+## Bugfixes
 
 * detectionHistory and spatialDetectionHistory did not run correctly under some rare circumstances (combinations of input arguments)
 * column names of detection histories were incorrect if occasionStartTime != 0 and datesAsOccasionNames = TRUE
 * argument maxNumberDays in detectionHistory / spatialDetectionHistory works on each station individually if day1 = "survey" or "station"; and from the specified date if day1 is a date
 
-## other changes
+## Other changes
 
 * additional checks for consistency of input in a number of functions
 * code simplification invisible to the user
@@ -463,7 +418,7 @@
 # camtrapR 0.99.0
 
 
-## new functions
+## New functions
 
 * checkSpeciesNames: checks a vector of species names (common or scientific) against the ITIS taxonomic database via package 'taxize'
 * checkSpeciesIdentification: expanded from former function checkSpeciesFolders (now defunct). Can check identification if metadata tags were used for species identification. 
@@ -479,7 +434,7 @@
 * recordDatabaseSample           -> recordTableSample
 * recordDatabaseIndividualSample -> recordTableIndividualSample
   
-## new features
+## New features
 
 * detectionHistory and spatialDetectionHistory: 
 	- detection histories can begin on any specified date, station-specific setup date or day the first station was set up (to that end argument "beginWithDay1" was changed to "day1")
@@ -493,12 +448,12 @@
 * detecionMaps: new argument "speciesToShow" to make maps for certain species only
 * activity plot functions show number of records that were used
   
-## bugfixes
+## Bugfixes
   
 * surveyReport returned an error when there were stations without records.
 * detecionMaps: Xcol and Ycol have arbitrary names now.
   
-## other changes
+## Other changes
 
 * arguments "customMetadataTags" and hasSpeciesFolders/ hasIndividualFolders was removed and replaced with argument "IDfrom"
 * metadata tags assigned in image management software are always extracted and tabulated in recordTable functions (making argument "customMetadataTags" obsolete)
@@ -512,13 +467,13 @@
 # camtrapR 0.98.0
 
 
-## new functions
+## New functions
 
 * createStationFolders: Create camera trap station directories, possibly with camera subdirectories, for storing raw images
 * recordDatabaseIndividual: Single-species record databases from camera trap images with custom metadata tags
 * spatialDetectionHistory: prepare a capthist object for spatial capture-recapture analyses
 
-## new features
+## New features
 
 * support for camera subdirectories in species identification: Station/Camera/Species in the following function:
 	- appendSpeciesFolders
@@ -543,7 +498,7 @@
 * detectionMaps: shapefile export using packages sp and rgdal
 * checkSpeciesFolders: new argument stationsToCheck
   
-## other changes
+## Other changes
 
 * checkSpeciesFolders: renamed argument exclude -> excludeSpecies
 * detectionHistory: "session" in argument names was renamed to "occasion" (to be consistent with secr nomenclature)
