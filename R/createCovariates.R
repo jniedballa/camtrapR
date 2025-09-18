@@ -245,6 +245,12 @@ createCovariates <- function(CTtable,
     terrain_measures <- match.arg(terrain_measures, valid_measures, several.ok = TRUE)
   }
   
+  # ensure we have internet connection for download
+  if (download_elevation) {
+    if(isFALSE(has_internet_socket())) stop("Your machine appears to be offline. Please connect to the internet to download elevation data, or set download_elevation = FALSE", call. = FALSE)
+    }
+  
+  
   # Validate elevation_zoom
   if (download_elevation) {
     if (!is.numeric(elevation_zoom) || elevation_zoom < 6 || elevation_zoom > 12) {
