@@ -1,8 +1,8 @@
 Package: camtrapR
 Type: Package
 Title: Camera Trap Data Management and Analysis Framework
-Version: 2.5.3
-Date: 2025-07-25
+Version: 2.6.0
+Date: 2025-09-17
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
                 comment = c(ORCID = "0000-0002-9187-2116")),
@@ -72,6 +72,7 @@ Suggests:
         R.rsp,
         RSQLite,
         ritis,
+        rlang,
         rmarkdown,
         rstudioapi,
         scales,
