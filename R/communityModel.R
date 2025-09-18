@@ -342,6 +342,12 @@ communityModel <- function(data_list,
   
   # 1. Check site covariates exist in data_list$siteCovs
   if(exists("siteCovs", where = data_list)) {
+    
+    if(inherits(data_list$siteCovs, "sf")) {
+      # message("site covariates are sf object. Dropping geometry.")
+      data_list$siteCovs <- st_drop_geometry(data_list$siteCovs)
+    }
+    
     # Collect all site covariates from parameter lists
     all_site_covs <- unique(c(
       unlist(occuCovs), 
@@ -608,7 +614,12 @@ communityModel <- function(data_list,
   
   # throw error for character covariates
   
-  if(length(covariates_char) >= 1) stop(paste("Covariate", covariates_char, "is character. Please convert to factor."), call. = FALSE)
+  if(length(covariates_char) >= 1) {
+    # browser()
+    stop(paste("Covariate", covariates_char, "is character. Please convert to factor."), call. = FALSE)
+    
+    # attempt to convert to factor?
+  }
     
   # paste cov1|cov2 (to check for random effects other than species, and nested random effects)
   covariates_numeric_categ <- unlist(sapply(covariates_numeric, paste, covariates_categ, sep = "|", simplify = F), use.names = F)
