@@ -37,7 +37,7 @@ if y is a list of matrices.}
 \item{model}{Character indicating model type ("Occupancy" or "RN")}
 
 \item{zhat}{List of z estimate matrices, one per species (optional). Each matrix 
-should follow the format specified in PPC.residuals.}
+should follow the format specified in \code{\link{PPC.residuals}}.}
 
 \item{z.cond}{Logical. If TRUE, new data is conditioned on estimated z (testing only 
 detection model fit). If FALSE, generates new z for each posterior sample 
@@ -51,7 +51,7 @@ with Bayesian p-values. If FALSE, returns only the p-values.}
 \item{show_progress}{Logical; whether to show a progress bar during computation 
 (if package pbapply is available)}
 
-\item{...}{Additional arguments passed to PPC.residuals()}
+\item{...}{Additional arguments passed to \code{\link{PPC.residuals}}.}
 }
 \value{
 If return.residuals=TRUE, returns a list containing:

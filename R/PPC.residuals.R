@@ -522,7 +522,7 @@ PPC.residuals <- function(y,
 #' @param K Number of occasions as either a scalar or site vector. Calculated automatically 
 #'   if y is a list of matrices.
 #' @param zhat List of z estimate matrices, one per species (optional). Each matrix 
-#'   should follow the format specified in PPC.residuals.
+#'   should follow the format specified in \code{\link{PPC.residuals}}.
 #' @param z.cond Logical. If TRUE, new data is conditioned on estimated z (testing only 
 #'   detection model fit). If FALSE, generates new z for each posterior sample 
 #'   (testing complete model).
@@ -533,7 +533,7 @@ PPC.residuals <- function(y,
 #' (if package pbapply is available)
 #' @param return.residuals Logical. If TRUE, returns species-specific residuals along 
 #'   with Bayesian p-values. If FALSE, returns only the p-values.
-#' @param ... Additional arguments passed to PPC.residuals()
+#' @param ... Additional arguments passed to \code{\link{PPC.residuals}}.
 #'   
 #'   
 #' @details
