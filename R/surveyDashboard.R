@@ -143,7 +143,7 @@
 #' @importFrom sf st_buffer st_convex_hull st_drop_geometry st_intersection st_transform st_union st_make_valid
 #' @importFrom terra rast vect project resample nlyr values<- mask
 #' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
-#' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline theme_void scale_x_continuous
+#' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline median_hilow scale_x_continuous stat_summary theme_void
 #' @importFrom shinyBS bsTooltip
 #' @export
 
@@ -1153,7 +1153,6 @@ surveyDashboard <- function(CTtable = NULL,
                                           title = "Select the camera trap table column to filter by.")
                                    ),
                                    choices = NULL),
-                       # add_tooltip(id = "filterColumn", title = "Select the column from the camera trap table to use for filtering stations."),
                        uiOutput("filterControls"), # Tooltips added dynamically via renderUI
                        shiny::actionButton("applyFilter", "Apply Filter", class = "btn-primary"),
                        add_tooltip(id = "applyFilter", title = "Apply the currently defined filter to the camera trap stations.")
@@ -1211,6 +1210,7 @@ surveyDashboard <- function(CTtable = NULL,
           fluidRow(
             shinydashboard::box(
               title = "Temporal Filtering Settings", width = 12, status = "primary",
+              solidHeader = TRUE,
               numericInput("minDeltaTime", "Minimum time difference (minutes)", value = 0, min = 0),
               add_tooltip(id = "minDeltaTime", title = "Specify the minimum time gap (in minutes) required between consecutive records of the same species at the same location to be considered independent."),
               selectInput("deltaTimeComparedTo", "Compare delta time to:",
@@ -1228,13 +1228,15 @@ surveyDashboard <- function(CTtable = NULL,
           ),
           fluidRow(
             shinydashboard::box(
-              title = "Filter Summary", width = 12, status = "info",
+              title = "Filter Summary", 
+              solidHeader = TRUE, width = 12, status = "info",
               uiOutput("temporalFilterSummary")
             )
           ),
           fluidRow(
             shinydashboard::box(
-              title = "Records by Species", width = 12, status = "info",
+              title = "Records by Species", 
+              solidHeader = TRUE, width = 12, status = "info",
               DT::dataTableOutput("temporalFilterTable")
             )
           )
@@ -1281,7 +1283,8 @@ surveyDashboard <- function(CTtable = NULL,
           ),
           fluidRow(
             shinydashboard::box(
-              title = "Filtered Records Preview", width = 12, status = "info",
+              title = "Filtered Records Preview", 
+              solidHeader = TRUE, width = 12, status = "info",
               DT::dataTableOutput("filteredRecordTable")
             )
           )
@@ -1400,7 +1403,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                                                     choices = c("Slope" = "slope", "Aspect" = "aspect", "TRI" = "TRI", "TPI" = "TPI", "Roughness" = "roughness"),
                                                                                     selected = c("slope", "TRI")),
                                                                  add_tooltip(id = "terrainMeasures", title = "Select the terrain metrics to calculate from the downloaded elevation data."),
-                                                                 radioButtons("elevationZoom", "Resolution (Zoom Level):",
+                                                                 radioButtons("elevationZoom", "Zoom Level (Resolution):",
                                                                               choices = c("12 (~20m)" = 12, "11 (~40m)" = 11, "10 (~80m)" = 10, "9 (~160m)" = 9),
                                                                               selected = 11),
                                                                  add_tooltip(id = "elevationZoom", title = "Select the desired resolution (zoom level) for the downloaded elevation data. Higher zoom levels provide finer resolution but require more download time and processing.")
@@ -1472,11 +1475,25 @@ surveyDashboard <- function(CTtable = NULL,
                                 title = "Settings", width = 12, status = "primary",
                                 fluidRow(
                                   column(4, 
-                                         selectInput("plotType", "Plot Type:", choices = c("Correlation matrix" = "matrix", "Scatter plot matrix" = "pairs"), selected = "matrix"), 
-                                         add_tooltip(id = "plotType", title = "Choose between a compact correlation matrix or a detailed scatter plot matrix.")),
+                                         selectInput("plotType", 
+                                           label = tagList(
+                                           "Plot Type:",
+                                           span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                title = "Choose between a compact correlation matrix or a detailed scatter plot matrix.")
+                                         ),
+                                         choices = c("Correlation matrix" = "matrix", "Scatter plot matrix" = "pairs"), 
+                                         selected = "matrix")
+                                         ),
                                   column(4, 
-                                         selectInput("correlationMethod", "Correlation Method:", choices = c("pearson", "spearman", "kendall"), selected = "pearson"), 
-                                         add_tooltip(id = "correlationMethod", title = "Select the statistical method for calculating correlations (Pearson for linear, Spearman/Kendall for monotonic).")),
+                                         selectInput("correlationMethod",  
+                                                     label = tagList(
+                                                       "Correlation Method:",
+                                                       span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                                            title = "Select the statistical method for calculating correlations (Pearson for linear, Spearman/Kendall for monotonic).")
+                                                     ),
+                                                     choices = c("pearson", "spearman", "kendall"), 
+                                                     selected = "pearson"), 
+                                         ),
                                   column(4, 
                                          checkboxInput("excludeNonNumeric", "Exclude non-numeric covariates", value = TRUE), 
                                          add_tooltip(id = "excludeNonNumeric", title = "Check to remove non-numeric columns (like character or factor variables) before calculating correlations."))
@@ -1493,18 +1510,16 @@ surveyDashboard <- function(CTtable = NULL,
                                                        ),
                                                        choices = c("Color Squares" = "color", "Circles" = "circle", "Filled Squares" = "square", "Ellipses" = "ellipse", "Shaded Squares" = "shade", "Pie Charts" = "pie"), 
                                                        selected = "color"),
-                                           # add_tooltip(id = "corrplotMethod", title = "Select the visual representation for the correlation matrix (requires 'corrplot' package).")
                                     ),
                                     column(4, 
                                            selectInput("corrplotOrder",
                                                        label = tagList(
                                                          "Variable Ordering:",
                                                          span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
-                                                              title = "Method for ordering variables in matrix (requires 'corrplot').")
+                                                              title = "Method for ordering variables in the correlation matrix (requires 'corrplot').")
                                                        ),
                                                        choices = c("Original Order" = "original", "Cluster by Similarity" = "hclust", "Order by First Principal Component" = "FPC", "Angular Order of Eigenvectors" = "AOE", "Alphabetical" = "alphabet"),
                                                        selected = "hclust") 
-                                           # add_tooltip(id = "corrplotOrder", title = "Select the method for ordering variables in the correlation matrix (requires 'corrplot' package).")
                                     )
                                   )
                                 )
@@ -1544,19 +1559,19 @@ surveyDashboard <- function(CTtable = NULL,
                               wellPanel(
                                 h4("Basic Settings", class = "text-primary"),
                                 numericInput("acc_q", "Diversity order (q):", value = 0, min = 0, max = 2, step = 1),
-                                add_tooltip(id = "acc_q", title = "Diversity Order (q=0: richness, q=1: Shannon, q=2: Simpson). Affects sensitivity to species abundance."),
+                                  add_tooltip(id = "acc_q", title = "Diversity Order (q=0: richness, q=1: Shannon, q=2: Simpson). Affects sensitivity to species abundance."),
                                 selectInput("acc_x_unit", "Sampling unit:", choices = c("Stations" = "station", "Survey Days" = "survey_day", "Station Days" = "station_day"), selected = "station"),
-                                add_tooltip(id = "acc_x_unit", title = "Unit for measuring sampling effort (Stations, Survey Days, Station Days)."),
+                                  add_tooltip(id = "acc_x_unit", title = "Unit for measuring sampling effort (Stations, Survey Days, Station Days).", placement = "top"),
                                 hr(),
                                 h4("Curve Settings", class = "text-primary"),
                                 numericInput("acc_knots", "Number of points on curve:", value = 40, min = 10, max = 100, step = 5),
-                                add_tooltip(id = "acc_knots", title = "Number of points to calculate along the rarefaction/extrapolation curve."),
+                                  add_tooltip(id = "acc_knots", title = "Number of points to calculate along the rarefaction/extrapolation curve."),
                                 hr(),
                                 h4("Bootstrap Settings", class = "text-primary"),
                                 sliderInput("acc_conf", "Confidence level:", min = 0.8, max = 0.99, value = 0.95, step = 0.01),
-                                add_tooltip(id = "acc_conf", title = "Set the confidence level (e.g., 0.95 for 95% CI) for the shaded intervals on the curves."),
+                                  add_tooltip(id = "acc_conf", title = "Set the confidence level (e.g., 0.95 for 95% CI) for the shaded intervals on the curves."),
                                 numericInput("acc_nboot", "Number of bootstrap replicates:", value = 50, min = 10, max = 200, step = 10),
-                                add_tooltip(id = "acc_nboot", title = "Number of bootstrap samples used to estimate the confidence intervals (higher values increase precision but take longer)."),
+                                  add_tooltip(id = "acc_nboot", title = "Number of bootstrap samples used to estimate the confidence intervals (higher values increase precision but take longer)."),
                                 hr(),
                                 h4("Plot Settings", class = "text-primary"),
                                 numericInput("acc_plot_scale", "Plot size scale:", value = 1.5, min = 0.5, max = 3, step = 0.1),
@@ -2156,7 +2171,7 @@ surveyDashboard <- function(CTtable = NULL,
                                      shiny::actionButton("createCommunityModel", "Create Model", class = "btn-primary btn-lg"), 
                                      add_tooltip(id = "createCommunityModel", title = "Generate the community model structure based on the specified configuration. Does not fit the model yet."))
                               ),
-                     fluidRow(shinydashboard::box(title = "Model Summary", width = 12, status = "success", 
+                     fluidRow(shinydashboard::box(title = "Model Summary", width = 12, status = "success", collapsible = TRUE,
                                                   verbatimTextOutput("communityModelSummary"))
                               )
             ),
@@ -2202,7 +2217,8 @@ surveyDashboard <- function(CTtable = NULL,
                                            h4("GoF Settings", class = "text-primary"),
                                            numericInput("gof_draws", "Number of posterior draws:", value = 1000, min = 100, max = 10000, step = 100), add_tooltip(id = "gof_draws", title = "Number of posterior samples used to simulate new datasets for comparison."),
                                            checkboxInput("gof_z_cond", "Condition on occupancy (z)", value = TRUE), add_tooltip(id = "gof_z_cond", title = "If checked, tests detection fit conditional on estimated occupancy. If unchecked, tests the full model."),
-                                           selectInput("gof_residual_type", "Residual type:", choices = c("Freeman-Tukey" = "FT", "Pearson Chi-squared" = "PearChi2"), selected = "FT"), add_tooltip(id = "gof_residual_type", title = "Metric used to calculate discrepancy between observed and simulated data."),
+                                           selectInput("gof_residual_type", "Residual type:", choices = c("Freeman-Tukey" = "FT", "Pearson Chi-squared" = "PearChi2"), selected = "FT"), 
+                                             add_tooltip(id = "gof_residual_type", title = "Metric used to calculate discrepancy between observed and simulated data.", placement = "top"),
                                            tags$div(style = "margin-top: 20px;", actionButton("run_gof", "Run Goodness of Fit Test", class = "btn-primary btn-lg btn-block"), add_tooltip(id = "run_gof", title = "Perform the Bayesian Goodness-of-Fit test using posterior predictive checks."))
                                          )
                                   ),
@@ -2255,7 +2271,7 @@ surveyDashboard <- function(CTtable = NULL,
                                 tags$div(class = "settings-group", 
                                          h4("Basic Settings"), 
                                          selectInput("plotSubmodel", "Submodel:", choices = c(Occupancy = "state", Detection = "det")), 
-                                         add_tooltip(id = "plotSubmodel", title = "Select the submodel ('state' for occupancy/abundance, 'det' for detection) to plot effects for.")),
+                                         add_tooltip(id = "plotSubmodel", title = "Select the submodel ('state' for occupancy/abundance, 'det' for detection) to plot effects for.", placement = "top")),
                                 conditionalPanel(condition = "input.communityModelType == 'RN' && input.plotSubmodel == 'state'", 
                                                  selectInput("plotResponse", "Response:", choices = c("occupancy", "abundance")), 
                                                  add_tooltip(id = "plotResponse", title = "For Royle-Nichols models, choose whether to plot effects on occupancy probability or expected abundance.")),
@@ -2267,15 +2283,15 @@ surveyDashboard <- function(CTtable = NULL,
                                   tags$div(
                                     class = "settings-group", style = "margin-top: 20px;", h4("Plot Settings"),
                                     selectInput("selectedPlot", "Select Effect:", choices = NULL), 
-                                    add_tooltip(id = "selectedPlot", title = "Select the specific covariate effect to visualize in the plots."),
+                                      add_tooltip(id = "selectedPlot", title = "Select the specific covariate effect to visualize in the plots.", placement = "top"),
                                     numericInput("plotDraws", "Number of Draws", value = 1000, min = 100), 
-                                    add_tooltip(id = "plotDraws", title = "Number of posterior draws used to calculate uncertainty intervals for the effect plots."),
+                                      add_tooltip(id = "plotDraws", title = "Number of posterior draws used to calculate uncertainty intervals for the effect plots."),
                                     numericInput("plotLevelOuter", "Confidence Level", value = 0.95, min = 0, max = 1, step = 0.01), 
-                                    add_tooltip(id = "plotLevelOuter", title = "Set the confidence level for the outer uncertainty interval (e.g., 0.95 for 95% CI)."),
+                                      add_tooltip(id = "plotLevelOuter", title = "Set the confidence level for the outer uncertainty interval (e.g., 0.95 for 95% CI)."),
                                     numericInput("plotLevelInner", "Inner Confidence Level", value = 0.75, min = 0, max = 1, step = 0.01), 
-                                    add_tooltip(id = "plotLevelInner", title = "Set the confidence level for the inner uncertainty interval (e.g., 0.75 for 75% CI)."),
+                                      add_tooltip(id = "plotLevelInner", title = "Set the confidence level for the inner uncertainty interval (e.g., 0.75 for 75% CI)."),
                                     numericInput("plotScale", "Plot Size Scale", value = 1.5, min = 0.5, max = 3, step = 0.1), 
-                                    add_tooltip(id = "plotScale", title = "Adjust the overall size of text and elements in the effect plots."),
+                                      add_tooltip(id = "plotScale", title = "Adjust the overall size of text and elements in the effect plots."),
                                     # checkboxInput("orderByEffect", "Order by Effect Size", value = TRUE), 
                                     checkboxInput("orderByEffect",
                                                   label = tagList(
@@ -2304,7 +2320,7 @@ surveyDashboard <- function(CTtable = NULL,
                               wellPanel(
                                 h4("Input Settings", class = "text-primary"),
                                 selectInput("prediction_raster_source", "Prediction Surface:", choices = c("Use extracted covariates" = "extracted", "Upload custom raster" = "custom")), 
-                                add_tooltip(id = "prediction_raster_source", title = "Choose the source for the covariate rasters needed for prediction."),
+                                add_tooltip(id = "prediction_raster_source", title = "Choose the source for the covariate rasters needed for prediction.", placement = "top"),
                                 conditionalPanel(condition = "input.prediction_raster_source == 'custom'", fileInput("covariate_raster", "Upload Raster:", accept = c(".tif")), 
                                                  add_tooltip(id = "covariate_raster", title = "Upload a multi-layer raster file (.tif) containing all necessary covariates. Layer names must match model covariates.")),
                                 hr(),
@@ -2334,12 +2350,16 @@ surveyDashboard <- function(CTtable = NULL,
                                                       div(class = "panel-heading d-flex justify-content-between align-items-center",
                                                           div(
                                                             style = "display: flex; gap: 10px; align-items: center;",
-                                                            shiny::actionButton("runOccupancyPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), add_tooltip(id = "runOccupancyPrediction", title = "Generate spatial predictions for species occupancy probabilities."),
+                                                            shiny::actionButton("runOccupancyPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), 
+                                                              add_tooltip(id = "runOccupancyPrediction", title = "Generate spatial predictions for species occupancy probabilities."),
                                                             selectInput("occupancySpecies", "Select Species:", choices = NULL, width = "300px"), 
-                                                            add_tooltip(id = "occupancySpecies", title = "Select the species for which to display the occupancy map."),
-                                                            selectInput("occupancyMapType", "Display:", choices = c("Mean Occupancy" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), add_tooltip(id = "occupancyMapType", title = "Choose which layer to display: Mean prediction, Standard Deviation, or Confidence Interval bounds."),
-                                                            selectInput("occupancyColorPalette", "Color Palette:", choices = c("Viridis", "Plasma", "Inferno", "Rocket"), selected = "Viridis", width = "200px"), add_tooltip(id = "occupancyColorPalette", title = "Select the color scheme for the occupancy map."),
-                                                            checkboxInput("invertOccupancyColors", "Invert Color Ramp", value = FALSE), add_tooltip(id = "invertOccupancyColors", title = "Reverse the selected color palette.")
+                                                              add_tooltip(id = "occupancySpecies", title = "Select the species for which to display the occupancy map.", placement = "top"),
+                                                            selectInput("occupancyMapType", "Display:", choices = c("Mean Occupancy" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), 
+                                                              add_tooltip(id = "occupancyMapType", title = "Choose which layer to display: Mean prediction, Standard Deviation, or Confidence Interval bounds.", placement = "top"),
+                                                            selectInput("occupancyColorPalette", "Color Palette:", choices = c("Viridis", "Plasma", "Inferno", "Rocket"), selected = "Viridis", width = "200px"), 
+                                                              add_tooltip(id = "occupancyColorPalette", title = "Select the color scheme for the occupancy map.", placement = "top"),
+                                                            checkboxInput("invertOccupancyColors", "Invert Color Ramp", value = FALSE), 
+                                                              add_tooltip(id = "invertOccupancyColors", title = "Reverse the selected color palette.")
                                                           )
                                                       ),
                                                       div(class = "panel-body", leaflet::leafletOutput("occupancyMap", height = "600px"), uiOutput("occupancyStats"))
@@ -2354,9 +2374,12 @@ surveyDashboard <- function(CTtable = NULL,
                                                       div(class = "panel-heading d-flex justify-content-between align-items-center",
                                                           div(
                                                             style = "display: flex; gap: 10px; align-items: center;",
-                                                            shiny::actionButton("runRichnessPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), add_tooltip(id = "runRichnessPrediction", title = "Generate spatial predictions for species richness."),
-                                                            selectInput("richnessType", "Display:", choices = c("Mean Richness" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), add_tooltip(id = "richnessType", title = "Choose which richness layer to display: Mean, Standard Deviation, or Confidence Interval bounds."),
-                                                            selectInput("richnessColorPalette", "Color Palette:", choices = c("Viridis", "Plasma", "Inferno", "Rocket"), selected = "Viridis", width = "200px"), add_tooltip(id = "richnessColorPalette", title = "Select the color scheme for the richness map."),
+                                                            shiny::actionButton("runRichnessPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), 
+                                                              add_tooltip(id = "runRichnessPrediction", title = "Generate spatial predictions for species richness."),
+                                                            selectInput("richnessType", "Display:", choices = c("Mean Richness" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), 
+                                                              add_tooltip(id = "richnessType", title = "Choose which richness layer to display: Mean, Standard Deviation, or Confidence Interval bounds.", placement = "top"),
+                                                            selectInput("richnessColorPalette", "Color Palette:", choices = c("Viridis", "Plasma", "Inferno", "Rocket"), selected = "Viridis", width = "200px"), 
+                                                              add_tooltip(id = "richnessColorPalette", title = "Select the color scheme for the richness map.", placement = "top"),
                                                             checkboxInput("invertRichnessColors", "Invert Color Ramp", value = FALSE), add_tooltip(id = "invertRichnessColors", title = "Reverse the selected color palette.")
                                                           )
                                                       ),
@@ -2982,7 +3005,7 @@ surveyDashboard <- function(CTtable = NULL,
           active_filters(list())
           
           
-          # Update other necessary reactive values
+          # Update other necessary reactive values with Wildlife Insights defaults
           data$stationCol <- "placename"
           data$cameraCol <- "camera_id"
           data$xcol <- "longitude"
@@ -3361,6 +3384,7 @@ surveyDashboard <- function(CTtable = NULL,
           data$CTtable <- imported_data$CTtable
           data$recordTable <- imported_data$recordTable
           
+          # Provide default column names and specifications for camtrap DP
           # Set column specifications based on imported data
           data$stationCol <- "locationName" #  "Station"
           
@@ -3449,7 +3473,12 @@ surveyDashboard <- function(CTtable = NULL,
                                           remove = FALSE)
           
           # Create aggregated CT table
-          data$aggregated_CTtable <- aggregateCTtableByStation(data$CTtable_sf, data$stationCol)
+          data$aggregated_CTtable <- aggregateStations(CTtable = data$CTtable_sf, 
+                                                       stationCol = data$stationCol,
+                                                       cameraCol = data$cameraCol,
+                                                       setupCol = data$setupCol,
+                                                       retrievalCol = data$retrievalCol,
+                                                       dateFormat = data$CTdateFormat)
           
           # Update data previews
           output$camtrapdp_preview_deployments <- DT::renderDT({
@@ -3642,7 +3671,13 @@ surveyDashboard <- function(CTtable = NULL,
     # Create reactive expression for aggregated_CTtable
     aggregated_CTtable <- shiny::reactive({
       req(data$CTtable_sf, data$stationCol)
-      aggregateCTtableByStation(df = data$CTtable_sf, stationCol = data$stationCol)
+      
+      aggregateStations(CTtable = data$CTtable_sf, 
+                        stationCol = data$stationCol,
+                        cameraCol = data$cameraCol,
+                        setupCol = data$setupCol,
+                        retrievalCol = data$retrievalCol,
+                        dateFormat = data$CTdateFormat)
     })
     
     # Update aggregated_CTtable when CTtable_sf changes
@@ -3813,66 +3848,7 @@ surveyDashboard <- function(CTtable = NULL,
     }, ignoreNULL = TRUE)
     
     
-    # define function for aggregating by station (collapsing cameras at station)
-    aggregateCTtableByStation <- function(df, stationCol) {
-      
-      if (!stationCol %in% names(df)) {
-        stop(paste("Error in aggregateCTtableByStation: station column '", stationCol, 
-                   "' not found in input data frame. Available columns are:", 
-                   paste(names(df), collapse = ", ")))
-      }
-      
-      if(inherits(df, "sf")) df <- sf::st_drop_geometry(df)
-      
-      # return original table if all station values are unique
-      if(all(table(df[, stationCol]) == 1)) return(df)
-      
-      # Identify data types
-      num_cols     <- sapply(df, is.numeric)
-      char_cols    <- sapply(df, is.character)
-      factor_cols  <- sapply(df, is.factor)
-      logical_cols <- sapply(df, is.logical)
-      date_cols    <- sapply(df, is.Date)
-      
-      # Aggregate
-      agg_fun <- function(x) {
-        if (is.numeric(x)) {
-          mean(x, na.rm = TRUE)
-        } else if (is.logical(x)) {
-          mean(as.integer(x), na.rm = TRUE)
-        } else if (is.character(x) | is.factor(x)) {
-          paste(unique(x), collapse = ", ")
-        } else if (is.Date(x)) {
-          paste(unique(x), collapse = ", ")
-        } else {
-          paste(unique(x), collapse = ", ") 
-        }
-      }
-      
-      if(inherits(df, "tbl")) {
-        df_agg <- aggregate(df, 
-                            by = list(df[[stationCol]]), 
-                            FUN = agg_fun)
-        df_agg[, stationCol] <- NULL
-      } else {
-        df_agg <- aggregate(df, 
-                            by = list(df[,stationCol]), 
-                            FUN = agg_fun)
-        df_agg[, stationCol] <- NULL
-      }
-      
-      
-      
-      colnames(df_agg) <- c(stationCol, 
-                            names(df_agg)[-1])
-      
-      return(df_agg)
-      # factors are converted to characters. Problematic?
-    }
-    
-    
-    
-    
+
     df_covariates <- observe({
       req(data$CTtable_aggregated, camop())
       stopifnot(rownames(camop()) == data$CTtable_aggregated[, data$stationCol])
@@ -4427,7 +4403,12 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Safely create aggregated table
       tryCatch({
-        data$aggregated_CTtable <- aggregateCTtableByStation(filtered_CT, data$stationCol)
+        data$aggregated_CTtable <- aggregateStations(CTtable = filtered_CT, 
+                                                     stationCol = data$stationCol,
+                                                     cameraCol = data$cameraCol,
+                                                     setupCol = data$setupCol,
+                                                     retrievalCol = date$retrievalCol,
+                                                     dateFormat = data$CTdateFormat)
         
         # Only create aggregated_CTtable_sf if needed and xcol/ycol are available
         if (!is.null(data$xcol) && !is.null(data$ycol)) {
@@ -4667,8 +4648,14 @@ surveyDashboard <- function(CTtable = NULL,
       
       if (is.numeric(column_data)) {
         tagList(
-          selectInput("numericOperator", "Condition:", choices = c("Greater than" = "gt", "Less than" = "lt", "Equal to" = "eq", "Between" = "between")),
-          add_tooltip(id = "numericOperator", title = "Select the comparison operator for numeric filtering."),
+          selectInput("numericOperator", 
+                      # "Condition:", 
+                      label = tagList(
+                        "Condition:",
+                        span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                             title = "Select the comparison operator for numeric filtering.")
+                      ),
+                      choices = c("Greater than" = "gt", "Less than" = "lt", "Equal to" = "eq", "Between" = "between")),
           conditionalPanel(
             condition = "input.numericOperator != 'between'",
             numericInput("numericValue", "Value:", value = round(mean(column_data, na.rm = TRUE)), min = min(column_data, na.rm = TRUE), max = max(column_data, na.rm = TRUE)),
@@ -6318,12 +6305,17 @@ surveyDashboard <- function(CTtable = NULL,
           }
           
           # Update aggregated table *after* CTtable_sf is updated
-          data$aggregated_CTtable <- aggregateCTtableByStation(data$CTtable_sf, data$stationCol)
+          data$aggregated_CTtable <- aggregateStations(CTtable = data$CTtable_sf, 
+                                                       stationCol = data$stationCol,
+                                                       cameraCol = data$cameraCol,
+                                                       setupCol = data$setupCol,
+                                                       retrievalCol = date$retrievalCol,
+                                                       dateFormat = data$CTdateFormat)
           
           showNotification("Covariate extraction completed successfully", type = "message")
           
         }, error = function(e) {
-          showNotification(paste("Error during covariate extraction:", e$message), type = "error", duration = NULL)
+          showNotification(paste("Error during covariate extraction:", e$message), type = "error", duration = 10)
           # Print detailed error to console for debugging
           print(paste("Detailed error in run_covariate_extraction:", e))
         }) # end tryCatch
@@ -7437,9 +7429,11 @@ surveyDashboard <- function(CTtable = NULL,
       # Create unmarkedFrameOccu from detection history
       # detection_hist() returns a list with [[1]] = detection matrix, [[2]] = effort matrix
       tryCatch({
+        sitecovs_umf <- st_drop_geometry(data$aggregated_CTtable)
+        
         unmarked::unmarkedFrameOccu(
           y = detection_hist()[[1]],          # Detection/non-detection matrix
-          siteCovs = data$aggregated_CTtable, # Site covariates
+          siteCovs = sitecovs_umf, # Site covariates
           obsCovs = list(                     # Observation covariates
             effort = detection_hist()[[2]]     # Effort matrix from detection history
           )
@@ -8847,6 +8841,7 @@ surveyDashboard <- function(CTtable = NULL,
           stationCol = data$stationCol,
           speciesCol = data$speciesCol,
           recordDateTimeCol = data$recordDateTimeCol,
+          recordDateTimeFormat = data$recordDateTimeFormat,
           species = sp,
           occasionLength = input$occasionLength_community,
           day1 = input$day1_community, #"survey",
@@ -9461,7 +9456,6 @@ surveyDashboard <- function(CTtable = NULL,
           # Store results
           gof_results(results)
           
-          print("GOF Finished")
           showNotification("Goodness of fit test completed", type = "message")
         }, error = function(e) {
           showNotification(paste("Error in GOF test:", e$message), type = "error")
@@ -9929,7 +9923,28 @@ surveyDashboard <- function(CTtable = NULL,
         ggplot(spatial_predictions_community$pao$pao_df, 
                aes(x = stats::reorder(Species, PAO, FUN = median), y = PAO)) +
           geom_violin(fill = "lightblue", alpha = 0.5) +
-          geom_boxplot(width = 0.2, fill = "white", alpha = 0.7) +
+          
+          # Layer 1: User-defined confidence interval (e.g., 95%)
+          # Displayed as a thin, semi-transparent line for the background
+          stat_summary(fun.data = median_hilow, 
+                       fun.args = list(conf.int = input$predictionLevel), # Dynamic input
+                       geom = "linerange", 
+                       color = "#4682B4", # A steelblue color
+                       linewidth = 0.5,
+                       alpha = 0.8) +
+          
+          # Layer 2: Interquartile range (50% CI)
+          # Displayed as a thicker, darker line on top
+          stat_summary(fun.data = median_hilow, 
+                       fun.args = list(conf.int = 0.5), 
+                       geom = "linerange", 
+                       color = "black", 
+                       linewidth = 0.8) +
+          
+          # Layer 3: The median point
+          # A simple point for the median, drawn on top of everything
+          stat_summary(fun = median, geom = "point", size = 2, color = "black") +
+          
           theme_bw() +
           theme(
             axis.text = element_text(size = 10),
