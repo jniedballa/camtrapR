@@ -1655,7 +1655,7 @@ parseDateTimeObject <- function(inputColumn,
   return(out)
 }
 
-## make a new empty matrix, a row for each unique station / camera combination
+# make empty matrix, a row for each unique station / camera combination ----
 stationSessionCamMatrix <- function(CTtable,
                                     stationCol,
                                     cameraCol, 
@@ -1817,6 +1817,8 @@ makeProgressbar <- function(current,
               "  ", formatC(round(perc * 100), width = 3), "%", sep = "")
 }
 
+
+# Accessing / manipulating digiKam database ----
 
 # access digiKam database and provide tables to extract species tags for videos
 # call before exiftool
@@ -2122,7 +2124,9 @@ addVideoHierarchicalSubject <- function(metadata.tmp,
 }
 
 
-# function to return fraction of day that has passed already at a given time (or its inverse, fraction of day remaining)
+# function to return fraction of day that has passed already at a given time  ----
+# also does the inverse, fraction of day remaining
+
 fractionOfDay <- function(time, type) {
   # time difference between time and midnight that day (fraction of the day that has passed already)
   delta <- as.numeric(difftime(time, as.Date(time), units = "days"))
@@ -2133,7 +2137,8 @@ fractionOfDay <- function(time, type) {
   if(type == "before")  return(delta)
 }
 
-# plot camera operation matrix (function from vignette 3)
+
+# plot camera operation matrix (function from vignette 3) ----
 camopPlot <- function(camOp, 
                       palette = "viridis",
                       lattice = FALSE){
@@ -2189,8 +2194,9 @@ camopPlot <- function(camOp,
   }
 }
 
-# intersect intervals, fast (adapted from lubridate)
-#https://github.com/tidyverse/lubridate/blob/master/R/intervals.r
+# intersect intervals, fast (adapted from lubridate) ----
+# https://github.com/tidyverse/lubridate/blob/master/R/intervals.r
+
 intersect.Interval.fast <- function(int1, int2, ...) {  # (x, y, ...) {
 
   starts <- pmax(int1@start, int2@start)
@@ -2203,7 +2209,7 @@ intersect.Interval.fast <- function(int1, int2, ...) {  # (x, y, ...) {
 
 
 
-# surveyReport legacy version (from 2.0.3)
+# surveyReport legacy version (from 2.0.3) ----
 # intended to run instead of new surveyReport to prevent error when re-running old code
 
 surveyReport_legacy <- function(recordTable,
@@ -2546,7 +2552,7 @@ surveyReport_legacy <- function(recordTable,
 }
 
 
-# split file names (created by imageRename) into their components
+# split file names (created by imageRename) into their components ----
 
 deparseFilename <- function(x, cameras) {
   x2 <- strsplit(x, split = "__")
@@ -2580,3 +2586,31 @@ deparseFilename <- function(x, cameras) {
   out
 }
 
+
+# Probe internet connection  ----
+
+# check if connection to Google's DNS server can be established
+# caveat: specific IP/port which could theoretically be blocked even if internet is otherwise fine
+# 8.8.8.8:53 should be reliable though
+
+has_internet_socket <- function() {
+  is_connected <- FALSE
+  # Use a known public DNS server or a reliable website's IP
+  # Google DNS: 8.8.8.8, Port 53 (DNS) or 80 (HTTP)
+  host <- "8.8.8.8"
+  port <- 53 # DNS port is good for basic connectivity check
+  timeout_seconds <- 3 # Prevent hanging
+  
+  suppressWarnings({
+    tryCatch({
+      con <- socketConnection(host = host, port = port, blocking = FALSE, open = "w+", timeout = timeout_seconds)
+      if (isOpen(con)) {
+        is_connected <- TRUE
+        close(con)
+      }
+    }, error = function(e) {
+      is_connected <- FALSE
+    })
+  })
+  return(is_connected)
+}
