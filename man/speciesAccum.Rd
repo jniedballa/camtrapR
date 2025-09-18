@@ -9,7 +9,9 @@ speciesAccum(
   recordTable,
   speciesCol,
   recordDateTimeCol,
+  recordDateTimeFormat = "ymd HMS",
   setupCol,
+  dateFormat = "ymd",
   stationCol,
   assemblageCol = NULL,
   q = 0,
@@ -29,7 +31,11 @@ speciesAccum(
 
 \item{recordDateTimeCol}{character. Name of the column containing date and time information in recordTable}
 
+\item{recordDateTimeFormat}{character. Format of column \code{recordDateTimeCol} in \code{recordTable}}
+
 \item{setupCol}{character. Name of the column containing camera setup dates in CTtable}
+
+\item{dateFormat}{character. Format of column \code{setupCol} in \code{CTtable}}
 
 \item{stationCol}{character. Name of the column containing station IDs in both tables}
 

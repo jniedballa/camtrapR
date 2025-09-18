@@ -34,7 +34,9 @@
 #' @param recordTable data.frame containing the camera trap records.
 #' @param speciesCol character. Name of the column specifying species names in recordTable
 #' @param recordDateTimeCol character. Name of the column containing date and time information in recordTable
+#' @param recordDateTimeFormat character. Format of column \code{recordDateTimeCol} in \code{recordTable} 
 #' @param setupCol character. Name of the column containing camera setup dates in CTtable
+#' @param dateFormat character. Format of column \code{setupCol} in \code{CTtable}
 #' @param stationCol character. Name of the column containing station IDs in both tables
 #' @param assemblageCol character. Optional. Name of column in recordTable for grouping data into separate assemblages
 #' @param q numeric. The order of diversity measure. Default is 0 (species richness)
@@ -99,13 +101,16 @@
 #'
 #' @importFrom dplyr mutate arrange distinct count left_join select
 #' @importFrom stats setNames
+#' @importFrom lubridate parse_date_time
 #' @export
 #' 
 speciesAccum <- function(CTtable, 
                          recordTable,
                          speciesCol,
                          recordDateTimeCol,
+                         recordDateTimeFormat = "ymd HMS",
                          setupCol, 
+                         dateFormat = "ymd",
                          stationCol,
                          assemblageCol = NULL,
                          q = 0,
@@ -118,6 +123,8 @@ speciesAccum <- function(CTtable,
   # Input validation
   x_unit <- match.arg(x_unit)
   
+  if(inherits(CTtable, "sf")) CTtable <- sf::st_drop_geometry(CTtable)
+  CTtable <- as.data.frame(CTtable)
   
   # Check if required columns exist
   required_cols <- c(speciesCol, recordDateTimeCol, stationCol)
@@ -155,7 +162,9 @@ speciesAccum <- function(CTtable,
         temporal = x_unit == "survey_day" | x_unit == "station_day",
         by_station = x_unit == "station_day",
         recordDateTimeCol = recordDateTimeCol,
+        recordDateTimeFormat = recordDateTimeFormat,
         setupCol = setupCol, 
+        dateFormat = dateFormat,
         stationCol = stationCol,
         speciesCol = speciesCol
       )
@@ -171,7 +180,9 @@ speciesAccum <- function(CTtable,
       temporal = x_unit == "survey_day" | x_unit == "station_day",
       by_station = x_unit == "station_day",
       recordDateTimeCol = recordDateTimeCol,
+      recordDateTimeFormat = recordDateTimeFormat,
       setupCol = setupCol, 
+      dateFormat = dateFormat,
       stationCol = stationCol,
       speciesCol = speciesCol
     )
@@ -197,13 +208,25 @@ create_incidence_matrix <- function(records_subset,
                                     stations_subset, 
                                     stationCol,
                                     setupCol,
-                                    recordDateTimeCol,
+                                    dateFormat,           # camera trap table
+                                    recordDateTimeCol,        # record table
+                                    recordDateTimeFormat,
                                     speciesCol,
                                     species_list, 
                                     temporal = FALSE,
                                     by_station)         # only relevant if temporal = T) 
   {
 
+  
+  
+  # parse date/time
+  records_subset[, recordDateTimeCol] <- parse_date_time(records_subset[, recordDateTimeCol],
+                                                         orders = recordDateTimeFormat)
+  
+  stations_subset[, setupCol] <- as.Date(parse_date_time(stations_subset[, setupCol], 
+                                                         orders = dateFormat))
+  
+  
   if(temporal) {
     
     # avoid CRAN notes
