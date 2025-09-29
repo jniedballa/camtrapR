@@ -1,6 +1,4 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # camtrapR
 
 <!-- badges: start -->
@@ -9,7 +7,6 @@
 status](https://www.r-pkg.org/badges/version/camtrapR)](https://CRAN.R-project.org/package=camtrapR)
 ![](https://cranlogs.r-pkg.org/badges/grand-total/camtrapR)
 [![](http://cranlogs.r-pkg.org/badges/camtrapR)](https://cran.r-project.org/package=camtrapR)
-<!-- [![Build Status](https://travis-ci.org/jniedballa/camtrapR.svg?branch=master)](https://travis-ci.org/jniedballa/camtrapR) -->
 <!-- badges: end -->
 
 camtrapR is a package for camera trap data management in R.
@@ -22,8 +19,7 @@ You can install the release version of camtrapR from CRAN:
 install.packages("camtrapR")
 ```
 
-or the  GitHub version (containing recent changes and new
-features) via:
+the GitHub master version via:
 
 ``` r
 # install.packages("remotes")
@@ -31,10 +27,14 @@ features) via:
 remotes::install_github("jniedballa/camtrapR", build_vignettes = TRUE)
 ```
 
-or from the dev branch for the latest development version (may not always be available).
+and the GitHub development version\* (containing the most recent changes
+and new features) via:
+
 ``` r
 remotes::install_github("jniedballa/camtrapR", ref = "dev", build_vignettes = TRUE)
 ```
+
+\[\* a development version may not always be available on GitHub\]
 
 For installation from GitHub make sure package `R.rsp` is available.
 `build_vignettes = TRUE` is necessary since v 2.1.1. due to the new
@@ -44,7 +44,7 @@ You can also install a previous version (e.g. if a recent update broke
 the code you need to run urgently) via:
 
 ``` r
-remotes::install_version(package = "camtrapR", version = "2.0.3")
+remotes::install_version(package = "camtrapR", version = "2.3.1")
 ```
 
 ## Exiftool
