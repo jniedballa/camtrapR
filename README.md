@@ -7,6 +7,7 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/camtrapR)](https://CRAN.R-project.org/package=camtrapR)
+![](https://cranlogs.r-pkg.org/badges/grand-total/camtrapR)
 [![](http://cranlogs.r-pkg.org/badges/camtrapR)](https://cran.r-project.org/package=camtrapR)
 <!-- [![Build Status](https://travis-ci.org/jniedballa/camtrapR.svg?branch=master)](https://travis-ci.org/jniedballa/camtrapR) -->
 <!-- badges: end -->
@@ -21,7 +22,8 @@ You can install the release version of camtrapR from CRAN:
 install.packages("camtrapR")
 ```
 
-the GitHub master version via:
+or the  GitHub version (containing recent changes and new
+features) via:
 
 ``` r
 # install.packages("remotes")
@@ -29,14 +31,10 @@ the GitHub master version via:
 remotes::install_github("jniedballa/camtrapR", build_vignettes = TRUE)
 ```
 
-and the GitHub development version\* (containing the most recent changes
-and new features) via:
-
+or from the dev branch for the latest development version (may not always be available).
 ``` r
 remotes::install_github("jniedballa/camtrapR", ref = "dev", build_vignettes = TRUE)
 ```
-
-\[\* a development version may not always be available on GitHub\]
 
 For installation from GitHub make sure package `R.rsp` is available.
 `build_vignettes = TRUE` is necessary since v 2.1.1. due to the new
