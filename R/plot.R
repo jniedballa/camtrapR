@@ -291,10 +291,7 @@ plot_effects_commOccu <- function(object,
                        ifelse(is_squared, " quadratic term (no linear term)", ""))
     
     
-    # make cran checks happy
-    lower <- NULL
-    upper <- NULL
-    
+
     # for squared covariates which have no unsquared version, sqrt-transform covariate and add expand covariate range to negative values (by mirr)
     if(is_squared & !has_squared) {
       vals[,1] <- sqrt(vals[,1])
@@ -355,14 +352,14 @@ plot_effects_commOccu <- function(object,
       p <- ggplot(vals, aes_string(x = params_covariate[[cov]], y = "mean", group = "Species")) + 
         geom_col() +
         facet_wrap(~Species) +
-        geom_linerange(aes(ymin = "lower", ymax = "upper")) +
+        geom_linerange(aes(ymin = lower, ymax = upper)) +
         theme_bw() +
         ggtitle(label = main,
                 subtitle = subtitle) +
         xlab (current_cov) +
         ylab(ylabel) +
         theme(panel.grid.minor = element_blank())
-      
+
       if(.hasSlot(object, "model")) if(object@model == "Occupancy") p <- p + ylim(0, 1) 
       if(!.hasSlot(object, "model")) p <- p + ylim(0, 1) 
       
