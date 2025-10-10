@@ -165,8 +165,11 @@
 #'                                  dateFormat   = "dmy"
 #' )
 #' 
+#' The examples above specified dateFormat using lubdridate package, which is more intuitive. 
+#' Alternatively one can used in base-R date conversions (strptime) as below:
+#' 
 #' # with problems/malfunction / dateFormat in strptime format
-#' camop_problem_lubridate <- cameraOperation(CTtable      = camtraps,
+#' camop_problem_oldformat <- cameraOperation(CTtable      = camtraps,
 #'                                            stationCol   = "Station",
 #'                                            setupCol     = "Setup_date",
 #'                                            retrievalCol = "Retrieval_date",
@@ -177,7 +180,7 @@
 #' 
 #' camop_no_problem
 #' camop_problem
-#' camop_problem_lubridate
+#' camop_problem_oldformat
 #' 
 #' @importFrom data.table rbindlist setDF setDT setkey foverlaps ":="
 #' @importFrom lubridate as_date as_datetime ddays dhours dseconds interval int_start int_end int_overlaps time_length "%within%" 
