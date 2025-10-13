@@ -1101,6 +1101,7 @@ makeSurveyZip <- function(output,
                           CTtable ,
                           speciesCol,
                           stationCol,
+                          cameraCol,
                           setupCol,
                           retrievalCol,
                           CTDateFormat,
@@ -1228,20 +1229,54 @@ makeSurveyZip <- function(output,
   
   # camera operation matrix
   
+  # Conditionally create the string for each optional argument
+  
+  # 1. Handle cameraCol
+  if (hasArg(cameraCol)) {
+    # If cameraCol was provided, create the active line of code
+    cameraCol_line <- sprintf("            cameraCol = '%s',\n", cameraCol)
+  } else {
+    # If cameraCol was not provided, create a commented-out placeholder
+    cameraCol_line <- "            #cameraCol = 'Not defined',\n"
+  }
+  
+  # 2. Handle byCamera
+  if (hasArg(byCamera)) {
+    # If byCamera was provided, activate it (assuming TRUE)
+    byCamera_line <- "            byCamera = TRUE,\n"
+  } else {
+    byCamera_line <- "            #byCamera,\n"
+  }
+  
+  # 3. Handle allCamsOn
+  if (hasArg(allCamsOn)) {
+    allCamsOn_line <- "            allCamsOn = TRUE,\n"
+  } else {
+    allCamsOn_line <- "            #allCamsOn,\n"
+  }
+  
+  # 4. Handle camerasIndependent
+  if (hasArg(camerasIndependent)) {
+    camerasIndependent_line <- "            camerasIndependent = TRUE,\n"
+  } else {
+    camerasIndependent_line <- "            #camerasIndependent,\n"
+  }
+  
+  
   sink(file = scriptfile, append = TRUE)
   cat("###  camera operation matrix  ### \n\n")
   
   cat(paste("camOp <- cameraOperation(CTtable = CTtable,
-            stationCol                        = '", stationCol, "',
-            #cameraCol,
-            setupCol                          = '", setupCol, "',
-            retrievalCol                      = '", retrievalCol, "',
-            hasProblems                       = '", CTHasProblems, "',
-            #byCamera,
-            #allCamsOn,
-            #camerasIndependent,
-            dateFormat                        = '", CTDateFormat, "' #,
-            #writecsv                         = FALSE,
+            stationCol = '", stationCol, "',\n",
+            cameraCol_line, 
+            "            setupCol  = '", setupCol, "',
+            retrievalCol  = '", retrievalCol, "',
+            hasProblems = '", CTHasProblems, "',\n",
+            byCamera_line,
+            allCamsOn_line,
+            camerasIndependent_line,
+            "            dateFormat  = '", CTDateFormat, "' #,
+            #writecsv  = FALSE,
             #outDir
   ) \n\n\n", sep = ""))
 
