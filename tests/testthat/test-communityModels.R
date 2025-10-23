@@ -82,7 +82,7 @@ test_that("communityModel output has correct structure for JAGS occupancy model"
 test_that("JAGS model fits correctly with valid data", {
   
   # 1. Skip if the R wrapper package isn't installed
-  skip_if_not_installed("R2jags")
+  skip_if_not_installed("rjags")
   
   library(rjags)
   
