@@ -830,6 +830,13 @@ detectionHistory <- function(recordTable,
   # Convert to list for manipulation
   call_list <- as.list(call_args)[-1]  # -1 removes the function name
   
+  # This function uses recursion with do.call, which can cause issues with
+  # finding objects in non-standard environments (like during testing).
+  # We must explicitly evaluate the camOp argument to get the actual object
+  # and replace the symbol in our call list before recursing.
+  if (!is.null(call_list$camOp)) {
+    call_list$camOp <- eval(call_list$camOp, envir = parent.frame())
+  }
   
   
   # Create the lapply call with only defined arguments
