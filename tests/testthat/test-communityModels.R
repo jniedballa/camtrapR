@@ -41,6 +41,7 @@ local({
   sitecovs <- camtraps[, c(1:3)]
   sitecovs$elevation <- c(300, 500, 600)
   sitecovs[, c(2:4)] <- scale(sitecovs[, -1])
+  sitecovs$some_factor <- factor(c("A", "A", "B"))
   
   # bundle input data
   data_list <- list(
@@ -53,9 +54,9 @@ local({
   modelfile1 <- tempfile(fileext = ".txt")
   mod.jags <- communityModel(
     data_list,
-    occuCovs = list(fixed = "utm_y", ranef = "elevation"),
+    occuCovs = list(fixed = c("some_factor", "utm_y"), ranef = "elevation"),
     detCovsObservation = list(fixed = "effort"),
-    intercepts = list(det = "ranef", occu = "ranef"),
+    intercepts = list(det = "fixed", occu = "ranef"),
     modelFile = modelfile1
   )
   
@@ -77,7 +78,7 @@ local({
     # Skips first
     skip_if_not_installed("rjags")
     skip_if(Sys.which("jags") == "", message = "JAGS executable not found. Skipping test.")
-    library(rjags)
+
     
     # 1. Fit the model
     fit.jags <- fit(mod.jags, n.iter = 100, n.burnin = 50, chains = 3)
@@ -90,15 +91,23 @@ local({
     plot_eff_state <- plot_effects(mod.jags, fit.jags, submodel = "state")
     plot_coef_state_comb <- plot_coef(mod.jags, fit.jags, submodel = "state", combine = TRUE, ordered = FALSE)
     
-    expect_length(plot_eff_state, 2)
+    expect_length(plot_eff_state, 3)
     expect_s3_class(plot_coef_state_comb, "ggplot")
     
     # 3. Test prediction and PPC
     draws <- 20
-    p <- predict(object = mod.jags, mcmc.list = fit.jags, type = "p_array", draws = draws)
-    psi <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi_array", draws = draws)
+    p_array <- predict(object = mod.jags, mcmc.list = fit.jags, type = "p_array", draws = draws)
+    psi_array <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi_array", draws = draws)
     
-    ppc_comm <- PPC.community(p = p, psi = psi, y = mod.jags@input$ylist, model = "Occupancy", type = "FT")
+    rich <- predict(object = mod.jags, mcmc.list = fit.jags, type = "richness", draws = draws)
+    psi <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi", draws = draws)
+    
+    expect_equal(dim(rich), c(3, 2))
+    expect_equal(dim(psi), c(15, 4))
+    
+    ppc_comm <- PPC.community(p = p_array, psi = psi_array, y = mod.jags@input$ylist, model = "Occupancy", type = "FT")
+    
+    
     
     expect_length(ppc_comm, 2)
     expect_named(ppc_comm, c("BP", "residuals"))
