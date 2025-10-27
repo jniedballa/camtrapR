@@ -823,7 +823,7 @@ plot_coef_commOccu <- function(object,
     p <- p + geom_vline(xintercept = 0, alpha = alpha_zero) +
       # species effects
       geom_pointrange(aes_string(xmin = "lower_outer", xmax = "upper_outer")) + 
-      geom_linerange (aes_string(xmin = "lower_inner", xmax = "upper_inner"), size = 1) +
+      geom_linerange (aes_string(xmin = "lower_inner", xmax = "upper_inner"), linewidth = 1) +
       facet_grid(rows = vars(type), 
                  cols = vars(covariate),
                  scales = scales, 
