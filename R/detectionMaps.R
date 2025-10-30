@@ -200,7 +200,7 @@ detectionMaps <- function(CTtable,
   }
 
   # data preparation
-  dat2 <- aggregate(CTtable[, c(Ycol, Xcol)], 
+  dat2 <- aggregate(CTtable[, c(Xcol, Ycol)], 
                     by = list(CTtable[,stationCol]), 
                     FUN = mean)    # get coordinates
   colnames(dat2)[1] <- stationCol
