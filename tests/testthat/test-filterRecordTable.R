@@ -13,7 +13,7 @@ wd_images_ID_species <- system.file("pictures/sample_images_species_dir",
 
 # --- Test Suite ---
 
-describe("Core Filtering Logic", {
+testthat::describe("Core Filtering Logic", {
   
   # Skip all tests in this describe block if ExifTool is not available
   skip_if(Sys.which("exiftool") == "", message = "ExifTool not found, skipping tests.")
@@ -61,7 +61,7 @@ describe("Core Filtering Logic", {
 })
 
 
-describe("Edge Cases", {
+testthat::describe("Edge Cases", {
   
   skip_if(Sys.which("exiftool") == "", message = "ExifTool not found, skipping tests.")
   
@@ -90,7 +90,7 @@ describe("Edge Cases", {
 })
 
 
-describe("Input Validation", {
+testthat::describe("Input Validation", {
   
   # This describe block does NOT need ExifTool, as it tests inputs, not logic.
   # We create a minimal dummy data frame for these tests.
