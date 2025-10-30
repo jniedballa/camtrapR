@@ -18,3 +18,4 @@
 ^vignettes/mapview_example\.png$
 ^vignettes/SpeciesID_digiKam\.png$
 ^\.github$
+^.covrignore$
