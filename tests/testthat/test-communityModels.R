@@ -94,6 +94,10 @@ local({
     expect_equal(mod.jags_RN@model, "RN")
   })
   
+  test_that("summary works", {
+    expect_output(summary(mod.jags), "=== Community Occupancy Model Summary ===")
+    expect_output(summary(mod.jags_RN), "=== Community Occupancy Model Summary ===")
+  })
   
   test_that("JAGS workflow (fit, plot, predict) runs correctly", {
     
