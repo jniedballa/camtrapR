@@ -59,7 +59,7 @@ mock_datapackage <- toJSON(list(
 
 # --- Test Suite ---
 
-describe("Core Functionality: Reading Data", {
+testthat::describe("Core Functionality: Reading Data", {
   
   test_that("it reads correctly from individual CSV files in a temp directory", {
     with_tempdir({
@@ -135,7 +135,7 @@ describe("Core Functionality: Reading Data", {
 })
 
 
-describe("Data Processing Logic", {
+testthat::describe("Data Processing Logic", {
   
   test_that("it correctly detects and records deployment gaps as problems", {
     with_tempdir({
@@ -180,7 +180,7 @@ describe("Data Processing Logic", {
 })
 
 
-describe("Argument Handling", {
+testthat::testthat::describe("Argument Handling", {
   
   test_that("filter_observations correctly subsets the recordTable", {
     with_tempdir({
