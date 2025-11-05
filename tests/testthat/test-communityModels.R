@@ -1,5 +1,6 @@
 context("communityModels")
 library(camtrapR)
+library(terra)
 
 # Use local() to create a self-contained environment for all related tests.
 
