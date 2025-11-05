@@ -72,6 +72,29 @@ local({
     modelFile = modelfile1_RN
   )
   
+  
+  # create prediction raster
+  
+  # 1. Create the base raster template
+  template <- rast(nrows = 10, ncols = 10)
+  
+  # 2. Create the 'utm_y' layer
+  layer_utm_y <- setValues(template, rnorm(ncell(template)))
+  names(layer_utm_y) <- "utm_y"
+  
+  # 3. Create the 'elevation' layer
+  layer_elevation <- setValues(template, rnorm(ncell(template)))
+  names(layer_elevation) <- "elevation"
+  
+  # 4. Create the 'some_factor' (categorical) layer
+  factor_values <- sample(c(1, 2), ncell(template), replace = TRUE)
+  layer_factor <- setValues(template, factor_values) 
+  names(layer_factor) <- "some_factor"
+  
+  # 5. Combine the individual layers into a single SpatRaster
+  prediction_raster <- c(layer_utm_y, layer_elevation, layer_factor)
+  
+  
   # --- TESTS: Now run the tests from within this environment ---
   
   test_that("communityModel output has correct structure for JAGS occupancy model", {
@@ -135,14 +158,23 @@ local({
     expect_s3_class(plot_coef_state_RN_comb, "ggplot")
     
     
-    # 3. Test prediction and PPC
+    # 3. Test predictions
     draws <- 20
+    
+    
     p_array <- predict(object = mod.jags, mcmc.list = fit.jags, type = "p_array", draws = draws)
     psi_array <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi_array", draws = draws)
     
     rich <- predict(object = mod.jags, mcmc.list = fit.jags, type = "richness", draws = draws)
     psi <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi", draws = draws)
     pao <- predict(object = mod.jags, mcmc.list = fit.jags, type = "pao", draws = draws)
+    
+    rich_batch <- predict(object = mod.jags, mcmc.list = fit.jags, type = "richness", draws = draws,
+                          batch = T)
+    
+    rich_rast <- predict(object = mod.jags, mcmc.list = fit.jags, type = "richness", draws = draws, 
+                         x = prediction_raster,
+                         interval = "confidence")
     
     expect_equal(dim(rich), c(3, 2))
     expect_equal(dim(psi), c(15, 4))
@@ -153,9 +185,13 @@ local({
     expect_equal(dim(pao$pao_df), c(100,3))
     expect_equal(dim(pao$pao_matrix), c(5,20))
     
+    expect_true(class(rich_rast) == "SpatRaster")
+    expect_equal(dim(rich_rast), c(10, 10, 4))
+    expect_named(rich_rast, c("mean", "sd", "lower", "upper"))
     
+    
+    # 4. Test Posterior predictive checks
     ppc_comm <- PPC.community(p = p_array, psi = psi_array, y = mod.jags@input$ylist, model = "Occupancy", type = "FT")
-    
     
     
     expect_length(ppc_comm, 2)
@@ -166,7 +202,7 @@ local({
     ppc_comm2 <- PPC.community(p = p_array, psi = psi_array, y = mod.jags@input$ylist, model = "Occupancy", type = "PearChi2")
     
     
-    # 4. Test prediction and PPC (Royle-Nichols model)
+    # 5. Test predictions (Royle-Nichols model)
     
     p_array <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "p_array", draws = draws)
     psi_array <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "psi_array", draws = draws)
@@ -190,6 +226,9 @@ local({
     expect_equal(dim(pao$pao_summary), c(5,8))
     expect_equal(dim(pao$pao_df), c(100,3))
     expect_equal(dim(pao$pao_matrix), c(5,20))
+    
+    
+    # 6. Test PPC (RN model)
     
     # returns warning in each call of PPC.residualy
     ppc_comm <- expect_warning(PPC.community(p = p_array, psi = abundance_array, 
