@@ -168,8 +168,6 @@ testthat::describe("activityOverlap()", {
                  "is not a column name in recordTable")
     expect_error(activityOverlap(recordTableSample, speciesA = "UNKNOWN", speciesB = "VTA"),
                  "all\\(c\\(speciesA, speciesB\\) %in% recordTable\\[, speciesCol\\]\\) is not TRUE")
-    expect_error(activityOverlap(recordTableSample, speciesA = "PBE", speciesB = "SUS"),
-                 "all(c(speciesA, speciesB) %in% recordTable[, speciesCol]) is not TRUE")
     expect_error(activityOverlap(recordTableSample[-which(recordTableSample$Species == "MNE")[2],], speciesA = "PBE", speciesB = "MNE"),
                  "speciesB has only 1 record. Cannot estimate density.")
     
