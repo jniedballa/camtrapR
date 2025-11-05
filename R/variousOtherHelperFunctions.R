@@ -1324,7 +1324,7 @@ makeSurveyZip <- function(output,
   
   
   cat(paste("this zip file contains a summary of a camera trapping survey:\n\n"))
-  cat(paste("total survey period:              ", min(output$survey_dates$setup_date), "-", max(output$survey_dates$retrieval_date), "\n"))
+  cat(paste("total survey period:              ", min(output$survey_dates$setup), "-", max(output$survey_dates$retrieval), "\n"))
   cat(paste("Total number of stations:         ", nrow(output$survey_dates), "\n"))
   cat(paste("Number of operational stations:   ", length(which(output$survey_dates$n_nights_active >= 1)), "\n"))
   cat(paste("Total number of cameras:          ", sum(output$survey_dates$n_cameras), "\n"))
