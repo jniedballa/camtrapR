@@ -130,22 +130,21 @@ testthat::describe("File Writing and Side Effects", {
         retrievalCol = "Retrieval_date",
         camOp        = camop_no_problem,
         CTDateFormat = "dmy",
-        sinkpath     = tmpdir # "." # Write to the temp directory
+        sinkpath     = tmpdir #"." # Write to the temp directory
       )
       
       # Check for the report file
-      report_files <- list.files(tmpdir, pattern = paste0("survey_report_", Sys.Date(), ".txt"))
+      report_files <- list.files(tmpdir, pattern = paste0("survey_report_", Sys.Date(), ".txt"), full.names = T)
       expect_equal(length(report_files), 1)
       
       
       # Check that the file has content
-      report_content <- readLines(file.path(tmpdir, report_files[1]))
+      report_content <- readLines(report_files[1])
       expect_gt(length(report_content), 10)
       expect_true(any(grepl("Total number of stations", report_content)))
     })
     
     
-    # the following test works in principle, but fails within test_that().
     
     test_that("makezip = TRUE creates a valid zip file with expected contents", {
 
@@ -165,22 +164,23 @@ testthat::describe("File Writing and Side Effects", {
 
 
     # 1. Check if the zip file was created
-    zip_files <- list.files(tmpdir, pattern = paste0("surveyReport_", Sys.Date(), ".zip"))
+    zip_files <- list.files(tmpdir, pattern = paste0("surveyReport_", Sys.Date(), ".zip"), full.names = T)
     expect_equal(length(zip_files), 1)
 
     # 2. Check the contents of the zip file
-    zip_contents <- utils::unzip(file.path(tmpdir, zip_files[1]), list = TRUE)
+    zip_contents <- utils::unzip(zip_files[1], list = TRUE)
 
     # Expected files/folders
-    expect_true("camtrapR_scripts.R" %in% zip_contents$Name)
+    expect_true("camtrapR_scripts.R" %in% basename(zip_contents$Name))
 
     # Check for specific files
-    expect_true("recordTable.csv" %in% zip_contents$Name)
+    expect_true("recordTable.csv" %in% basename(zip_contents$Name))
     n_species <- length(unique(recordTableSample$Species))
     expect_equal(sum(grepl("activity_", zip_contents$Name)), n_species)
     expect_equal(sum(grepl("Presence", zip_contents$Name)), n_species)
   })
 })
+# })
 
 
 
