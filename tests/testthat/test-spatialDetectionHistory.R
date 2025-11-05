@@ -37,7 +37,7 @@ camop_session <- cameraOperation(CTtable      = camtrapsMultiSeason,
 
 # --- Test Suite ---
 
-describe("Core Functionality (Single Session)", {
+testthat::describe("Core Functionality (Single Session)", {
   
   # Skip all tests in this file if secr is not installed
   skip_if_not_installed("secr")
@@ -80,7 +80,7 @@ describe("Core Functionality (Single Session)", {
 })
 
 
-describe("Multi-Session Functionality", {
+testthat::describe("Multi-Session Functionality", {
   
   skip_if_not_installed("secr")
   
@@ -114,7 +114,7 @@ describe("Multi-Session Functionality", {
 })
 
 
-describe("Covariate Handling", {
+testthat::describe("Covariate Handling", {
   
   skip_if_not_installed("secr")
   
@@ -152,7 +152,7 @@ describe("Covariate Handling", {
 })
 
 
-describe("Output Modes and Other Options", {
+testthat::describe("Output Modes and Other Options", {
   
   skip_if_not_installed("secr")
   
@@ -208,7 +208,7 @@ describe("Output Modes and Other Options", {
 })
 
 
-describe("Input Validation", {
+testthat::describe("Input Validation", {
   
   test_that("it stops for missing or invalid inputs", {
     # Missing camOp
