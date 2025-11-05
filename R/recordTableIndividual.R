@@ -271,8 +271,11 @@ recordTableIndividual <- function(inDir,
   
   if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
 
-  if(!is.logical(hasStationFolders))    stop("hasStationFolders must be of class 'logical'", call. = FALSE)
-
+  
+  if(!is.character(inDir))  stop("inDir must be of class 'character'", call. = FALSE)
+  if(length(inDir) != 1)    stop("inDir may only consist of 1 element only", call. = FALSE)
+  if(!dir.exists(inDir))    stop("Could not find inDir:\n", inDir, call. = FALSE)
+  
   IDfrom <- match.arg(IDfrom, choices = c("metadata", "directory") )
             
  if(IDfrom == "metadata"){
@@ -335,13 +338,13 @@ recordTableIndividual <- function(inDir,
 
   if(!is.logical(writecsv)) stop("writecsv must be logical")
 
-  if(!is.character(inDir))  stop("inDir must be of class 'character'", call. = FALSE)
-  if(length(inDir) != 1)    stop("inDir may only consist of 1 element only", call. = FALSE)
-  if(!dir.exists(inDir))    stop("Could not find inDir:\n", inDir, call. = FALSE)
-
 
   # find image directories
 
+  
+  if(!is.logical(hasStationFolders))    stop("hasStationFolders must be of class 'logical'", call. = FALSE)
+  
+  
   if(hasStationFolders == TRUE){
     dirs       <- list.dirs(inDir, full.names = TRUE,  recursive = FALSE)
     dirs_short <- list.dirs(inDir, full.names = FALSE, recursive = FALSE)
