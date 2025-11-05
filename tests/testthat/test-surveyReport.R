@@ -147,40 +147,39 @@ testthat::describe("File Writing and Side Effects", {
     
     # the following test works in principle, but fails within test_that().
     
-    # test_that("makezip = TRUE creates a valid zip file with expected contents", {
-    #   
-    # 
-    #   report <- surveyReport(
-    #     recordTable  = recordTableSample,
-    #     CTtable      = camtraps,
-    #     setupCol     = "Setup_date",
-    #     retrievalCol = "Retrieval_date",
-    #     camOp        = camop_no_problem,
-    #     CTDateFormat = "dmy",
-    #     Xcol         = "utm_x",
-    #     Ycol         = "utm_y",
-    #     sinkpath     = tmpdir, #".",
-    #     makezip      = TRUE
-    #   )
-    #   
-    #   
-    #   # 1. Check if the zip file was created
-    #   zip_files <- list.files(tmpdir, pattern = paste0("surveyReport_", Sys.Date(), ".zip"))
-    #   expect_equal(length(zip_files), 1)
-    #   
-    #   # 2. Check the contents of the zip file
-    #   zip_contents <- utils::unzip(file.path(tmpdir, zip_files[1]), list = TRUE)
-    #   
-    #   # Expected files/folders
-    #   expect_true("camtrapR_scripts.R" %in% zip_contents$Name)
-    #   
-    #   # Check for specific files
-    #   expect_true("recordTable.csv" %in% zip_contents$Name)
-    #   n_species <- length(unique(recordTableSample$Species))
-    #   expect_equal(sum(grepl("activity_", zip_contents$Name)), n_species)
-    #   expect_equal(sum(grepl("Presence", zip_contents$Name)), n_species)
-    # })
-  # })
+    test_that("makezip = TRUE creates a valid zip file with expected contents", {
+
+
+      report <- surveyReport(
+        recordTable  = recordTableSample,
+        CTtable      = camtraps,
+        setupCol     = "Setup_date",
+        retrievalCol = "Retrieval_date",
+        camOp        = camop_no_problem,
+        CTDateFormat = "dmy",
+        Xcol         = "utm_x",
+        Ycol         = "utm_y",
+        sinkpath     = tmpdir, #".",
+        makezip      = TRUE
+      )
+
+
+    # 1. Check if the zip file was created
+    zip_files <- list.files(tmpdir, pattern = paste0("surveyReport_", Sys.Date(), ".zip"))
+    expect_equal(length(zip_files), 1)
+
+    # 2. Check the contents of the zip file
+    zip_contents <- utils::unzip(file.path(tmpdir, zip_files[1]), list = TRUE)
+
+    # Expected files/folders
+    expect_true("camtrapR_scripts.R" %in% zip_contents$Name)
+
+    # Check for specific files
+    expect_true("recordTable.csv" %in% zip_contents$Name)
+    n_species <- length(unique(recordTableSample$Species))
+    expect_equal(sum(grepl("activity_", zip_contents$Name)), n_species)
+    expect_equal(sum(grepl("Presence", zip_contents$Name)), n_species)
+  })
 })
 
 
