@@ -173,9 +173,15 @@ local({
     rich_batch <- predict(object = mod.jags, mcmc.list = fit.jags, type = "richness", draws = draws,
                           batch = T)
     
+    psi_array_rast <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi_array", draws = draws)
+    
     rich_rast <- predict(object = mod.jags, mcmc.list = fit.jags, type = "richness", draws = draws, 
                          x = prediction_raster,
                          interval = "confidence")
+    psi_rast <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi", draws = draws,
+                   x = prediction_raster)
+    pao <- predict(object = mod.jags, mcmc.list = fit.jags, type = "pao", draws = draws,
+                   x = prediction_raster,)
     
     expect_equal(dim(rich), c(3, 2))
     expect_equal(dim(psi), c(15, 4))
@@ -216,6 +222,9 @@ local({
     abundance_array <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "lambda_array", draws = draws)
     pao <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "pao", draws = draws)
     
+    abundance_rast <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "abundance", draws = draws,
+                              x = prediction_raster)
+    
     expect_equal(dim(rich), c(3, 2))
     expect_equal(dim(rich_conf), c(3, 4))
     expect_equal(dim(psi), c(15, 4))
@@ -245,6 +254,106 @@ local({
     ppc_comm2 <- expect_warning(PPC.community(p = p_array, psi = abundance_array, 
                                y = mod.jags_RN@input$ylist, model = "RN", type = "PearChi2"))
     
+    
+  })
+  
+  test_that("Other model specifications work", {
+    
+    # various effect types
+    mod.jags_fixed <- communityModel(
+      data_list,
+      occuCovs = list(fixed = c("some_factor", "utm_y"), fixed = c("some_factor", "elevation")),
+      detCovsObservation = list(fixed = "effort"),
+      intercepts = list(det = "fixed", occu = "fixed"),
+      modelFile = tempfile(fileext = "txt")
+    )
+    
+    mod.jags_ranef <- communityModel(
+      data_list,
+      occuCovs = list(fixed = c("some_factor", "elevation")),
+      detCovsObservation = list(ranef = "effort"),
+      intercepts = list(det = "ranef", occu = "ranef"),
+      modelFile = tempfile(fileext = "txt")
+    )
+    
+    mod.jags_indep <- communityModel(
+      data_list,
+      occuCovs = list(independent  = c("utm_y")),
+      intercepts = list(det = "independent", occu = "independent"),
+      modelFile = tempfile(fileext = "txt")
+    )
+    
+    mod.jags_fixed_specsiteranef <- communityModel(
+      data_list,
+      speciesSiteRandomEffect = list(det = T, occu = F),
+      modelFile = tempfile(fileext = "txt")
+    )
+     
+    
+    # data augmentation
+    
+    
+    mod.jags_aug1 <- communityModel(
+      data_list,
+      modelFile = tempfile(fileext = "txt"),
+      augmentation = c(maxknown = 6) 
+    )
+    
+    mod.jags_aug2 <- communityModel(
+      data_list,
+      modelFile = tempfile(fileext = "txt"),
+      augmentation = c(full = 6) 
+    )
+    
+    # nimble models
+    mod.jags_fixed_nimble <- communityModel(
+      data_list,
+      occuCovs = list(fixed = c("some_factor", "utm_y"), fixed = c("some_factor", "elevation")),
+      detCovsObservation = list(fixed = "effort"),
+      intercepts = list(det = "fixed", occu = "fixed"),
+      modelFile = tempfile(fileext = "txt"),
+      nimble = TRUE
+    )
+    
+    mod.jags_ranef_nimble <- communityModel(
+      data_list,
+      occuCovs = list(fixed = c("some_factor", "elevation")),
+      detCovsObservation = list(ranef = "effort"),
+      intercepts = list(det = "ranef", occu = "ranef"),
+      modelFile = tempfile(fileext = "txt"),
+      nimble = TRUE
+    )
+    
+    mod.jags_indep_nimble <- communityModel(
+      data_list,
+      occuCovs = list(independent  = c("utm_y")),
+      intercepts = list(det = "independent", occu = "independent"),
+      modelFile = tempfile(fileext = "txt"),
+      nimble = TRUE
+    )
+    
+  })
+  
+  test_that("Other error conditions work", {
+    
+    expect_error(
+      mod.jags_indep <- communityModel(
+        data_list,
+        occuCovs = list(independent  = c("some_factor", "utm_y")),
+        intercepts = list(det = "independent", occu = "independent"),
+        modelFile = tempfile(fileext = "txt")
+      ),
+      "independent effects of categorical site covariates are currently not supported"
+    )
+    
+    expect_error(
+    mod.jags_fixed_specsiteranef <- communityModel(
+      data_list,
+      speciesSiteRandomEffect = list(det = T, occu = T),
+      modelFile = tempfile(fileext = "txt")
+    ),
+    fixed = "speciesSiteRandomEffect$occu must be FALSE"
+    )
     
   })
   
