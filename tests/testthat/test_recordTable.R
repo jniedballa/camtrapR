@@ -68,6 +68,13 @@ rec_table3b <- recordTable(inDir              = wd_images_ID_species,
 )
 
 
+rec_table4 <- recordTable(inDir                  = wd_images_ID_species,
+                          IDfrom                 = "directory",
+                          timeZone               = "UTC",
+                          video = list(file_formats = c("jpg", "mp4"), 
+                                       dateTimeTag = "QuickTime:CreateDate"
+                                       )
+)
 
 # Test section
   
@@ -78,6 +85,7 @@ test_that("recordTable output has correct class", {
   expect_is(rec_table2_2, "data.frame")
   expect_is(rec_table3a,  "data.frame")
   expect_is(rec_table3b,  "data.frame")
+  expect_is(rec_table4,  "data.frame")
 })
 
 test_that("recordTable output has correct dimensions", {
@@ -87,6 +95,7 @@ test_that("recordTable output has correct dimensions", {
   expect_equal(dim(rec_table2_2), c(39,16))
   expect_equal(dim(rec_table3a),  c(67,12))
   expect_equal(dim(rec_table3b),  c(55,12))
+  expect_equal(dim(rec_table4),   c(57,12))
 })
 
 test_that("removeDuplicateRecords works", {
