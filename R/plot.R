@@ -92,19 +92,12 @@ plot_effects_commOccu <- function(object,
     
     has_squared <- cov_info_subset$has_quadratic[cov]
     if(paste0(current_cov, keyword_quadratic) %in% params_covariate){
-      #has_squared <- TRUE
       squared_cov <- paste0(current_cov, keyword_quadratic)
-    } #else {
-      #has_squared <- FALSE
-    #}
+    } 
     
     # determine data type of current covariate
     covariate_is_numeric <- cov_info_subset$data_type [cov] == "cont"
     covariate_is_factor  <- cov_info_subset$data_type [cov] == "categ"
-    
-    
-    # covariate_is_fixed <- !cov_info_subset$ranef[cov]
-    # covariate_is_ranef <- cov_info_subset$ranef[cov]
     
     effect_type <- ifelse(cov_info_subset$ranef[cov], "ranef",
                           ifelse(cov_info_subset$independent[cov], "independent", "fixed"))
@@ -160,17 +153,6 @@ plot_effects_commOccu <- function(object,
       
         
         
-      # # get intercepts
-      # if(!paste0(keyword_submodel_short, "0.mean") %in%  object@params) {
-      #   # fixed intercept
-      #   out_intercept[,i,] <- posterior_matrix[, grepl(paste0(keyword_submodel_short, "0$"), colnames(posterior_matrix))] 
-      # } else {
-      #   
-      #   # random intercept
-      #   out_intercept[,i,] <- posterior_matrix[, colnames(posterior_matrix) %in% paste0(keyword_submodel_short, "0", "[", i, "]")] 
-      # }
-      
-      
       if(covariate_is_numeric) {
         
         if(effect_type == "fixed") {
@@ -289,7 +271,6 @@ plot_effects_commOccu <- function(object,
     subtitle <- paste0(ifelse(effect_type == "ranef", "Random effect", ifelse(effect_type == "independent", "Independent effects", "Fixed effect")),
                        ifelse(has_squared, " (with quadratic term)", ""),
                        ifelse(is_squared, " quadratic term (no linear term)", ""))
-    
     
 
     # for squared covariates which have no unsquared version, sqrt-transform covariate and add expand covariate range to negative values (by mirr)
@@ -518,11 +499,6 @@ plot_coef_commOccu <- function(object,
     covariate_is_factor  <- cov_info_subset$data_type [cov] == "categ"
     
     
-    # covariate_is_fixed <- !cov_info_subset$ranef[cov]
-    # covariate_is_indep <- cov_info_subset$independent[cov]
-    # covariate_is_ranef <- cov_info_subset$ranef[cov]
-    
-    
     
     effect_type <- ifelse(cov_info_subset$ranef[cov], "ranef",
                           ifelse(cov_info_subset$independent[cov], "independent", "fixed"))
@@ -746,7 +722,7 @@ plot_coef_commOccu <- function(object,
     if(!combine){
       
       
-      p_list[[cov]] <- ggplot (df_quantiles_i, aes_string(y = "species", x = "median", color = color_by)) +
+      p_list[[cov]] <- ggplot (df_quantiles_i, aes_string(y = "species", x = "median", color = color_by))
         
         if(community_lines) {
         # community effect
