@@ -240,3 +240,133 @@ testthat::describe("Full Image Management Workflow", {
     })
   })
 })
+
+
+
+# =========================================================================
+# Tests for getSpeciesImages()
+# =========================================================================
+testthat::describe("getSpeciesImages()", {
+  
+  # Path to sample images included with the package
+  wd_images_ID <- system.file("pictures/sample_images_species_dir", 
+                              package = "camtrapR") 
+  
+  # create a mock record table and file structure for robustness
+  mock_record_table <- data.frame(
+    Station = c("StationA", "StationA", "StationB"),
+    Species = c("PBE", "VTA", "PBE"),
+    Directory = c("path/to/stationA", "path/to/stationA", "path/to/stationB"),
+    FileName = c("img1.jpg", "img2.jpg", "img3.jpg"),
+    stringsAsFactors = FALSE
+  )
+  
+  test_that("it copies correct files using a recordTable", {
+    with_tempdir({ # All file operations happen in a temporary directory
+      
+      # 1. Create the source directory structure and dummy files
+      dir.create("path/to/stationA", recursive = TRUE)
+      dir.create("path/to/stationB", recursive = TRUE)
+      file.create(file.path("path/to/stationA", c("img1.jpg", "img2.jpg")))
+      file.create(file.path("path/to/stationB", "img3.jpg"))
+      
+      # Define the output directory
+      out_dir <- "species_images"
+      
+      # 2. Call the function to copy images for species "PBE"
+      copy_table <- getSpeciesImages(
+        species     = "PBE",
+        recordTable = mock_record_table,
+        outDir      = out_dir
+      )
+      
+      # 3. Verify the output
+      expect_s3_class(copy_table, "data.frame")
+      expect_equal(nrow(copy_table), 2) # Should find 2 images of PBE
+      expect_true(all(copy_table$copy_ok))
+      
+      # 4. Check the file system
+      output_path <- file.path(out_dir, "PBE")
+      expect_true(dir.exists(output_path))
+      copied_files <- list.files(output_path)
+      expect_equal(length(copied_files), 2)
+      expect_equal(sort(copied_files), c("img1.jpg", "img3.jpg"))
+    })
+  })
+  
+  test_that("it copies correct files using inDir and IDfrom = 'directory'", {
+    with_tempdir({
+      # 1. Create a source directory structure with species subfolders
+      in_dir <- "source_images"
+      dir.create(file.path(in_dir, "StationA", "PBE"), recursive = TRUE)
+      dir.create(file.path(in_dir, "StationA", "VTA"), recursive = TRUE)
+      dir.create(file.path(in_dir, "StationB", "PBE"), recursive = TRUE)
+      
+      # Create dummy image files
+      file.create(file.path(in_dir, "StationA/PBE/img1.jpg"))
+      file.create(file.path(in_dir, "StationA/VTA/img2.jpg"))
+      file.create(file.path(in_dir, "StationB/PBE/img3.jpg"))
+      
+      out_dir <- "species_images"
+      
+      # 2. Call the function
+      copy_table <- getSpeciesImages(
+        species = "PBE",
+        inDir   = in_dir,
+        outDir  = out_dir,
+        IDfrom  = "directory"
+      )
+      
+      # 3. Verify output and file system
+      expect_equal(nrow(copy_table), 2) # 2 images of PBE
+      
+      output_path <- file.path(out_dir, "PBE")
+      copied_files <- list.files(output_path)
+      expect_equal(length(copied_files), 2)
+      expect_equal(sort(copied_files), c("img1.jpg", "img3.jpg"))
+    })
+  })
+  
+  test_that("createStationSubfolders = TRUE works correctly", {
+    with_tempdir({
+      # Setup is the same as the previous test
+      in_dir <- "source_images"
+      dir.create(file.path(in_dir, "StationA", "PBE"), recursive = TRUE)
+      dir.create(file.path(in_dir, "StationB", "PBE"), recursive = TRUE)
+      file.create(file.path(in_dir, "StationA/PBE/img1.jpg"))
+      file.create(file.path(in_dir, "StationB/PBE/img3.jpg"))
+      
+      out_dir <- "species_images"
+      
+      # Call with createStationSubfolders = TRUE
+      copy_table <- getSpeciesImages(
+        species                 = "PBE",
+        inDir                   = in_dir,
+        outDir                  = out_dir,
+        IDfrom                  = "directory",
+        createStationSubfolders = TRUE # Key argument
+      )
+      
+      # Verify the nested output directory structure
+      expect_true(dir.exists(file.path(out_dir, "PBE", "StationA")))
+      expect_true(dir.exists(file.path(out_dir, "PBE", "StationB")))
+      expect_true(file.exists(file.path(out_dir, "PBE", "StationA", "img1.jpg")))
+      expect_true(file.exists(file.path(out_dir, "PBE", "StationB", "img3.jpg")))
+    })
+  })
+  
+  test_that("it stops if the output directory is not empty", {
+    with_tempdir({
+      out_dir <- "species_images"
+      # Create a non-empty output directory beforehand
+      dir.create(file.path(out_dir, "PBE"), recursive = TRUE)
+      file.create(file.path(out_dir, "PBE", "existing_file.jpg"))
+      
+      # Expect the function to stop
+      expect_error(
+        getSpeciesImages(species = "PBE", recordTable = mock_record_table, outDir = out_dir),
+        regexp = "target directory .* is not empty"
+      )
+    })
+  })
+})
