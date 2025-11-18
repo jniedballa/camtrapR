@@ -284,16 +284,58 @@ local({
     
     
     # 4. Test Posterior predictive checks
-    ppc_comm <- PPC.community(p = p_array, psi = psi_array, y = mod.jags@input$ylist, model = "Occupancy", type = "FT")
+    ppc_comm1a <- PPC.community(p = p_array, psi = psi_array, 
+                              y = mod.jags@input$ylist, 
+                              model = "Occupancy", 
+                              type = "FT",
+                              z.cond = T)
     
     
-    expect_length(ppc_comm, 2)
-    expect_named(ppc_comm, c("BP", "residuals"))
-    expect_equal(dim(ppc_comm$BP), c(6, 2))
-    expect_named(ppc_comm$residuals, species_to_include)
+    expect_length(ppc_comm1a, 2)
+    expect_named(ppc_comm1a, c("BP", "residuals"))
+    expect_equal(dim(ppc_comm1a$BP), c(6, 2))
+    expect_named(ppc_comm1a$residuals, species_to_include)
     
-    ppc_comm2 <- PPC.community(p = p_array, psi = psi_array, y = mod.jags@input$ylist, model = "Occupancy", type = "PearChi2")
+    ppc_comm1b <- PPC.community(p = p_array, psi = psi_array, 
+                                y = mod.jags@input$ylist, 
+                                model = "Occupancy", 
+                                type = "FT",
+                                z.cond = F)
     
+    
+    expect_length(ppc_comm1b, 2)
+    expect_named(ppc_comm1b, c("BP", "residuals"))
+    expect_equal(dim(ppc_comm1b$BP), c(6, 2))
+    expect_named(ppc_comm1b$residuals, species_to_include)
+    
+    
+    # 
+    ppc_comm2a <- PPC.community(p = p_array, psi = psi_array, 
+                                y = mod.jags@input$ylist, 
+                                model = "Occupancy", 
+                                type = "PearChi2",
+                                z.cond = T)
+    
+    
+    expect_length(ppc_comm2a, 2)
+    expect_named(ppc_comm2a, c("BP", "residuals"))
+    expect_equal(dim(ppc_comm2a$BP), c(6, 2))
+    expect_named(ppc_comm2a$residuals, species_to_include)
+    
+    ppc_comm2b <- PPC.community(p = p_array, psi = psi_array, 
+                                y = mod.jags@input$ylist, 
+                                model = "Occupancy", 
+                                type = "PearChi2",
+                                z.cond = F)
+    
+    
+    expect_length(ppc_comm2b, 2)
+    expect_named(ppc_comm2b, c("BP", "residuals"))
+    expect_equal(dim(ppc_comm2b$BP), c(6, 2))
+    expect_named(ppc_comm2b$residuals, species_to_include)
+    
+    
+
     
     # 5. Test predictions (Royle-Nichols model)
     
@@ -301,8 +343,6 @@ local({
     psi_array <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "psi_array", draws = draws)
     
     rich <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "richness", draws = draws)
-    rich_conf <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "richness", draws = draws, 
-                         interval = "confidence")
     psi <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "psi", draws = draws)
     abundance <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "abundance", draws = draws)
     abundance_array <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "lambda_array", draws = draws)
@@ -310,6 +350,12 @@ local({
     
     abundance_rast <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "abundance", draws = draws,
                               x = prediction_raster)
+    
+    rich_conf <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "richness", draws = draws, 
+                         interval = "confidence")
+    abundance_conf <- predict(object = mod.jags_RN, mcmc.list = fit.jags_RN, type = "abundance", draws = draws,
+                              interval = "confidence")
+    
     
     expect_equal(dim(rich), c(3, 2))
     expect_equal(dim(rich_conf), c(3, 4))
