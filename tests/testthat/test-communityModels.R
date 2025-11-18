@@ -2,6 +2,7 @@ context("communityModels")
 library(camtrapR)
 library(terra)
 
+
 # Use local() to create a self-contained environment for all related tests.
 
 local({
@@ -44,11 +45,16 @@ local({
   sitecovs[, c(2:4)] <- scale(sitecovs[, -1])
   sitecovs$some_factor <- factor(c("A", "A", "B"))
   
+  sitecovs$elevation_squared <- sitecovs$elevation^2
+  
+  effort_categ <- ifelse(DetHist_list$effort > 0, "high", "low")
+  
   # bundle input data
   data_list <- list(
     ylist = DetHist_list$detection_history,
     siteCovs = sitecovs,
-    obsCovs = list(effort = DetHist_list$effort)
+    obsCovs = list(effort = DetHist_list$effort,
+                   effort_categ = effort_categ)
   )
   
   # create community model
@@ -96,7 +102,76 @@ local({
   prediction_raster <- c(layer_utm_y, layer_elevation, layer_factor)
   
   
-  # --- TESTS: Now run the tests from within this environment ---
+  
+  # create various models for checks downstream
+  
+  # various effect types
+  mod.jags_fixed <- communityModel(
+    data_list,
+    occuCovs = list(fixed = c("some_factor", "utm_y", "elevation")),
+    detCovsObservation = list(fixed = "effort"),
+    intercepts = list(det = "fixed", occu = "fixed"),
+    modelFile = tempfile(fileext = "txt")
+  )
+  
+  mod.jags_ranef <- communityModel(
+    data_list,
+    occuCovs = list(ranef = c("some_factor", "elevation")),
+    detCovsObservation = list(ranef = "effort"),
+    intercepts = list(det = "ranef", occu = "ranef"),
+    modelFile = tempfile(fileext = "txt")
+  )
+  
+  mod.jags_indep <- communityModel(
+    data_list,
+    occuCovs = list(independent  = c("utm_y")),
+    intercepts = list(det = "independent", occu = "independent"),
+    modelFile = tempfile(fileext = "txt")
+  )
+  
+  mod.jags_fixed_specsiteranef <- communityModel(
+    data_list,
+    speciesSiteRandomEffect = list(det = T, occu = F),
+    modelFile = tempfile(fileext = "txt")
+  )
+  
+  
+  mod.jags_fixed2 <- communityModel(
+    data_list,
+    # occuCovs = list(fixed = c("some_factor", "utm_y", "elevation")),
+    detCovsObservation = list(fixed = "effort_categ"),
+    intercepts = list(det = "fixed", occu = "fixed"),
+    modelFile = tempfile(fileext = "txt")
+  )
+  
+  # quadratic effects
+  mod.jags_quad1 <- communityModel(
+    data_list,
+    occuCovs = list(fixed = c("elevation", "elevation_squared")),
+    modelFile = tempfile(fileext = "txt")
+  )
+  mod.jags_quad2 <- communityModel(
+    data_list,
+    occuCovs = list(ranef = c("elevation", "elevation_squared")),
+    modelFile = tempfile(fileext = "txt")
+  )
+  
+  # data augmentation
+  
+  mod.jags_aug1 <- communityModel(
+    data_list,
+    modelFile = tempfile(fileext = "txt"),
+    augmentation = c(maxknown = 7) 
+  )
+  
+  mod.jags_aug2 <- communityModel(
+    data_list,
+    modelFile = tempfile(fileext = "txt"),
+    augmentation = c(full = 8) 
+  )
+  
+  
+  # --- TESTS:  ---
   
   test_that("communityModel output has correct structure for JAGS occupancy model", {
     # Objects like mod.jags are available from the parent local() environment
@@ -176,12 +251,21 @@ local({
     psi_array_rast <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi_array", draws = draws)
     
     rich_rast <- predict(object = mod.jags, mcmc.list = fit.jags, type = "richness", draws = draws, 
-                         x = prediction_raster,
-                         interval = "confidence")
+                         x = prediction_raster)
     psi_rast <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi", draws = draws,
                    x = prediction_raster)
     pao <- predict(object = mod.jags, mcmc.list = fit.jags, type = "pao", draws = draws,
-                   x = prediction_raster,)
+                   x = prediction_raster)
+    
+    # predictions with confidence intervals
+    
+    
+    rich_rast_conf <- predict(object = mod.jags, mcmc.list = fit.jags, type = "richness", draws = draws, 
+                         x = prediction_raster, interval = "confidence")
+    psi_rast_conf <- predict(object = mod.jags, mcmc.list = fit.jags, type = "psi", draws = draws,
+                        x = prediction_raster, interval = "confidence")
+    pao_conf <- predict(object = mod.jags, mcmc.list = fit.jags, type = "pao", draws = draws,
+                   x = prediction_raster, interval = "confidence")
     
     expect_equal(dim(rich), c(3, 2))
     expect_equal(dim(psi), c(15, 4))
@@ -193,8 +277,10 @@ local({
     expect_equal(dim(pao$pao_matrix), c(5,20))
     
     expect_true(class(rich_rast) == "SpatRaster")
-    expect_equal(dim(rich_rast), c(10, 10, 4))
-    expect_named(rich_rast, c("mean", "sd", "lower", "upper"))
+    expect_equal(dim(rich_rast), c(10, 10, 2))
+    expect_named(rich_rast, c("mean", "sd"))
+    expect_equal(dim(rich_rast_conf), c(10, 10, 4))
+    expect_named(rich_rast_conf, c("mean", "sd", "lower", "upper"))
     
     
     # 4. Test Posterior predictive checks
@@ -257,53 +343,22 @@ local({
     
   })
   
+ 
   test_that("Other model specifications work", {
     
-    # various effect types
-    mod.jags_fixed <- communityModel(
-      data_list,
-      occuCovs = list(fixed = c("some_factor", "utm_y"), fixed = c("some_factor", "elevation")),
-      detCovsObservation = list(fixed = "effort"),
-      intercepts = list(det = "fixed", occu = "fixed"),
-      modelFile = tempfile(fileext = "txt")
-    )
+   
     
-    mod.jags_ranef <- communityModel(
-      data_list,
-      occuCovs = list(fixed = c("some_factor", "elevation")),
-      detCovsObservation = list(ranef = "effort"),
-      intercepts = list(det = "ranef", occu = "ranef"),
-      modelFile = tempfile(fileext = "txt")
-    )
+    expect_equal(length(mod.jags_fixed@input$ylist), 5)
+    expect_equal(length(mod.jags_aug1@input$ylist), 7)
+    expect_equal(length(mod.jags_aug2@input$ylist), 8)
+  })
+  
+  
+  test_that("Nimble models work",  {
     
-    mod.jags_indep <- communityModel(
-      data_list,
-      occuCovs = list(independent  = c("utm_y")),
-      intercepts = list(det = "independent", occu = "independent"),
-      modelFile = tempfile(fileext = "txt")
-    )
+    skip_if_not_installed(c("nimble", "nimbleEcology"))
     
-    mod.jags_fixed_specsiteranef <- communityModel(
-      data_list,
-      speciesSiteRandomEffect = list(det = T, occu = F),
-      modelFile = tempfile(fileext = "txt")
-    )
-     
-    
-    # data augmentation
-    
-    
-    mod.jags_aug1 <- communityModel(
-      data_list,
-      modelFile = tempfile(fileext = "txt"),
-      augmentation = c(maxknown = 6) 
-    )
-    
-    mod.jags_aug2 <- communityModel(
-      data_list,
-      modelFile = tempfile(fileext = "txt"),
-      augmentation = c(full = 6) 
-    )
+    library(nimbleEcology)
     
     # nimble models
     mod.jags_fixed_nimble <- communityModel(
@@ -317,7 +372,7 @@ local({
     
     mod.jags_ranef_nimble <- communityModel(
       data_list,
-      occuCovs = list(fixed = c("some_factor", "elevation")),
+      occuCovs = list(ranef = c("some_factor", "elevation")),
       detCovsObservation = list(ranef = "effort"),
       intercepts = list(det = "ranef", occu = "ranef"),
       modelFile = tempfile(fileext = "txt"),
@@ -332,7 +387,102 @@ local({
       nimble = TRUE
     )
     
+    # check that nimble models can be fit
+    
+    fit.nimble1 <- fit(mod.jags_fixed_nimble, n.iter = 100, n.burnin = 50, chains = 3)
+    
+    expect_s3_class(fit.nimble1, "mcmc.list")
   })
+  
+  test_that("plot function works", {
+    
+    # first fit the models above
+    fit.mod.jags.fixed <- fit(mod.jags_fixed, n.iter = 100, n.burnin = 50, chains = 3)
+    fit.mod.jags.ranef <- fit(mod.jags_ranef, n.iter = 100, n.burnin = 50, chains = 3)
+    fit.mod.jags.indep <- fit(mod.jags_indep, n.iter = 100, n.burnin = 50, chains = 3)
+    fit.mod.jags.quad1 <- fit(mod.jags_quad1, n.iter = 100, n.burnin = 50, chains = 3)
+    fit.mod.jags.quad2 <- fit(mod.jags_quad2, n.iter = 100, n.burnin = 50, chains = 3)
+    
+    
+    #  plot
+    p1a <- plot_effects(mod.jags_fixed, 
+                       fit.mod.jags.fixed, 
+                       submodel = "state")
+    p1b <- plot_coef(mod.jags_fixed, 
+                        fit.mod.jags.fixed, 
+                        submodel = "state")
+    
+    expect_equal(class(p1a), "list")
+    expect_equal(class(p1b), "list")
+    
+    expect_equal(length(p1a), 3)
+    expect_equal(length(p1b), 3)
+    
+    expect_named(p1a, c("some_factor", "utm_y", "elevation" ))
+    
+    expect_s3_class(p1a$utm_y, "ggplot")
+    
+    
+    
+    p2a <- plot_effects(mod.jags_ranef, 
+                        fit.mod.jags.ranef, 
+                        submodel = "state")
+    p2b <- plot_coef(mod.jags_ranef, 
+                     fit.mod.jags.ranef, 
+                     submodel = "state")
+    
+    p3a <- plot_effects(mod.jags_indep, 
+                        fit.mod.jags.indep, 
+                        submodel = "state")
+    p3b <- plot_coef(mod.jags_indep, 
+                     fit.mod.jags.indep, 
+                     submodel = "state")
+    
+    # p4a <- plot_effects(mod.jags_quad1,    # error currently
+    #                     fit.mod.jags.quad1, 
+    #                     submodel = "state")
+    p4b <- plot_coef(mod.jags_quad1, 
+                     fit.mod.jags.quad1, 
+                     submodel = "state")
+    
+    p5a <- plot_effects(mod.jags_quad2, 
+                        fit.mod.jags.quad2, 
+                        submodel = "state")
+    p5b <- plot_coef(mod.jags_quad2, 
+                     fit.mod.jags.quad2, 
+                     submodel = "state")
+  
+    
+    p1b1 <- plot_coef(mod.jags_ranef, 
+                      fit.mod.jags.ranef, 
+                      submodel = "state", 
+                      ordered = F)
+    
+    p1b2 <- plot_coef(mod.jags_ranef, 
+                      fit.mod.jags.ranef, 
+                      submodel = "state", 
+                      combine = T,
+                      ordered = F)
+    
+    p1b3 <- plot_coef(mod.jags_ranef, 
+                      fit.mod.jags.ranef, 
+                      submodel = "state",
+                      level = c(0.9, 0.5))
+    
+    p1b4 <- plot_coef(mod.jags_ranef, 
+                      fit.mod.jags.ranef, 
+                      submodel = "state", 
+                      community_lines = T)
+    
+    p1b5 <- plot_coef(mod.jags_ranef, 
+                      fit.mod.jags.ranef, 
+                      submodel = "state", 
+                      community_lines = T,
+                      combine = T,
+                      ordered = F)
+    
+  })
+  
   
   test_that("Other error conditions work", {
     
