@@ -109,7 +109,7 @@ local({
   mod.jags_fixed <- communityModel(
     data_list,
     occuCovs = list(fixed = c("some_factor", "utm_y", "elevation")),
-    detCovsObservation = list(fixed = "effort"),
+    detCovsObservation = list(fixed = c("effort", "effort_categ")),
     intercepts = list(det = "fixed", occu = "fixed"),
     modelFile = tempfile(fileext = "txt")
   )
@@ -117,7 +117,7 @@ local({
   mod.jags_ranef <- communityModel(
     data_list,
     occuCovs = list(ranef = c("some_factor", "elevation")),
-    detCovsObservation = list(ranef = "effort"),
+    detCovsObservation = list(ranef =  c("effort", "effort_categ")),
     intercepts = list(det = "ranef", occu = "ranef"),
     modelFile = tempfile(fileext = "txt")
   )
