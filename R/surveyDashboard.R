@@ -231,7 +231,7 @@ surveyDashboard <- function(CTtable = NULL,
     "dplyr",
     "sf",
     "terra",
-    "stars",   # not needed by itself but needed by mapview
+    # "stars",   # not needed by itself but needed by mapview
     "leaflet",
     "mapview",
     "ggplot2",
