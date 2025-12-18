@@ -442,6 +442,10 @@ local({
   
   test_that("plot function works", {
     
+    # prevent warning about unused variable "effort categ"
+    mod.jags_fixed@data$effort_categ <- NULL
+    mod.jags_ranef@data$effort_categ <- NULL
+    
     # first fit the models above
     fit.mod.jags.fixed <- fit(mod.jags_fixed, n.iter = 100, n.burnin = 50, chains = 3)
     fit.mod.jags.ranef <- fit(mod.jags_ranef, n.iter = 100, n.burnin = 50, chains = 3)
