@@ -1,8 +1,8 @@
 Package: camtrapR
 Type: Package
 Title: Camera Trap Data Management and Analysis Framework
-Version: 3.0.0.1
-Date: 2025-10-09
+Version: 3.0.0.2
+Date: 2025-12-18
 Authors@R: c(
         person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
                 comment = c(ORCID = "0000-0002-9187-2116")),
@@ -58,6 +58,7 @@ Suggests:
         lattice,
         magick,
         mapview,
+        mockery,
         nimble,
         nimbleEcology,
         overlap,
