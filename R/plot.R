@@ -301,7 +301,7 @@ plot_effects_commOccu <- function(object,
     
     if(covariate_is_numeric){
       
-      p <- ggplot(vals, aes_string(x = params_covariate[[cov]], y = "mean", group = "Species")) + 
+      p <- ggplot(vals, aes(x = params_covariate[[cov]], y = .data[["mean"]], group = .data[["Species"]])) + 
         geom_line() +
         theme_bw() +
         ggtitle(label = main,
@@ -317,7 +317,7 @@ plot_effects_commOccu <- function(object,
       # note for later, can optionally plot all species in  one plot if combine = TRUE (= ggplot code to this point)
       if(!combine){
         p <- p + facet_wrap(~Species) +
-          geom_ribbon(aes_string(ymin = "lower", ymax = "upper"), alpha = 0.2)
+          geom_ribbon(aes(ymin = .data[["lower"]], ymax = .data[["upper"]]), alpha = 0.2)
       }
     }
     
@@ -330,7 +330,7 @@ plot_effects_commOccu <- function(object,
                            levels = levels(object@data[[current_cov]]))
       } 
       
-      p <- ggplot(vals, aes_string(x = params_covariate[[cov]], y = "mean", group = "Species")) + 
+      p <- ggplot(vals, aes(x = params_covariate[[cov]], y = .data[["mean"]], group = .data[["Species"]])) + 
         geom_col() +
         facet_wrap(~Species) +
         geom_linerange(aes(ymin = lower, ymax = upper)) +
@@ -391,7 +391,7 @@ plot_effects_commOccu <- function(object,
   #' @return A list of ggplot objects (one list item per covariate).
   #' @export
   #' @importFrom ggplot2 geom_vline geom_linerange geom_pointrange element_blank theme labs expr
-  #' @importFrom ggplot2 scale_color_manual scale_y_discrete aes_string vars facet_grid facet_wrap ylim geom_col
+  #' @importFrom ggplot2 scale_color_manual scale_y_discrete aes vars facet_grid facet_wrap ylim geom_col
   # @import coda
   #'
   setMethod("plot_effects", 
@@ -722,7 +722,7 @@ plot_coef_commOccu <- function(object,
     if(!combine){
       
       
-      p_list[[cov]] <- ggplot (df_quantiles_i, aes_string(y = "species", x = "median", color = color_by))
+      p_list[[cov]] <- ggplot (df_quantiles_i, aes(y = .data[["species"]], x = .data[["median"]], color = color_by))
         
         if(community_lines) {
         # community effect
@@ -739,8 +739,8 @@ plot_coef_commOccu <- function(object,
         geom_vline(xintercept = 0, alpha = alpha_zero) +
         
         # species effects
-        geom_pointrange(aes_string(xmin = "lower_outer", xmax = "upper_outer")) + 
-        geom_linerange( aes_string(xmin = "lower_inner", xmax = "upper_inner"), linewidth = 1) +
+        geom_pointrange(aes(xmin = .data[["lower_outer"]], xmax = .data[["upper_outer"]])) + 
+        geom_linerange( aes(xmin = .data[["lower_inner"]], xmax = .data[["upper_inner"]]), linewidth = 1) +
         facet_grid(rows = vars(type),
                    cols = vars(covariate),
                    scales = scales,
@@ -784,7 +784,7 @@ plot_coef_commOccu <- function(object,
     df_quantiles_all$species <- factor(df_quantiles_all$species, 
                                        levels = rev(sort(unique(as.character(df_quantiles_all$species)))))
     
-    p <- ggplot (df_quantiles_all, aes_string(y = "species", x = "median", color = color_by))
+    p <- ggplot (df_quantiles_all, aes(y = .data[["species"]], x = .data[["median"]], color = color_by))
       
     if(community_lines)  {
       # community effect
@@ -798,8 +798,8 @@ plot_coef_commOccu <- function(object,
     }
     p <- p + geom_vline(xintercept = 0, alpha = alpha_zero) +
       # species effects
-      geom_pointrange(aes_string(xmin = "lower_outer", xmax = "upper_outer")) + 
-      geom_linerange (aes_string(xmin = "lower_inner", xmax = "upper_inner"), linewidth = 1) +
+      geom_pointrange(aes(xmin = .data[["lower_outer"]], xmax = .data[["upper_outer"]])) + 
+      geom_linerange (aes(xmin = .data[["lower_inner"]], xmax = .data[["upper_inner"]]), linewidth = 1) +
       facet_grid(rows = vars(type), 
                  cols = vars(covariate),
                  scales = scales, 
