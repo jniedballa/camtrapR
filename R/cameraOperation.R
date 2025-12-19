@@ -165,8 +165,8 @@
 #'                                  dateFormat   = "dmy"
 #' )
 #' 
-#' The examples above specified dateFormat using lubdridate package, which is more intuitive. 
-#' Alternatively one can used in base-R date conversions (strptime) as below:
+#' # The examples above specified dateFormat using lubdridate package, which is more intuitive. 
+#' # Alternatively one can used in base-R date conversions (strptime) as below:
 #' 
 #' # with problems/malfunction / dateFormat in strptime format
 #' camop_problem_oldformat <- cameraOperation(CTtable      = camtraps,
