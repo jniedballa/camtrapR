@@ -187,18 +187,6 @@ reportTest_problem$survey_dates
 
 
 
-## if camOp is missing, the legacy version (from 2.0.3) will be used:
-
-reportTest_problem_old <- surveyReport (recordTable          = recordTableSample,
-                                        CTtable              = camtraps,
-                                       # camOp                = camop_problem,
-                                        speciesCol           = "Species",
-                                        stationCol           = "Station",
-                                        setupCol             = "Setup_date",
-                                        retrievalCol         = "Retrieval_date",
-                                        CTDateFormat         = "dmy", 
-                                        recordDateTimeCol    = "DateTimeOriginal",
-                                        recordDateTimeFormat = "ymd HMS")
 
 \dontrun{
 # run again with sinkpath defined
