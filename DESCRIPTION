@@ -87,6 +87,7 @@ Suggests:
         units,
         unmarked,
         viridisLite,
+        withr,
         zip
 VignetteBuilder: R.rsp
 SystemRequirements: ExifTool (https://exiftool.org/)
