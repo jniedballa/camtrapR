@@ -1241,23 +1241,24 @@ makeSurveyZip <- function(output,
   }
   
   # 2. Handle byCamera
-  if (hasArg(byCamera)) {
-    # If byCamera was provided, activate it (assuming TRUE)
-    byCamera_line <- "            byCamera = TRUE,\n"
+  if (hasArg(cameraCol)) {
+    # If cameraCol was provided, set byCamera = FALSE (aggregate to station)
+    byCamera_line <- "            byCamera = FALSE,\n"
   } else {
     byCamera_line <- "            #byCamera,\n"
   }
   
   # 3. Handle allCamsOn
-  if (hasArg(allCamsOn)) {
-    allCamsOn_line <- "            allCamsOn = TRUE,\n"
+  if (hasArg(cameraCol)) {
+    # If cameraCol was provided, set allCamsOn = FALSE (one out of several cameras active is acceptable)
+    allCamsOn_line <- "            allCamsOn = FALSE,\n"
   } else {
     allCamsOn_line <- "            #allCamsOn,\n"
   }
   
   # 4. Handle camerasIndependent
-  if (hasArg(camerasIndependent)) {
-    camerasIndependent_line <- "            camerasIndependent = TRUE,\n"
+  if (hasArg(cameraCol)) {
+    camerasIndependent_line <- "            camerasIndependent = TRUE,  #  please check \n"
   } else {
     camerasIndependent_line <- "            #camerasIndependent,\n"
   }
