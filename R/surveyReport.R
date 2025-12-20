@@ -150,18 +150,6 @@
 #' 
 #' 
 #' 
-#' ## if camOp is missing, the legacy version (from 2.0.3) will be used:
-#' 
-#' reportTest_problem_old <- surveyReport (recordTable          = recordTableSample,
-#'                                         CTtable              = camtraps,
-#'                                        # camOp                = camop_problem,
-#'                                         speciesCol           = "Species",
-#'                                         stationCol           = "Station",
-#'                                         setupCol             = "Setup_date",
-#'                                         retrievalCol         = "Retrieval_date",
-#'                                         CTDateFormat         = "dmy", 
-#'                                         recordDateTimeCol    = "DateTimeOriginal",
-#'                                         recordDateTimeFormat = "ymd HMS")
 #' 
 #' \dontrun{
 #' # run again with sinkpath defined
@@ -209,16 +197,11 @@ surveyReport <- function(recordTable,
   
   
   
-  # for users running old (<= 2.0.3) code: redirect to legacy version of surveyReport if camop not defined
+  # for users running old (<= 2.0.3) code: error out if camop not defined
   
   if(!hasArg(camOp)){
-    warning("Argument 'camOp' is missing (expected since camtrapR 2.1). Will run legacy version of surveyReport (from camtrapR 2.0.3). See:  news(package = 'camtrapR') and ?surveyReport. This warning may be raised to an error in the future, so please adapt your code.",
+    stop("Argument 'camOp' is missing (expected since camtrapR 2.1). The legacy version of surveyReport which did not require camOp is no longer supported.",
             immediate. = TRUE)
-    args_names <- ls()
-    args <- mget(args_names)
-    args_subset <- args[!sapply(args, is.symbol)]
-    out <- do.call(surveyReport_legacy, args_subset)
-    return(out)
   }
   
   

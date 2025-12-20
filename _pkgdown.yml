@@ -5,6 +5,11 @@ reference:
     desc: Overview of the camtrapR package
     contents:
       - '`camtrapR-package`'
+  - title: Data import
+    desc: Functions for importing data sets from external sources
+    contents:
+      - '`readcamtrapDP`'
+      - '`readWildlifeInsights`'
   - title: Image organisation and management
     desc: Functions for image organisation and preprocessing
     contents:
@@ -32,9 +37,10 @@ reference:
       - '`addToPath`'
       - '`filterRecordTable`'
   - title: Data exploration and visualisation
-    desc: Functions for plotting species activity, detection maps and exporting shapefiles
+    desc: Functions for plotting species activity, accumulation, detection maps and exporting shapefiles
     contents:
       - '`detectionMaps`'
+      - '`speciesAccum`'
       - '`activityHistogram`'
       - '`activityDensity`'
       - '`activityRadial`'
@@ -59,6 +65,12 @@ reference:
       - '`summary,commOccu-method`'
       - '`plot_coef`'
       - '`plot_effects`'
+      - '`PPC.community`'
+      - '`PPC.residuals`'
+  - title: Other
+    desc: Additional functions
+    contents:
+      - '`aggregateStations`'
   - title: Sample data
     desc: Sample data sets included in camtrapR
     contents:

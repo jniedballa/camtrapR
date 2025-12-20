@@ -258,12 +258,7 @@ createCovariates <- function(CTtable,
     }
   }
   
-  if (is.null(raster_template) && is.null(resolution)) {
-    warning("Neither 'raster_template' or 'resolution' are defined. No prediction rasters will be created.", call. = F, immediate. = T)
-    create_raster <- FALSE
-  } else {
-    create_raster <- TRUE
-  }
+
   
   # Check buffer sizes
   if (!is.numeric(buffer_ct) || buffer_ct < 0) {
@@ -279,6 +274,13 @@ createCovariates <- function(CTtable,
   }
   if (buffer_aoi > 50000) {
     warning("Buffer size for 'buffer_aoi' exceeds 50km. Ensure this is intended.", call. = F, immediate. = T)
+  }
+  
+  if (is.null(raster_template) && is.null(resolution)) {
+    warning("Neither 'raster_template' or 'resolution' are defined. No prediction rasters will be created.", call. = F, immediate. = T)
+    create_raster <- FALSE
+  } else {
+    create_raster <- TRUE
   }
   
   # Initialize list for all rasters

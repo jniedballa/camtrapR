@@ -116,6 +116,7 @@ filterRecordTable <- function(#inDir,
   
   if(!hasArg(stationCol)) stationCol <- "Station"
   if(!is.character(stationCol)) stop("stationCol must be of class 'character'")
+  if(!stationCol %in% colnames(recordTable)) stop("stationCol is not a column name in recordTable")
   checkForSpacesInColumnNames(stationCol = stationCol)
   
   # speciesCol <- "Species"
@@ -134,6 +135,8 @@ filterRecordTable <- function(#inDir,
   
   # check input
   
+  if(!inherits(recordTable, "data.frame")) stop("recordTable must be a data frame")
+  
   # try to extract timezone (if available)
   if(is.POSIXt(recordTable[, recordDateTimeCol])){
     timeZone <- try(tz(recordTable[, recordDateTimeCol]))
@@ -151,9 +154,6 @@ filterRecordTable <- function(#inDir,
   
 
   
-  if(!is.element(timeZone , OlsonNames())){
-    stop("timeZone must be an element of OlsonNames()", call. = FALSE)
-  }
   # if(Sys.which("exiftool") == "") stop("cannot find ExifTool", call. = FALSE)
   
   if(hasArg(cameraCol)){
@@ -196,6 +196,7 @@ filterRecordTable <- function(#inDir,
   
   minDeltaTime <- as.integer(minDeltaTime)
   if(!is.integer(minDeltaTime)) stop("'minDeltaTime' must be an integer", call. = FALSE)
+  if(minDeltaTime < 0) stop("'minDeltaTime' must be a positive number", call. = FALSE)
   
   if(minDeltaTime != 0){
     if(isFALSE(removeDuplicateRecords)){
@@ -224,6 +225,11 @@ filterRecordTable <- function(#inDir,
   if(hasArg(eventSummaryColumn)) {
     if(!is.character(eventSummaryColumn))     stop("eventSummaryColumn must be of class 'character'", call. = FALSE)
     if(!is.character(eventSummaryFunction))   stop("eventSummaryFunction must be of class 'character'", call. = FALSE)
+  }
+  
+  
+  if(!is.element(timeZone , OlsonNames())){
+    stop("timeZone must be an element of OlsonNames()", call. = FALSE)
   }
   
   

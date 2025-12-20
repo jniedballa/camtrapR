@@ -773,8 +773,10 @@ communityModel <- function(data_list,
         stop(paste("detection history and", obs_cov_tmp_i_name, "matrix must have the same dimensions"))
       }
       
-      all_matching <- all(!is.na(data_list$ylist[[1]]) == !is.na(data_list$obsCovs[[obs_cov_tmp_i_name]]))
-      if(isFALSE(all_matching)) stop(paste("NAs in detection history and", obs_cov_tmp_i_name, "matrix differ"))
+      # all_matching <- all(!is.na(data_list$ylist[[1]]) == !is.na(data_list$obsCovs[[obs_cov_tmp_i_name]]))
+      # browser()
+      NAs_in_obs_cov_not_in_dethist <- !which(is.na(data_list$obsCovs[[obs_cov_tmp_i_name]])) %in% which(is.na(data_list$ylist[[1]]))
+      if(any(NAs_in_obs_cov_not_in_dethist)) stop(paste("NAs in detection history and", obs_cov_tmp_i_name, "matrix differ"))
     })
   }
   
@@ -1527,12 +1529,12 @@ communityModel <- function(data_list,
                            
                            #"\n### species-level Bayesian p-value",
                            #paste0("Bpvalue_species[", speciesIndex, "] <- R2[", speciesIndex, "] > new.R2[", speciesIndex, "]"),
-                           "# Goodness-of-fit test was temporarily removed from models.",
+                           "# Goodness-of-fit test is now implemented in PPC.community function.",
                            "\n", sep = "\n")
     # attr(close_loop1a1, "params") <- c("R2", "new.R2", "Bpvalue_species")
   } else {
     close_loop2 <- "}   # close station loop\n"
-    close_loop1a1 <- "# Goodness-of-fit test was temporarily removed from models.\n"
+    close_loop1a1 <- "# Goodness-of-fit test is now implemented in PPC.community function.\n"
   }
   
   
