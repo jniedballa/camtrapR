@@ -64,6 +64,8 @@ testthat::describe("Core Functionality & Return Value", {
 
 testthat::describe("Filtering and Subset Options", {
   
+  plot(1)  # avoid warning: calling par(new=TRUE) with no plot
+  
   test_that("speciesToShow argument correctly filters the output", {
     species_subset <- c("PBE", "VTA")
     maps_df_filtered <- detectionMaps(

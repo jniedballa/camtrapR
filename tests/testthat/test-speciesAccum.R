@@ -3,8 +3,6 @@
 context("speciesAccum")
 
 # Load necessary libraries
-library(testthat)
-library(iNEXT) # Needed for the output class check
 library(lubridate)
 library(dplyr)
 
@@ -61,9 +59,12 @@ testthat::describe("Core Functionality", {
   #   expect_equal(result$DataInfo$T, 3) 
   #   expect_equal(result$DataInfo$S.obs, 3)
   #   expect_equal(result$DataInfo$n, 5)
-  # })
+  })
   
   test_that("it produces a valid iNEXT object with x_unit = 'survey_day'", {
+    
+    skip_if_not_installed("iNEXT")
+    
     result <- speciesAccum(
       CTtable = mock_cams,
       recordTable = mock_recs,
@@ -104,7 +105,7 @@ testthat::describe("Core Functionality", {
 #     expect_equal(result$DataInfo$T, 3)
 #     expect_equal(result$DataInfo$S.obs, 3)
 #   })
-})
+# })
 
 
 # testthat::describe("Assemblage Grouping", {
@@ -144,6 +145,7 @@ testthat::describe("Core Functionality", {
 testthat::describe("Incidence Matrix Creation (Internal Logic)", {
   
   test_that("create_incidence_matrix builds a correct 'station' matrix", {
+    
     # Call the internal helper directly to test its output
     mat <- create_incidence_matrix(
       records_subset = mock_recs,
@@ -192,6 +194,9 @@ testthat::describe("Incidence Matrix Creation (Internal Logic)", {
 testthat::describe("Input Validation", {
   
   test_that("it stops for missing or invalid columns", {
+    
+    skip_if_not_installed("iNEXT")
+    
     expect_error(
       speciesAccum(CTtable = mock_cams, recordTable = mock_recs, speciesCol = "WRONG_COL",
                    recordDateTimeCol = "DateTime", setupCol = "Setup_date", stationCol = "Station"),

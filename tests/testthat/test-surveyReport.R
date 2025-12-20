@@ -1,10 +1,6 @@
 
 context("surveyReport")
 
-
-library(testthat)
-library(withr)
-
 # --- Test Setup ---
 # Create shared data and camera operation matrices once.
 data(camtraps)
@@ -118,8 +114,6 @@ testthat::describe("Core Functionality and Return Value", {
 
 testthat::describe("File Writing and Side Effects", {
   
-  # with_tempdir({
-  
   tmpdir <- tempdir()
   
     test_that("sinkpath argument creates a text report", {
@@ -148,6 +142,7 @@ testthat::describe("File Writing and Side Effects", {
     
     test_that("makezip = TRUE creates a valid zip file with expected contents", {
 
+      testthat::skip_if_not_installed("overlap")
 
       report <- surveyReport(
         recordTable  = recordTableSample,
@@ -180,12 +175,10 @@ testthat::describe("File Writing and Side Effects", {
     expect_equal(sum(grepl("Presence", zip_contents$Name)), n_species)
   })
 })
-# })
 
 
 
 testthat::describe("Date/time column checks", {
-  
   
   camtraps_setup_blank    <- camtraps
   camtraps_retrieval_blank <- camtraps

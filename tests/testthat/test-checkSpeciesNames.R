@@ -1,5 +1,3 @@
-library(testthat)
-library(mockery)
 
 # --- Helper to create mock TSN objects ---
 # Mimics taxize::as.tsn behavior:
@@ -21,6 +19,9 @@ fake_as_tsn_impl <- function(x, check = FALSE) {
 }
 
 test_that("Input validation works", {
+  
+  testthat::skip_if_not_installed("taxize")
+  
   expect_error(checkSpeciesNames(speciesNames = "Cat", searchtype = "invalid"),
                "should be one of")
   
@@ -31,22 +32,26 @@ test_that("Input validation works", {
 })
 
 test_that("Happy Path: Valid Scientific Name found", {
+  
+  testthat::skip_if_not_installed("mockery")
+  testthat::skip_if_not_installed("taxize")
+  
   # --- Mocks ---
   # get_tsn returns a TSN object
-  m_get_tsn <- mock(fake_as_tsn_impl("123456"))
+  m_get_tsn <- mockery::mock(fake_as_tsn_impl("123456"))
   
-  m_sci_name <- mock(data.frame(tsn = "123456", combinedname = "Panthera leo", stringsAsFactors = FALSE))
-  m_com_name <- mock(data.frame(tsn = "123456", commonName = "Lion", stringsAsFactors = FALSE))
-  m_author   <- mock(data.frame(tsn = "123456", authorship = "Linnaeus", stringsAsFactors = FALSE))
-  m_rank     <- mock(data.frame(tsn = "123456", rankname = "Species", stringsAsFactors = FALSE))
+  m_sci_name <- mockery::mock(data.frame(tsn = "123456", combinedname = "Panthera leo", stringsAsFactors = FALSE))
+  m_com_name <- mockery::mock(data.frame(tsn = "123456", commonName = "Lion", stringsAsFactors = FALSE))
+  m_author   <- mockery::mock(data.frame(tsn = "123456", authorship = "Linnaeus", stringsAsFactors = FALSE))
+  m_rank     <- mockery::mock(data.frame(tsn = "123456", rankname = "Species", stringsAsFactors = FALSE))
   
   # --- Stubs ---
-  stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
-  stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
-  stub(checkSpeciesNames, "ritis::scientific_name", m_sci_name)
-  stub(checkSpeciesNames, "ritis::common_names", m_com_name)
-  stub(checkSpeciesNames, "ritis::taxon_authorship", m_author)
-  stub(checkSpeciesNames, "ritis::rank_name", m_rank)
+  mockery::stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
+  mockery::stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
+  mockery::stub(checkSpeciesNames, "ritis::scientific_name", m_sci_name)
+  mockery::stub(checkSpeciesNames, "ritis::common_names", m_com_name)
+  mockery::stub(checkSpeciesNames, "ritis::taxon_authorship", m_author)
+  mockery::stub(checkSpeciesNames, "ritis::rank_name", m_rank)
   
   # --- Execution ---
   result <- checkSpeciesNames(speciesNames = "Panthera leo", 
@@ -63,23 +68,27 @@ test_that("Happy Path: Valid Scientific Name found", {
 })
 
 test_that("Logic: Multiple Common Names are collapsed", {
-  # --- Mocks ---
-  m_get_tsn <- mock(fake_as_tsn_impl("123"))
   
-  m_sci_name <- mock(data.frame(tsn = "123", combinedname = "Simba", stringsAsFactors = FALSE))
-  m_com_name <- mock(data.frame(tsn = c("123", "123"), 
+  testthat::skip_if_not_installed("mockery")
+  testthat::skip_if_not_installed("taxize")
+  
+  # --- Mocks ---
+  m_get_tsn <- mockery::mock(fake_as_tsn_impl("123"))
+  
+  m_sci_name <- mockery::mock(data.frame(tsn = "123", combinedname = "Simba", stringsAsFactors = FALSE))
+  m_com_name <- mockery::mock(data.frame(tsn = c("123", "123"), 
                                 commonName = c("NameA", "NameB"), 
                                 stringsAsFactors = FALSE))
-  m_author   <- mock(data.frame(tsn = "123", authorship = "Disney", stringsAsFactors = FALSE))
-  m_rank     <- mock(data.frame(tsn = "123", rankname = "Species", stringsAsFactors = FALSE))
+  m_author   <- mockery::mock(data.frame(tsn = "123", authorship = "Disney", stringsAsFactors = FALSE))
+  m_rank     <- mockery::mock(data.frame(tsn = "123", rankname = "Species", stringsAsFactors = FALSE))
   
   # --- Stubs ---
-  stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
-  stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
-  stub(checkSpeciesNames, "ritis::scientific_name", m_sci_name)
-  stub(checkSpeciesNames, "ritis::common_names", m_com_name)
-  stub(checkSpeciesNames, "ritis::taxon_authorship", m_author)
-  stub(checkSpeciesNames, "ritis::rank_name", m_rank)
+  mockery::stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
+  mockery::stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
+  mockery::stub(checkSpeciesNames, "ritis::scientific_name", m_sci_name)
+  mockery::stub(checkSpeciesNames, "ritis::common_names", m_com_name)
+  mockery::stub(checkSpeciesNames, "ritis::taxon_authorship", m_author)
+  mockery::stub(checkSpeciesNames, "ritis::rank_name", m_rank)
   
   # --- Execution ---
   result <- checkSpeciesNames("Simba", "common")
@@ -91,16 +100,20 @@ test_that("Logic: Multiple Common Names are collapsed", {
 })
 
 test_that("Error Handling: No Matches Found (All NA)", {
+  
+  testthat::skip_if_not_installed("mockery")
+  testthat::skip_if_not_installed("taxize")
+  
   # --- Mocks ---
   # taxize::get_tsn returns NA
-  m_get_tsn <- mock(NA)
+  m_get_tsn <- mockery::mock(NA)
   
   # Important: When checkSpeciesNames gets NA, it filters the list.
   # The resulting list is empty. fake_as_tsn_impl correctly returns length 0.
   # This prevents the loop from running and calling ritis functions with bad data.
   
-  stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
-  stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
+  mockery::stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
+  mockery::stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
   
   # --- Execution & Assertion ---
   # Since the filtered list is empty, the function hits the `else { stop(...) }` block
@@ -111,25 +124,29 @@ test_that("Error Handling: No Matches Found (All NA)", {
 })
 
 test_that("Partial Success: One match, One mismatch", {
+  
+  testthat::skip_if_not_installed("mockery")
+  testthat::skip_if_not_installed("taxize")
+  
   input_names <- c("Lion", "Unicorn")
   
   # --- Mocks ---
   # taxize::get_tsn returns vector: "123" for Lion, NA for Unicorn
   tsn_raw <- c("123", NA)
-  m_get_tsn <- mock(tsn_raw)
+  m_get_tsn <- mockery::mock(tsn_raw)
   
   # Mock ritis functions (only called for valid TSN "123")
-  m_sci_name <- mock(data.frame(tsn = "123", combinedname = "Leo", stringsAsFactors = FALSE))
-  m_com_name <- mock(data.frame(tsn = "123", commonName = "Lion", stringsAsFactors = FALSE))
-  m_author   <- mock(data.frame(tsn = "123", authorship = "L.", stringsAsFactors = FALSE))
-  m_rank     <- mock(data.frame(tsn = "123", rankname = "Spp", stringsAsFactors = FALSE))
+  m_sci_name <- mockery::mock(data.frame(tsn = "123", combinedname = "Leo", stringsAsFactors = FALSE))
+  m_com_name <- mockery::mock(data.frame(tsn = "123", commonName = "Lion", stringsAsFactors = FALSE))
+  m_author   <- mockery::mock(data.frame(tsn = "123", authorship = "L.", stringsAsFactors = FALSE))
+  m_rank     <- mockery::mock(data.frame(tsn = "123", rankname = "Spp", stringsAsFactors = FALSE))
   
-  stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
-  stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
-  stub(checkSpeciesNames, "ritis::scientific_name", m_sci_name)
-  stub(checkSpeciesNames, "ritis::common_names", m_com_name)
-  stub(checkSpeciesNames, "ritis::taxon_authorship", m_author)
-  stub(checkSpeciesNames, "ritis::rank_name", m_rank)
+  mockery::stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
+  mockery::stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
+  mockery::stub(checkSpeciesNames, "ritis::scientific_name", m_sci_name)
+  mockery::stub(checkSpeciesNames, "ritis::common_names", m_com_name)
+  mockery::stub(checkSpeciesNames, "ritis::taxon_authorship", m_author)
+  mockery::stub(checkSpeciesNames, "ritis::rank_name", m_rank)
   
   # --- Execution ---
   expect_warning(
@@ -150,11 +167,15 @@ test_that("Partial Success: One match, One mismatch", {
 })
 
 test_that("Error Handling: taxize network error", {
+  
+  testthat::skip_if_not_installed("mockery")
+  testthat::skip_if_not_installed("taxize")
+  
   # --- Mock ---
   err <- structure("Network Error", class = "try-error")
-  m_get_tsn <- mock(err)
+  m_get_tsn <- mockery::mock(err)
   
-  stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
+  mockery::stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
   
   # --- Execution ---
   expect_message(
@@ -166,22 +187,26 @@ test_that("Error Handling: taxize network error", {
 })
 
 test_that("Logic: Accepted = FALSE fetches usage rating", {
+  
+  testthat::skip_if_not_installed("mockery")
+  testthat::skip_if_not_installed("taxize")
+  
   # --- Mocks ---
-  m_get_tsn <- mock(fake_as_tsn_impl("999"))
+  m_get_tsn <- mockery::mock(fake_as_tsn_impl("999"))
   
-  m_sci_name <- mock(data.frame(tsn = "999", combinedname = "OldName", stringsAsFactors = FALSE))
-  m_com_name <- mock(data.frame()) 
-  m_author   <- mock(data.frame()) 
-  m_rank     <- mock(data.frame())
-  m_core_meta <- mock(data.frame(tsn = "999", taxonUsageRating = "invalid", stringsAsFactors = FALSE))
+  m_sci_name <- mockery::mock(data.frame(tsn = "999", combinedname = "OldName", stringsAsFactors = FALSE))
+  m_com_name <- mockery::mock(data.frame()) 
+  m_author   <- mockery::mock(data.frame()) 
+  m_rank     <- mockery::mock(data.frame())
+  m_core_meta <- mockery::mock(data.frame(tsn = "999", taxonUsageRating = "invalid", stringsAsFactors = FALSE))
   
-  stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
-  stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
-  stub(checkSpeciesNames, "ritis::scientific_name", m_sci_name)
-  stub(checkSpeciesNames, "ritis::common_names", m_com_name)
-  stub(checkSpeciesNames, "ritis::taxon_authorship", m_author)
-  stub(checkSpeciesNames, "ritis::rank_name", m_rank)
-  stub(checkSpeciesNames, "ritis::core_metadata", m_core_meta)
+  mockery::stub(checkSpeciesNames, "taxize::get_tsn", m_get_tsn)
+  mockery::stub(checkSpeciesNames, "taxize::as.tsn", fake_as_tsn_impl)
+  mockery::stub(checkSpeciesNames, "ritis::scientific_name", m_sci_name)
+  mockery::stub(checkSpeciesNames, "ritis::common_names", m_com_name)
+  mockery::stub(checkSpeciesNames, "ritis::taxon_authorship", m_author)
+  mockery::stub(checkSpeciesNames, "ritis::rank_name", m_rank)
+  mockery::stub(checkSpeciesNames, "ritis::core_metadata", m_core_meta)
   
   # --- Execution ---
   result <- checkSpeciesNames("OldName", "scientific", accepted = FALSE)

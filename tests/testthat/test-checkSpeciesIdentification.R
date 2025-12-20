@@ -1,10 +1,11 @@
-library(testthat)
-library(mockery)
 
 test_that("Input argument validation works", {
-  # FIX: Add cycle = TRUE because the function is called 3 times in this block
-  m_sys_which <- mock("/usr/bin/exiftool", cycle = TRUE)
-  stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
+  
+  testthat::skip_if_not_installed("mockery")
+  
+  #  Add cycle = TRUE because the function is called 3 times in this block
+  m_sys_which <- mockery::mock("/usr/bin/exiftool", cycle = TRUE)
+  mockery::stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
   
   # Create a dummy directory to pass dir.exists check
   temp_dir <- tempdir()
@@ -32,6 +33,7 @@ test_that("Input argument validation works", {
 })
 
 test_that("Logic: ID from Directory - Temporal Independence Check", {
+  testthat::skip_if_not_installed("mockery")
   # --- Setup ---
   temp_dir <- file.path(tempdir(), "test_station_dir")
   dir.create(temp_dir, showWarnings = FALSE)
@@ -42,7 +44,7 @@ test_that("Logic: ID from Directory - Temporal Independence Check", {
   on.exit(unlink(temp_dir, recursive = TRUE))
   
   # --- Mocks ---
-  m_sys_which <- mock("found")
+  m_sys_which <- mockery::mock("found")
   
   # Mock runExiftool return data
   mock_exif_data <- data.frame(
@@ -53,7 +55,7 @@ test_that("Logic: ID from Directory - Temporal Independence Check", {
     HierarchicalSubject = c("", ""),
     stringsAsFactors = FALSE
   )
-  m_runExiftool <- mock(mock_exif_data)
+  m_runExiftool <- mockery::mock(mock_exif_data)
   
   # Mock assignSpeciesID
   fake_assign_species <- function(intable, ...) {
@@ -62,9 +64,9 @@ test_that("Logic: ID from Directory - Temporal Independence Check", {
   }
   
   # --- Stubbing ---
-  stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
-  stub(checkSpeciesIdentification, "runExiftool", m_runExiftool)
-  stub(checkSpeciesIdentification, "assignSpeciesID", fake_assign_species)
+  mockery::stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
+  mockery::stub(checkSpeciesIdentification, "runExiftool", m_runExiftool)
+  mockery::stub(checkSpeciesIdentification, "assignSpeciesID", fake_assign_species)
   
   # --- Execution ---
   result <- checkSpeciesIdentification(
@@ -85,6 +87,9 @@ test_that("Logic: ID from Directory - Temporal Independence Check", {
 })
 
 test_that("Logic: ID from Metadata - Double Observer Conflict Check", {
+  
+  testthat::skip_if_not_installed("mockery")
+  
   # --- Setup ---
   temp_dir <- file.path(tempdir(), "test_station_meta")
   dir.create(temp_dir, showWarnings = FALSE)
@@ -92,8 +97,8 @@ test_that("Logic: ID from Metadata - Double Observer Conflict Check", {
   on.exit(unlink(temp_dir, recursive = TRUE))
   
   # --- Mocks ---
-  m_sys_which <- mock("found")
-  m_progressbar <- mock(NULL)
+  m_sys_which   <- mockery::mock("found")
+  m_progressbar <- mockery::mock(NULL)
   
   mock_exif_data <- data.frame(
     Directory = file.path(temp_dir, "StationB"),
@@ -102,7 +107,7 @@ test_that("Logic: ID from Metadata - Double Observer Conflict Check", {
     HierarchicalSubject = "Species|Fox_&_Compare|Wolf", 
     stringsAsFactors = FALSE
   )
-  m_runExiftool <- mock(mock_exif_data)
+  m_runExiftool <- mockery::mock(mock_exif_data)
   
   fake_add_meta <- function(intable, ...) {
     intable$metadata_SpeciesTag <- "Fox"
@@ -116,11 +121,11 @@ test_that("Logic: ID from Metadata - Double Observer Conflict Check", {
   }
   
   # --- Stubbing ---
-  stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
-  stub(checkSpeciesIdentification, "runExiftool", m_runExiftool)
-  stub(checkSpeciesIdentification, "makeProgressbar", m_progressbar)
-  stub(checkSpeciesIdentification, "addMetadataAsColumns", fake_add_meta)
-  stub(checkSpeciesIdentification, "assignSpeciesID", fake_assign_species)
+  mockery::stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
+  mockery::stub(checkSpeciesIdentification, "runExiftool", m_runExiftool)
+  mockery::stub(checkSpeciesIdentification, "makeProgressbar", m_progressbar)
+  mockery::stub(checkSpeciesIdentification, "addMetadataAsColumns", fake_add_meta)
+  mockery::stub(checkSpeciesIdentification, "assignSpeciesID", fake_assign_species)
   
   # --- Execution ---
   result <- checkSpeciesIdentification(
@@ -142,6 +147,9 @@ test_that("Logic: ID from Metadata - Double Observer Conflict Check", {
 })
 
 test_that("Logic: Exclude Species functionality", {
+  
+  testthat::skip_if_not_installed("mockery")
+  
   # --- Setup ---
   temp_dir <- file.path(tempdir(), "test_exclude")
   dir.create(temp_dir, showWarnings = FALSE)
@@ -151,7 +159,7 @@ test_that("Logic: Exclude Species functionality", {
   on.exit(unlink(temp_dir, recursive = TRUE))
   
   # --- Mocks ---
-  m_sys_which <- mock("found")
+  m_sys_which <- mockery::mock("found")
   
   mock_exif_data <- data.frame(
     Directory = file.path(temp_dir, "StationC", "Deer"),
@@ -160,16 +168,16 @@ test_that("Logic: Exclude Species functionality", {
     HierarchicalSubject = "",
     stringsAsFactors = FALSE
   )
-  m_runExiftool <- mock(mock_exif_data)
+  m_runExiftool <- mockery::mock(mock_exif_data)
   
   fake_assign_species <- function(intable, ...) {
     intable$species <- "Deer"
     return(intable)
   }
   
-  stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
-  stub(checkSpeciesIdentification, "runExiftool", m_runExiftool)
-  stub(checkSpeciesIdentification, "assignSpeciesID", fake_assign_species)
+  mockery::stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
+  mockery::stub(checkSpeciesIdentification, "runExiftool", m_runExiftool)
+  mockery::stub(checkSpeciesIdentification, "assignSpeciesID", fake_assign_species)
   
   # --- Execution ---
   result <- checkSpeciesIdentification(
@@ -184,20 +192,23 @@ test_that("Logic: Exclude Species functionality", {
   expect_equal(nrow(result$temporalIndependenceCheck), 0)
   
   # Verify runExiftool command string excluded Human
-  args_passed <- mock_args(m_runExiftool)[[1]]
+  args_passed <- mockery::mock_args(m_runExiftool)[[1]]
   command_str <- args_passed$command.tmp
   expect_false(grepl("Human", command_str))
   expect_true(grepl("Deer", command_str))
 })
 
 test_that("Logic: hasCameraFolders = TRUE logic", {
+  
+  testthat::skip_if_not_installed("mockery")
+  
   # --- Setup ---
   temp_dir <- file.path(tempdir(), "test_cam_folders")
   dir.create(temp_dir, showWarnings = FALSE)
   dir.create(file.path(temp_dir, "StationD"), showWarnings = FALSE)
   on.exit(unlink(temp_dir, recursive = TRUE))
   
-  m_sys_which <- mock("found")
+  m_sys_which <- mockery::mock("found")
   
   mock_exif_data <- data.frame(
     Directory = c(file.path(temp_dir, "StationD", "Cam1", "Fox"),
@@ -210,16 +221,16 @@ test_that("Logic: hasCameraFolders = TRUE logic", {
     HierarchicalSubject = "",
     stringsAsFactors = FALSE
   )
-  m_runExiftool <- mock(mock_exif_data)
+  m_runExiftool <- mockery::mock(mock_exif_data)
   
   fake_assign_species <- function(intable, ...) {
     intable$species <- basename(intable$Directory)
     return(intable)
   }
   
-  stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
-  stub(checkSpeciesIdentification, "runExiftool", m_runExiftool)
-  stub(checkSpeciesIdentification, "assignSpeciesID", fake_assign_species)
+  mockery::stub(checkSpeciesIdentification, "Sys.which", m_sys_which)
+  mockery::stub(checkSpeciesIdentification, "runExiftool", m_runExiftool)
+  mockery::stub(checkSpeciesIdentification, "assignSpeciesID", fake_assign_species)
   
   # --- Execution ---
   result <- checkSpeciesIdentification(

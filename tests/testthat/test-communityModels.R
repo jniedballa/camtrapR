@@ -442,6 +442,10 @@ local({
   
   test_that("plot function works", {
     
+    # skips first
+    skip_if_not_installed("rjags")
+    
+    
     # prevent warning about unused variable "effort categ"
     mod.jags_fixed@data$effort_categ <- NULL
     mod.jags_ranef@data$effort_categ <- NULL
