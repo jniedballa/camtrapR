@@ -1,99 +1,112 @@
-Package: camtrapR
 Type: Package
+Package: camtrapR
 Title: Camera Trap Data Management and Analysis Framework
 Version: 3.0.0.2
 Date: 2025-12-18
 Authors@R: c(
-        person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
-                comment = c(ORCID = "0000-0002-9187-2116")),
-        person("Alexandre", "Courtiol", role = "aut",
-                comment = c(ORCID = "0000-0003-0637-2959")),
-        person("Rahel", "Sollmann", role = "aut",
-                comment = c(ORCID = "0000-0002-1607-2039")),
-        person("John", "Mathai", role = "ctb"),
-        person("Seth Timothy", "Wong", role = "ctb",
-                comment = c(ORCID = "0000-0001-8083-9268")),
-        person("An The Truong", "Nguyen", role = "ctb",
-                comment = c(ORCID = "0009-0000-2861-2672")),
-        person("Azlan bin", "Mohamed", role = "ctb",
-                comment = c(ORCID = "0000-0003-3788-4383")),
-        person("Andrew", "Tilker", role = "ctb",
-                comment = c(ORCID = "0000-0003-3630-8691")),
-        person("Roshan", "Guharajan", role = "ctb",
-                comment = c(ORCID = "0000-0001-8124-5461")),
-        person("Ioannis", "Alexiou", role = "ctb",
-                comment = c(ORCID = "0000-0001-5095-4767")),
-        person("Andreas", "Wilting", role = c("ctb", "ths"),
-                comment = c(ORCID = "0000-0001-5073-9186"))
-        )
-Depends: 
-        R (>= 4.1.0)
-Imports: 
-        data.table,
-        dplyr,
-        DT, 
-        generics,
-        ggplot2,
-        leaflet,
-        lubridate,
-        methods,
-        secr,
-        sf,
-        shiny,
-        shinyBS,
-        shinydashboard,
-        shinyjs,
-        terra
-Suggests: 
-        abind,
-        bayesplot,
-        callr,
-        coda,
-        corrplot,
-        elevatr,
-        iNEXT,
-        jsonlite,
-        jsonify,
-        knitr,
-        lattice,
-        magick,
-        mapview,
-        mockery,
-        nimble,
-        nimbleEcology,
-        overlap,
-        parallel,
-        patchwork,
-        pbapply,
-        plotly,
-        psych,
-        raster,
-        reshape2,
-        rjags,
-        R.rsp,
-        RSQLite,
-        ritis,
-        rlang,
-        rmarkdown,
-        rstudioapi,
-        scales,
-        shinyWidgets,
-        stringr,
-        tesseract,
-        taxize,
-        testthat,
-        tibble,
-        ubms,
-        units,
-        unmarked,
-        viridisLite,
-        withr,
-        zip
-VignetteBuilder: R.rsp
-SystemRequirements: ExifTool (https://exiftool.org/)
-Description: Management and analysis of camera trap wildlife data through an integrated workflow. Provides functions for image/video organization and metadata extraction, species/individual identification. Creates detection histories for occupancy and spatial capture-recapture analyses, with support for multi-season studies. Includes tools for fitting community occupancy models in JAGS and NIMBLE, and an interactive dashboard for survey data visualization and analysis. Features visualization of species distributions and activity patterns, plus export capabilities for GIS and reports. Emphasizes automation and reproducibility while maintaining flexibility for different study designs.
-URL: https://github.com/jniedballa/camtrapR, https://jniedballa.github.io/camtrapR/, https://groups.google.com/forum/#!forum/camtrapr
-BugReports: https://groups.google.com/forum/#!forum/camtrapr
-Encoding: UTF-8
+    person("Juergen", "Niedballa", , "camtrapr@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9187-2116")),
+    person("Alexandre", "Courtiol", role = "aut",
+           comment = c(ORCID = "0000-0003-0637-2959")),
+    person("Rahel", "Sollmann", role = "aut",
+           comment = c(ORCID = "0000-0002-1607-2039")),
+    person("John", "Mathai", role = "ctb"),
+    person("Seth Timothy", "Wong", role = "ctb",
+           comment = c(ORCID = "0000-0001-8083-9268")),
+    person("An The Truong", "Nguyen", role = "ctb",
+           comment = c(ORCID = "0009-0000-2861-2672")),
+    person("Azlan bin", "Mohamed", role = "ctb",
+           comment = c(ORCID = "0000-0003-3788-4383")),
+    person("Andrew", "Tilker", role = "ctb",
+           comment = c(ORCID = "0000-0003-3630-8691")),
+    person("Roshan", "Guharajan", role = "ctb",
+           comment = c(ORCID = "0000-0001-8124-5461")),
+    person("Ioannis", "Alexiou", role = "ctb",
+           comment = c(ORCID = "0000-0001-5095-4767")),
+    person("Andreas", "Wilting", role = c("ctb", "ths"),
+           comment = c(ORCID = "0000-0001-5073-9186"))
+  )
+Description: Management and analysis of camera trap wildlife data through
+    an integrated workflow. Provides functions for image/video
+    organization and metadata extraction, species/individual
+    identification. Creates detection histories for occupancy and spatial
+    capture-recapture analyses, with support for multi-season studies.
+    Includes tools for fitting community occupancy models in JAGS and
+    NIMBLE, and an interactive dashboard for survey data visualization and
+    analysis. Features visualization of species distributions and activity
+    patterns, plus export capabilities for GIS and reports. Emphasizes
+    automation and reproducibility while maintaining flexibility for
+    different study designs.
 License: GPL (>= 2)
+URL: https://github.com/jniedballa/camtrapR,
+    https://jniedballa.github.io/camtrapR/,
+    https://groups.google.com/forum/#!forum/camtrapr
+BugReports: https://groups.google.com/forum/#!forum/camtrapr
+Depends: 
+    R (>= 4.1.0)
+Imports: 
+    data.table,
+    dplyr,
+    DT,
+    generics,
+    ggplot2,
+    leaflet,
+    lubridate,
+    methods,
+    secr,
+    sf,
+    shiny,
+    shinyBS,
+    shinydashboard,
+    shinyjs,
+    terra
+Suggests: 
+    abind,
+    bayesplot,
+    callr,
+    coda,
+    corrplot,
+    elevatr,
+    iNEXT,
+    jsonify,
+    jsonlite,
+    knitr,
+    lattice,
+    magick,
+    mapview,
+    mockery,
+    nimble,
+    nimbleEcology,
+    overlap,
+    parallel,
+    patchwork,
+    pbapply,
+    plotly,
+    psych,
+    R.rsp,
+    raster,
+    reshape2,
+    ritis,
+    rjags,
+    rlang,
+    rmarkdown,
+    RSQLite,
+    rstudioapi,
+    scales,
+    shinyWidgets,
+    stringr,
+    taxize,
+    tesseract,
+    testthat,
+    tibble,
+    ubms,
+    units,
+    unmarked,
+    viridisLite,
+    withr,
+    zip
+VignetteBuilder: 
+    R.rsp
+Encoding: UTF-8
 RoxygenNote: 7.3.2
+SystemRequirements: ExifTool (https://exiftool.org/)
