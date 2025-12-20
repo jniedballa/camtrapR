@@ -1,3 +1,12 @@
+# camtrapR 3.0.1
+
+## bugfixes
+* fixed plot_effects with categorical covariates
+
+## Other changes
+* removed legacy surveyReport (surveyReport now always requires camera operation matrix)
+
+
 # camtrapR 3.0.0
 
 ## Important note:
