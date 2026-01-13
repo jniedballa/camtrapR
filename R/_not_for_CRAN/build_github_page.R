@@ -3,6 +3,7 @@ require(devtools)
 
 
 Sys.setlocale("LC_ALL","English")
+Sys.setenv(TZ = "UTC")
 
 
 build_home()
@@ -22,15 +23,3 @@ build_reference()  # function documentation
 build_reference_index(pkg = ".")
 
 
-
-library(rmarkdown)
-
-# building html vignette with code below ensures that toc works correctly
-wd <- "C:/Users/niedballa/Documents/GitHub/camtrapR/vignettes"
-render(input = file.path(wd, "camtrapr5.Rmd"),
-     #output = file.path(wd, "camtrapR5.html")
-     output_format = "html_document",
-     output_options = list(#self_contained = T,
-                           toc = T,
-                           toc_depth = 2,
-                           toc_float = T))
