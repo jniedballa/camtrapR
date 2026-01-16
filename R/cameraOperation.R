@@ -138,7 +138,7 @@
 #' \code{\link{spatialDetectionHistory}}, if sampling effort (the number of
 #' active trap nights in a occasion) is to be computed and returned.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @examples
 #' 

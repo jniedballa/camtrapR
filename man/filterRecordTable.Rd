@@ -115,5 +115,5 @@ rec_table_filt <- filterRecordTable(recordTable         = rec_table,
  }
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

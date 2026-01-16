@@ -92,5 +92,5 @@ Phil Harvey's ExifTool \url{https://exiftool.org/} \cr
 \code{\link{recordTable}}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

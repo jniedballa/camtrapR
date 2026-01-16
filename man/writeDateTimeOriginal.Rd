@@ -109,5 +109,5 @@ stopCluster(cl)
 \code{\link{OCRdataFields}}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

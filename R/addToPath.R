@@ -19,7 +19,7 @@
 #' 
 #' @note The directories in PATH can be queried by \code{Sys.getenv("PATH")}.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @examples
 #' 

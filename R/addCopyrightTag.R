@@ -39,7 +39,7 @@
 #' More importantly, the specified copyright tag is written into the Copyright
 #' field of the Exif metadata of all images in inDir.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @examples
 #' 

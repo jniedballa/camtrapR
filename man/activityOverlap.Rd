@@ -155,5 +155,5 @@ trap data. Journal of Agricultural, Biological and Environmental Statistics,
 \url{https://www.kent.ac.uk/smsas/personal/msr/overlap.html}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

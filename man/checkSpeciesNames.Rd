@@ -82,5 +82,5 @@ species.names.check3
 \url{https://www.itis.gov/}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

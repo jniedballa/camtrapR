@@ -1,16 +1,6 @@
 
 # camtrapR
 
-<!-- badges: start -->
-
-[![CRAN
-status](https://www.r-pkg.org/badges/version-ago/camtrapR)](https://CRAN.R-project.org/package=camtrapR)
-![](https://cranlogs.r-pkg.org/badges/grand-total/camtrapR)
-[![](http://cranlogs.r-pkg.org/badges/camtrapR)](https://cran.r-project.org/package=camtrapR)
-[![Codecov test
-coverage](https://codecov.io/gh/jniedballa/camtrapR/graph/badge.svg)](https://app.codecov.io/gh/jniedballa/camtrapR)
-<!-- badges: end -->
-
 camtrapR is a package for camera trap data management in R.
 
 ## Installation
@@ -21,28 +11,8 @@ You can install the release version of camtrapR from CRAN:
 install.packages("camtrapR")
 ```
 
-the GitHub master version via:
 
-``` r
-# install.packages("remotes")
-# install.packages("R.rsp")
-remotes::install_github("jniedballa/camtrapR", build_vignettes = TRUE)
-```
-
-and the GitHub development version\* (containing the most recent changes
-and new features) via:
-
-``` r
-remotes::install_github("jniedballa/camtrapR", ref = "dev", build_vignettes = TRUE)
-```
-
-\[\* a development version may not always be available on GitHub\]
-
-For installation from GitHub make sure package `R.rsp` is available.
-`build_vignettes = TRUE` is necessary since v 2.1.1. due to the new
-static vignettes.
-
-You can also install a previous version (e.g. if a recent update broke
+You can also install a previous version (e.g. if a recent update broke
 the code you need to run urgently) via:
 
 ``` r
@@ -67,33 +37,11 @@ models from existing record tables.
 
 ## Help and Support
 
-### Google Group
-
-There is a [Google
-Group](https://groups.google.com/forum/#!forum/camtrapr) for all
-questions and problems regarding camtrapR. Please feel free to join the
-discussion there.
-
-### GitHub issues
-
-Alternatively, you can report bugs and problems as issues on GitHub
-[(here)](https://github.com/jniedballa/camtrapR/issues).
+The original (non-anonymized) version of the package provides multiple ways of 
+obtaining help from the package maintainers.
 
 ## Further reading
 
-See the [Article in Methods in Ecology and
-Evolution](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600)
-for an overview of the package. The five vignettes provide examples for
-the entire workflow.
+The five vignettes provide examples for the entire workflow.
 
-## Citation
 
-To cite camtrapR, please use:
-
-Jürgen Niedballa, Rahel Sollmann, Alexandre Courtiol, Andreas Wilting
-(2016). camtrapR: an R package for efficient camera trap data
-management. Methods in Ecology and Evolution 7(12), 1457-1462,
-<https://doi.org/10.1111/2041-210X.12600>, URL:
-<https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600>
-
-or see `citation("camtrapR")`

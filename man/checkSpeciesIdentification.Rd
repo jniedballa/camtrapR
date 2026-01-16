@@ -140,5 +140,5 @@ check.folders3   # the data frame is empty
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

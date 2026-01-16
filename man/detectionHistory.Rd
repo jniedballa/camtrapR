@@ -333,5 +333,5 @@ mod.jags <- communityModel(data_list,
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

@@ -142,5 +142,5 @@ timeshift_undo <- timeShiftImages(inDir               = wd_images_ID_copy,
 \url{https://exiftool.org/#shift}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

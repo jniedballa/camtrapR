@@ -221,5 +221,5 @@ camop_problem_oldformat
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

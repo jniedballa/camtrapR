@@ -40,5 +40,5 @@ grepl(exiftool_dir,  Sys.getenv("PATH"))
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

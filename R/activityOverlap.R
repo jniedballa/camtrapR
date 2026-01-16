@@ -55,7 +55,7 @@
 #' enough to see changes in sunrise and sunset times, this may result in biased
 #' representations of species activity.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @seealso \code{\link{activityDensity}} \cr
 #' \url{https://www.kent.ac.uk/smsas/personal/msr/overlap.html}

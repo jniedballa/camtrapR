@@ -123,7 +123,7 @@
 #' \bold{\code{alpha.obs.fixed.cont.effort}} is the fixed effect of the continuous observation-level covariate 'effort' on detection probability
 #' 
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #'  
 #' @examples
 #' 

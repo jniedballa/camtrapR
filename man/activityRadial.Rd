@@ -129,5 +129,5 @@ R. R-News, 6(4): 8-12. \cr \url{https://CRAN.R-project.org/package=plotrix }
 \code{\link{activityOverlap}}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

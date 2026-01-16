@@ -77,7 +77,7 @@
 #' @return A \code{data.frame} containing the information about the processed
 #' directories and the number of images.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @references \url{https://exiftool.org/#shift}
 #' 

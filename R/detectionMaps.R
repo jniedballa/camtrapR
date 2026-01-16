@@ -54,7 +54,7 @@
 #' events by species at each station and total species number by station. In
 #' addition and optionally, R graphics or png image files.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @references A great resource for coordinate system information
 #' is \url{https://spatialreference.org/}. Use the Proj4 string as

@@ -102,5 +102,5 @@ activityHistogram (recordTable = recordTableSample,
 \code{\link{activityOverlap}}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

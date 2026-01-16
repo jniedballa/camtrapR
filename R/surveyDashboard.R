@@ -130,7 +130,7 @@
 #' - no support for spatial capture-recapture models (or anything related to individual IDs)
 #' 
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #'  
 #' @importFrom grDevices hcl.colors colorRampPalette
 #' @importFrom graphics layout pairs plot.new title

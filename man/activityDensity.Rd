@@ -117,5 +117,5 @@ for animal activity patterns. R package version 0.3.2.
 \url{https://www.kent.ac.uk/smsas/personal/msr/overlap.html}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

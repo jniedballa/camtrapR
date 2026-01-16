@@ -138,5 +138,5 @@ Ecological Monographs, 84(1), 45-67.
 \code{\link{surveyDashboard}} for interactive species accumulation analysis
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

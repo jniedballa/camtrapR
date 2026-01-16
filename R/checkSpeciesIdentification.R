@@ -68,7 +68,7 @@
 #' found either. From version 0.99.0, the function can also handle images
 #' identied with metadata tags.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @examples
 #' 

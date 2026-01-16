@@ -200,5 +200,5 @@ ppc_comm <- PPC.community(
   calculations
 }
 \author{
-Rahel Sollmann
+Anonymized Author
 }

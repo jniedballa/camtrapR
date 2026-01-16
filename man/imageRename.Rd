@@ -161,5 +161,5 @@ renaming.table2 <- imageRename(inDir               = wd_images_raw,
 Phil Harvey's ExifTool \url{https://exiftool.org/}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

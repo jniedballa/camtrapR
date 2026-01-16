@@ -41,7 +41,7 @@
 #' @return Invisible NULL. The actual output is the JPG images which now have a
 #' DateTimeOriginal tag.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @seealso \code{\link{OCRdataFields}}
 #' 

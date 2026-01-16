@@ -127,5 +127,5 @@ df_image_data
 \code{\link{writeDateTimeOriginal}}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

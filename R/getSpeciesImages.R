@@ -77,7 +77,7 @@
 #' the copy status (\code{copy_ok}; TRUE if copying was successful, FALSE if
 #' not).
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @examples
 #' 

@@ -49,5 +49,5 @@ Camera Base Version 1.7 User Guide
 \url{https://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

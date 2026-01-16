@@ -85,5 +85,5 @@ SpecNameRemove1
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

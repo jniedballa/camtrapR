@@ -45,7 +45,7 @@
 #' radians, i.e. scaled to [\eqn{0, 2\pi}]. If \code{allSpecies == TRUE}, all
 #' species' vectors are returned in an invisible named list.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @seealso \code{\link{activityHistogram}}, \code{\link{activityRadial}},
 #' \code{\link{activityOverlap}}

@@ -121,7 +121,7 @@
 #'   }
 #'   If you encounter issues with the function, please contact the package developers.
 #' 
-#' @author Rahel Sollmann
+#' @author Anonymized Author
 #' 
 #' @references
 #' Sollmann, Rahel. Occupancy models and the "good fit, bad prediction" dilemma. 
@@ -557,7 +557,7 @@ PPC.residuals <- function(y,
 #' @seealso \code{\link{PPC.residuals}} for details on the underlying single-species 
 #'   calculations
 #'   
-#' @author Rahel Sollmann
+#' @author Anonymized Author
 #' 
 #' @export
 #' 

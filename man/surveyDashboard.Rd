@@ -169,5 +169,5 @@ data("recordTableSample")
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

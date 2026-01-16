@@ -125,5 +125,5 @@ specImagecopy <- getSpeciesImages(species                 = species_to_copy,
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

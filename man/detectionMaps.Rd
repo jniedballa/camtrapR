@@ -170,5 +170,5 @@ is \url{https://spatialreference.org/}. Use the Proj4 string as
 \code{shapefileProjection} argument.
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

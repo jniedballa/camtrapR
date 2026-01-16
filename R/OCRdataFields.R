@@ -74,7 +74,7 @@
 #' @return A \code{data.frame} with original directory and file names, and
 #' additional columns for the OCR data of each extracted geometry.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @seealso \code{\link{writeDateTimeOriginal}}
 #' 

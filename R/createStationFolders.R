@@ -23,7 +23,7 @@
 #' @return A \code{data.frame} with station (and possibly camera) directory
 #' names and an indicator for whether they were created successfully.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @examples
 #' 

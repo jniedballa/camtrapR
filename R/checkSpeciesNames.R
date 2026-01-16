@@ -23,7 +23,7 @@
 #' common and scientific names, taxon author and year, taxonomic rank, status,
 #' TSNs (taxonomic serial numbers) and ITIS urls.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @references \url{https://www.itis.gov/}
 #' 

@@ -31,7 +31,7 @@
 #' @return A \code{data.frame} containing the old and new file names and
 #' directories.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @examples
 #' 

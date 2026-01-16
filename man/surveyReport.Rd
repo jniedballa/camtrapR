@@ -212,5 +212,5 @@ readLines(list.files(getwd(), pattern = paste("survey_report_", Sys.Date(), ".tx
 \code{\link{recordTable}}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

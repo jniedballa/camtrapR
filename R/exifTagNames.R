@@ -31,7 +31,7 @@
 #' @return A data frame containing three columns: metadata tag group, tag name,
 #' and values.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @seealso \code{\link{recordTable}}
 #' 

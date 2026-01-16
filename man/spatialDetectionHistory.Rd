@@ -299,5 +299,5 @@ sdh_multi <- spatialDetectionHistory(recordTableIndividual = recordTableIndividu
 \pkg{secr} \pkg{RMark}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

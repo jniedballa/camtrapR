@@ -46,7 +46,7 @@
 #' @export
 #' @importFrom lubridate ymd_hms is.POSIXt tz parse_date_time
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #'
 #' @examples
 #' 

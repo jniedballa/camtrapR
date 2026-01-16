@@ -60,5 +60,5 @@ list.dirs(wd_createStationDir)
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

@@ -277,5 +277,5 @@ data(recordTableSample)
 Phil Harvey's ExifTool \url{https://exiftool.org/}
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

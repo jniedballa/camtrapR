@@ -158,7 +158,7 @@
 #' \code{vignette("DataExtraction")} or online
 #' (\url{https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.pdf})).
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @references Phil Harvey's ExifTool \url{https://exiftool.org/}
 #' 

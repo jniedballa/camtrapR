@@ -31,7 +31,7 @@
 #' @return A \code{data.frame} with directory names and an indicator for
 #' whether directories were created or deleted.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @examples
 #' 

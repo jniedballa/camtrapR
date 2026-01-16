@@ -47,7 +47,7 @@
 
 ## Bugfixes
 * cameraOperation: last occasions is 0 (not NA) when occasionStartTime = 12 and retrieval time is 12 noon (to prevent dropping of records on last day)
-* cameraOperation: allows any number of ProblemX_from/to columns (was previously limited to 9). Reported by Nicolas Deere.
+* cameraOperation: allows any number of ProblemX_from/to columns (was previously limited to 9). 
 * predict / plot_effects: fixed wrong assignment of intercept estimates to posterior draws
 
 ## Other changes
@@ -82,16 +82,16 @@
 * cameraOperation: gained argument occasionStartTime (deprecated in detectionHistory / spatialDetectionHistory)
 * function camopPlot is now accessible via camtrapR:::camopPlot(). It also gained an argument "lattice", which can be TRUE or FALSE (if TRUE, it uses levelplot() from lattice)
 * surveyReport: new argument camOp (for a camera operation matrix), argument CTHasProblems is deprecated. Improved calculation of survey effort.
-* timeShiftImages / addCopyrightTag: added argument "ignoreMinorErrors", set it to TRUE if functions fails due to bad MakerNotes (reported by An Nguyen)
+* timeShiftImages / addCopyrightTag: added argument "ignoreMinorErrors", set it to TRUE if functions fails due to bad MakerNotes 
 * detectionMaps uses package sf instead of sp and rgdal
 
 ## Bugfixes
-* cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character (reported by David Nicholls)
-* recordTable: supports extraction of metadata tags from video files in camera subdirectories, and allows duplicate video file names in different camera subdirectories (reported by Sian Green)
-* recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata, reported by Sian Green)
-* imageRename: fixed error when hasCameraFolders is TRUE, but a station has only 1 camera (reported by Camille Coudrat and Ezekiel Gading)
-* detectionHistory: fixed a bug that caused errors when using multiple sessions and non-standard date/time formats (reported by Daniele Barcelos)
-* checkSpeciesNames: fixed error due to change in taxize::get_tsn (reported by Ivonne Oddoy)
+* cameraOperation now works when Problem columns are of class date or POSIX. Now being converted to character 
+* recordTable: supports extraction of metadata tags from video files in camera subdirectories, and allows duplicate video file names in different camera subdirectories
+* recordTable: fix bug that assigned Albums to wrong AlbumRoots in the digiKam database (when reading video metadata)
+* imageRename: fixed error when hasCameraFolders is TRUE, but a station has only 1 camera
+* detectionHistory: fixed a bug that caused errors when using multiple sessions and non-standard date/time formats
+* checkSpeciesNames: fixed error due to change in taxize::get_tsn
 
 ## Other changes
 * lubridate is a dependency now (for cameraOperation)
@@ -102,13 +102,13 @@
 
 ## Bugfixes
 * fixed error messages if date or date/time columns contain blank values or NA
-* fixed DH_error2 in detectionHistory() with output = "count" (reported by Maddy Uetrecht)
+* fixed DH_error2 in detectionHistory() with output = "count"
 * cameraOperation failed if setupCol or retrievalCol were of class "Date". Now being converted to character.
-* imageRename: fixed camera IDs being assigned incorrectly in very rare cases on Mac (reported by Camille Coudrat)
+* imageRename: fixed camera IDs being assigned incorrectly in very rare cases on Mac
 * recordTable: fixed error when videos had metadata tags that were not in tag groups
 
 ## Other changes
-* recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with "L" for Latin character set, everything else will most likely break the code, suggested by Saloni Salaria)
+* recordTable / recordTableIndividual: users can specify 1-character Exiftool arguments in additionalMetadataTags (only tested with "L" for Latin character set, everything else will most likely break the code)
 * improved error messages in recordTable/recordTableIndividual and detectionHistory/spatialDetectionHistory functions
 
 # camtrapR 2.0.2
@@ -148,7 +148,7 @@
 * error message in functions that call Exiftool when inDir is empty (no subdirectories)
 * surveyReport: error message when zip file can't be created
 * special characters in directory names now supported (but still best avoided; requires ExifTool 9.79 or later)
-* detectionMaps: fixed error when trying to plot backgroundPolygon (reported by Oliver Wearn)
+* detectionMaps: fixed error when trying to plot backgroundPolygon
 
 ## Other changes
 
@@ -253,7 +253,7 @@
 
 ## Bugfixes
 
-* activityDensity: fixed problem with argument allSpecies = TRUE that caused output list to return values for one species only (reported by Sally Soo).
+* activityDensity: fixed problem with argument allSpecies = TRUE that caused output list to return values for one species only.
 * appendSpeciesNames, checkSpeciesIdentification,getSpeciesImages, recordTableIndividual: fixed error in extracting species IDs from image metadata in directories in which no images are tagged. These stations are now skipped with a warning.
 * detectionHistory / spatialDetectionHistory: fixed error with detection histories and effort matrix full of NAs arising if camera operation matrix had values > 2 (after argument camerasIndependent = TRUE in cameraOperation)
 
@@ -270,7 +270,7 @@
 
 ## Bugfixes
 
-* camera operation: fixed bug with empty entries in cameraCol when cameraCol is defined (reported by Partha Sarathi Ghose)
+* camera operation: fixed bug with empty entries in cameraCol when cameraCol is defined
 * recordTable / recordTableIndividual: verbose warnings and better handling of situations in which date/time is unreadable (empty Exif:DateTimeOriginal metadata tag)
 
 ## New features
@@ -288,7 +288,7 @@
 
 ## Bugfixes
 
-* recordTable / recordTableIndividual: column "HierarchicalSubject" (containing digiKam metadata tags in their native format) was called "record.table3[, col_to_move]" by mistake (thanks to Ross Pitman for reporting)
+* recordTable / recordTableIndividual: column "HierarchicalSubject" (containing digiKam metadata tags in their native format) was called "record.table3[, col_to_move]" by mistake
 
 ## Other changes
 
@@ -311,7 +311,7 @@
 ## Other changes
 
 * recordTable / recordTableIndividual: improved handling and reporting of stations without images (warning instead of error)
-* recordTable / recordTableIndividual: improved handling and reporting of stations where all images lack species/individual metadata tags (only if using metadata ID, functions will throw warning instead of error, reported by Aditya Malgaonkar)
+* recordTable / recordTableIndividual: improved handling and reporting of stations where all images lack species/individual metadata tags (only if using metadata ID, functions will throw warning instead of error)
 
 
 
@@ -320,7 +320,7 @@
 
 ## Bugfixes
 
-* fixed crash in cameraOperation function caused by underscores in station / camera IDs (reported by Wyatt Petersen)
+* fixed crash in cameraOperation function caused by underscores in station / camera IDs
 
 ## New functions
 
@@ -384,9 +384,9 @@
 
 ## Bugfixes
 
-* detectionHistory: malfunctioning cameras (0 in camera operation matrix) did not cause detection history matrix cells to be NA (even if includeEffort = FALSE; reported by Hsiang Ling Chen)
+* detectionHistory: malfunctioning cameras (0 in camera operation matrix) did not cause detection history matrix cells to be NA (even if includeEffort = FALSE)
 * detectionHistory: if the last occasion is shorter than occasionLength, the corresponding detection history matrix cells will now be NA if includeEffort = FALSE
-* surveyReport: species column names other than "Species" are now supported, i.e. argument "speciesCol" is now respected (thanks to Valentine Herrmann and Stefano Anile for reporting)
+* surveyReport: species column names other than "Species" are now supported, i.e. argument "speciesCol" is now respected
 
 ## New features
 

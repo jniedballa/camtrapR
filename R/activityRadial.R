@@ -52,7 +52,7 @@
 #' \code{allSpecies == TRUE}, all species' data frames are returned in an
 #' invisible named list.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @seealso \code{\link{activityDensity}}, \code{\link{activityHistogram}},
 #' \code{\link{activityOverlap}}

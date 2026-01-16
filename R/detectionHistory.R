@@ -128,7 +128,7 @@
 #' the "Data Extraction" vignette (\code{vignette("DataExtraction")} or online at
 #' \url{https://cran.r-project.org/package=camtrapR/vignettes/camtrapr3.pdf}).
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @examples
 #' 

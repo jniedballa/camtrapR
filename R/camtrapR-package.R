@@ -37,26 +37,15 @@
 #' @aliases camtrapR-package camtrapR
 #' @docType package
 #' 
-#' @section User support: The camtrapR Google group is an online support and
-#' help forum for camtrapR users. You can find it here:
-#' \url{https://groups.google.com/forum/#!forum/camtrapr}.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
-#' Maintainer:Juergen Niedballa <camtrapr@@gmail.com>
+#' Maintainer: Anonymized Author <XXX@XX.com>
 #' 
 #' @seealso \pkg{overlap} \pkg{unmarked} \pkg{ubms} \pkg{secr} \pkg{wiqid}
 #' 
 #' @references
 #' 
-#' Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016): camtrapR: an
-#' R package for efficient camera trap data management. Methods in Ecology and
-#' Evolution, 7(12).
-#' \url{https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600}
-#' \cr
-#' 
-#' camtrapR Google Group \url{https://groups.google.com/forum/#!forum/camtrapr}
-#' \cr
 #' 
 #' Lemon, J. (2006) Plotrix: a package in the red light district of R. R-News,
 #' 6(4): 8-12. \cr

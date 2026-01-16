@@ -88,5 +88,5 @@ list.dirs(wd_createDirTest)
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

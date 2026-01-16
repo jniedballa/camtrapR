@@ -4,27 +4,27 @@ Title: Camera Trap Data Management and Analysis Framework
 Version: 3.0.1
 Date: 2025-12-20
 Authors@R: c(
-    person("Juergen", "Niedballa", , "camtrapr@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-9187-2116")),
-    person("Alexandre", "Courtiol", role = "aut",
-           comment = c(ORCID = "0000-0003-0637-2959")),
-    person("Rahel", "Sollmann", role = "aut",
-           comment = c(ORCID = "0000-0002-1607-2039")),
-    person("John", "Mathai", role = "ctb"),
-    person("Seth Timothy", "Wong", role = "ctb",
-           comment = c(ORCID = "0000-0001-8083-9268")),
-    person("An The Truong", "Nguyen", role = "ctb",
-           comment = c(ORCID = "0009-0000-2861-2672")),
-    person("Azlan bin", "Mohamed", role = "ctb",
-           comment = c(ORCID = "0000-0003-3788-4383")),
-    person("Andrew", "Tilker", role = "ctb",
-           comment = c(ORCID = "0000-0003-3630-8691")),
-    person("Roshan", "Guharajan", role = "ctb",
-           comment = c(ORCID = "0000-0001-8124-5461")),
-    person("Ioannis", "Alexiou", role = "ctb",
-           comment = c(ORCID = "0000-0001-5095-4767")),
-    person("Andreas", "Wilting", role = c("ctb", "ths"),
-           comment = c(ORCID = "0000-0001-5073-9186"))
+    person("Anonymized", "Author", , "anonymized@example.com", role = c("aut", "cre"),
+           comment = c(ORCID = "...")),
+    person("Anonymized", "Author", role = "aut",
+           comment = c(ORCID = "...")),
+    person("Anonymized", "Author", role = "aut",
+           comment = c(ORCID = "...")),
+    person("Anonymized", "Author", role = "ctb"),
+    person("Anonymized", "Author", role = "ctb",
+           comment = c(ORCID = "...")),
+    person("Anonymized", "Author", role = "ctb",
+           comment = c(ORCID = ".")),
+    person("Anonymized", "Author", role = "ctb",
+           comment = c(ORCID = "...")),
+    person("Anonymized", "Author", role = "ctb",
+           comment = c(ORCID = "...")),
+    person("Anonymized", "Author", role = "ctb",
+           comment = c(ORCID = "...")),
+    person("Anonymized", "Author", role = "ctb",
+           comment = c(ORCID = "...")),
+    person("Anonymized", "Author", role = c("ctb", "ths"),
+           comment = c(ORCID = "..."))
   )
 Description: Management and analysis of camera trap wildlife data through
     an integrated workflow. Provides functions for image/video
@@ -38,10 +38,8 @@ Description: Management and analysis of camera trap wildlife data through
     automation and reproducibility while maintaining flexibility for
     different study designs.
 License: GPL (>= 2)
-URL: https://github.com/jniedballa/camtrapR,
-    https://jniedballa.github.io/camtrapR/,
-    https://groups.google.com/forum/#!forum/camtrapr
-BugReports: https://groups.google.com/forum/#!forum/camtrapr
+URL: 
+BugReports: 
 Depends: 
     R (>= 4.1.0)
 Imports: 

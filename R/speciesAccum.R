@@ -97,7 +97,7 @@
 #'
 #' @seealso \code{\link{surveyDashboard}} for interactive species accumulation analysis
 #'
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #'
 #' @importFrom dplyr mutate arrange distinct count left_join select
 #' @importFrom stats setNames

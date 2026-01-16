@@ -18,7 +18,7 @@
 #' @section Warning : Please make a backup of your images before running this
 #' function.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @references This function uses the code from: \cr Tobler, Mathias (2015).
 #' Camera Base Version 1.7 User Guide

@@ -288,5 +288,5 @@ plot(fit.nimble.comp)
 Kéry, M., and J. A. Royle. "Applied hierarchical modelling in ecology - Modeling distribution, abundance and species richness using R and BUGS." Volume 1: Prelude and Static Models. Elsevier/Academic Press, 2016.
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

@@ -86,7 +86,7 @@
 #' directory and file names and an indicator for whether images were copied
 #' successfully.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @references Phil Harvey's ExifTool \url{https://exiftool.org/}
 #' 

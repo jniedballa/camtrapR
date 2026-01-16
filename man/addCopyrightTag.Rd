@@ -91,5 +91,5 @@ metadat [metadat$tag_name == "Copyright",]
 
 }
 \author{
-Juergen Niedballa
+Anonymized Author
 }

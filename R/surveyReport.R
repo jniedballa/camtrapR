@@ -84,7 +84,7 @@
 #' \code{Ycol} are defined), the survey report tables, the record table and the
 #' camera trap station table, and an example R script.
 #' 
-#' @author Juergen Niedballa
+#' @author Anonymized Author
 #' 
 #' @seealso \code{\link{recordTable}}
 #' 
