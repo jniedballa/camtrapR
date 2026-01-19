@@ -1,6 +1,6 @@
 ---
 title: "1. Organising raw camera trap images in camtrapR"
-author: "Juergen Niedballa (<camtrapr@gmail.com>)"
+author: "Anonymized Author"
 date: "`r Sys.Date()`"
 output:
   pdf_document:
@@ -43,13 +43,6 @@ You can install the newest stable version from CRAN via:
 install.packages("camtrapR")
 ```
 
-Alternatively, you can install the development version with the latest features and bugfixes from GitHub (requires package remotes):
-
-```{r eval = FALSE}
-library(remotes)
-install_github("jniedballa/camtrapR")
-```
-
 
 Afterwards, load camtrapR via:
 
@@ -60,7 +53,7 @@ library(camtrapR)
 
 ## Documentation
 
-The latest vignettes, function reference and changelog can be found on the [camtrapR GitHub pages](https://jniedballa.github.io/camtrapR/) or the [camtrapR page on CRAN](https://CRAN.R-project.org/package=camtrapR). Source code can be found on [GitHub](https://github.com/jniedballa/camtrapR).
+The latest vignettes, function reference and changelog can be found on the [REMOVED] or the [REMOVED]. Source code can be found on [REMOVED].
 
 
 ## Workflow
@@ -164,7 +157,7 @@ Sys.which("exiftool")
 
 If exiftool.exe cannot be placed in a PATH directory (e.g. due to limited user privileges), users can place exiftool.exe in any directory and then add that directory to PATH temporarily for use in the running R session using the function `exiftoolPath`. This is necessary if the directory containing exiftool.exe is not in PATH by default.
 
-```{r}
+```{r eval=FALSE}
 # this is a dummy example assuming the directory structure: C:/Path/To/Exiftool/exiftool.exe
 exiftool_dir <- "C:/Path/To/Exiftool"        
 exiftoolPath(exiftoolDir = exiftool_dir)
@@ -266,7 +259,7 @@ The directories for the raw images can be created automatically using the functi
 
 Here is an example in which station directories without camera subdirectories are created. 
 
-```{r}
+```{r message=FALSE, results = F}
 # create a temporary dummy directory for tests
 # (normally, you'd set up an empty directory in a proper place, e.g. .../myStudy/rawImages)
 wd_createStationDir <- file.path(normalizePath(tempdir(), winslash = "/"), "createStationFoldersTest")
@@ -299,7 +292,7 @@ There is a `station` column with station IDs, `camera` is NA because there was 1
 The function `timeShiftImages` should be run directly after saving the raw images on the hard disk. 
 
 
-```{r eval = exiftool_present}
+```{r eval = exiftool_present, results = "hide", message = F}
 # copy sample images to another location (so we don't mess around in the package directory)
 wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")
 file.copy(from = wd_images_raw, to = normalizePath(tempdir(), winslash = "/") , recursive = TRUE)
@@ -319,7 +312,7 @@ timeshift_run
 
 ExifTool has now updated the time tag of all images in the directories specified in the `timeShiftTable`. The original images are preserved as XYZ.JPG_original files (XYZ being the original file name). By setting argument `undo = TRUE`, the orginals are restored and the modified images are deleted. The function will check if the number of JPG_original files and JPG files in folders is identical. If not, the function will not work. It does not check for consistency of file names. 
 
-```{r eval = exiftool_present}
+```{r eval = exiftool_present, message = FALSE, results = F}
 timeshift_undo <- timeShiftImages(inDir               = wd_images_raw_copy,
                                  timeShiftTable       = timeShiftTable,
                                  stationCol           = "Station",
@@ -339,7 +332,7 @@ timeshift_undo
 
 Some Reconyx Hyperfire cameras (e.g. Hyperfire HC500) don't store date and time in the standard Exif format. Consequently, camtrapR cannot read the DateTimeOriginal tag from these images. This can be fixed easily by using the camtrapR function `fixDateTimeOriginal` or by following the instructions given by Mathias Tobler in the CameraBase documentation (page 7):
 
-http://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf
+https://www.atrium-biodiversity.org/tools/camerabase/files/CameraBaseDoc1.7.pdf
 
 <!-- ### Date/Time problems with Maginon cameras -->
 
@@ -391,7 +384,7 @@ Station ID and camera ID are derived from the raw image directory structure crea
 Again, please be aware that temporary directories are used in the example. Set `outDir` to a permanent directory.
 In addition, images are not actually copied (argument `copyImages = FALSE`), but copying and renaming is mererly simulated in out example. So, in real world data, set `copyImages = TRUE`.
 
-```{r eval = exiftool_present}
+```{r eval = exiftool_present, results = F}
  # raw image location
 wd_images_raw <- system.file("pictures/raw_images", package = "camtrapR")   
  # destination for renamed images to be copied to
@@ -448,7 +441,7 @@ addCopyrightTag(inDir        = wd_images_ID_copy,
 ```
 
 When we check the outcome with function exifTagNames, we find field "Copyright" in line 27.
-```{r eval = exiftool_present}
+```{r eval=exiftool_present, message=FALSE, results="hide"}
 exiftagnames_extracted <- exifTagNames(wd_images_ID_copy)
 knitr::kable(exiftagnames_extracted, row.names = TRUE)
 ```

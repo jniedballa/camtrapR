@@ -1,6 +1,6 @@
 ---
 title: "3. Data Extraction from Images and videos, creating occupancy & secr input"
-author: "Juergen Niedballa (<camtrapr@gmail.com>)"
+author: "Anonymized Author"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default
@@ -57,7 +57,7 @@ length(list.files(wd_images_ID, pattern = "JPG", recursive = TRUE))
 
 Now we can run `recordTable`. Here is a minimal example:
 
-```{r eval = exiftool_present}
+```{r eval = exiftool_present, results = F, message = F}
 rec.db.species0 <- recordTable(inDir  = wd_images_ID,
                                IDfrom = "directory")
 
@@ -170,7 +170,7 @@ table(rec.db.species60.exclude$Species)
 `recordTable` and `recordTableIndividual` can both extract additional metadata from images (apart from date and time). For example, some camera models record ambient temperature or moon phase, which may be of interest. Metadata tags are stored in the images at the time they are taken and can be accessed and extracted if their tag names are known. Some tag names are standardised (e.g. "DateTimeOriginal") while others are manufacturer-specific. Therefore, function `exifTagNames` returns all Exif metadata it finds in a sample image. Users can then choose which to extract with `recordTable` and `recordTableIndividual`.  
 
 
-```{r eval = exiftool_present}
+```{r eval = exiftool_present, results = "hide", message = F}
 wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
 exifTagNames(inDir = wd_images_ID)
 ```
@@ -181,7 +181,7 @@ Use the entries in `tag_name` (not `tag_description`) when providing values to t
 
 Of the tags shown here, "DateTimeOriginal" contains the date and time that camtrapR reads out. Apart from that, there is little information of ecological interest in the example data. However, for demonstration purposes, let's extract information about the camera model and make. To be as precise as possible, we provide tags in the format: tag_group:tag_name (e.g. EXIF:Model)
 
-```{r eval = exiftool_present}
+```{r eval = exiftool_present, results = F, message = F}
 rec.db.species.metadata1 <- recordTable(inDir                  = wd_images_ID,
                                         IDfrom                 = "directory",
                                         timeZone               = "Asia/Kuala_Lumpur",
@@ -223,7 +223,7 @@ In addition to the metadata that were saved when the image was taken (see above)
 
 
 
-```{r eval = exiftool_present}
+```{r eval = exiftool_present, results = F, message = F}
 head(rec.db.pbe)
 ```
 

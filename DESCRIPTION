@@ -2,9 +2,9 @@ Type: Package
 Package: camtrapR
 Title: Camera Trap Data Management and Analysis Framework
 Version: 3.0.1
-Date: 2025-12-20
+Date: 2025-01-20
 Authors@R: c(
-    person("Anonymized", "Author", , "anonymized@example.com", role = c("aut", "cre"),
+    person("Anonymized", "Author", , "author@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "...")),
     person("Anonymized", "Author", role = "aut",
            comment = c(ORCID = "...")),

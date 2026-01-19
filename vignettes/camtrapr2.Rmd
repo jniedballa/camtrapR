@@ -1,6 +1,6 @@
 ---
 title: "2. Species and Individual Identification"
-author: "Juergen Niedballa (<camtrapr@gmail.com>)"
+author: "Anonymized Author"
 date: "`r Sys.Date()`"
 output:
   pdf_document:
@@ -287,7 +287,7 @@ It makes sense to create directories for all species one expects to find in the 
 
 Here is an example in which we first create station directories and the then species directories within these. Note that creating station directories in the example is for demonstration purposes only. Normally, at this point you would already have a directory structure with station directories (possibly with camera subdirectories), each containing renamed, unsorted images. Running `createStationFolders` here therefore is for demonstration only.
 
-```{r}
+```{r message = FALSE, results='hide'}
 
 # this dummy directory will be used as inDir (containing station directories with species subdirectories)
 wd_createSpeciesFoldersTest <- file.path(normalizePath(tempdir(), winslash = "/"), "createSpeciesFoldersTest")
@@ -366,7 +366,7 @@ The latter requires one of the following directory structures:
 Here is an example using images identified with the drag & drop method.
 
 
-```{r eval = exiftool_present}
+```{r eval = exiftool_present, message = FALSE, results = F}
 wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
 
 # run check with 120 seconds (2 minutes) maximum time differnce
@@ -406,7 +406,7 @@ The second element returned by `checkSpeciesIdentification` (`IDconflictCheck`) 
 Once species are identified correctly, species names can be appended to image file names using `appendSpeciesNames`. The species names are taken from the directory names (of the drag and drop method was used) or from metadata tags and will be appended to the image file names. Set argument `IDfrom = "directory"` or `IDfrom = "metadata"`, respectively.
 A data frame will show directories, old and new file names.
 
-```{r}
+```{r message=FALSE, results='hide'}
 
 # copy sample images to another location (so we don't mess around in the package directory)
 wd_images_ID <- system.file("pictures/sample_images_species_dir", package = "camtrapR")
@@ -443,7 +443,7 @@ The function `getSpeciesImages` collects all images of a focal species from all 
 The images that are to be copied can be specified an a record table (as returned by function `recordTable`) or, alternatively, the function can scan for all images of your target species that were identified using either the drag and drop method or metadata tagging for species identification. Please see the function help file for more detail.
 
 
-```{r}
+```{r message = F, results=F}
 # again, we use a temporary directory for demonstration. Change this in your own code!
 wd_images_species_copy <- file.path(normalizePath(tempdir(), winslash = "/"), "sampleSpeciesImages")
 
@@ -504,7 +504,7 @@ Despite its name, the function `checkSpeciesIdentification`can also be used to c
 
 For lack of an example dataset in the package, here's two theoretical code examples which assumes tagged images of only one species in this directory "C:/Users/Peter/individualID/SpeciesA"", either with or without station subdirectories
 
-```{r eval = FALSE}
+```{r eval = FALSE, results=F}
 # all images in one directory, no station subdirectories
 # column "station" in outtable will be uninformative
 ID_check1 <- checkSpeciesIdentification(inDir    = "C:/Users/Peter/individualID",

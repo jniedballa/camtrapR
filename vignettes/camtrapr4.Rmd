@@ -1,6 +1,6 @@
 ---
 title: "4. Data exploration and visualisation"
-author: "Juergen Niedballa (<camtrapr@gmail.com>)"
+author: "Anonymized Author"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default
@@ -100,7 +100,7 @@ Because it is so widespread, here's the PROJ4 string for standard Lat/Long coord
 ```
  
  
-```{r}
+```{r message = F, results = F}
  # define shapefile name
  shapefileName       <- "recordShapefileTest"
 

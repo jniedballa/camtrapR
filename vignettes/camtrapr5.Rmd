@@ -1,6 +1,6 @@
 ---
 title: "5. Multi-species occupancy models"
-author: Juergen Niedballa (<camtrapr@gmail.com>)
+author: "Anonymized Author"
 date: "`r Sys.Date()`"
 output:
     rmarkdown::html_vignette:
@@ -220,7 +220,7 @@ This does **not** automatically include effort as a covariate on detection proba
 Now the interesting part. The function communityModel() creates a new class, "commOccu". It is an object that contains all relevant information for running a community occupancy model. Here we will create a JAGS model (the default). For a model in Nimble, see further below.
 
 
-```{r}
+```{r message=FALSE, results=FALSE}
 # text file to save the model
  modelfile1 <- tempfile(fileext = ".txt")
 
@@ -350,7 +350,7 @@ require(nimbleEcology)
 
 We can fit the same model in Nimble using the exact same functions as for the JAGS model above. Only set `nimble = TRUE`.
 
-```{r}
+```{r message=FALSE, results=FALSE}
  modelfile2 <- tempfile(fileext = ".txt")
 
  mod.nimble <- communityModel(data_list,
@@ -495,7 +495,7 @@ input_AHM <- list(ylist = ylist,
 
 Here's a model in JAGS, with a species-specific effect of habitat on occupancy and wind on detection, and species-specific intercepts. 
 
-```{r}
+```{r  message=FALSE, results=FALSE}
 modelFile_jags <- tempfile(fileext = ".txt")
 
 model1_jags <- communityModel(
@@ -572,7 +572,7 @@ plot_eff_jags_occu2
 
 Here's the same model in Nimble:
 
-```{r}
+```{r message=FALSE, results=FALSE}
 modelFile_nimble <- tempfile(fileext = ".txt")
 
 model1_nimble <- communityModel(
@@ -661,7 +661,7 @@ And fit models in JAGS and Nimble:
 
 
 
-```{r}
+```{r message=FALSE, results=FALSE}
 modelFile_jags_na <- tempfile(fileext = ".txt")
 
 model1_jags_na <- communityModel(
@@ -692,10 +692,10 @@ DT::datatable(round(summary(out_ahm_jags_na)$statistics, 3))
 As can be seen, the JAGS model handles NAs well and parameter estimates are very similar to the model without missing data above.
 
 
-Nimble models can technically also be fit with NAs present, but there will be numerous warnings and residuals as well as Bayesian p-values cannot be computed. 
+Nimble models can technically also be fit with NAs present, but there will be numerous warnings, and residuals as well as Bayesian p-values cannot be computed. 
 
 
-```{r}
+```{r message=FALSE, results=FALSE}
 modelFile_nimble_na <- tempfile(fileext = ".txt")
 
 model1_nimble_na <- communityModel(
@@ -1407,7 +1407,7 @@ coda::gelman.plot(out_ahm_nimble2,  multivariate = FALSE)
 Instead of a standard occupancy model one can fit the occupancy model of Royle and Nichols (2003), which relates probability of detection of the species to the number of individuals available for detection at each site (instead of their occupancy status alone). Probability of occupancy is a derived parameter: the probability that at least one individual is available for detection at the site. It is achieve by setting the parameter "model" to "RN":
 
 
-```{r results="hide"}
+```{r results="hide", message = F}
 modelFile_jags_RN <- tempfile(fileext = ".txt")
 
 model1_jags_RN <- communityModel(
