@@ -1,3 +1,8 @@
+# camtrapR 3.0.2
+
+## bugfixes
+* fixed plot_effects with continuous covariates
+
 # camtrapR 3.0.1
 
 ## bugfixes
