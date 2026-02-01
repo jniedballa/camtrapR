@@ -1,3 +1,9 @@
+# camtrapR 3.0.3
+
+## bugfixes
+* surveyDashboard: in covariate extraction, fix "Error in date$retrievalCol: object of type 'closure' is not subsettable"
+
+
 # camtrapR 3.0.2
 
 ## bugfixes
