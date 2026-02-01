@@ -3677,7 +3677,8 @@ surveyDashboard <- function(CTtable = NULL,
                         cameraCol = data$cameraCol,
                         setupCol = data$setupCol,
                         retrievalCol = data$retrievalCol,
-                        dateFormat = data$CTdateFormat)
+                        dateFormat = data$CTdateFormat,
+                        quiet = T)
     })
     
     # Update aggregated_CTtable when CTtable_sf changes
@@ -4408,7 +4409,8 @@ surveyDashboard <- function(CTtable = NULL,
                                                      cameraCol = data$cameraCol,
                                                      setupCol = data$setupCol,
                                                      retrievalCol = data$retrievalCol,
-                                                     dateFormat = data$CTdateFormat)
+                                                     dateFormat = data$CTdateFormat,
+                                                     quiet = TRUE)
         
         # Only create aggregated_CTtable_sf if needed and xcol/ycol are available
         if (!is.null(data$xcol) && !is.null(data$ycol)) {
@@ -6310,7 +6312,8 @@ surveyDashboard <- function(CTtable = NULL,
                                                        cameraCol = data$cameraCol,
                                                        setupCol = data$setupCol,
                                                        retrievalCol = data$retrievalCol,
-                                                       dateFormat = data$CTdateFormat)
+                                                       dateFormat = data$CTdateFormat,
+                                                       quiet = TRUE)
           
           showNotification("Covariate extraction completed successfully", type = "message")
           
