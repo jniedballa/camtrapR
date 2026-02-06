@@ -301,7 +301,7 @@ plot_effects_commOccu <- function(object,
     
     if(covariate_is_numeric){
       
-      p <- ggplot(vals, aes(x = params_covariate[[cov]], y = .data[["mean"]], group = .data[["Species"]])) + 
+		p <- ggplot(vals, aes(x = .data[[params_covariate[[cov]]]], y = .data[["mean"]], group = .data[["Species"]])) + 
         geom_line() +
         theme_bw() +
         ggtitle(label = main,
@@ -330,7 +330,7 @@ plot_effects_commOccu <- function(object,
                            levels = levels(object@data[[current_cov]]))
       } 
       
-      p <- ggplot(vals, aes(x = params_covariate[[cov]], y = .data[["mean"]], group = .data[["Species"]])) + 
+      p <- ggplot(vals, aes(x = .data[[params_covariate[[cov]]]], y = .data[["mean"]], group = .data[["Species"]])) + 
         geom_col() +
         facet_wrap(~Species) +
         geom_linerange(aes(ymin = lower, ymax = upper)) +
