@@ -2307,3 +2307,101 @@ has_internet_socket <- function() {
   })
   return(is_connected)
 }
+
+
+# Check total / available system memory ----
+
+.get_system_memory <- function() {
+  out <- list(total = NA, available = NA)
+  
+  try({
+    if (.Platform$OS.type == "windows") {
+      # Use a direct PowerShell call to get raw numbers only
+      cmd <- "powershell -command \"$m = Get-CimInstance Win32_OperatingSystem; $m.TotalVisibleMemorySize; $m.FreePhysicalMemory\""
+      res <- system(cmd, intern = TRUE, ignore.stderr = TRUE)
+      res <- res[nzchar(gsub("[^0-9]", "", res))] # Remove non-numeric lines
+      if (length(res) >= 2) {
+        out$total <- as.numeric(res[1]) / 1e6
+        out$available <- as.numeric(res[2]) / 1e6
+      }
+      
+    } else if (Sys.info()["sysname"] == "Darwin") {
+      # macOS: Use absolute path for sysctl
+      sysctl_path <- "/usr/sbin/sysctl"
+      if (file.exists(sysctl_path)) {
+        res <- system2(sysctl_path, "hw.memsize", stdout = TRUE, stderr = FALSE)
+        # Extract digits only, ignore labels
+        digits <- gsub("[^0-9]", "", res)
+        if (nzchar(digits)) out$total <- as.numeric(digits) / 1e9
+        # available is difficult to get in script on Mac
+      }
+      
+    } else if (Sys.info()["sysname"] == "Linux") {
+      if (file.exists("/proc/meminfo")) {
+        lines <- readLines("/proc/meminfo")
+        parse_kb <- function(tag) {
+          line <- grep(tag, lines, value = TRUE)
+          if (length(line) > 0) return(as.numeric(gsub("[^0-9]", "", line)) / 1e6)
+          return(NA)
+        }
+        out$total <- parse_kb("MemTotal")
+        out$available <- parse_kb("MemAvailable")
+        if (is.na(out$available)) out$available <- parse_kb("MemFree")
+      }
+    }
+  }, silent = TRUE)
+  
+  return(out)
+}
+
+
+
+#' validate memory before allocation
+#' @param ram_usage_estimate Estimated size of the object in GB
+#' 
+.check_memory_usage <- function(ram_usage_estimate) {
+  
+  mem <- .get_system_memory()
+  
+  # Only proceed if we actually successfully retrieved memory info
+  if (!is.na(mem$total)) {
+    
+    # A: HARD ERROR - Physical hardware limit
+    if (ram_usage_estimate > mem$total) {
+      stop(sprintf(
+        "Cannot allocate array. Predicted size (%.2f GB) exceeds total system RAM (%.2f GB).", 
+        ram_usage_estimate, mem$total), call. = FALSE)
+    }
+    
+    # B: AVAILABLE MEMORY CHECKS
+    if (!is.na(mem$available)) {
+      # ERROR: If it exceeds what's currently free
+      if (ram_usage_estimate > mem$available) {
+        stop(sprintf(
+          "Insufficient memory: Predicted array requires %.2f GB, but only %.2f GB is currently available. Free up memory, reduce dimensions, or use 'batch = TRUE'.", 
+          ram_usage_estimate, mem$available), call. = FALSE)
+        
+        # WARNING: If it uses more than 80% of what's left
+      } else if (ram_usage_estimate > (mem$available * 0.8)) {
+        warning(sprintf(
+          "High memory pressure: Predicted array (%.2f GB) will use %.0f%% of available RAM. This may slow down your system.", 
+          ram_usage_estimate, (ram_usage_estimate / mem$available) * 100), call. = FALSE)
+      }
+      
+    } else {
+      # C: FALLBACK (When Available is unknown, e.g., macOS)
+      # Stop if > 90% total, warn if > 70% total
+      if (ram_usage_estimate > (mem$total * 0.9)) {
+        stop(sprintf(
+          "Predicted array (%.2f GB) exceeds safe threshold (90%%) of total RAM (%.2f GB).", 
+          ram_usage_estimate, mem$total), call. = FALSE)
+      } else if (ram_usage_estimate > (mem$total * 0.7)) {
+        warning(sprintf(
+          "High memory usage: Predicted array (%.2f GB) uses a large portion of total RAM.", 
+          ram_usage_estimate), call. = FALSE)
+      }
+    }
+  }
+  
+  return(invisible(NULL))
+}
