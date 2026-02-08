@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 ![](https://cranlogs.r-pkg.org/badges/grand-total/camtrapR)
 [![](http://cranlogs.r-pkg.org/badges/camtrapR)](https://cran.r-project.org/package=camtrapR)
 [![Codecov test coverage](https://codecov.io/gh/jniedballa/camtrapR/graph/badge.svg)](https://app.codecov.io/gh/jniedballa/camtrapR)
+[![R-CMD-check](https://github.com/jniedballa/camtrapR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jniedballa/camtrapR/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 camtrapR is a package for camera trap data management in R.

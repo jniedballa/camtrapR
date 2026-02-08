@@ -9,6 +9,7 @@ status](https://www.r-pkg.org/badges/version-ago/camtrapR)](https://CRAN.R-proje
 [![](http://cranlogs.r-pkg.org/badges/camtrapR)](https://cran.r-project.org/package=camtrapR)
 [![Codecov test
 coverage](https://codecov.io/gh/jniedballa/camtrapR/graph/badge.svg)](https://app.codecov.io/gh/jniedballa/camtrapR)
+[![R-CMD-check](https://github.com/jniedballa/camtrapR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jniedballa/camtrapR/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 camtrapR is a package for camera trap data management in R.
