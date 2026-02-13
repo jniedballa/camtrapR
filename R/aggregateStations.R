@@ -21,6 +21,7 @@
 #'                  be interpretable by either \code{as.Date} or the "orders" argument
 #'                  \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}. Can be a date
 #'                  or a date-time.
+#' @param quiet logical. If TRUE, print message if no aggregation is needed.
 #'
 #' @details
 #' The aggregation logic handles different column types as follows:
@@ -66,11 +67,11 @@ aggregateStations <- function(CTtable,
                               cameraCol = NULL,
                               setupCol = NULL,
                               retrievalCol = NULL,
-                              dateFormat = NULL) {
+                              dateFormat = NULL,
+                              quiet = FALSE) {
   
   
   # --- Handle sf objects ---
-  
   is_sf_input <- inherits(CTtable, "sf")
   
   if (is_sf_input) {
@@ -107,7 +108,8 @@ aggregateStations <- function(CTtable,
   
   # --- Early exit if no aggregation needed ---
   if (all(table(df[[stationCol]]) == 1)) {
-    message("No aggregation needed: All 'stationCol' values are already unique.")
+    if(!is.logical(quiet)) stop("'quiet' must be TRUE or FALSE")
+    if(isFALSE(quiet)) message("No aggregation needed: All 'stationCol' values are already unique.")
     return(df)
   }
   

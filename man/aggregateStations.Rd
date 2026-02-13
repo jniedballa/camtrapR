@@ -10,7 +10,8 @@ aggregateStations(
   cameraCol = NULL,
   setupCol = NULL,
   retrievalCol = NULL,
-  dateFormat = NULL
+  dateFormat = NULL,
+  quiet = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ retrieval dates in \code{CTtable}}
 be interpretable by either \code{as.Date} or the "orders" argument
 \code{\link[lubridate]{parse_date_time}} in \pkg{lubridate}. Can be a date
 or a date-time.}
+
+\item{quiet}{logical. If TRUE, print message if no aggregation is needed.}
 }
 \value{
 A data frame with one row per unique station, containing aggregated information.

@@ -159,37 +159,17 @@ rast(YourRaster)")
 
   # store dimensions of output
   n_cells_all <- nrow(values_to_predict_subset)  # dimension 1
-  n_species <- object@data$M                     # dimension 2
-  n_samples <- nrow(posterior_matrix)            # dimension 3
+  n_species   <- object@data$M                     # dimension 2
+  n_samples   <- nrow(posterior_matrix)            # dimension 3
   
+  n_occasions <- object@data$maxocc
+  n_stations  <- object@data$J
   
-  # Get total system memory (for memory checks below)
-  total_ram <- NA
-  
-  # For Windows
-  if(.Platform$OS.type == "windows") {
-    mem_info <- system("wmic computersystem get totalphysicalmemory", intern = TRUE)
-    if(length(mem_info) > 1) {
-      total_ram <- as.numeric(mem_info[2]) / 1e9  # Convert bytes to GB
-    }
-  } else {
-    # For Unix-like systems (Linux/Mac)
-    if(Sys.info()["sysname"] == "Darwin") {  # macOS
-      mem_info <- system("sysctl hw.memsize", intern = TRUE)
-      if(length(mem_info) > 0) {
-        total_ram <- as.numeric(sub("hw.memsize: ", "", mem_info)) / 1e9  # Convert bytes to GB
-      }
-    } else {  # Linux
-      mem_info <- system("grep MemTotal /proc/meminfo", intern = TRUE)
-      if(length(mem_info) > 0) {
-        total_ram <- as.numeric(gsub("MemTotal:\\s+|\\s+kB", "", mem_info)) / 1e6  # Convert KB to GB
-      }
-    }
-  }
   
   if(type != "p_array") {
     
     
+    ## occupancy / abundance, by batch  ----
     if(isTRUE(batch) | is.numeric(batch)) {
       
       # create batches of values to predict on
@@ -218,7 +198,7 @@ rast(YourRaster)")
         n_cells_batch <- nrow(values_to_predict_subset_i)
         
         # create 3D array for linear predictor (intercepts + covariate effects)
-        lin_pred <- array(data = NA, dim = c(n_cells_batch,  # raster cells (batch)
+        lin_pred <- array(data = NA_real_, dim = c(n_cells_batch,  # raster cells (batch)
                                              n_species,      # species
                                              n_samples))     # posterior samples
         
@@ -234,20 +214,20 @@ rast(YourRaster)")
         }
         
         
-        # memory warning and error check (silly here because checks on one bactch only at a time)
-        if(object.size(lin_pred) / 1e6 * (nrow(cov_info_subset) + 1) > 4000) { # if estimated RAM usage > 4GB
-          ram_usage_estimate <- round(object.size(lin_pred) / 1e6 * (nrow(cov_info_subset) + 1) / 1e3) # in GB
-          
-          
-          message(paste("Watch RAM usage. At least", ram_usage_estimate, "GB will be required"))
-          
-          # Error if we can determine total RAM and it's insufficient
-          if(!is.na(total_ram) && ram_usage_estimate > total_ram) {
-            stop(paste("Operation requires approximately", ram_usage_estimate, 
-                       "GB of RAM, but system only has", round(total_ram, 1), 
-                       "GB total. Please reduce number of draws, predict on fewer cells (e.g. lower resolution), or use a system with more RAM."))
-          }
-        }
+        
+        # estimate required memory for prediction
+        ram_usage_estimate <- (prod(c(n_cells_batch,
+                                      n_species,       
+                                      n_samples)) *
+                                 8) /   # 8 bytes per value
+          1e9 *                  # to Gb
+          (nrow(cov_info_subset) + 1)  # number of covariates (plus intercept)
+        
+        
+        # ensure sufficient memory is available
+        .check_memory_usage(ram_usage_estimate)
+        
+        
         
         # container for individual covariate effects
         out <- list()
@@ -353,17 +333,31 @@ rast(YourRaster)")
       
       rm(array_list)
       
-    }
+    }   # end (if(isTRUE(batch)))
     
     
-    
+    ## occupancy / abundance, not by batch  ----
     
     if(isFALSE(batch)) {
       
+      
+      # estimate required memory for prediction
+      ram_usage_estimate <- (prod(c(n_cells_all,
+                                    n_species,       
+                                    n_samples)) *
+                               8) /   # 8 bytes per value
+        1e9 *                  # to Gb
+        (nrow(cov_info_subset) + 1)  # number of covariates (plus intercept)
+      
+      
+      # ensure sufficient memory is available
+      .check_memory_usage(ram_usage_estimate)
+      
+      
       # create 3D array for linear predictor (intercepts + covariate effects)
-      lin_pred <- array(data = NA, dim = c(nrow(values_to_predict_subset),    # raster cells (all)
-                                           object@data$M,                     # species
-                                           nrow(posterior_matrix)))           # posterior samples
+      lin_pred <- array(data = NA_real_, dim = c(n_cells_all,    # raster cells (all)
+                                                 n_species,                     # species
+                                                 n_samples))           # posterior samples
       
       
       for(i in 1:n_species){    # species loop
@@ -379,21 +373,7 @@ rast(YourRaster)")
       cleanup_threshold <- 500  #Mb
       if(object.size(lin_pred) / 1e6 > cleanup_threshold)     gc()   # if intercept matrix > 500Mb, cleanup
       
-      # memory warning (if applicable)
-      if(object.size(lin_pred) / 1e6 * (nrow(cov_info_subset) + 1) > 4000 ){
-        ram_usage_estimate <- round(object.size(lin_pred) / 1e6 * (nrow(cov_info_subset) + 1) / 1e3) # in Gb
-        message(paste("Watch RAM usage. At least", ram_usage_estimate, "Gb will be required"))
-      
-        
-        # Error if we can determine total RAM and it's insufficient
-        if(!is.na(total_ram) && ram_usage_estimate > total_ram) {
-          stop(paste("Operation requires approximately", ram_usage_estimate, 
-                     "GB of RAM, but system only has", round(total_ram, 1), 
-                     "GB total. Please reduce number of draws, predict on fewer cells (e.g. lower resolution), or use a system with more RAM."))
-        }
-      } 
-      
-      
+
       if(nrow(cov_info_subset) >= 1) {   # if there are covariates
         
         
@@ -485,15 +465,35 @@ rast(YourRaster)")
     
   } else {   # = if type == "p_array", do:
     
+    ## detection probability
+    
     if (!requireNamespace("abind", quietly = TRUE)) {
       stop(paste("Please install the package abind to run this function with type =", type))
     }
+    
+    
+    
+    # estimate required memory for prediction
+    ram_usage_estimate <- (prod(c(n_cells_all,
+                                  n_species,       
+                                  n_samples,
+                                  n_occasions
+                                  )) *
+                             8) /   # 8 bytes per value
+      1e9 *                  # to Gb
+      (nrow(cov_info_subset) + 1)  # number of covariates (plus intercept)
+    
+    
+    # ensure sufficient memory is available
+    .check_memory_usage(ram_usage_estimate)
+    
+    
     
     # get intercept
     
     if(cov_info_intercept$ranef == FALSE  && cov_info_intercept$independent == FALSE  ) {
       index_intercept <- rep(grep('^alpha0$', colnames(posterior_matrix)),
-                             times = object@data$M)    # repeat for each species
+                             times = n_species)    # repeat for each species
     } else {
       index_intercept <- grep('alpha0[', colnames(posterior_matrix), fixed=TRUE)
     }
@@ -564,14 +564,14 @@ rast(YourRaster)")
         p_arr_list <- list()
         
         # loop over species and occasions to fill arrays
-        for (i in 1:object@data$M){   # species loop
+        for (i in 1:n_species){   # species loop
           # prepare empty array (for current species)
-          p_arr_list [[i]] <- array(NA, c(nrow(posterior_matrix), 
-                                          object@data$J, 
-                                          object@data$maxocc))
+          p_arr_list [[i]] <- array(NA_real_, c(n_samples, 
+                                          n_stations, 
+                                          n_occasions))
           # order: [draws, stations, occasions]
           
-          for (k in 1:object@data$maxocc){ # occasion loop
+          for (k in 1:n_occasions){ # occasion loop
             
             # if covariate is site-occasion covariate, multiply parameter values from
             # posterior draws with covariate values (by occasion)
@@ -624,14 +624,14 @@ rast(YourRaster)")
       }
       
     } else {
-      logit.p <- array(NA, 
-                       dim = c(object@data$J,        # stations
-                               object@data$M,        # species
-                               nrow(posterior_matrix),
-                               object@data$maxocc   # occasions
+      logit.p <- array(NA_real_, 
+                       dim = c(n_stations,        # stations
+                               n_species,        # species
+                               n_samples,
+                               n_occasions   # occasions
                        ))
-      for(i in 1:object@data$J) {          # station
-        for(k in 1:object@data$maxocc) {   # occasion
+      for(i in 1:n_stations) {          # station
+        for(k in 1:n_occasions) {   # occasion
           logit.p[i,,,k] <- t(a0_matrix)
         }
       }
