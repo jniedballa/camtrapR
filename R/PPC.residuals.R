@@ -123,9 +123,6 @@
 #' 
 #' @author Anonymized Author
 #' 
-#' @references
-#' Sollmann, Rahel. Occupancy models and the "good fit, bad prediction" dilemma. 
-#' Ecology (submitted)
 #' 
 #' @importFrom stats dbinom rmultinom rpois
 #' 

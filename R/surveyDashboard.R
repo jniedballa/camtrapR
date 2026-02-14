@@ -276,29 +276,9 @@ surveyDashboard <- function(CTtable = NULL,
   }
   
   # Function to get version info from GitHub
-  get_github_version <- function(repo = "jniedballa/camtrapR") {
-    tryCatch({
-      # Get DESCRIPTION content from GitHub
-      desc_url <- paste0("https://raw.githubusercontent.com/", repo, "/dev/DESCRIPTION")
-      
-      # Try to download DESCRIPTION file
-      desc_content <- readLines(desc_url, warn = FALSE)
-      
-      # Find Version line
-      version_line <- grep("^Version:", desc_content, value = TRUE)
-      if (length(version_line) == 0) {
-        warning("No version information found in GitHub DESCRIPTION")
-        return(NULL)
-      }
-      
-      # Extract version number
-      version <- gsub("^Version:\\s*", "", version_line)
-      package_version(version)
-      
-    }, error = function(e) {
-      warning("Could not fetch GitHub version: ", e$message)
-      return(NULL)
-    })
+  get_github_version <- function() {
+    # function code removed for review
+    return(NULL)
   }
   
   # Function to compare versions and return notification text if needed
