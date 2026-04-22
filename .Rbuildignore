@@ -19,3 +19,5 @@
 ^vignettes/SpeciesID_digiKam\.png$
 ^\.github$
 ^.covrignore$
+^\.positai$
+^\.claude$
