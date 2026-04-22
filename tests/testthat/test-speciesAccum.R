@@ -19,15 +19,15 @@ mock_cams <- data.frame(
 mock_recs <- data.frame(
   Station = c("A", "A", "B", "B", "C", "C", "A"),
   Species = c("Fox", "Badger", "Fox", "Deer", "Badger", "Deer", "Fox"),
-  DateTime = as.POSIXct(c(
-    "2023-01-01 12:00", # Fox at A on Day 1 (station day 1)
-    "2023-01-02 10:00", # Badger at A on Day 2 (station day 2)
-    "2023-01-02 14:00", # Fox at B on Day 2 (station day 1)
-    "2023-01-04 08:00", # Deer at B on Day 4 (station day 3)
-    "2023-01-05 18:00", # Badger at C on Day 5 (station day 1)
-    "2023-01-06 20:00", # Deer at C on Day 6 (station day 2)
-    "2023-01-03 16:00"  # Fox at A on Day 3 (station day 3) - a second visit
-  )),
+  DateTime = c(
+    "2023-01-01 12:00:00", # Fox at A on Day 1 (station day 1)
+    "2023-01-02 10:00:00", # Badger at A on Day 2 (station day 2)
+    "2023-01-02 14:00:00", # Fox at B on Day 2 (station day 1)
+    "2023-01-04 08:00:00", # Deer at B on Day 4 (station day 3)
+    "2023-01-05 18:00:00", # Badger at C on Day 5 (station day 1)
+    "2023-01-06 20:00:00", # Deer at C on Day 6 (station day 2)
+    "2023-01-03 16:00:00"  # Fox at A on Day 3 (station day 3) - a second visit
+  ),
   Season = c("Winter", "Winter", "Winter", "Winter", "Spring", "Spring", "Winter")
 )
 
