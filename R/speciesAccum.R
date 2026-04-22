@@ -217,14 +217,23 @@ create_incidence_matrix <- function(records_subset,
                                     by_station)         # only relevant if temporal = T) 
   {
 
+  # 1. Parse Record Date/Times (only if they aren't already POSIXt)
+  if (!inherits(records_subset[[recordDateTimeCol]], "POSIXt")) {
+    records_subset[[recordDateTimeCol]] <- parse_date_time(
+      records_subset[[recordDateTimeCol]],
+      orders = recordDateTimeFormat
+    )
+  }
   
-  
-  # parse date/time
-  records_subset[, recordDateTimeCol] <- parse_date_time(records_subset[, recordDateTimeCol],
-                                                         orders = recordDateTimeFormat)
-  
-  stations_subset[, setupCol] <- as.Date(parse_date_time(stations_subset[, setupCol], 
-                                                         orders = dateFormat))
+  # 2. Parse Station Setup Dates (ensure they end up as Date objects)
+  if (!inherits(stations_subset[[setupCol]], c("Date", "POSIXt"))) {
+    stations_subset[[setupCol]] <- as.Date(parse_date_time(
+      stations_subset[[setupCol]], 
+      orders = dateFormat
+    ))
+  } else {
+    stations_subset[[setupCol]] <- as.Date(stations_subset[[setupCol]])
+  }
   
   
   if(temporal) {
