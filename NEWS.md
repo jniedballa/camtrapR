@@ -1,3 +1,8 @@
+# camtrapR 3.0.4
+
+maintenance release to avoid potential problems in CRAN check on r-devel-linux-x86_64-fedora-clang in test-speciesAccum.R
+
+
 # camtrapR 3.0.3
 
 ## bugfixes
