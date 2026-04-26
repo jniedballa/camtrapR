@@ -21,3 +21,5 @@
 ^.covrignore$
 ^\.positai$
 ^\.claude$
+^.stignore
+^.stfolder
