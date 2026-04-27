@@ -13,7 +13,11 @@ data("recordTableSample")
 
 test_that("surveyDashboard can be launched without parameters without error", {
   
-  testthat::skip_if_not_installed(c('mapview', 'plotly', 'corrplot', 'unmarked', 'ubms'))
+  testthat::skip_if_not_installed("mapview")
+  testthat::skip_if_not_installed("plotly")
+  testthat::skip_if_not_installed("corrplot")
+  testthat::skip_if_not_installed("unmarked")
+  testthat::skip_if_not_installed("ubms")
   
   testServer(app = surveyDashboard(), {
     
@@ -25,7 +29,11 @@ test_that("surveyDashboard can be launched without parameters without error", {
 
 test_that("surveyDashboard server logic initializes correctly with data", {
   
-  testthat::skip_if_not_installed(c('mapview', 'plotly', 'corrplot', 'unmarked', 'ubms'))
+  testthat::skip_if_not_installed("mapview")
+  testthat::skip_if_not_installed("plotly")
+  testthat::skip_if_not_installed("corrplot")
+  testthat::skip_if_not_installed("unmarked")
+  testthat::skip_if_not_installed("ubms")
   
   # testServer runs the server function in the current R process,
   # making its internal state (like reactives) accessible for testing.

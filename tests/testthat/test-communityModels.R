@@ -402,7 +402,8 @@ local({
   
   test_that("Nimble models work",  {
     
-    skip_if_not_installed(c("nimble", "nimbleEcology"))
+    skip_if_not_installed("nimble")
+    skip_if_not_installed("nimbleEcology")
     
     library(nimbleEcology)
     
