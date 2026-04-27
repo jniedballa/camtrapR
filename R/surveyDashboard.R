@@ -243,8 +243,8 @@ surveyDashboard <- function(CTtable = NULL,
     "stats",
     "scales",
     "corrplot",
-    "unmarked",
-    "ubms"
+    "unmarked" #,
+    # "ubms"
   )
   
   # Check which packages are missing
@@ -7829,6 +7829,23 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     ## Basic workflow server logic   ----
+    
+    # check if ubms is available if selected
+    observeEvent(input$basic_model_package, {
+      if (input$basic_model_package == "ubms") {
+        if (!requireNamespace("ubms", quietly = TRUE)) {
+          # Show a warning to the user
+          showNotification(
+            "The 'ubms' package is required for Bayesian models. Please install it with install.packages('ubms').", 
+            type = "error", 
+            duration = 10
+          )
+          
+          # Revert the dropdown back to unmarked
+          updateSelectInput(session, "basic_model_package", selected = "unmarked")
+        }
+      }
+    })
     
     observeEvent(input$basic_run_model, {
       req(umf())
