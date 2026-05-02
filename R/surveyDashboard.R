@@ -5829,6 +5829,8 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Update choices for original raster band selection
     observe({
+      # TODO: mapview fails with error if stars package not available. Any way to avoid that and only require terra?
+      
       # Ensure original rasters is a list and not empty
       if (is.null(data$original_rasters) || !is.list(data$original_rasters) || length(data$original_rasters) == 0) {
         updateSelectInput(session, "rasterBand", choices = NULL, selected = NULL)
@@ -7946,7 +7948,7 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     ## Advanced workflow server logic  ----
-    
+    # TODO: reimplement advanced model properly and activate in UI
     # Generate formula for the model
     generateFormula <- function(effects, package = "unmarked") {
       
@@ -10535,14 +10537,14 @@ surveyDashboard <- function(CTtable = NULL,
         if (any(c("original_rasters", "prediction_raster") %in% input$export_rasters)) {
           rasters_dir <- file.path(export_dir, "rasters")
           dir.create(rasters_dir, recursive = TRUE)
-          
+
           tryCatch({
             # Export original rasters
             if ("original_rasters" %in% input$export_rasters && !is.null(data$original_rasters)) {
               orig_dir <- file.path(rasters_dir, "original")
               dir.create(orig_dir, recursive = TRUE)
               
-              for (i in 1:terra::nlyr(data$original_rasters)) {
+              for (i in 1:length(data$original_rasters)) {
                 layer_name <- names(data$original_rasters)[i]
                 file_path <- file.path(orig_dir, paste0(layer_name, ".tif"))
                 terra::writeRaster(data$original_rasters[[i]], file_path, overwrite = TRUE)
@@ -10555,6 +10557,7 @@ surveyDashboard <- function(CTtable = NULL,
               pred_dir <- file.path(rasters_dir, "prediction")
               dir.create(pred_dir, recursive = TRUE)
               
+              # TODO: Why save as individual layers instead of multi-band raster?
               for (i in 1:terra::nlyr(data$prediction_raster)) {
                 layer_name <- names(data$prediction_raster)[i]
                 file_path <- file.path(pred_dir, paste0(layer_name, ".tif"))
