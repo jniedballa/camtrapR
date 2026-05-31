@@ -2356,9 +2356,9 @@ has_internet_socket <- function() {
 
 
 
-#' validate memory before allocation
-#' @param ram_usage_estimate Estimated size of the object in GB
-#' 
+# validate memory before allocation
+# @param ram_usage_estimate Estimated size of the object in GB
+# 
 .check_memory_usage <- function(ram_usage_estimate) {
   
   mem <- .get_system_memory()
