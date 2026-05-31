@@ -1817,7 +1817,7 @@ surveyDashboard <- function(CTtable = NULL,
                                   
                                   checkboxInput("basic_scale_covariates", 
                                                 label = label_with_info("Scale covariates", "Check to standardize numeric covariates (mean=0, sd=1). Recommended."), 
-                                                value = FALSE
+                                                value = TRUE
                                   ), 
                                   
                                   conditionalPanel(
@@ -1986,7 +1986,7 @@ surveyDashboard <- function(CTtable = NULL,
                                     add_tooltip(id = "adv_effort_on_detection", title = "Include camera effort as an observation covariate.")
                              ),
                              column(3,
-                                    checkboxInput("adv_scale_covariates", "Scale covariates", value = FALSE),
+                                    checkboxInput("adv_scale_covariates", "Scale covariates", value = TRUE),
                                     add_tooltip(id = "adv_scale_covariates", title = "Standardize numeric covariates before modeling.")
                              )
                            )
