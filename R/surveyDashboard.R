@@ -145,6 +145,7 @@
 #' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
 #' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline median_hilow scale_x_continuous stat_summary theme_void
 #' @importFrom shinyBS bsTooltip
+#' @importFrom reshape2 melt
 #' @export
 
 
@@ -243,7 +244,8 @@ surveyDashboard <- function(CTtable = NULL,
     "stats",
     "scales",
     "corrplot",
-    "unmarked" #,
+    "unmarked",
+    "reshape2"#,
     # "ubms"
   )
   

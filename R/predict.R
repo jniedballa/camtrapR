@@ -1026,6 +1026,7 @@ rast(YourRaster)")
 #' @importFrom stats rbinom dpois sd
 #' @importFrom utils object.size
 #' @importFrom methods .hasSlot
+#' @importFrom reshape2 melt
 #' @export
 
 

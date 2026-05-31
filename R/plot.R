@@ -392,6 +392,7 @@ plot_effects_commOccu <- function(object,
   #' @export
   #' @importFrom ggplot2 geom_vline geom_linerange geom_pointrange element_blank theme labs expr
   #' @importFrom ggplot2 scale_color_manual scale_y_discrete aes vars facet_grid facet_wrap ylim geom_col
+  #' @importFrom reshape2 melt
   # @import coda
   #'
   setMethod("plot_effects", 
