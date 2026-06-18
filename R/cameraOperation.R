@@ -183,7 +183,7 @@
 #' camop_problem_oldformat
 #' 
 #' @importFrom data.table rbindlist setDF setDT setkey foverlaps ":="
-#' @importFrom lubridate as_date as_datetime ddays dhours dseconds interval int_start int_end int_overlaps time_length "%within%" 
+#' @importFrom lubridate as_date as_datetime ddays dhours dseconds interval int_start int_end int_overlaps is.Date time_length "%within%" 
 #' @importFrom methods hasArg is new
 #' @importFrom stats aggregate na.omit start end rnorm window quantile
 #' @importFrom utils capture.output modifyList write.csv zip head menu read.table
@@ -574,6 +574,12 @@ cameraOperation <- function(CTtable,
     }
     
     rm(problemFromColumn, problemToColumn, cols.prob.from.index, cols.prob.to.index)
+  } else {   # if there are no problems, but hasProblems = FALSE, check that there are indeed no Problem columns (since if there are, they will be ignored, which may not be intended)
+    # find problem columns
+    has.cols.prob.from <- any(grepl(colnames(CTtable), pattern = "Problem[0-9]+\\Sfrom"))
+    has.cols.prob.to   <- any(grepl(colnames(CTtable), pattern = "Problem[0-9]+\\Sto"))
+   
+    if(has.cols.prob.from || has.cols.prob.to ) message("CTtable contains Problem columns, but `hasProblem` is FALSE. Ensure this is intended.")
   }
   
   # create empty matrix with desired dimensions (depending on presence of camera / session columns)
