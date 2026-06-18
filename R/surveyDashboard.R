@@ -265,78 +265,6 @@ surveyDashboard <- function(CTtable = NULL,
   }
   
   
-  #Version check
-  
-  # Function to get version info from the local DESCRIPTION file
-  get_local_version <- function(package = "camtrapR") {
-    tryCatch({
-      utils::packageVersion(package)
-    }, error = function(e) {
-      warning("Could not determine local version: ", e$message)
-      return(NULL)
-    })
-  }
-  
-  # Function to get version info from GitHub
-  get_github_version <- function(repo = "jniedballa/camtrapR") {
-    tryCatch({
-      # Get DESCRIPTION content from GitHub
-      desc_url <- paste0("https://raw.githubusercontent.com/", repo, "/dev/DESCRIPTION")
-      
-      # Try to download DESCRIPTION file
-      desc_content <- readLines(desc_url, warn = FALSE)
-      
-      # Find Version line
-      version_line <- grep("^Version:", desc_content, value = TRUE)
-      if (length(version_line) == 0) {
-        warning("No version information found in GitHub DESCRIPTION")
-        return(NULL)
-      }
-      
-      # Extract version number
-      version <- gsub("^Version:\\s*", "", version_line)
-      package_version(version)
-      
-    }, error = function(e) {
-      warning("Could not fetch GitHub version: ", e$message)
-      return(NULL)
-    })
-  }
-  
-  # Function to compare versions and return notification text if needed
-  check_version <- function() {
-    local_ver <- get_local_version()
-    github_ver <- get_github_version()
-    
-    if (is.null(local_ver) || is.null(github_ver)) {
-      return(NULL)  # Return NULL if we couldn't get either version
-    }
-    
-    if (github_ver > local_ver) {
-      return(list(
-        text = HTML(paste0("A newer version (", github_ver, ") is available on GitHub. ",
-                           "You are currently using version ", local_ver, ". ",
-                           "Please update to access the latest features and bug fixes:<br>",
-                           "<code>remotes::install_github('jniedballa/camtrapR', ref = 'dev')</code>")),
-        type = "warning"
-      ))
-    }
-    return(NULL)  # Return NULL if current version is up to date
-  }
-  
-  # Function to create version notification
-  create_version_notification <- function() {
-    version_info <- check_version()
-    if (!is.null(version_info)) {
-      shiny::showNotification(
-        ui = version_info$text,
-        type = version_info$type,
-        duration = NULL,
-        closeButton = TRUE,
-        id = "version-check"
-      )
-    }
-  }
   
   
   # function to locate help files
@@ -1787,7 +1715,7 @@ surveyDashboard <- function(CTtable = NULL,
                        fluidRow(
                          column(width = 3,
                                 wellPanel(
-                                  h4("Model Configuration", class = "text-primary"),
+                                  uiOutput("model_config_header"),
                                   selectInput("basic_model_package",
                                               label = label_with_info("Package:", "Select R package: 'unmarked' (frequentist) or 'ubms' (Bayesian)."),
                                               choices = c("unmarked", "ubms"), selected = "unmarked"
@@ -2551,19 +2479,6 @@ surveyDashboard <- function(CTtable = NULL,
   
   server <- function(input, output, session) { 
 
-    #  version check
-    observe({
-      version_info <- check_version()
-      if (!is.null(version_info)) {
-        showNotification(
-          version_info$text,
-          type = version_info$type,
-          duration = NULL,
-          closeButton = TRUE,
-          id = "version-check"
-        )
-      }
-    })
     
     # Welcome screen (if dashboards started without data)
     output$welcome_screen <- renderUI({
@@ -2575,14 +2490,7 @@ surveyDashboard <- function(CTtable = NULL,
         return(NULL)
       }
       
-      version_info <- check_version()
-      version_alert <- if (!is.null(version_info)) {
-        tags$div(
-          class = "alert alert-warning",
-          icon("info-circle"), 
-          version_info$text
-        )
-      }
+      
       
       shinydashboard::box(
         width = 12,
@@ -2758,6 +2666,7 @@ surveyDashboard <- function(CTtable = NULL,
         required_ct_cols <- c(required_ct_cols, data$cameraCol)
       }
       
+
       # Check for case mismatches in CT table
       for (col in required_ct_cols) {
         if (!col %in% ct_cols && tolower(col) %in% ct_cols_lower) {
@@ -7504,6 +7413,13 @@ surveyDashboard <- function(CTtable = NULL,
     # Tab: Occupancy  ----
     
     ##  General ----
+    output$model_config_header <- renderUI({
+      if (!is.null(input$species_dethist) && input$species_dethist != "") {
+        h4(paste0("Model Configuration (", input$species_dethist, ")"), class = "text-primary")
+      } else {
+        h4("Model Configuration", class = "text-primary")
+      }
+    })
     
     # Observer to update covariate choices for all occupancy workflows
     observe({
