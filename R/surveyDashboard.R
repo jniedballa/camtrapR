@@ -169,56 +169,6 @@ surveyDashboard <- function(CTtable = NULL,
                             exclude = NULL) {
   
   
-  # pkg_required <- c(
-  #   # UI packages
-  #   "shiny",
-  #   "shinyWidgets", 
-  #   "shinydashboard",
-  #   "DT",
-  #   
-  #   # Data manipulation
-  #   "dplyr",
-  #   "lubridate",
-  #   "sf",
-  #   "terra",
-  #   
-  #   # Visualization
-  #   "ggplot2",
-  #   "plotly",
-  #   "patchwork",
-  #   "mapview",
-  #   "leaflet",
-  #   "viridisLite",
-  #   "scales",
-  #   
-  #   # Modeling
-  #   "unmarked",
-  #   "ubms",
-  #   "bayesplot",
-  #   "coda"
-  # )
-  # 
-  # pkg_optional <- c(
-  #   "corrplot",
-  #   "psych",
-  #   "rstudioapi",
-  #   "callr"
-  # )
-  # 
-  # # Check required packages
-  # missing_required <- pkg_required[!sapply(pkg_required, requireNamespace, quietly = TRUE)]
-  # if (length(missing_required) > 0) {
-  #   stop("Please install the following required packages: ", 
-  #        paste(missing_required, collapse = ", "))
-  # }
-  # 
-  # # Check optional packages and warn if missing
-  # missing_optional <- pkg_optional[!sapply(pkg_optional, requireNamespace, quietly = TRUE)]
-  # if (length(missing_optional) > 0) {
-  #   warning("The following optional packages are not installed. Some features may be limited: ",
-  #           paste(missing_optional, collapse = ", "))
-  # }
-  # 
   
   # For now do aggressive package check until I load functions cleanly with pkg::function()
   
@@ -2498,7 +2448,7 @@ surveyDashboard <- function(CTtable = NULL,
         solidHeader = TRUE,
         title = "Welcome to the Camera Trap Survey Dashboard",
         
-        if (!is.null(version_info)) version_alert,
+        #if (!is.null(version_info)) version_alert,
         
         tags$div(
           style = "padding: 20px;",
@@ -2752,43 +2702,9 @@ surveyDashboard <- function(CTtable = NULL,
       output$record_preview <- DT::renderDT({
         generate_preview(data$recordTable_temp)
       })
-    })
-    
-    
-    # output$camerasIndependentImportUI <- renderUI({ 
-    #   req(data$CTtable_temp, input$stationCol, input$cameraCol)
-    #   
-    #   # Only show camerasIndependent if camera column is selected and multiple cameras exist
-    #   if (input$cameraCol != "") {
-    #     n_cameras_per_station <- table(data$CTtable_temp[[input$stationCol]])
-    #     has_multiple_cameras <- any(n_cameras_per_station > 1)
-    #     
-    #     if (has_multiple_cameras) {
-    #       checkboxInput("camerasIndependentImport", 
-    #                     "Cameras are independent", 
-    #                     value = FALSE)
-    #     }
-    #   }
-    # })
-    
-    # output$camerasIndependentUI <- renderUI({
-    #   if (!is.null(data$cameraCol) && data$cameraCol != "") {
-    #     # Show a warning if camerasIndependent is not defined in data
-    #     if (is.null(data$camerasIndependent)) {
-    #       tagList(
-    #         checkboxInput("camerasIndependent", "Cameras are independent", value = FALSE),
-    #         div(
-    #           class = "alert alert-warning",
-    #           style = "padding: 5px 10px; margin-top: 5px;",
-    #           icon("exclamation-triangle"), 
-    #           "This setting is required when using camera ID column."
-    #         )
-    #       )
-    #     } else {
-    #       checkboxInput("camerasIndependent", "Cameras are independent", value = data$camerasIndependent)
-    #     }
-    #   }
-    # })
+    })    
+
+
     
     # renderUI for camerasIndependentUI (Temporal Filter)
     output$camerasIndependentUI <- renderUI({
@@ -5815,11 +5731,6 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     # # Render original covariate raster map
-    # output$originalCovariatePlot <- leaflet::renderLeaflet({
-    #   req(data$original_rasters, input$rasterBand)
-    #   selected_raster <- data$original_rasters[[input$rasterBand]]
-    #   render_raster_map(selected_raster, input$rasterBand, is_prediction = FALSE)
-    # })
      output$originalCovariatePlot <- leaflet::renderLeaflet({
       req(data$original_rasters, input$rasterBand)
 
@@ -5991,77 +5902,6 @@ surveyDashboard <- function(CTtable = NULL,
     }
     
     # Helper function to clip/mask prediction rasters
-    # clip_prediction_rasters <- function(rasters, prediction_extent) {
-    #   if (is.null(prediction_extent)) return(rasters)
-    #   
-    #   # Safely handle transformations and clipping
-    #   tryCatch({
-    #     # Get CRS information
-    #     raster_crs <- terra::crs(rasters)
-    #     extent_crs <- sf::st_crs(prediction_extent)
-    #     
-    #     # Check if we're transforming between geographic and projected systems
-    #     is_raster_geo <- grepl("\\+proj=longlat", raster_crs) || grepl("geographic", raster_crs, ignore.case = TRUE)
-    #     is_extent_geo <- grepl("\\+proj=longlat", extent_crs$proj4string) || grepl("geographic", extent_crs$input, ignore.case = TRUE)
-    #     
-    #     
-    #     # Special handling for transformation between geographic and projected systems
-    #     if (is_raster_geo != is_extent_geo) {
-    #       # Create a temporary buffer around the extent in its own CRS
-    #       # This helps ensure overlap after transformation
-    #       prediction_extent_buffered <- sf::st_buffer(prediction_extent, dist = if(is_extent_geo) 0.1 else 10000)
-    #       
-    #       # Get the bounding box of the prediction extent
-    #       bbox <- sf::st_bbox(prediction_extent_buffered)
-    #       bbox_poly <- sf::st_as_sfc(bbox, crs = extent_crs)
-    #       
-    #       # Safety check: ensure coordinates are reasonable
-    #       bbox_coords <- sf::st_coordinates(bbox_poly)[,1:2]
-    #       if (any(!is.finite(bbox_coords))) {
-    #         return(rasters)  # Return original rasters if coordinates invalid
-    #       }
-    #       
-    #       # Transform the bbox to raster CRS
-    #       bbox_transformed <- sf::st_transform(bbox_poly, raster_crs)
-    #       
-    #       # Check for valid transformation
-    #       transformed_coords <- sf::st_coordinates(bbox_transformed)[,1:2]
-    #       if (any(!is.finite(transformed_coords))) {
-    #         return(rasters)  # Return original rasters if transformation failed
-    #       }
-    #       
-    #       # Extract the bbox from the transformed geometry
-    #       t_bbox <- sf::st_bbox(bbox_transformed)
-    #       
-    #       # Create an extent object for cropping
-    #       crop_ext <- terra::ext(t_bbox["xmin"], t_bbox["xmax"], t_bbox["ymin"], t_bbox["ymax"])
-    # 
-    #       
-    #       # Crop using the bbox extent
-    #       return(terra::crop(rasters, crop_ext))
-    #       
-    #     } else {
-    #       # Standard approach when both are in similar coordinate systems
-    #       # Transform the prediction extent to match the raster's CRS
-    #       extent_transformed <- sf::st_transform(prediction_extent, raster_crs)
-    #       
-    #       # Convert to a terra vector object for cropping and masking
-    #       extent_vect <- terra::vect(extent_transformed)
-    #       
-    #       
-    #       # First crop to bounding box for efficiency
-    #       rasters_cropped <- terra::crop(rasters, extent_vect)
-    #       
-    #       # Then mask to actual polygon shape
-    #       return(terra::mask(rasters_cropped, extent_vect))
-    #     }
-    #   }, error = function(e) {
-    #     # If clipping fails, return original rasters
-    #     warning(paste("Failed to clip rasters:", e$message))
-    #     return(rasters)
-    #   })
-    # }
-    
     clip_prediction_rasters <- function(rasters, prediction_extent) {
       if (is.null(prediction_extent) || !inherits(prediction_extent, "sf")) return(rasters)
       if (!inherits(rasters, "SpatRaster")) return(rasters)
@@ -6243,8 +6083,6 @@ surveyDashboard <- function(CTtable = NULL,
           }
           
           # --- Call the unified createCovariates function ---
-          # print("Arguments passed to createCovariates:") # Debugging
-          # print(str(args_list))                        # Debugging
           covariates_extract_list <- do.call(camtrapR::createCovariates, args_list)
 
           
@@ -7195,24 +7033,10 @@ surveyDashboard <- function(CTtable = NULL,
           
           # Display summary statistics
           output$acc_summary <- renderDT({
-            # print_AsyEst <- current_objects$results$AsyEst
-            # print_AsyEst[, -c(1,2)] <- round(print_AsyEst[, -c(1,2)], 2) 
-            # print(print_AsyEst)
             DT::datatable(print_AsyEst)
           })
           
-          
-          # # Save objects
-          # current_objects$acc_summary <- output$acc_summary
-          # current_objects$acc_rarefaction_plot <- output$acc_rarefaction_plot
-          # current_objects$acc_rarefaction_plot_combined <- output$acc_rarefaction_plot_combined
-          # current_objects$acc_coverage_plot <- output$acc_coverage_plot
-          # current_objects$acc_coverage_plot_combined <- output$acc_coverage_plot_combined
-          # current_objects$acc_richness_plot_combined <- output$acc_richness_plot_combined
-          # current_objects$acc_richness_plot_combined_combined <- output$acc_richness_plot_combined
-          
-          # print(str(current_objects))
-          
+                    
           species_accumulation_objects(current_objects)
           
           showNotification("Analysis completed successfully", type = "message")
@@ -8270,7 +8094,73 @@ surveyDashboard <- function(CTtable = NULL,
       # Generate formula using existing formula generation function
       formula_tmp <- generateFormula(modelEffects(), input$adv_model_package)
       
-      withProgress(message = 'Fitting advanced model...', value = 0, {
+      withProgres# generateFormula <- function(effects, package = "unmarked") {
+    #   # Helper function to generate term
+    #   generate_term <- function(effect) {
+    #     if(effect$type == "random") {
+    #       if(package == "ubms") {
+    #         # For ubms, use proper random effect syntax
+    #         paste0("(1|", effect$covariates[2], ")")
+    #       } else {
+    #         # For unmarked, convert to interaction since it doesn't support random effects
+    #         warning("Random effects not supported in unmarked, converting to interaction")
+    #         paste(effect$covariates, collapse = " * ")
+    #       }
+    #     } else {
+    #       switch(effect$type,
+    #              "linear" = effect$covariates[1],
+    #              "quadratic" = paste0(effect$covariates[1], " + I(", effect$covariates[1], "^2)"),
+    #              "interaction" = paste(effect$covariates, collapse = " * ")
+    #       )
+    #     }
+    #   }
+    #   
+    #   # Process detection terms
+    #   det_terms <- if(length(effects$detection) > 0) {
+    #     vapply(effects$detection, generate_term, character(1))
+    #   } else {
+    #     character(0)
+    #   }
+    #   det_formula <- if(length(det_terms) > 0) paste(det_terms, collapse = " + ") else "1"
+    #   
+    #   # Process occupancy terms
+    #   occu_terms <- if(length(effects$occupancy) > 0) {
+    #     vapply(effects$occupancy, generate_term, character(1))
+    #   } else {
+    #     character(0)
+    #   }
+    #   occu_formula <- if(length(occu_terms) > 0) paste(occu_terms, collapse = " + ") else "1"
+    #   
+    #   # Return the full formula
+    #   formula(paste0("~", det_formula, " ~", occu_formula))
+    # }
+    
+    # Preview the formula with debugging
+    output$formulaPreview <- renderPrint({
+      req(modelEffects())
+      
+      current_effects <- modelEffects()
+      # cat("=== Formula Preview Debug ===\n")
+      # cat("Raw modelEffects structure:\n")
+      # str(current_effects)
+      # 
+      # cat("\nDetection effects:\n")
+      # print(length(current_effects$detection))
+      # str(current_effects$detection)
+      # 
+      # cat("\nOccupancy effects:\n")
+      # print(length(current_effects$occupancy))
+      # str(current_effects$occupancy)
+      
+      cat("\nGenerated Formula:\n")
+      formula <- generateFormula(current_effects, input$model_package)
+      print(formula)
+      # cat("===========================\n")
+    })
+    
+    
+    
+    s(message = 'Fitting advanced model...', value = 0, {
         tryCatch({
           model <- switch(
             paste(input$adv_model_package, input$adv_model_type, sep = "_"),
@@ -9054,7 +8944,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
-    # 
+    # TODO: background processing for model fitting (commented out for now)
     # observeEvent(input$fitCommunityModel_background, {
     #   req(commOccu_model())
     #   
@@ -9227,7 +9117,27 @@ surveyDashboard <- function(CTtable = NULL,
       combine = FALSE,
       scales = "free_y",
       community_lines = FALSE
-    )
+    )        # Create plot data with effect type handling
+        # plot_data <- createAdvancedEffectPlot(
+        #   model = model,
+        #   effect = effect,        # Create plot data with effect type handling
+        # plot_data <- createAdvancedEffectPlot(
+        #   model = model,
+        #   effect = effect,
+        #   submodel = tolower(input$adv_plot_submodel),
+        #   ci_level = input$adv_ci_level,
+        #   show_data = input$adv_show_data
+        # )
+        
+        # print(plot_data)
+        
+        #   submodel = tolower(input$adv_plot_submodel),
+        #   ci_level = input$adv_ci_level,
+        #   show_data = input$adv_show_data
+        # )
+        
+        # print(plot_data)
+        
     
     
     # Update species choices when model is available
