@@ -1,8 +1,8 @@
 Type: Package
 Package: camtrapR
 Title: Camera Trap Data Management and Analysis Framework
-Version: 3.0.4
-Date: 2026-04-26
+Version: 3.0.5
+Date: 2026-06-19
 Authors@R: c(
     person("Juergen", "Niedballa", , "camtrapr@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9187-2116")),
@@ -53,6 +53,7 @@ Imports:
     leaflet,
     lubridate,
     methods,
+    reshape2,
     secr,
     sf,
     shiny,
@@ -85,7 +86,6 @@ Suggests:
     psych,
     R.rsp,
     raster,
-    reshape2,
     ritis,
     rjags,
     rlang,
