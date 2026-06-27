@@ -1665,6 +1665,7 @@ surveyDashboard <- function(CTtable = NULL,
                        fluidRow(
                          column(width = 3,
                                 wellPanel(
+                                  h4("Model Configuration", class = "text-primary"),
                                   uiOutput("model_config_header"),
                                   selectInput("basic_model_package",
                                               label = label_with_info("Package:", "Select R package: 'unmarked' (frequentist) or 'ubms' (Bayesian)."),
@@ -7239,10 +7240,8 @@ surveyDashboard <- function(CTtable = NULL,
     ##  General ----
     output$model_config_header <- renderUI({
       if (!is.null(input$species_dethist) && input$species_dethist != "") {
-        h4(paste0("Model Configuration (", input$species_dethist, ")"), class = "text-primary")
-      } else {
-        h4("Model Configuration", class = "text-primary")
-      }
+        h5(paste("Species:", input$species_dethist), class = "text-primary")
+      } 
     })
     
     # Observer to update covariate choices for all occupancy workflows
