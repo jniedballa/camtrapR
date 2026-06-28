@@ -546,7 +546,8 @@ surveyDashboard <- function(CTtable = NULL,
                               solidHeader = TRUE,
                               width = 12,
                               shiny::fileInput("record_file",
-                                               label = label_with_info("Upload Record CSV", "Upload the CSV file containing species detection records."),
+                                               label = label_with_info("Upload Record CSV", 
+                                                                       "Upload the CSV file containing species detection records. If you see an error 'maximum upload size exceeded', please restart dashboard and adjust maximum allowed file size in sidebar, under 'File Size Control'."),
                                                accept = c(".csv")
                               ),
                               
@@ -795,7 +796,7 @@ surveyDashboard <- function(CTtable = NULL,
             status = "warning",
             solidHeader = TRUE,
             width = 12,
-            shiny::numericInput("max_file_size", "Maximum file size (MB)", value = 10, min = 5, max = 100),
+            shiny::numericInput("max_file_size", "Maximum file size (MB)", value = 500, min = 500, max = 2000, step = 500),
             add_tooltip(id = "max_file_size", title = "Set the maximum size (in Megabytes) for files uploaded to the application."),
             shiny::actionButton("update_max_size", "Update Maximum File Size"),
             add_tooltip(id = "update_max_size", title = "Apply the selected maximum file size limit.")
@@ -3580,10 +3581,6 @@ surveyDashboard <- function(CTtable = NULL,
       })
     })
     
-    # Helper function for null coalescing
-    "%||%" <- function(x, y) {
-      if (is.null(x)) y else x
-    }
     
     ## import shapefile ----
     
@@ -3708,7 +3705,7 @@ surveyDashboard <- function(CTtable = NULL,
     ## Upload file size ----
     
     # Reactive value to store the current max file size
-    current_max_size <- shiny::reactiveVal(10)
+    current_max_size <- shiny::reactiveVal(500)
     
     # Observer to update max file size
     shiny::observeEvent(input$update_max_size, {
