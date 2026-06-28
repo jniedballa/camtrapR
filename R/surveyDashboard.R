@@ -1678,14 +1678,21 @@ surveyDashboard <- function(CTtable = NULL,
                               shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_n_stations", width = NULL)),
                               shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_percent_1s", width = NULL))
                             ),
-                            shinydashboard::box(width = 12, title = "Detection History Plot", collapsible = TRUE, collapsed = FALSE, status = "primary", solidHeader = TRUE, plotly::plotlyOutput("detectionHistory")),
-                            shinydashboard::box(width = 12, title = "unmarkedFrame Summary", status = "info", solidHeader = TRUE, collapsible = TRUE, collapsed = TRUE, shiny::verbatimTextOutput("umf_summary")),
-                            shiny::actionButton("return_dethist", "Return detection history"), add_tooltip(id = "return_dethist", 
-                                                                                                           title = "Save the generated detection history list (detections and effort) to your R workspace.",
-                                                                                                           placement = "top"),
-                            shiny::actionButton("return_umf", "Return unmarkedFrame"), add_tooltip(id = "return_umf", 
-                                                                                                   title = "Save the generated unmarkedFrame object (formatted for modeling) to your R workspace.",
-                                                                                                   placement = "top")
+                            shinydashboard::box(width = 12, title = "Detection History Plot", collapsible = TRUE, collapsed = FALSE, status = "primary", solidHeader = TRUE, 
+                                                plotly::plotlyOutput("detectionHistory")),
+                            shiny::actionButton("return_dethist", "Return detection history"), 
+                            add_tooltip(id = "return_dethist", 
+                                        title = "Save the generated detection history list (detections and effort) to your R workspace.",
+                                        placement = "top")
+            ),
+            shiny::tabPanel("unmarkedFrame",
+                              shinydashboard::box(width = 12, title = "unmarkedFrame Summary", status = "info", solidHeader = TRUE, 
+                                                  footer = "This summary was created automatically based on the detection history (for observations and observation-level covariate 'effort') and the camera trap table (for site covariates). It is used as input for single-species occupancy models.",
+                                                  shiny::verbatimTextOutput("umf_summary")),
+                              shiny::actionButton("return_umf", "Return unmarkedFrame"), 
+                              add_tooltip(id = "return_umf", 
+                                          title = "Save the generated unmarkedFrame object (formatted for modeling) to your R workspace.",
+                                          placement = "top")
             )
           )
         ),
@@ -1790,7 +1797,9 @@ surveyDashboard <- function(CTtable = NULL,
                          ),
                          column(width = 9,
                                 fluidRow(
-                                  column(width = 7, shinydashboard::box(title = "Model Summary", status = "primary", width = NULL, solidHeader = TRUE, collapsible = TRUE, height = "500px", verbatimTextOutput("basic_model_summary"))),
+                                  column(width = 7, 
+                                         shinydashboard::box(title = "Model Summary", status = "primary", width = NULL, solidHeader = TRUE, collapsible = TRUE, height = "500px", 
+                                                             verbatimTextOutput("basic_model_summary"))),
                                   column(width = 5,
                                          shinydashboard::box(
                                            title = "Parameter Estimates", status = "primary", width = NULL, solidHeader = TRUE, collapsible = TRUE,
