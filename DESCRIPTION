@@ -93,6 +93,7 @@ Suggests:
     RSQLite,
     rstudioapi,
     scales,
+    shinytest2,
     shinyWidgets,
     stringr,
     taxize,

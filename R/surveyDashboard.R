@@ -146,6 +146,7 @@
 #' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline median_hilow scale_x_continuous stat_summary theme_void
 #' @importFrom shinyBS bsTooltip
 #' @importFrom reshape2 melt
+#' @importFrom checkmate assert_data_frame assert_logical assert_character assert_choice makeAssertCollection reportAssertions
 #' @export
 
 
@@ -169,7 +170,63 @@ surveyDashboard <- function(CTtable = NULL,
                             exclude = NULL) {
   
   
+  # check inputs
+  assert_data_frame(CTtable, null.ok = TRUE)
+  assert_data_frame(recordTable, null.ok = TRUE)
   
+  if(!is.null(CTtable) && is.null(recordTable)) stop("If CTtable is defined, recordTable must be defined too.")
+  if(is.null(CTtable) && !is.null(recordTable)) stop("If recordTable is defined, CTtable must be defined too.")
+  
+  if(!is.null(CTtable) && !is.null(recordTable)){
+    
+    # initialize assertion collection
+    coll <- makeAssertCollection()
+    
+    # check column name parameters
+    assert_character(stationCol, len = 1, add = coll)
+    assert_character(xcol, len = 1, add = coll)
+    assert_character(ycol, len = 1, add = coll)
+    assert_character(setupCol, len = 1, add = coll)
+    assert_character(retrievalCol, len = 1, add = coll)
+    assert_character(speciesCol, len = 1, add = coll)
+    assert_character(recordDateTimeCol, len = 1, add = coll)
+    assert_character(cameraCol, null.ok = TRUE, len = 1, add = coll)
+    
+    # check format parameters
+    assert_character(CTdateFormat, len = 1, add = coll)
+    assert_character(recordDateTimeFormat, len = 1, add = coll)
+    
+    # other
+    assert_logical(camerasIndependent, len = 1, null.ok = TRUE)
+    assert_character(exclude, len = 1, null.ok = TRUE)
+    assert(
+      checkClass(crs, "numeric"),
+      checkClass(crs, "character"),
+      .var.name = "crs",
+      add = coll
+    )
+    
+    # ensure column names are in tables
+    # camera trap table
+    assert_choice(stationCol, choices = names(CTtable), add = coll)
+    assert_choice(xcol, choices = names(CTtable), add = coll)
+    assert_choice(ycol, choices = names(CTtable), add = coll)
+    assert_choice(setupCol, choices = names(CTtable), add = coll)
+    assert_choice(retrievalCol, choices = names(CTtable), add = coll)
+    assert_choice(cameraCol, choices = names(CTtable), null.ok = T)
+    
+    # record table
+    assert_choice(stationCol, choices = names(recordTable), add = coll)
+    assert_choice(speciesCol, choices = names(recordTable), add = coll)
+    assert_choice(recordDateTimeCol, choices = names(recordTable), add = coll)
+    
+    
+    # If any assertion failed, stop and print combined list of errors
+    reportAssertions(coll)
+  }
+  
+  
+  # check required packages are available
   # For now do aggressive package check until I load functions cleanly with pkg::function()
   
   # Load all required packages
@@ -2427,7 +2484,7 @@ surveyDashboard <- function(CTtable = NULL,
   
   
   
-  
+  # Server function definition ####
   server <- function(input, output, session) { 
 
     
@@ -4255,6 +4312,8 @@ surveyDashboard <- function(CTtable = NULL,
         }
         
         # add little black dots at stations with detections
+        # TODO: remove layer "Stations with detections" when input$scale_size is TRUE again
+        
         if (input$species_for_map != "n_species" & !input$scale_size) {
           map_view <- map_view + mapview::mapview(
             detmaps_sf_logi,
@@ -11304,6 +11363,7 @@ surveyDashboard <- function(CTtable = NULL,
     
   }
   
-  shiny::shinyApp(ui, server)    #### 
+  # Start ShinyApp ----
+  shiny::shinyApp(ui, server)
   
 }

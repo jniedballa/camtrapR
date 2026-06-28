@@ -4,7 +4,9 @@
 * simulateCamtrapData: simulate camera trap data with custom properties
 
 ## bugfixes
-* surveyDashboard: fix error in export of covariate rasters
+* surveyDashboard: 
+  - fix error in export of covariate rasters
+  - assert validity of parameter inputs (prevents opening app when e.g. column names specified wrongly)
 
 
 # camtrapR 3.0.4
