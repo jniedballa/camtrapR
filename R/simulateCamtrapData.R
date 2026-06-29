@@ -216,20 +216,19 @@ simulateCamtrapData <- function(nStations = 10,
     camtraps$Problem1_from <- ifelse(has_problem, format(lubridate::as_date(prob_start_posix), format = fmt_full), "")
     camtraps$Problem1_to   <- ifelse(has_problem, format(lubridate::as_date(prob_end_posix), format = fmt_full), "")
   }
-  
+
     # Add Covariates
-  # TODO: covariates are added to each deployment randomly. When 2 cameras or multiple seasons, the covariates at the same location differ. Assign by location instead!
   if (!is.null(covariates$continuous)) {
     for (cov in names(covariates$continuous)) {
       params <- covariates$continuous[[cov]] 
-      camtraps[[cov]] <- round(rnorm(n_deployments, params[1], params[2]), 1)  # round to one digit
+      camtraps[[cov]] <- round(rnorm(nStations, params[1], params[2]), 1) [as.factor(camtraps$Station)]
     }
   }
   
   if (!is.null(covariates$categorical)) {
     for (cov in names(covariates$categorical)) {
       n_levels <- covariates$categorical[[cov]]
-      camtraps[[cov]] <- sample(paste0(cov, "_", 1:n_levels), n_deployments, replace = TRUE)
+      camtraps[[cov]] <- sample(paste0(cov, "_", 1:n_levels), nStations, replace = TRUE)[as.numeric(as.factor(camtraps$Station))]
     }
   }
   
