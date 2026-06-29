@@ -1,0 +1,324 @@
+---
+title: "6. Sample camera trap datasets and the `surveyDashboard`"
+author: "Jürgen Niedballa"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{6. Sample camera trap datasets and the `surveyDashboard`}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+Before analyzing your own camera trapping data, it is often helpful to explore existing datasets or generate simulated data to understand the expected data structures. 
+
+The `camtrapR` package provides access to several types of sample data, representing different standards and acquisition methods:
+
+1. **Classic built-in package data** (standard `camtrapR` format)
+2. **Camtrap DP formatted data** (the emerging Camera Trap Data Package standard)
+3. **Wildlife Insights data exports** (with built-in workarounds for common metadata omissions)
+4. **Simulated data** (dynamic datasets generated on the fly for testing)
+
+This vignette guides you through loading these various data sources and shows how to explore them interactively using the built-in Shiny application web interface, `surveyDashboard()`. Since this function launches an interactive web browser session, **the `surveyDashboard()` code below is not run during document compilation**, but you can run it directly in your R console.
+
+By using these sample datasets, you can quickly familiarize yourself with the capabilities of `camtrapR` and the `surveyDashboard()` user interface before importing your own field data. 
+
+
+
+## Setup
+
+Load required packages
+
+```{r}
+#| message: false
+library(camtrapR)
+library(DT)
+```
+
+## 1. Built-in `camtrapR` Sample Data
+
+`camtrapR` comes with a classic, reliable "tiny" dataset containing camera trap records and station details collected in Sabah, Malaysian Borneo in 2009. This is the easiest way to test package functions.
+
+
+```{r}
+data("camtraps")
+data("recordTableSample")
+```
+
+```{r}
+#| eval: false
+surveyDashboard(
+  CTtable = camtraps,
+  recordTable = recordTableSample,
+  xcol = "utm_x",
+  ycol = "utm_y",
+  crs = "epsg:32650",      # = UTM50N
+  stationCol = "Station",
+  setupCol = "Setup_date",
+  retrievalCol = "Retrieval_date",
+  CTdateFormat = "dmy"
+)
+```
+
+View the camera trap table:
+``` {r}
+DT::datatable(camtraps)
+```
+
+View the record table:
+``` {r}
+DT::datatable(recordTableSample)
+```
+
+
+The record table can also be created from JPG images that are included in the package with `recordTable`. See the help file for example code: `?recordTable`.
+
+Note, in the sample data the species names are abbreviated in order to comply with CRAN package guidelines (no spaces in folder names used for species in sample images), which carried over into the sample record table. The species name are:
+
+- EGY: *Echinosorex gymnura* (Moonrat)
+- MNE: *Macaca nemestrina* (Southern pig-tailed macaque)
+- PBE: *Prionailurus bengalensis* (Leopard cat)
+- TRA: *Tragulus spp.* (Mousedeer)
+- VTA: *Viverra tangalunga* (Malayan Civet)
+
+## 2. Camtrap DP Sample Data
+
+The **Camera Trap Data Package (Camtrap DP)** is a community-developed data exchange format. `camtrapR` supports reading Camtrap DP formatted data. The package includes a small, standardized sample dataset (without image files).
+
+```{r  load-camtrap-dp}
+path_camtrapdp <- system.file("sample_data/tdwg_camtrap-dp_1.0.2_example", 
+                                    package = "camtrapR")
+camtrapdp <- readcamtrapDP(deployments_file = file.path(path_camtrapdp, "deployments.csv"),
+                           observations_file = file.path(path_camtrapdp, "observations.csv"),
+                           media_file = file.path(path_camtrapdp, "media.csv"),
+                           datapackage_file = file.path(path_camtrapdp, "datapackage.json")) 
+
+```
+
+Have a quick look at the camera trap (deployments) data:
+
+```{r}
+DT::datatable(camtrapdp$CTtable)
+```
+
+And the record table (observations):
+
+```{r}
+DT::datatable(camtrapdp$recordTable)
+```
+
+Open surveyDashboard with camtrap DP data:
+
+```{r}
+#| eval: false
+surveyDashboard( CTtable = camtrapdp$CTtable,
+                 recordTable = camtrapdp$recordTable, 
+                 xcol = "longitude", 
+                 ycol = "latitude", 
+                 crs = 4326, 
+                 stationCol = "locationName", 
+                 setupCol = "Setup_date", 
+                 retrievalCol = "Retrieval_date", 
+                 CTdateFormat = "ymd HMS", 
+                 speciesCol = "vernacularName_eng")
+```
+
+vernacularNames are useful, but optional under the camtrap DP standard. If they are not included the data still load, creating a field "vernacuarNames" which uses "scientificNames" and "observationType" as a fallback (e.g. for "blank").
+
+```{r}
+camtrapdp_no_vernac <- readcamtrapDP(deployments_file = file.path(path_camtrapdp, "deployments.csv"),
+                           observations_file = file.path(path_camtrapdp, "observations.csv"),
+                           media_file = file.path(path_camtrapdp, "media.csv"),
+                           datapackage_file = file.path(path_camtrapdp, "datapackage_no_vernacularNames.json"))
+```
+
+```{r}
+#| eval: false
+surveyDashboard( CTtable = camtrapdp_no_vernac$CTtable,
+                 recordTable = camtrapdp_no_vernac$recordTable, 
+                 xcol = "longitude", 
+                 ycol = "latitude", 
+                 crs = 4326, 
+                 stationCol = "locationName", 
+                 setupCol = "Setup_date", 
+                 retrievalCol = "Retrieval_date", 
+                 CTdateFormat = "ymd HMS", 
+                 speciesCol = "vernacularName")
+```
+
+
+## 3. Wildlife Insights
+
+Wildlife Insights data can be downloaded from the [Wildlife Insights website](https://app.wildlifeinsights.org/explore).
+
+Assuming we have downloaded a zipped data export, we can load it with `readWildlifeInsights`. Alternatively one can directly specify the paths to the required tabls.
+
+
+```{r}
+#| eval: false 
+wildlifeinsights <- readWildlifeInsights(zipfile = "path/to/your/file.zip")
+```
+
+**Warning**: many Wildlife Insights downloads currently don't match the declared [Wildlife Insights Minimum Metadata Standards](https://docs.google.com/spreadsheets/d/1Jg-WybmVeGlWGrbPpwuwJCgranOV1r3M_LrzELttfK0/edit?usp=sharing) and cause errors in the import function. Specifically,
+
+- the deployments table often lacks the "placename" column
+- in the images table, "timestamp" is often not formatted according to the standard
+
+
+# 4. Simulated datasets
+
+
+`camtrapR` can generate synthetic datasets for testing without real-world data.
+
+The package provides a simulation function `simulateCamtrapData` that can generate datasets of varying complexity, including:
+
+* Single or dual camera setups
+* Single or multi-season studies
+
+The following parameters can be adjusted:
+
+- number of stations
+- cameras per station, seasons
+- number of species
+- number of records and
+- location of study area are adjustable.
+- numeric and categorical covariates (simulated).
+
+The current implementation is a very simplified model of the ecological processes:
+
+- species distributions are random and not a function of covariates.
+- species activities are uniform throughout the day.
+
+### Single season data
+
+We first set a seed for reproducible output and request data for 20 Stations. The remaining parameters remain at their default values. See `?simulateCamtrapData` for details.
+
+```{r}
+seed <- 100
+nStation <- 20
+```
+
+#### Single camera
+
+```{r}
+simcam1 <- simulateCamtrapData(nStation = nStation,
+                               seed = seed)
+```
+
+
+The result is a list containing camera deployments and mock detections. We can inspect the camera trap table:
+```{r}
+DT::datatable(simcam1$camtraps)
+```
+
+And the record table:
+```{r}
+DT::datatable(simcam1$recordTable)
+```
+
+The dashboard can be called as follows:
+```{r}
+#| eval: false
+surveyDashboard(CTtable = simcam1$camtraps,
+                recordTable = simcam1$recordTable,
+                stationCol = "Station",
+                speciesCol = "Species",
+                xcol = "longitude",
+                ycol = "latitude",
+                setupCol = "Setup_date",
+                retrievalCol = "Retrieval_date",
+                crs = 4326)
+```
+
+#### Dual camera
+
+Dual-camera setups can be simulated by setting `camerasPerStation = 2`. While the `surveyDashboard` requires input to `camerasIndependent`, there is no mechanism in `simulateCamtrapData` that influences independence of records between cameras.
+```{r}
+simcam2 <- simulateCamtrapData(nStation = nStation,
+                               camerasPerStation = 2,
+                               seed = seed)
+```
+
+```{r}
+#| eval: false
+surveyDashboard(CTtable = simcam2$camtraps,
+                recordTable = simcam2$recordTable,
+                stationCol = "Station",
+                speciesCol = "Species",
+                xcol = "longitude",
+                ycol = "latitude",
+                setupCol = "Setup_date",
+                retrievalCol = "Retrieval_date",
+                cameraCol = "Camera", 
+                camerasIndependent = FALSE,
+                crs = 4326)
+```
+
+### Multi-season data
+
+#### Single camera
+
+Multi-season setups can be simulated by setting `nSeasons = 2` (or a higher number).
+
+```{r}
+simcam3 <- simulateCamtrapData(nStation = nStation,
+                               nSeasons = 2,
+                               seed = seed)
+```
+
+The dashboard currently does not support multi-season data.
+
+
+#### Dual camera
+
+Multi-season, dual camera setups can be simulated by setting `nSeasons = 2` (or a higher number) and `camerasPerStation = 2`.
+
+```{r}
+simcam4 <- simulateCamtrapData(nStation = nStation,
+                               camerasPerStation = 2,
+                               nSeasons = 2,
+                               seed = seed)
+```
+
+The dashboard currently does not support multi-season data.
+
+
+## 5. Other CSVs
+
+### Large dataset
+
+To ensure loading large csv in the dashboard works we can simulate a large dataset:
+
+```{r}
+sim_study_large <- simulateCamtrapData(nStations = 1000, 
+                                       camerasPerStation = 2, 
+                                       nSpecies = 60, 
+                                       nRecords = 300000, 
+                                       seed = seed)
+```
+
+```{r}
+#| eval: false
+surveyDashboard(CTtable = sim_study_large$camtraps,
+                recordTable = sim_study_large$recordTable, 
+                xcol = "longitude", 
+                ycol = "latitude", 
+                crs = 4326, 
+                stationCol = "Station", 
+                cameraCol = "Camera", 
+                setupCol = "Setup_date", 
+                retrievalCol = "Retrieval_date", 
+                CTdateFormat = "ymd", 
+                camerasIndependent = TRUE, 
+                speciesCol = "Species" )
+```
+
