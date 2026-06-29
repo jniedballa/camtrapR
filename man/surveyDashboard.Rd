@@ -112,6 +112,7 @@ The dashboard includes several major components:
   \item Basic workflow for simple model specification (linear effects)
   \item Support for both unmarked and ubms packages
   \item Automated detection history creation
+  \item Automatic scaling of covariates (including prediction rasters)
   \item Model comparison and selection
   \item Response curves and spatial predictions
 }
@@ -125,19 +126,16 @@ The dashboard includes several major components:
   \item MCMC diagnostics and convergence assessment
   \item Species occupancy, richness and PAO predictions
 }
+
+The app state can be saved and restored
 }
 \note{
-\itemize{
-  \item Interactive maps with multiple basemap options
-  \item Covariate scaling is performed automatically if requested (includes
-   automatic scaling of prediction rasters)
-  \item The app state can be saved and restored
-}
-
 Current limitations include:
 
-- supports only single-season data
-- no support for spatial capture-recapture models (or anything related to individual IDs)
+\itemize{
+\item  supports only single-season data
+\item  no support for spatial capture-recapture models (or anything related to individual IDs)
+}
 }
 \examples{
 
@@ -166,6 +164,7 @@ data("recordTableSample")
   }
   
   
+
 
 }
 \author{
