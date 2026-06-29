@@ -6,7 +6,7 @@ library(testthat)
 library(withr)
 library(jsonlite)
 
-# --- Mock Data Creation ---
+# --- Mock Data Creation ---- 
 # For most tests, we'll create data programmatically to ensure the tests
 # are self-contained and predictable.
 
@@ -132,6 +132,21 @@ testthat::describe("Core Functionality: Reading Data", {
     expect_gt(nrow(result$CTtable), 0)
     expect_gt(nrow(result$recordTable), 0)
   })
+  
+  test_that("It works when vernacularNames are missing from datapackage.json", {
+  
+  # uses datapackage_no_vernacularNames.json which has vernacularNames removed manually
+  fixture_path <- test_path("fixtures", "sample_camtrap_dp_data")
+  
+  expect_warning(readcamtrapDP(deployments_file = file.path(fixture_path, "deployments.csv"),
+                               observations_file = file.path(fixture_path, "observations.csv"),
+                               media_file = file.path(fixture_path, "media.csv"),
+                               datapackage_file = file.path(fixture_path, "datapackage_no_vernacularNames.json")),  
+                 
+                 "No vernacularName in metadata. Creating 'vernacularNames' from 'scientificNames' with 'observationType' as fallback."
+                 
+  )
+  })
 })
 
 
@@ -206,7 +221,7 @@ testthat::describe("Argument Handling", {
   })
   
   test_that("add_file_path and remove_bbox work correctly", {
-
+    
     fixture_path <- test_path("fixtures", "sample_camtrap_dp_data")
     
       # Test with file paths added and bbox removed (defaults)
