@@ -73,6 +73,7 @@
 # #'   random effects)
 #'   \item Support for both unmarked and ubms packages
 #'   \item Automated detection history creation
+#'   \item Automatic scaling of covariates (including prediction rasters)
 #'   \item Model comparison and selection
 #'   \item Response curves and spatial predictions
 #' }
@@ -87,13 +88,13 @@
 #'   \item Species occupancy, richness and PAO predictions
 #' }
 #'
-#'
-#' @note 
+#' The app state can be saved and restored
+#' 
+#' @note Current limitations include:
+#' 
 #' \itemize{
-#'   \item Interactive maps with multiple basemap options
-#'   \item Covariate scaling is performed automatically if requested (includes
-#'    automatic scaling of prediction rasters)
-#'   \item The app state can be saved and restored
+#' \item  supports only single-season data
+#' \item  no support for spatial capture-recapture models (or anything related to individual IDs)
 #' }
 #' 
 #' @examples
@@ -124,11 +125,6 @@
 #'   
 #'   
 #'
-#' @note Current limitations include:
-#' 
-#' - supports only single-season data
-#' - no support for spatial capture-recapture models (or anything related to individual IDs)
-#' 
 #' 
 #' @author Juergen Niedballa
 #'  
@@ -136,7 +132,7 @@
 #' @importFrom graphics layout pairs plot.new title
 #' @importFrom lubridate is.Date parse_date_time
 #' @importFrom utils read.csv str unzip sessionInfo
-#' @importFrom shiny renderUI renderText outputOptions req observe observeEvent reactiveVal reactiveValues renderTable renderPrint renderPlot updateSelectInput updateSelectizeInput updateTextInput updateNumericInput updateSliderInput updateCheckboxInput updateCheckboxGroupInput updateActionButton removeNotification showNotification showModal removeModal modalDialog modalButton HTML tags tabsetPanel tabPanel actionButton checkboxInput checkboxGroupInput fileInput numericInput radioButtons selectInput sliderInput textInput uiOutput verbatimTextOutput plotOutput textOutput wellPanel withProgress fluidRow column div hr h4 conditionalPanel helpText tagList tableOutput reactive reactiveTimer varSelectizeInput icon h1 h2 h3 isolate need validate span
+#' @importFrom shiny renderUI renderText outputOptions req observe observeEvent reactiveVal reactiveValues renderTable renderPrint renderPlot updateSelectInput updateSelectizeInput updateTextInput updateNumericInput updateSliderInput updateCheckboxInput updateCheckboxGroupInput updateActionButton removeNotification showNotification showModal removeModal modalDialog modalButton HTML tags tabsetPanel tabPanel actionButton checkboxInput checkboxGroupInput fileInput numericInput radioButtons selectInput sliderInput textInput uiOutput verbatimTextOutput plotOutput textOutput wellPanel withProgress fluidRow column div hr h4 h5 conditionalPanel helpText tagList tableOutput reactive reactiveTimer varSelectizeInput icon h1 h2 h3 isolate need validate span
 #' @importFrom shinydashboard dropdownMenu dropdownMenuOutput renderMenu
 #' @importFrom DT renderDT DTOutput datatable
 #' @importFrom dplyr %>% group_by summarize n n_distinct pull sym
@@ -146,7 +142,7 @@
 #' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline median_hilow scale_x_continuous stat_summary theme_void
 #' @importFrom shinyBS bsTooltip
 #' @importFrom reshape2 melt
-#' @importFrom checkmate assert_data_frame assert_logical assert_character assert_choice makeAssertCollection reportAssertions
+#' @importFrom checkmate assert assert_data_frame assert_logical assert_character assert_choice checkClass makeAssertCollection reportAssertions
 #' @export
 
 
@@ -170,7 +166,7 @@ surveyDashboard <- function(CTtable = NULL,
                             exclude = NULL) {
   
   
-  # check inputs
+  # check inputs ----
   assert_data_frame(CTtable, null.ok = TRUE)
   assert_data_frame(recordTable, null.ok = TRUE)
   
@@ -197,7 +193,9 @@ surveyDashboard <- function(CTtable = NULL,
     assert_character(recordDateTimeFormat, len = 1, add = coll)
     
     # other
-    assert_logical(camerasIndependent, len = 1, null.ok = TRUE)
+    if(!is.null(cameraCol)) {
+      assert_logical(camerasIndependent, len = 1)  
+    }
     assert_character(exclude, len = 1, null.ok = TRUE)
     assert(
       checkClass(crs, "numeric"),
@@ -226,7 +224,7 @@ surveyDashboard <- function(CTtable = NULL,
   }
   
   
-  # check required packages are available
+  # check required packages are available ----
   # For now do aggressive package check until I load functions cleanly with pkg::function()
   
   # Load all required packages
@@ -1778,20 +1776,29 @@ surveyDashboard <- function(CTtable = NULL,
                                                  value = 2000, min = 100
                                     ), 
                                     
+                                    # TODO: Allow user to set burnin (as in community models). Parameter warmup in stan_occu (currently defaults to iteration / 2 - reasonable)
+                                    
                                     numericInput("basic_ubms_thin", 
                                                  label = label_with_info("Thinning:", "Thinning interval for MCMC samples (keep every nth sample)."), 
                                                  value = 1, min = 1
                                     ), 
                                     
                                     uiOutput("basic_ubms_cores_input"), # Tooltip added dynamically
+                                    add_tooltip(id = "basic_ubms_cores_input", title = "Number of CPU cores to use for parallel chain execution (maximum limited by available cores). For simple model 1 core is often faster than multiple (due to Shiny overhead).")
                                   ),
                                   hr(),
                                   div(style = "text-align: center; margin-top: 20px;",
                                       actionButton("basic_run_model", "Run Model", class = "btn-primary btn-lg btn-block"), 
                                       add_tooltip(id = "basic_run_model", title = "Fit the occupancy model with the current specifications."),
                                       div(style = "margin-top: 10px;",
-                                          actionButton("basic_add_to_modsel", "Add to Model Selection", class = "btn-success btn-block"), add_tooltip(id = "basic_add_to_modsel", title = "Add the currently fitted model to the model selection table for comparison.")
-                                      )
+                                          actionButton("basic_add_to_modsel", "Add to Model Selection", class = "btn-success btn-block"), 
+                                          add_tooltip(id = "basic_add_to_modsel", title = "Add the currently fitted model to the model selection table for comparison.")
+                                          # TODO: Add button for exporting model (as with unmarkedFrame)
+                                      ),
+                                      div(style = "margin-top: 10px;",
+                                          actionButton("export_basic_model", "Export Model", class = "btn-info btn-block"), 
+                                          add_tooltip(id = "export_basic_model", title = "Exports the fitted model to your R workspace.")
+                                      ),
                                   )
                                 )
                          ),
@@ -1824,7 +1831,9 @@ surveyDashboard <- function(CTtable = NULL,
                            title = "Model Selection", status = "info", width = 12,
                            tableOutput("basic_model_selection"),
                            shiny::fluidRow(
-                             shiny::column(width = 12, shiny::actionButton("basic_clear_modsel", "Clear model selection", class = "btn-warning"), add_tooltip(id = "basic_clear_modsel", title = "Remove all models from the model selection table."))
+                             shiny::column(width = 12, shiny::actionButton("basic_clear_modsel", "Clear model selection", class = "btn-warning"), 
+                                           add_tooltip(id = "basic_clear_modsel", title = "Remove all models from the model selection table."))
+                             # TODO: Add button for exporting model list and/or model selection (as with unmarkedFrame)
                            )
                          )
                        )
@@ -2243,6 +2252,7 @@ surveyDashboard <- function(CTtable = NULL,
                      fluidRow(shinydashboard::box(title = "Model Summary", width = 12, status = "success", collapsible = TRUE,
                                                   verbatimTextOutput("communityModelSummary"))
                               )
+                     # TODO: Print path to model file in UI or as a notification
             ),
             tabPanel("Model Fitting",
                      fluidRow(
@@ -2603,6 +2613,7 @@ surveyDashboard <- function(CTtable = NULL,
     # single species occupancy
     #  reactive values to track models for each workflow
     basic_model <- reactiveVal(NULL)
+    basic_model_formula <- reactiveVal(NULL)
     advanced_model <- reactiveVal(NULL)
     modelEffects <- reactiveVal(list(detection = list(), occupancy = list()))
     
@@ -7348,11 +7359,11 @@ surveyDashboard <- function(CTtable = NULL,
     
     output$basic_ubms_cores_input <- renderUI({
       max_cores <- min(parallel::detectCores() - 1, 7)
-      safe_cores <- min(max_cores, input$basic_ubms_chains %||% 1) # Use %||% for safety
+      # safe_cores <- min(max_cores, input$basic_ubms_chains %||% 1) # Use %||% for safety
+      safe_cores <- 1  # single core is often faster than multiple for small models (due to parallel overhead of shiny)
       tagList(
         numericInput("basic_ubms_cores", "Number of cores:",
-                     value = safe_cores, min = 1, max = max_cores),
-        add_tooltip(id = "basic_ubms_cores", title = "Number of CPU cores to use for parallel chain execution (max limited by available cores).")
+                     value = safe_cores, min = 1, max = max_cores)
       )
     })
     
@@ -7558,6 +7569,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Basic workflow state tracking and clearing
+    # clear all modelling objects if input changed
     observeEvent(c(
       input$basic_model_package,
       input$basic_model_type,
@@ -7572,12 +7584,15 @@ surveyDashboard <- function(CTtable = NULL,
         return(NULL)  # Use explicit return(NULL) to force early exit
       }
       
-      # Clear the model if it exists
+      # Clear the model if it exists (or if models were added to model selection)
       if (!is.null(basic_model()) || length(single_species_occu_objects$basic_modList) > 0) {
         basic_model(NULL)
+        basic_model_formula(NULL)
         single_species_occu_objects$basic_modList <- list()
-        output$basic_model_selection <- renderTable({ NULL })
-        output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
+        # the following was stupid. Overwriting the original render function with function that can only output NULL
+        # "output$id <- " may only appear once in function!
+        # output$basic_model_selection <- renderTable({ NULL })    
+        # output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
         shiny::showNotification("Basic model cleared due to input changes", type = "warning")
       }
     }, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -7601,8 +7616,8 @@ surveyDashboard <- function(CTtable = NULL,
       if (!is.null(advanced_model()) || length(single_species_occu_objects$adv_modList) > 0) {
         advanced_model(NULL)
         single_species_occu_objects$adv_modList <- list()
-        output$adv_model_selection <- renderTable({ NULL })
-        output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
+        # output$adv_model_selection <- renderTable({ NULL })
+        # output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
         shiny::showNotification("Advanced model cleared due to input changes", type = "warning")
       }
     }, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -7619,17 +7634,18 @@ surveyDashboard <- function(CTtable = NULL,
       if (!is.null(basic_model()) || length(single_species_occu_objects$basic_modList) > 0) {
         something_to_clear <- TRUE
         basic_model(NULL)
+        basic_model_formula(NULL)
         
         single_species_occu_objects$basic_modList <- list()
-        output$basic_model_selection <- renderTable({ NULL })
-        output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
+        # output$basic_model_selection <- renderTable({ NULL })
+        # output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
       }
       if (!is.null(advanced_model()) || length(single_species_occu_objects$adv_modList) > 0) {
         something_to_clear <- TRUE
         advanced_model(NULL)
         single_species_occu_objects$adv_modList <- list()
-        output$adv_model_selection <- renderTable({ NULL })
-        output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
+        # output$adv_model_selection <- renderTable({ NULL })
+        # output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
       }
       if(something_to_clear) shiny::showNotification("Models and predictions cleared due to data changes", type = "warning")
     }, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -7653,7 +7669,7 @@ surveyDashboard <- function(CTtable = NULL,
           updateSelectInput(session, "basic_model_package", selected = "unmarked")
         }
       }
-    })
+    }, label = "Select model package (single)")
     
     observeEvent(input$basic_run_model, {
       req(umf())
@@ -7713,45 +7729,81 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Combine formulas
       formula_tmp <- stats::formula(paste0("~", det_formula, " ~", occ_formula))
+      # basic_model_formula(formula_tmp)
+      basic_model_formula(list(detection = det_formula,
+                               occupancy = occ_formula))
       
-      
+
+
       withProgress(message = 'Fitting basic model...', value = 0, {
         tryCatch({
           model <- switch(
             paste(input$basic_model_package, input$basic_model_type, sep = "_"),
+            
             "unmarked_Occupancy" = unmarked::occu(formula = formula_tmp, data = umf()),
             "unmarked_Royle-Nichols" = unmarked::occuRN(formula = formula_tmp, data = umf()),
-            "ubms_Occupancy" = ubms::stan_occu(
-              formula = formula_tmp, 
-              data = umf(), 
-              chains = input$basic_ubms_chains, 
-              iter = input$basic_ubms_iter, 
-              warmup = floor(input$basic_ubms_iter/2), 
-              thin = input$basic_ubms_thin, 
-              cores = input$basic_ubms_cores,
+            
+            "ubms_Occupancy" = eval(bquote(ubms::stan_occu(
+              formula = .(formula_tmp),       # Evaluate to show the actual formula (e.g. ~1 ~1)
+              data    = umf(),                # Leave as text (so it doesn't print the giant S4 object!)
+              chains  = .(input$basic_ubms_chains),  # Evaluate to a number (e.g., 3)
+              iter    = .(input$basic_ubms_iter), 
+              warmup  = .(floor(input$basic_ubms_iter/2)), 
+              thin    = .(input$basic_ubms_thin), 
+              cores   = .(input$basic_ubms_cores),   # Evaluate to a number (so cores > 1 works)
               refresh = 0
-            ),
-            "ubms_Royle-Nichols" = ubms::stan_occuRN(
-              formula = formula_tmp, 
-              data = umf(), 
-              chains = input$basic_ubms_chains, 
-              iter = input$basic_ubms_iter, 
-              warmup = floor(input$basic_ubms_iter/2), 
-              thin = input$basic_ubms_thin, 
-              cores = input$basic_ubms_cores,
+            ))),
+            
+            "ubms_Royle-Nichols" = eval(bquote(ubms::stan_occuRN(
+              formula = .(formula_tmp),
+              data    = umf(), 
+              chains  = .(input$basic_ubms_chains), 
+              iter    = .(input$basic_ubms_iter), 
+              warmup  = .(floor(input$basic_ubms_iter/2)), 
+              thin    = .(input$basic_ubms_thin), 
+              cores   = .(input$basic_ubms_cores),
               refresh = 0
-            )
+            )))
+            # NOTE: ubms model fit can be very slow even with few iterations (happens in dashboard, not console)
           )
           
           # Store the model in basic workflow reactive
           basic_model(model)
           shiny::showNotification("Basic model fitted successfully", type = "message")
           
+          # print(class(basic_model()))
+          
         }, error = function(e) {
           shiny::showNotification(paste("Error fitting basic model:", e$message), type = "error")
         })
+        # browser()
       })
-    })
+    }, label = "Run model (single)")
+    
+    # Add action button to return unmarkedFrame object
+    observeEvent(input$export_basic_model, {
+      req(basic_model())
+      object_name <- paste0("model", "_", 
+                            gsub(" ", "_", input$species_dethist), "_",
+                            input$occasionLength_single_species, "d", "_", 
+                            input$basic_model_package, "_",
+                            paste0("p_", basic_model_formula()$detection), "_",
+                            paste0("psi_", basic_model_formula()$occupancy)
+                            # basic_model_formula()
+                            )
+      
+      assign_to_global_umf <- function(pos=1) {
+        basic_model <- basic_model()
+        assign(object_name, basic_model, envir=as.environment(pos))
+      }
+      
+      assign_to_global_umf()
+      
+      showModal(modalDialog(
+        title = "Object Saved",
+        paste("The fitted model has been saved to the workspace as:", object_name)
+      ))
+    }, label = "Export model (single)")
     
     ## Advanced workflow server logic  ----
     # TODO: reimplement advanced model properly and activate in UI
@@ -8158,7 +8210,7 @@ surveyDashboard <- function(CTtable = NULL,
       # Generate formula using existing formula generation function
       formula_tmp <- generateFormula(modelEffects(), input$adv_model_package)
       
-      withProgres# generateFormula <- function(effects, package = "unmarked") {
+      # generateFormula <- function(effects, package = "unmarked") {
     #   # Helper function to generate term
     #   generate_term <- function(effect) {
     #     if(effect$type == "random") {
@@ -8224,7 +8276,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
-    s(message = 'Fitting advanced model...', value = 0, {
+    withProgress(message = 'Fitting advanced model...', value = 0, {
         tryCatch({
           model <- switch(
             paste(input$adv_model_package, input$adv_model_type, sep = "_"),
@@ -8268,9 +8320,9 @@ surveyDashboard <- function(CTtable = NULL,
     output$basic_model_summary <- renderPrint({
       req(basic_model())
       if (input$basic_model_package == "unmarked") {
-        # print(summary(basic_model()))
         print(basic_model())
-      } else {
+      } 
+      if (input$basic_model_package == "ubms") {
         print(basic_model())
       }
     })
@@ -8592,15 +8644,29 @@ surveyDashboard <- function(CTtable = NULL,
     observeEvent(input$basic_add_to_modsel, {
       req(basic_model())
       single_species_occu_objects$basic_modList <- c(single_species_occu_objects$basic_modList, list(basic_model()))
-    })
+      showNotification(paste("Model added to model selection (Total:", length(single_species_occu_objects$basic_modList), ")."), type = "default")
+
+    }, label = "Add to model selection (basic)")
     
     observeEvent(input$basic_clear_modsel, {
       single_species_occu_objects$basic_modList <- list()
-    })
+    }, label = "Clear model selection (basic)")
     
     output$basic_model_selection <- renderTable({
-      req(length(single_species_occu_objects$basic_modList) > 0)
-      createModelSelectionTable(single_species_occu_objects$basic_modList, input$basic_model_package)
+      
+      mod_list <- single_species_occu_objects$basic_modList
+      pkg <- input$basic_model_package
+      
+      # Instead of req(), explicitly return NULL to CLEAR the UI
+      if (pkg == "unmarked" && length(mod_list) == 0) {
+        return(NULL) 
+      }
+      if (pkg == "ubms" && length(mod_list) <= 1) {
+        return(NULL)
+      }
+      
+      # If we make it past the checks, render the table
+      createModelSelectionTable(mod_list, pkg)
     })
     
     # advanced
@@ -8629,11 +8695,25 @@ surveyDashboard <- function(CTtable = NULL,
         ms <- unmarked::modSel(fl)
         df_ms <- round(ms@Full[, c("nPars", "AIC", "delta", "AICwt", "cumltvWt", "Rsq")], 2)
         df_ms <- cbind(formula = ms@Full$formula, df_ms)
-      } else {
+      } 
+      if (package == "ubms") {
+        # old implementation (before breaking changes in loo 2.9.0 / ubms 1.2.9 - modSel returns matrix)
+        # fl <- ubms::fitList(fits = model_list)
+        # ms <- ubms::modSel(fl)
+        # df_ms <- round(ms@Full[, c("nPars", "WAIC", "delta", "weight")], 2)
+        # df_ms <- cbind(formula = ms@Full$formula, df_ms)
+        
+        # ubms >= 1.2.9 (modSel returns data frame)
+        # construct model names from formula
+        names(model_list) <- sapply(model_list, FUN = \(x) {
+          paste(paste(as.character(x@submodels@submodels$det@formula), collapse = ""), 
+                paste(as.character(x@submodels@submodels$state@formula), collapse = ""))
+        })
+        
         fl <- ubms::fitList(fits = model_list)
-        ms <- ubms::modSel(fl)
-        df_ms <- round(ms@Full[, c("nPars", "WAIC", "delta", "weight")], 2)
-        df_ms <- cbind(formula = ms@Full$formula, df_ms)
+        ms <- ubms::modSel(fl) # requires > 1 model fitList, otherwise Error in : 'loo_compare' requires at least two models.
+        df_ms <- round(ms, 2)
+        df_ms <- cbind(model = rownames(df_ms), df_ms)
       }
       return(df_ms)
     }
@@ -11316,10 +11396,10 @@ surveyDashboard <- function(CTtable = NULL,
         # Reset output elements if output reference provided
         if (!is.null(output)) {
           # Clear model summaries and plots
-          output$basic_model_selection <- renderTable({ NULL })
-          output$adv_model_selection <- renderTable({ NULL })
-          output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
-          output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
+          # output$basic_model_selection <- renderTable({ NULL })
+          # output$adv_model_selection <- renderTable({ NULL })
+          # output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
+          # output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
           
           # Clear species accumulation plots
           output$acc_rarefaction_plot <- NULL
