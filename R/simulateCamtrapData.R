@@ -218,6 +218,7 @@ simulateCamtrapData <- function(nStations = 10,
   }
   
     # Add Covariates
+  # TODO: covariates are added to each deployment randomly. When 2 cameras or multiple seasons, the covariates at the same location differ. Assign by location instead!
   if (!is.null(covariates$continuous)) {
     for (cov in names(covariates$continuous)) {
       params <- covariates$continuous[[cov]] 
