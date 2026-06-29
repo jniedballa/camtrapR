@@ -372,14 +372,17 @@ readcamtrapDP <- function(
           }
         }
       } else {
-        # # If no vernacular names in metadata, create at least one column with observationType fallback
-        # recordTable$vernacularName <- recordTable$scientificName
-        # empty_names <- is.na(recordTable$vernacularName) | recordTable$vernacularName == ""
-        # has_obs_type <- !is.na(recordTable$observationType) & recordTable$observationType != ""
-        # recordTable$vernacularName[empty_names & has_obs_type] <- 
-        #   recordTable$observationType[empty_names & has_obs_type]
         
-        stop("No vernacularName in metadata")
+        warning("No vernacularName in metadata. Creating 'vernacularNames' from 'scientificNames' with 'observationType' as fallback.")
+        
+        # # If no vernacular names in metadata, create at least one vernacularNames column with observationType fallback
+        # to capture blank and other non-animal tags
+        recordTable$vernacularName <- recordTable$scientificName
+        empty_names <- is.na(recordTable$vernacularName) | recordTable$vernacularName == ""
+        has_obs_type <- !is.na(recordTable$observationType) & recordTable$observationType != ""
+        recordTable$vernacularName[empty_names & has_obs_type] <-
+          recordTable$observationType[empty_names & has_obs_type]
+        
       }
     }
   } else {
@@ -390,7 +393,7 @@ readcamtrapDP <- function(
     # recordTable$vernacularName[empty_names & has_obs_type] <- 
     #   recordTable$observationType[empty_names & has_obs_type]
     
-    stop("No metadata or not taxonomic information in metadata")
+    stop("No metadata or no taxonomic information in metadata")
   }
   
   
