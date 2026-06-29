@@ -367,6 +367,40 @@ surveyDashboard <- function(CTtable = NULL,
     
     shinydashboard::dashboardHeader(
       title = "Survey dashboard",
+      
+      # Link collection
+      dropdownMenu(
+        type = "notifications",
+        icon = icon("link"),
+        badgeStatus = "success",
+        headerText = "Useful Links",
+        
+        # custom notificationItem function to prevent 403 access denied error from Google
+        # also ensures that websites open in new tab, not in the shiny app tab
+        # NOTE: minor caveat: When clicking links from RStudio built-in Viewer, it opens useless blank page (also the web site in browser though)
+        # solution 1: Just close the blank page and go to browser 
+        # solution 2: In app, click "Open in browser", then click links
+        # solution 3: before starting app, run options(shiny.launch.browser = TRUE) to automatically open app in browser
+        
+        notificationItem_blank(
+          text = "GitHub Repository",
+          icon = icon("github"),
+          status = "info",
+          href = "https://github.com/jniedballa/camtrapR"
+        ),
+        notificationItem_blank(
+          text = "Report an Issue",
+          icon = icon("bug"),
+          status = "danger",
+          href = "https://github.com/jniedballa/camtrapR/issues"
+        ),
+        notificationItem_blank(
+          text = "Google Group",
+          icon = icon("google"),
+          status = "warning",
+          href = "https://groups.google.com/g/camtrapr"
+        )
+      ),
       shinydashboard::dropdownMenuOutput("stateMenu")
     ),
     

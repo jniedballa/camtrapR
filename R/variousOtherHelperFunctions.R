@@ -2405,3 +2405,16 @@ has_internet_socket <- function() {
   
   return(invisible(NULL))
 }
+
+
+# custom function to force links from dashboard to open in a new tab
+notificationItem_blank <- function(text, icon = shiny::icon("warning"), status = "success", href = NULL) {
+  if (is.null(href)) href <- "#"
+  # Add the color class to the icon (adminLTE default behavior)
+  icon <- shiny::tagAppendAttributes(icon, class = paste0("text-", status))
+  
+  # Build the HTML with target = "_blank"
+  tags$li(
+    tags$a(href = href, target = "_blank", icon, text)
+  )
+}
