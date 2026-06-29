@@ -501,7 +501,7 @@ surveyDashboard <- function(CTtable = NULL,
                               shiny::textInput("crs",
                                                label = label_with_info("Coordinate Reference System", "Specify the CRS using EPSG codes (e.g., EPSG:4326 for WGS84, EPSG:32650 for UTM Zone 50N). No quotes needed."),
                                                value = "",
-                                               placeholder = "e.g. EPSG:4326 or EPSG:32648"
+                                               placeholder = "e.g. 4326 or EPSG:4326"
                               ),
                               
                               # --- Date Columns ---
@@ -2695,6 +2695,24 @@ surveyDashboard <- function(CTtable = NULL,
         required_ct_cols <- c(required_ct_cols, data$cameraCol)
       }
       
+      # check if stationCol is unique(if cameraCol is not defined)
+      if((is.null(data$cameraCol) || data$cameraCol == "")) {
+        if(anyDuplicated(data$CTtable[, data$stationCol])) {
+          showModal(modalDialog(
+            title = "Input Error",
+            "Duplicate values in stationCol. Do you need to specify cameraCol?",
+            easyClose = TRUE
+          ))
+        }
+      } else { # check if stationCol + cameraCol is unique (e.g. because of season / session column)
+        if(anyDuplicated(data$CTtable[, c(data$stationCol, data$cameraCol)])) {
+          showModal(modalDialog(
+            title = "Input Error",
+            "Duplicate values in stationCol and cameraCol. Multi-season datasets are not yet supported.",
+            easyClose = TRUE
+          ))
+        }
+      }
 
       # Check for case mismatches in CT table
       for (col in required_ct_cols) {
@@ -2751,6 +2769,7 @@ surveyDashboard <- function(CTtable = NULL,
       if (is.null(data)) return(NULL)
       preview <- head(data, max_rows)
       DT::datatable(preview, options = list(scrollX = TRUE, dom = 't'))
+      # NOTE: Would be nice to show the selected columns color-coded, but low priority
     }
     
     # Observer for CT file upload
@@ -2803,35 +2822,79 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
+    
+    # Debounce the CRS input: only update after short period  of no typing to avoid excessive warnings
+    crs_done <- shiny::debounce(
+      reactive(input$crs),
+      millis = 1000 # milliseconds
+    )
+    
     # validate input coordinate system
+    #  Observe the debounced value, not input$crs directly
     observe({
-      req(input$crs)
+      req(crs_done())
       
-      # Clean up CRS input
-      clean_crs <- gsub("['\"]", "", input$crs)  # Remove quotes if present
+      # Clean: remove quotes and whitespace
+      clean_crs <- gsub('["\']', "", crs_done())
+      clean_crs <- trimws(clean_crs)
       
-      # Validate CRS format
-      if (!grepl("^EPSG:\\d+$", clean_crs, ignore.case = TRUE)) {
-        showNotification("CRS should be in format 'EPSG:number' (e.g. EPSG:4326)", 
-                         type = "warning",
-                         duration = 10)
+      if (nchar(clean_crs) == 0) return()
+      
+      # Accept "EPSG:4326" or just "4326"
+      if (!grepl("^(EPSG:)?\\d+$", clean_crs, ignore.case = TRUE)) {
+        showNotification(
+          "CRS should be an EPSG number, with or without 'EPSG:' (e.g. 4326 or EPSG:4326)",
+          id = "crs_warning",
+          type = "warning",
+          duration = 10
+        )
         return()
       }
       
-      # Try to create CRS object to validate
+      # Silently add EPSG: prefix if missing
+      if (!grepl("^EPSG:", clean_crs, ignore.case = TRUE)) {
+        clean_crs <- paste0("EPSG:", clean_crs)
+      }
+      
+      # Validate against sf
       tryCatch({
         sf::st_crs(clean_crs)
-        # Store clean CRS in data if valid
-        data$crs <- clean_crs
+        data$crs <- clean_crs          # always stored as "EPSG:number"
+        removeNotification(id = "crs_warning")
       }, error = function(e) {
-        showNotification("Invalid CRS specified. Please check the EPSG code.", 
-                         type = "error")
+        showNotification(
+          "Invalid CRS specified. Please check the EPSG code.",
+          id = "crs_error",
+          type = "error"
+        )
       })
     })
     
     # Observer for CT "Done" button
     shiny::observeEvent(input$ct_done, {
+      
       req(data$CTtable_temp)
+      
+      # check if stationCol is unique(if cameraCol is not defined)
+      if((is.null(input$cameraCol) || input$cameraCol == "")) {
+        if(anyDuplicated(data$CTtable_temp[, input$stationCol])) {
+          showModal(modalDialog(
+            title = "Input Error",
+            "Duplicate values in stationCol. Do you need to specify cameraCol?",
+            easyClose = TRUE
+          ))
+        }
+      } else { # check if stationCol + cameraCol is unique (e.g. because of season / session column)
+        if(anyDuplicated(data$CTtable_temp[, c(input$stationCol, input$cameraCol)])) {
+          showModal(modalDialog(
+            title = "Input Error",
+            "Duplicate values in stationCol and cameraCol. Multi-season datasets are not yet supported.",
+            easyClose = TRUE
+          ))
+        }
+      }
+      
+
       data$CTtable <- data$CTtable_temp
       data$stationCol <- input$stationCol
       data$cameraCol <- if(input$cameraCol != "") input$cameraCol else NULL
