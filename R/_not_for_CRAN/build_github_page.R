@@ -12,6 +12,7 @@ build_news()       # NEWS section
 build_articles()   # all vignettes 
 build_article(name = "camtrapr1")   # is for individual vignettes
 build_article(name = "camtrapr5")   # is for individual vignettes
+build_article(name = "camtrapr6")   # is for individual vignettes
 build_articles_index()
 
 
@@ -26,7 +27,8 @@ build_reference_index(pkg = ".")
 library(rmarkdown)
 
 # building html vignette with code below ensures that toc works correctly
-wd <- "C:/Users/niedballa/Documents/GitHub/camtrapR/vignettes"
+wd <- here::here("vignettes")
+
 render(input = file.path(wd, "camtrapr5.Rmd"),
      #output = file.path(wd, "camtrapR5.html")
      output_format = "html_document",
@@ -34,3 +36,13 @@ render(input = file.path(wd, "camtrapr5.Rmd"),
                            toc = T,
                            toc_depth = 2,
                            toc_float = T))
+
+
+render(input = file.path(wd, "camtrapr6.Rmd"),
+       #output = file.path(wd, "camtrapR5.html")
+       output_format = "html_document",
+       output_options = list(#self_contained = T,
+         toc = T,
+         toc_depth = 2,
+         toc_float = T))
+
