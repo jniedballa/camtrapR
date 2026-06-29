@@ -45,6 +45,7 @@ BugReports: https://groups.google.com/forum/#!forum/camtrapr
 Depends: 
     R (>= 4.1.0)
 Imports: 
+    checkmate,
     data.table,
     dplyr,
     DT,
