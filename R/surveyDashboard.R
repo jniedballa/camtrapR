@@ -1827,7 +1827,6 @@ surveyDashboard <- function(CTtable = NULL,
                                       div(style = "margin-top: 10px;",
                                           actionButton("basic_add_to_modsel", "Add to Model Selection", class = "btn-success btn-block"), 
                                           add_tooltip(id = "basic_add_to_modsel", title = "Add the currently fitted model to the model selection table for comparison.")
-                                          # TODO: Add button for exporting model (as with unmarkedFrame)
                                       ),
                                       div(style = "margin-top: 10px;",
                                           actionButton("export_basic_model", "Export Model", class = "btn-info btn-block"), 
@@ -7861,7 +7860,6 @@ surveyDashboard <- function(CTtable = NULL,
               cores   = .(input$basic_ubms_cores),
               refresh = 0
             )))
-            # NOTE: ubms model fit can be very slow even with few iterations (happens in dashboard, not console)
           )
           
           # Store the model in basic workflow reactive
@@ -10626,7 +10624,7 @@ surveyDashboard <- function(CTtable = NULL,
               pred_dir <- file.path(rasters_dir, "prediction")
               dir.create(pred_dir, recursive = TRUE)
               
-              # TODO: Why save as individual layers instead of multi-band raster?
+              # NOTE:: Why save as individual layers instead of multi-band raster?
               for (i in 1:terra::nlyr(data$prediction_raster)) {
                 layer_name <- names(data$prediction_raster)[i]
                 file_path <- file.path(pred_dir, paste0(layer_name, ".tif"))
