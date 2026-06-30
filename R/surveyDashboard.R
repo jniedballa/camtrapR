@@ -221,6 +221,16 @@ surveyDashboard <- function(CTtable = NULL,
     
     # If any assertion failed, stop and print combined list of errors
     checkmate::reportAssertions(coll)
+    
+    
+    if(any(is.na(recordTable[, speciesCol]))) {
+      stop(paste("Error in data input:\n", 
+                 sum(is.na(recordTable[, speciesCol])),
+           "out of", 
+           nrow(recordTable), 
+           "records have no species tag. Please remove these first"),
+           call. = F)
+    }
   }
   
   
