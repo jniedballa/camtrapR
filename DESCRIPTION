@@ -1,8 +1,8 @@
 Type: Package
 Package: camtrapR
 Title: Camera Trap Data Management and Analysis Framework
-Version: 3.0.5
-Date: 2026-06-19
+Version: 3.0.6
+Date: 2026-06-30
 Authors@R: c(
     person("Juergen", "Niedballa", , "camtrapr@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9187-2116")),
