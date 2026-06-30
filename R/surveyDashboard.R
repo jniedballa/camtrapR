@@ -167,8 +167,8 @@ surveyDashboard <- function(CTtable = NULL,
   
   
   # check inputs ----
-  assert_data_frame(CTtable, null.ok = TRUE)
-  assert_data_frame(recordTable, null.ok = TRUE)
+  checkmate::assert_data_frame(CTtable, null.ok = TRUE)
+  checkmate::assert_data_frame(recordTable, null.ok = TRUE)
   
   if(!is.null(CTtable) && is.null(recordTable)) stop("If CTtable is defined, recordTable must be defined too.")
   if(is.null(CTtable) && !is.null(recordTable)) stop("If recordTable is defined, CTtable must be defined too.")
@@ -176,51 +176,51 @@ surveyDashboard <- function(CTtable = NULL,
   if(!is.null(CTtable) && !is.null(recordTable)){
     
     # initialize assertion collection
-    coll <- makeAssertCollection()
+    coll <- checkmate::makeAssertCollection()
     
     # check column name parameters
-    assert_character(stationCol, len = 1, add = coll)
-    assert_character(xcol, len = 1, add = coll)
-    assert_character(ycol, len = 1, add = coll)
-    assert_character(setupCol, len = 1, add = coll)
-    assert_character(retrievalCol, len = 1, add = coll)
-    assert_character(speciesCol, len = 1, add = coll)
-    assert_character(recordDateTimeCol, len = 1, add = coll)
-    assert_character(cameraCol, null.ok = TRUE, len = 1, add = coll)
+    checkmate::assert_character(stationCol, len = 1, add = coll)
+    checkmate::assert_character(xcol, len = 1, add = coll)
+    checkmate::assert_character(ycol, len = 1, add = coll)
+    checkmate::assert_character(setupCol, len = 1, add = coll)
+    checkmate::assert_character(retrievalCol, len = 1, add = coll)
+    checkmate::assert_character(speciesCol, len = 1, add = coll)
+    checkmate::assert_character(recordDateTimeCol, len = 1, add = coll)
+    checkmate::assert_character(cameraCol, null.ok = TRUE, len = 1, add = coll)
     
     # check format parameters
-    assert_character(CTdateFormat, len = 1, add = coll)
-    assert_character(recordDateTimeFormat, len = 1, add = coll)
+    checkmate::assert_character(CTdateFormat, len = 1, add = coll)
+    checkmate::assert_character(recordDateTimeFormat, len = 1, add = coll)
     
     # other
     if(!is.null(cameraCol)) {
-      assert_logical(camerasIndependent, len = 1)  
+      checkmate::assert_logical(camerasIndependent, len = 1)  
     }
-    assert_character(exclude, len = 1, null.ok = TRUE)
-    assert(
-      checkClass(crs, "numeric"),
-      checkClass(crs, "character"),
+    checkmate::assert_character(exclude, len = 1, null.ok = TRUE)
+    checkmate::assert(
+      checkmate::checkClass(crs, "numeric"),
+      checkmate::checkClass(crs, "character"),
       .var.name = "crs",
       add = coll
     )
     
     # ensure column names are in tables
     # camera trap table
-    assert_choice(stationCol, choices = names(CTtable), add = coll)
-    assert_choice(xcol, choices = names(CTtable), add = coll)
-    assert_choice(ycol, choices = names(CTtable), add = coll)
-    assert_choice(setupCol, choices = names(CTtable), add = coll)
-    assert_choice(retrievalCol, choices = names(CTtable), add = coll)
-    assert_choice(cameraCol, choices = names(CTtable), null.ok = T)
+    checkmate::assert_choice(stationCol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(xcol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(ycol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(setupCol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(retrievalCol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(cameraCol, choices = names(CTtable), null.ok = T)
     
     # record table
-    assert_choice(stationCol, choices = names(recordTable), add = coll)
-    assert_choice(speciesCol, choices = names(recordTable), add = coll)
-    assert_choice(recordDateTimeCol, choices = names(recordTable), add = coll)
+    checkmate::assert_choice(stationCol, choices = names(recordTable), add = coll)
+    checkmate::assert_choice(speciesCol, choices = names(recordTable), add = coll)
+    checkmate::assert_choice(recordDateTimeCol, choices = names(recordTable), add = coll)
     
     
     # If any assertion failed, stop and print combined list of errors
-    reportAssertions(coll)
+    checkmate::reportAssertions(coll)
   }
   
   
@@ -2284,8 +2284,10 @@ surveyDashboard <- function(CTtable = NULL,
                               ),
                      fluidRow(shinydashboard::box(title = "Model Summary", width = 12, status = "success", collapsible = TRUE,
                                                   verbatimTextOutput("communityModelSummary"))
-                              )
-                     # TODO: Print path to model file in UI or as a notification
+                              ),
+                     fluidRow(shinydashboard::box(title = "Model File", width = 12, status = "info", collapsible = TRUE, collapsed = FALSE,
+                                                  htmlOutput("communityModelTextfile"))
+                     )
             ),
             tabPanel("Model Fitting",
                      fluidRow(
@@ -9139,6 +9141,35 @@ surveyDashboard <- function(CTtable = NULL,
       summary(commOccu_model())
     })
     
+    # Render model summary
+    output$communityModelTextfile <- renderUI({
+      req(commOccu_model())
+      
+      if (input$modelFile == "") {
+        label <- "The model file was saved to a temporary location:"
+      } else {
+        label <- "The model file was saved to disk:"
+      }
+      
+      path <- commOccu_model()@modelFile
+      
+      tags$div(
+        tags$p(
+          tags$strong(label)
+        ),
+        tags$div(
+          style = paste(
+            "background-color: #f5f5f5;",
+            "padding: 10px;",
+            "border: 1px solid #ddd;",
+            "border-radius: 4px;",
+            "font-family: monospace;",
+            "word-break: break-all;"
+          ),
+          path
+        )
+      )
+    })
     
     
     
