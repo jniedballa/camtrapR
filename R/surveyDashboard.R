@@ -3806,19 +3806,33 @@ surveyDashboard <- function(CTtable = NULL,
     aggregated_CTtable <- shiny::reactive({
       req(data$CTtable_sf, data$stationCol)
       
-      aggregateStations(CTtable = data$CTtable_sf, 
+      tryCatch({
+        aggregateStations(
+          CTtable = data$CTtable_sf,
                         stationCol = data$stationCol,
                         cameraCol = data$cameraCol,
                         setupCol = data$setupCol,
                         retrievalCol = data$retrievalCol,
                         dateFormat = data$CTdateFormat,
-                        quiet = T)
+          quiet = TRUE
+        )
+      }, error = function(e) {
+        msg <- paste("Error aggregating camera trap table:", e$message)
+        
+        # Keep the notification
+        showNotification(msg, type = "error", duration = NULL)
+        
+        # Stop the reactive chain gracefully with the captured error message
+        shiny::validate(shiny::need(FALSE, msg))
+        # stop(e$message)
     })
+      
+    }, label = "aggregate camera trap table")
     
     # Update aggregated_CTtable when CTtable_sf changes
     observe({
       data$aggregated_CTtable <- aggregated_CTtable()
-    })
+    }, label = "Update aggregated_CTtable when CTtable_sf changes")
     
     ## Upload file size ----
     
