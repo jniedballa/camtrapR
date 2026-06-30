@@ -71,10 +71,7 @@ aggregateStations <- function(CTtable,
                               quiet = FALSE) {
   
   
-  # --- Handle sf objects ---
-  is_sf_input <- inherits(CTtable, "sf")
-
-  # --- Input Validation ---
+    # --- Input Validation ---
   required_cols <- c(stationCol)
   if (!is.null(cameraCol)) required_cols <- c(required_cols, cameraCol)
   if (!is.null(setupCol)) required_cols <- c(required_cols, setupCol)
@@ -88,13 +85,15 @@ aggregateStations <- function(CTtable,
   }
   
   # Validate dateFormat if date columns are provided and are characters
-  if ((!is.null(setupCol) && is.character(df[[setupCol]])) ||
-      (!is.null(retrievalCol) && is.character(df[[retrievalCol]]))) {
+  if ((!is.null(setupCol) && is.character(CTtable[, setupCol])) ||
+      (!is.null(retrievalCol) && is.character(CTtable[, retrievalCol]))) {
     if (is.null(dateFormat)) {
       stop("Error in aggregateStations: 'dateFormat' must be provided if 'setupCol' or 'retrievalCol' are character strings.")
     }
   }
   
+  # --- Handle sf objects ---
+  is_sf_input <- inherits(CTtable, "sf")
   
   if (is_sf_input) {
     # message("Input 'CTtable' is an sf object. Geometry column will be dropped during aggregation.")
