@@ -1,7 +1,14 @@
+# camtrapR 3.0.6
+
+## new features
+* readCamtrapDP now uses the camtrapdp package for reading camtrap DP data
+
+
 # camtrapR 3.0.5
 
 ## new function
 * simulateCamtrapData: simulate camera trap data with custom properties
+
 
 ## bugfixes
 * surveyDashboard: 

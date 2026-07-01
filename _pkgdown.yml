@@ -74,6 +74,7 @@ reference:
   - title: Sample data
     desc: Sample data sets included in camtrapR
     contents:
+      - '`simulateCamtrapData`'
       - '`camtraps`'
       - '`recordTableSample`'
       - '`recordTableIndividualSample`'

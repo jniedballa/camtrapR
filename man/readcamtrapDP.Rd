@@ -5,10 +5,11 @@
 \title{Convert Camtrap DP format data to camtrapR format}
 \usage{
 readcamtrapDP(
-  deployments_file = "deployments.csv",
-  media_file = "media.csv",
-  observations_file = "observations.csv",
-  datapackage_file = "datapackage.json",
+  file = "datapackage.json",
+  deployments_file = NULL,
+  media_file = NULL,
+  observations_file = NULL,
+  datapackage_file = NULL,
   min_gap_hours = 24,
   removeNA = FALSE,
   removeEmpty = FALSE,
@@ -18,13 +19,15 @@ readcamtrapDP(
 )
 }
 \arguments{
-\item{deployments_file}{character. Path to deployments.csv file}
+\item{file}{character. Path to the `datapackage.json` file. Replaces individual CSV arguments.}
 
-\item{media_file}{character. Path to media.csv file}
+\item{deployments_file}{Deprecated. Ignored in favor of `file`.}
 
-\item{observations_file}{character. Path to observations.csv file}
+\item{media_file}{Deprecated. Ignored in favor of `file`.}
 
-\item{datapackage_file}{character. Path to datapackage.json file}
+\item{observations_file}{Deprecated. Ignored in favor of `file`.}
+
+\item{datapackage_file}{Deprecated. Alias for `file`.}
 
 \item{min_gap_hours}{numeric. Minimum gap in hours to consider as a camera interruption (default: 24)}
 
@@ -36,89 +39,105 @@ readcamtrapDP(
 
 \item{add_file_path}{logical. Whether to add file path from media table to the observation table}
 
-\item{filter_observations}{Controls which observation types to include. \code{NULL} or \code{FALSE} keeps all observations (default), \code{TRUE} keeps only animal observations, or provide a character vector of specific observation types to include.}
+\item{filter_observations}{Controls which observation types to include. \code{NULL} or \code{FALSE} keeps all (default), \code{TRUE} keeps only animal, or provide a character vector of types.}
 }
 \value{
 List containing three elements:
 \itemize{
-  \item CTtable: Data frame with camera trap deployment information in camtrapR format
-  \item recordTable: Data frame with species records in camtrapR format
-  \item metadata: List containing project metadata extracted from datapackage.json
+  \item \strong{CTtable}: Data frame with camera trap deployment information in camtrapR format
+  \item \strong{recordTable}: Data frame with species records in camtrapR format
+  \item \strong{metadata}: List containing project metadata extracted from datapackage.json
 }
 }
 \description{
 This function converts camera trap data from the Camtrap DP standard format to the format
 used by camtrapR. Camtrap DP is an open standard for the FAIR exchange and archiving of 
-camera trap data, structured in a simple yet flexible data model consisting of three tables: 
-Deployments, Media, and Observations.
+camera trap data.
 }
 \details{
-Camtrap DP is a standardized format developed under the umbrella of the Biodiversity Information
-Standards (TDWG) that facilitates data exchange between different camera trap platforms and systems.
-It supports a wide range of camera deployment designs, classification techniques, and analytical use cases.
-
-While the 'camtrapdp' package (available on CRAN) provides general functionality for reading, 
+While the 'camtrapdp' package provides general functionality for reading, 
 manipulating, and transforming Camtrap DP data, this function specifically converts Camtrap DP 
 data directly into the format required by camtrapR, producing the CTtable and recordTable objects 
 that camtrapR functions expect.
 
-This function reads the three primary tables from a Camtrap DP dataset:
-\itemize{
-  \item Deployments: Information about camera trap placements
-  \item Observations: Classifications derived from the media files
-  \item Media: Information about the media files (images/videos) recorded
-}
+This function acts as a wrapper around \code{\link[camtrapdp]{read_camtrapdp}}, utilizing it to 
+robustly read the datapackage, upgrade older versions, and validate the schema, before applying 
+camtrapR's specific formatting logic and gap analysis.
 
-The Media table is only read if the \code{add_file_path} parameter is set to \code{TRUE}. 
-
-The function converts these into two primary camtrapR data structures:
-\itemize{
-  \item CTtable: Contains deployment information including station ID, setup/retrieval dates, 
-        camera operation problems, camera setup, and more
-  \item recordTable: Contains observation records with taxonomic and temporal information
-}
-
-Additional features include:
-\itemize{
-  \item Parsing of deploymentTags and deploymentGroups (in deployments) and observationTags (in observations)
-  \item Extraction of taxonomic information from metadata 
-  \item Handling of deployment intervals and gaps
-}
+The function provides a fallback mechanism for location names and species names.
 }
 \note{
-Camtrap DP was developed as a consensus of a long, in-depth consultation process with 
-camera trap data management platforms and major players in the field of camera trapping.
-It builds upon the earlier Camera Trap Metadata Standard (CTMS) but addresses its limitations.
-
 The Camtrap DP standard structures data in a way that supports both media-based observations
 (using a single media file as source) and event-based observations (considering an event with
 a specified duration as source). For the purpose of this function, both are treated to be equivalent. 
 Event-based observations are converted to a single timestamp in the recordTable (using the event start time).
-
-Consider using the 'camtrapdp' package (Desmet et al., 2024) for more general operations on 
-Camtrap DP data before converting to camtrapR format with this function.
 }
+\section{Handling Optional Data and Fallbacks}{
+
+The Camtrap DP standard is designed to be highly flexible, meaning several
+columns that are traditionally required by \code{camtrapR} (such as specific
+station names or common species names) are technically optional.
+To ensure your data always loads smoothly into \code{camtrapR} formats, the 
+\code{readcamtrapDP()} function employs a robust fallback hierarchy.
+
+\strong{Location / Station Fallbacks}
+
+In \code{camtrapR}, deployments are grouped by a \code{Station} identifier.
+Under the Camtrap DP standard, both \code{locationID} and \code{locationName}
+are optional. Real-world datasets vary wildly: the official standard example
+provides \code{locationName}, while other datasets might only provide
+\code{locationID} (leaving \code{locationName} as \code{NA}), or neither!
+
+To guarantee a \code{Station} ID is created, the function looks for
+identifiers in this exact order:
+\enumerate{
+  \item \code{locationID}: The primary identifier.
+  \item \code{locationName}: Used if \code{locationID} is completely missing or all \code{NA}.
+  \item \code{deploymentID}: The ultimate fallback. If no location data is
+  provided, the function treats each individual deployment as its own unique station.
+}
+
+\emph{(Note: If the chosen column has some missing values, those specific
+blanks are automatically filled with the \code{deploymentID}).}
+
+\strong{Taxonomy and Species Fallbacks}
+
+Similarly, \code{vernacularNames} (common names) are entirely optional in
+Camtrap DP. Furthermore, non-animal records (like camera misfires or human
+activity) will naturally lack a \code{scientificName}. In \code{camtrapR},
+users typically expect a single classification column that contains both
+animals and non-animals.
+
+To handle this, the function applies this taxonomic fallback hierarchy:
+\enumerate{
+  \item \code{vernacularNames}: If provided in the dataset, these are joined
+  to the observations (e.g., as \code{vernacularName_en}). Non-animal records
+  (which have no name) are filled using the core \code{observationType}
+  (e.g., \code{"blank"}, \code{"human"}, \code{"vehicle"}).
+  \item \code{scientificName}: If no vernacular names exist, the function
+  falls back to using \code{scientificName} as the primary classification column.
+  It will issue a warning to inform you of this, and populate any empty rows
+  with the \code{observationType} so that non-animal events are not lost as
+  \code{NA}s in downstream \code{camtrapR} analyses.
+}
+}
+
 \examples{
 \dontrun{
-# Read a Camtrap DP dataset
-camtrap_data <- readcamtrapDP(
-  deployments_file = "path/to/deployments.csv",
-  media_file = "path/to/media.csv",
-  observations_file = "path/to/observations.csv",
-  datapackage_file = "path/to/datapackage.json"
-)
-
-# alternatively, set the working directory only
-setwd("path/to/camtrapdp_data")
-camtrap_data <- readcamtrapDP()   # uses default file names
+# load the sample camtrap DP dataset included in camtrapR.
+ path_camtrapdp <- system.file("sample_data/tdwg_camtrap-dp_1.0.2_example", 
+                               package = "camtrapR")
+camtrapdp_data <- readcamtrapDP(file = file.path(path_camtrapdp, "datapackage.json")) 
 
 
 # Extract components
-ct_table <- camtrap_data$CTtable
-record_table <- camtrap_data$recordTable
-metadata <- camtrap_data$metadata
+ct_table     <- camtrapdp_data$CTtable
+record_table <- camtrapdp_data$recordTable
+metadata     <- camtrapdp_data$metadata
 
+# See Vignette 6 for more thorough examples for working with camtrap DP data. 
 }
+
 
 }
 \references{
@@ -126,9 +145,5 @@ Bubnicki, J.W., Norton, B., Baskauf, S.J., et al. (2023). Camtrap DP: an open st
 FAIR exchange and archiving of camera trap data. Remote Sensing in Ecology and Conservation, 10(3), 283-295.
 
 Desmet, P., Govaert, S., Huybrechts, P., Oldoni, D. (2024). camtrapdp: Read and Manipulate Camera 
-Trap Data Packages. R package version 0.3.1. https://CRAN.R-project.org/package=camtrapdp
-}
-\seealso{
-\code{\link[camtrapdp]{read_camtrapdp}} in the 'camtrapdp' package for reading Camtrap DP data
-\code{\link[camtrapdp]{check_camtrapdp}} in the 'camtrapdp' package for validating Camtrap DP data
+Trap Data Packages. R package  https://CRAN.R-project.org/package=camtrapdp
 }

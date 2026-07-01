@@ -9,7 +9,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -19,20 +18,18 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-Before analyzing your own camera trapping data, it is often helpful to explore existing datasets or generate simulated data to understand the expected data structures. 
+Before analyzing your own camera trapping data, it is often helpful to explore existing datasets or generate simulated data to understand the expected data structures.
 
 The `camtrapR` package provides access to several types of sample data, representing different standards and acquisition methods:
 
-1. **Classic built-in package data** (standard `camtrapR` format)
-2. **Camtrap DP formatted data** (the emerging Camera Trap Data Package standard)
-3. **Wildlife Insights data exports** (with built-in workarounds for common metadata omissions)
-4. **Simulated data** (dynamic datasets generated on the fly for testing)
+1.  **Classic built-in package data** (standard `camtrapR` format)
+2.  **Camtrap DP formatted data** (the emerging Camera Trap Data Package standard)
+3.  **Wildlife Insights data exports** (with built-in workarounds for common metadata omissions)
+4.  **Simulated data** (dynamic datasets generated on the fly for testing)
 
 This vignette guides you through loading these various data sources and shows how to explore them interactively using the built-in Shiny application web interface, `surveyDashboard()`. Since this function launches an interactive web browser session, **the `surveyDashboard()` code below is not run during document compilation**, but you can run it directly in your R console.
 
-By using these sample datasets, you can quickly familiarize yourself with the capabilities of `camtrapR` and the `surveyDashboard()` user interface before importing your own field data. 
-
-
+By using these sample datasets, you can quickly familiarize yourself with the capabilities of `camtrapR` and the `surveyDashboard()` user interface before importing your own field data.
 
 ## Setup
 
@@ -47,7 +44,6 @@ library(DT)
 ## 1. Built-in `camtrapR` Sample Data
 
 `camtrapR` comes with a classic, reliable "tiny" dataset containing camera trap records and station details collected in Sabah, Malaysian Borneo in 2009. This is the easiest way to test package functions.
-
 
 ```{r}
 data("camtraps")
@@ -70,15 +66,16 @@ surveyDashboard(
 ```
 
 View the camera trap table:
-``` {r}
+
+```{r}
 DT::datatable(camtraps)
 ```
 
 View the record table:
-``` {r}
+
+```{r}
 DT::datatable(recordTableSample)
 ```
-
 
 The record table can also be created from JPG images that are included in the package with `recordTable`. See the help file for example code: `?recordTable`.
 
@@ -90,21 +87,22 @@ Note, in the sample data the species names are abbreviated in order to comply wi
 - TRA: *Tragulus spp.* (Mousedeer)
 - VTA: *Viverra tangalunga* (Malayan Civet)
 
-## 2. Camtrap DP Sample Data
+## 2. Camtrap DP Data
 
-The **Camera Trap Data Package (Camtrap DP)** is a community-developed data exchange format. `camtrapR` supports reading Camtrap DP formatted data. The package includes a small, standardized sample dataset (without image files).
+The **Camera Trap Data Package (Camtrap DP)** is a community-developed data exchange format. `camtrapR` supports reading Camtrap DP formatted data.
+
+### Built-in sample camtrap DP dataset
+
+The package includes the standard camtrap DP sample dataset (without image files).
 
 ```{r  load-camtrap-dp}
 path_camtrapdp <- system.file("sample_data/tdwg_camtrap-dp_1.0.2_example", 
                                     package = "camtrapR")
-camtrapdp <- readcamtrapDP(deployments_file = file.path(path_camtrapdp, "deployments.csv"),
-                           observations_file = file.path(path_camtrapdp, "observations.csv"),
-                           media_file = file.path(path_camtrapdp, "media.csv"),
-                           datapackage_file = file.path(path_camtrapdp, "datapackage.json")) 
+camtrapdp <- readcamtrapDP(file = file.path(path_camtrapdp, "datapackage.json")) 
 
 ```
 
-Have a quick look at the camera trap (deployments) data:
+Have a quick look at the camera trap (deployments) data. In the vignette we use `DT::datatable()` but in interactive sessions `View()` provides a richer presentation of the data.
 
 ```{r}
 DT::datatable(camtrapdp$CTtable)
@@ -118,8 +116,7 @@ DT::datatable(camtrapdp$recordTable)
 
 Open surveyDashboard with camtrap DP data:
 
-```{r}
-#| eval: false
+```{r eval = FALSE}
 surveyDashboard( CTtable = camtrapdp$CTtable,
                  recordTable = camtrapdp$recordTable, 
                  xcol = "longitude", 
@@ -132,40 +129,80 @@ surveyDashboard( CTtable = camtrapdp$CTtable,
                  speciesCol = "vernacularName_eng")
 ```
 
-vernacularNames are useful, but optional under the camtrap DP standard. If they are not included the data still load, creating a field "vernacuarNames" which uses "scientificNames" and "observationType" as a fallback (e.g. for "blank").
+### A real-world dataset (Snapshot Japan 2023)
 
-```{r}
-camtrapdp_no_vernac <- readcamtrapDP(deployments_file = file.path(path_camtrapdp, "deployments.csv"),
-                           observations_file = file.path(path_camtrapdp, "observations.csv"),
-                           media_file = file.path(path_camtrapdp, "media.csv"),
-                           datapackage_file = file.path(path_camtrapdp, "datapackage_no_vernacularNames.json"))
+For testing with a larger dataset, download the [Snapshot Japan 2023 data fro GBIF](https://www.gbif.org/dataset/f0a42d7d-1eda-4ec8-ac66-c1343acea3bc) (under Download, choose "Source archive". Unzip and save in a folder.
+
+Load the data:
+
+``` {r eval = F}
+dir_snapshot_japan <- "/path/to/unzipped/datapackage"
+camtrapdp_japan <- readcamtrapDP(file.path(wd_snapshot_japan, "datapackage.json"))
 ```
 
-```{r}
-#| eval: false
-surveyDashboard( CTtable = camtrapdp_no_vernac$CTtable,
-                 recordTable = camtrapdp_no_vernac$recordTable, 
-                 xcol = "longitude", 
-                 ycol = "latitude", 
-                 crs = 4326, 
-                 stationCol = "locationName", 
-                 setupCol = "Setup_date", 
-                 retrievalCol = "Retrieval_date", 
-                 CTdateFormat = "ymd HMS", 
-                 speciesCol = "vernacularName")
+Open the dashboard with the data:
+
+``` {r eval = F}
+surveyDashboard(CTtable = camtrapdp_japan$CTtable,
+                recordTable = camtrapdp_japan$recordTable,
+                xcol = "longitude", 
+                ycol = "latitude", 
+                crs = 4326, 
+                stationCol = "Station",
+                setupCol = "Setup_date", 
+                retrievalCol = "Retrieval_date", 
+                CTdateFormat = "ymd HMS", 
+                speciesCol = "scientificName")
+
 ```
+
+**Note:** The Snapshot Japan dataset covers a very large area. Downloading elevation data for this entire extent in the "Extract Covariates" tab of the dashboard at high resolution (30m) makes heavy demands on AWS servers and can potentially lead to IP blocks.
+
+Please only download the resolution you absolutely need and consider limiting the extent by filtering stations first. 
+
+We highly recommend using the **Data Export** button in the dashboard sidebar to save your harmonized prediction and raw covariate rasters locally after the first run, allowing you to load them offline in the future.
+
+
+### Handling Optional Data and Fallbacks
+
+The Camtrap DP standard is designed to be highly flexible, meaning several columns that are traditionally required by `camtrapR` (such as specific station names or common species names) are technically optional.
+
+To ensure your data always loads smoothly into `camtrapR` formats, the `readcamtrapDP()` function employs a robust fallback hierarchy.
+
+#### Location / Station Fallbacks
+
+In `camtrapR`, deployments are grouped by a `Station` identifier. Under the Camtrap DP standard, both `locationID` and `locationName` are optional. Real-world datasets vary wildly: the official standard example provides `locationName`, while other datasets might only provide `locationID` (leaving `locationName` as `NA`), or neither!
+
+To guarantee a `Station` ID is created, the function looks for identifiers in this exact order: 
+
+1. **`locationID`**: The primary identifier. 
+2. **`locationName`**: Used if `locationID` is completely missing or all `NA`. 
+3. **`deploymentID`**: The ultimate fallback. If no location data is provided, the function treats each individual deployment as its own unique station. 
+
+*(Note: If the chosen column has some missing values, those specific blanks are automatically filled with the `deploymentID`).*
+
+#### Taxonomy and Species Fallbacks
+
+Similarly, `vernacularNames` (common names) are entirely optional in Camtrap DP. Furthermore, non-animal records (like camera misfires or human activity) will naturally lack a `scientificName`. In `camtrapR`, users typically expect a single classification column that contains both animals and non-animals.
+
+To handle this, the function applies this taxonomic fallback hierarchy: 
+
+1. **`vernacularNames`**: If provided in the dataset, these are joined to the observations (e.g., as `vernacularName_en`). Non-animal records (which have no name) are filled using the core `observationType` (e.g., `"blank"`, `"human"`, `"vehicle"`). 
+2. **`scientificName`**: If no vernacular names exist, the function falls back to using `scientificName` as the primary classification column. It will issue a warning to inform you of this, and populate any empty rows with the `observationType` so that non-animal events are not lost as `NA`s in downstream `camtrapR` analyses.
+
+In the Snapshot Japan 2023 dataset above, `vernacularNames` are absent from the metadata. Notice how the function loads the data regardless, with a message informing the user of the fallback used.
+
 
 
 ## 3. Wildlife Insights
 
 Wildlife Insights data can be downloaded from the [Wildlife Insights website](https://app.wildlifeinsights.org/explore).
 
-Assuming we have downloaded a zipped data export, we can load it with `readWildlifeInsights`. Alternatively one can directly specify the paths to the required tabls.
-
+Assuming we have downloaded a zipped data export, we can load it with `readWildlifeInsights`. Alternatively one can directly specify the paths to the required tables.
 
 ```{r}
 #| eval: false 
-wildlifeinsights <- readWildlifeInsights(zipfile = "path/to/your/file.zip")
+wildlifeinsights <- readWildlifeInsights(zipfile = "path/to/your/downloaded_file.zip")
 ```
 
 **Warning**: many Wildlife Insights downloads currently don't match the declared [Wildlife Insights Minimum Metadata Standards](https://docs.google.com/spreadsheets/d/1Jg-WybmVeGlWGrbPpwuwJCgranOV1r3M_LrzELttfK0/edit?usp=sharing) and cause errors in the import function. Specifically,
@@ -173,16 +210,17 @@ wildlifeinsights <- readWildlifeInsights(zipfile = "path/to/your/file.zip")
 - the deployments table often lacks the "placename" column
 - in the images table, "timestamp" is often not formatted according to the standard
 
+The developers are working on a solution and this warning will be removed when the problems are solved.
+
 
 # 4. Simulated datasets
-
 
 `camtrapR` can generate synthetic datasets for testing without real-world data.
 
 The package provides a simulation function `simulateCamtrapData` that can generate datasets of varying complexity, including:
 
-* Single or dual camera setups
-* Single or multi-season studies
+- Single or dual camera setups
+- Single or multi-season studies
 
 The following parameters can be adjusted:
 
@@ -214,18 +252,20 @@ simcam1 <- simulateCamtrapData(nStation = nStation,
                                seed = seed)
 ```
 
-
 The result is a list containing camera deployments and mock detections. We can inspect the camera trap table:
+
 ```{r}
 DT::datatable(simcam1$camtraps)
 ```
 
 And the record table:
+
 ```{r}
 DT::datatable(simcam1$recordTable)
 ```
 
 The dashboard can be called as follows:
+
 ```{r}
 #| eval: false
 surveyDashboard(CTtable = simcam1$camtraps,
@@ -242,6 +282,7 @@ surveyDashboard(CTtable = simcam1$camtraps,
 #### Dual camera
 
 Dual-camera setups can be simulated by setting `camerasPerStation = 2`. While the `surveyDashboard` requires input to `camerasIndependent`, there is no mechanism in `simulateCamtrapData` that influences independence of records between cameras.
+
 ```{r}
 simcam2 <- simulateCamtrapData(nStation = nStation,
                                camerasPerStation = 2,
@@ -277,7 +318,6 @@ simcam3 <- simulateCamtrapData(nStation = nStation,
 
 The dashboard currently does not support multi-season data.
 
-
 #### Dual camera
 
 Multi-season, dual camera setups can be simulated by setting `nSeasons = 2` (or a higher number) and `camerasPerStation = 2`.
@@ -291,19 +331,18 @@ simcam4 <- simulateCamtrapData(nStation = nStation,
 
 The dashboard currently does not support multi-season data.
 
-
 ## 5. Other CSVs
 
 ### Large dataset
 
-To ensure loading large csv in the dashboard works we can simulate a large dataset:
+To ensure loading large datasets in the dashboard works we can simulate one:
 
 ```{r}
 sim_study_large <- simulateCamtrapData(nStations = 1000, 
                                        camerasPerStation = 2, 
-                                       nSpecies = 60, 
-                                       nRecords = 300000, 
-                                       seed = seed)
+                                       duration_days = 100,
+                                       nSpecies = 100, 
+                                       nRecords = 100000)
 ```
 
 ```{r}
@@ -319,6 +358,5 @@ surveyDashboard(CTtable = sim_study_large$camtraps,
                 retrievalCol = "Retrieval_date", 
                 CTdateFormat = "ymd", 
                 camerasIndependent = TRUE, 
-                speciesCol = "Species" )
+                speciesCol = "Species")
 ```
-

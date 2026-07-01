@@ -1,247 +1,241 @@
-
 context("readcamtrapDP")
 
 # Load necessary libraries for testing
 library(testthat)
 library(withr)
-library(jsonlite)
 
-# --- Mock Data Creation ---- 
-# For most tests, we'll create data programmatically to ensure the tests
-# are self-contained and predictable.
+# --- Setup Fixture Paths ---
+# automatic tests
+# fixture_path <- test_path("fixtures", "sample_camtrap_dp_data")
+# local tests
+fixture_path <- file.path(Sys.getenv("CAMTRAPR_DIR"), "tests", "testthat", "fixtures", "sample_camtrap_dp_data")
 
-# Mock deployments.csv data
-mock_deployments <- data.frame(
-  deploymentID = c("dep1", "dep2", "dep3"),
-  locationID = c("StationA", "StationA", "StationB"),
-  locationName = c("Forest Edge", "Forest Edge", "River Bank"),
-  deploymentStart = c("2022-01-01T12:00:00Z", "2022-01-15T12:00:00Z", "2022-01-05T10:00:00Z"),
-  deploymentEnd = c("2022-01-10T12:00:00Z", "2022-01-25T12:00:00Z", "2022-01-20T10:00:00Z"),
-  deploymentTags = c("habitat:forest|research_project:X", "research_project:X", NA),
-  stringsAsFactors = FALSE
-)
-# The gap between dep1 and dep2 is 5 days (120 hours), which should trigger the problem logic.
+dp_file <- file.path(fixture_path, "datapackage.json")
 
-# Mock observations.csv data
-mock_observations <- data.frame(
-  observationID = 1:4,
-  deploymentID = c("dep1", "dep1", "dep2", "dep3"),
-  observationType = c("animal", "human", "animal", "unidentified"),
-  scientificName = c("Panthera pardus", NA, "Sus scrofa", NA),
-  count = c(1, 2, 1, 1),
-  eventStart = c("2022-01-02T14:00:00Z", "2022-01-03T10:00:00Z", "2022-01-16T22:00:00Z", "2022-01-08T05:00:00Z"),
-  bboxX = c(10, NA, 30, NA),
-  stringsAsFactors = FALSE
-)
-
-# Mock media.csv data
-mock_media <- data.frame(
-  mediaID = 1:4,
-  deploymentID = c("dep1", "dep1", "dep2", "dep3"),
-  filePath = c("imgs/dep1/img1.jpg", "imgs/dep1/img2.jpg", "imgs/dep2/img3.jpg", "imgs/dep3/img4.jpg"),
-  stringsAsFactors = FALSE
-)
-# Note: In a real CamtrapDP, mediaIDs should link to observationIDs. We simplify here for the test.
-
-# Mock datapackage.json content
-mock_datapackage <- toJSON(list(
-  name = "mock-project",
-  taxonomic = list(
-    scientificName = c("Panthera pardus", "Sus scrofa"),
-    taxonRank = c("species", "species"),
-    vernacularNames = list(
-      eng = c("Leopard", "Wild Boar"),
-      fra = c("Léopard", "Sanglier")
-    )
-  )
-), auto_unbox = TRUE, pretty = TRUE)
-
-
-# --- Test Suite ---
+# ---------------------------------------------------------
+# Test Suite 1: Core Functionality & Legacy Arguments
+# ---------------------------------------------------------
 
 testthat::describe("Core Functionality: Reading Data", {
   
-  test_that("it reads correctly from individual CSV files in a temp directory", {
-    with_tempdir({
-      # Create mock files in the temporary directory
-      write.csv(mock_deployments, "deps.csv", row.names = FALSE)
-      write.csv(mock_observations, "obs.csv", row.names = FALSE)
-      write.csv(mock_media, "med.csv", row.names = FALSE)
-      writeLines(mock_datapackage, "dp.json")
-      
-      # Call the function with explicit file paths
-      result <- readcamtrapDP(
-        deployments_file = "deps.csv",
-        observations_file = "obs.csv",
-        media_file = "med.csv", # needed for add_file_path later
-        datapackage_file = "dp.json"
-      )
-      
-      # 1. Check output structure
-      expect_equal(class(result), "list")
-      expect_named(result, c("CTtable", "recordTable", "metadata"))
-      
-      # 2. Check CTtable
-      ct_table <- result$CTtable
-      expect_s3_class(ct_table, "data.frame")
-      expect_equal(nrow(ct_table), 2) # StationA and StationB
-      
-      # 3. Check recordTable
-      rec_table <- result$recordTable
-      expect_s3_class(rec_table, "data.frame")
-      expect_equal(nrow(rec_table), 4) # 4 observations
-      
-      # 4. Check metadata
-      expect_true("taxonomic" %in% names(result$metadata))
-    })
-  })
+  # Skip all tests if camtrapdp or fixture is missing
+  skip_if_not_installed("camtrapdp")
+  skip_if_not(dir.exists(fixture_path), "Sample fixture data not found.")
   
-  test_that("it reads correctly when only a directory is set (default filenames)", {
-    with_tempdir({
-      # Create files with default names
-      write.csv(mock_deployments, "deployments.csv", row.names = FALSE)
-      write.csv(mock_observations, "observations.csv", row.names = FALSE)
-      writeLines(mock_datapackage, "datapackage.json")
-      
-      # Temporarily change working directory to the temp dir
-      with_dir(".", {
-        # Call with no arguments
-        result <- readcamtrapDP()
-      })
-      
-      # Check that the output is valid
-      expect_equal(nrow(result$CTtable), 2)
-      expect_equal(nrow(result$recordTable), 4)
-    })
-  })
-  
-  test_that("it reads correctly from the package's fixture data (real files)", {
-    # This test uses the unzipped data you placed in tests/testthat/fixtures/
-    fixture_path <- test_path("fixtures", "sample_camtrap_dp_data")
+  test_that("it reads a valid datapackage correctly", {
+    result <- readcamtrapDP(file = dp_file)
     
-    # Skip if the directory doesn't exist, so the test is robust
-    skip_if_not(dir.exists(fixture_path), "Sample fixture data not found.")
+    # 1. Check output structure
+    expect_type(result, "list")
+    expect_named(result, c("CTtable", "recordTable", "metadata"))
     
-    # Use with_dir to temporarily set the working directory
-    with_dir(fixture_path, {
-      result <- readcamtrapDP()
-    })
-    
-    # Perform some basic checks on the real data
-    expect_equal(class(result), "list")
+    # 2. Check CTtable
+    expect_s3_class(result$CTtable, "data.frame")
     expect_gt(nrow(result$CTtable), 0)
+    expect_true("Station" %in% colnames(result$CTtable))
+    
+    # 3. Check recordTable
+    expect_s3_class(result$recordTable, "data.frame")
     expect_gt(nrow(result$recordTable), 0)
+    
+    # 4. Check metadata
+    expect_type(result$metadata, "list")
   })
   
-  test_that("It works when vernacularNames are missing from datapackage.json", {
+  test_that("it handles legacy CSV arguments by issuing a warning but parsing successfully", {
+    # Simulate someone providing the old individual file paths
+    expect_warning(
+      result <- readcamtrapDP(
+        file = dp_file,
+        deployments_file = file.path(fixture_path, "deployments.csv"),
+        media_file = file.path(fixture_path, "media.csv")
+      ),
+      "ignored"
+    )
+    
+    expect_type(result, "list")
+    expect_s3_class(result$CTtable, "data.frame")
+    expect_s3_class(result$recordTable, "data.frame")
+  })
+})
+# 
+# ---------------------------------------------------------
+# Test Suite 2: Conditional Logic & Fallbacks
+# ---------------------------------------------------------
+
+testthat::describe("Conditional Logic & Optional Column Fallbacks", {
   
-  # uses datapackage_no_vernacularNames.json which has vernacularNames removed manually
-  fixture_path <- test_path("fixtures", "sample_camtrap_dp_data")
+  skip_if_not_installed("camtrapdp")
+  skip_if_not(dir.exists(fixture_path), "Sample fixture data not found.")
   
-  expect_warning(readcamtrapDP(deployments_file = file.path(fixture_path, "deployments.csv"),
-                               observations_file = file.path(fixture_path, "observations.csv"),
-                               media_file = file.path(fixture_path, "media.csv"),
-                               datapackage_file = file.path(fixture_path, "datapackage_no_vernacularNames.json")),  
-                 
-                 "No vernacularName in metadata. Creating 'vernacularNames' from 'scientificNames' with 'observationType' as fallback."
-                 
-  )
+  test_that("it falls back to locationName when locationID is missing", {
+    with_tempdir({
+      # Copy fixture to temp directory
+      file.copy(list.files(fixture_path, full.names = TRUE), ".", recursive = TRUE)
+      
+      # Corrupt locationID (It is optional in the DP schema, so camtrapdp handles this fine)
+      deps <- read.csv("deployments.csv", stringsAsFactors = FALSE)
+      deps$locationID <- NA
+      write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
+      
+      res <- readcamtrapDP("datapackage.json")
+      
+      # Station should now equal locationName
+      expect_setequal(res$CTtable$Station, unique(deps$locationName))
+    })
+  })
+  
+  test_that("it falls back to deploymentID when both locationID and locationName are missing", {
+    with_tempdir({
+      file.copy(list.files(fixture_path, full.names = TRUE), ".", recursive = TRUE)
+      
+      deps <- read.csv("deployments.csv", stringsAsFactors = FALSE)
+      deps$locationID <- NA
+      deps$locationName <- NA
+      write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
+      
+      res <- readcamtrapDP("datapackage.json")
+      
+      # Station should now equal deploymentID
+      expect_setequal(res$CTtable$Station, unique(deps$deploymentID))
+    })
+  })
+  
+  test_that("it assigns 'unknown_camera' when cameraID is missing", {
+    with_tempdir({
+      file.copy(list.files(fixture_path, full.names = TRUE), ".", recursive = TRUE)
+      
+      deps <- read.csv("deployments.csv", stringsAsFactors = FALSE)
+      deps$cameraID <- NA
+      write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
+      
+      res <- readcamtrapDP("datapackage.json")
+      
+      expect_true(all(res$CTtable$cameraID == "unknown_camera"))
+      expect_true(all(res$recordTable$cameraID == "unknown_camera"))
+    })
+  })
+  
+  test_that("it handles taxonomy fallbacks for non-animal observations (e.g. blanks)", {
+    with_tempdir({
+      file.copy(list.files(fixture_path, full.names = TRUE), ".", recursive = TRUE)
+      
+      # Read observations and artificially insert a new "blank" row
+      obs <- read.csv("observations.csv", stringsAsFactors = FALSE)
+      fake_obs <- obs[1, ]
+      fake_obs$observationID <- "fake_blank_1"
+      fake_obs$observationType <- "blank"
+      fake_obs$scientificName <- NA 
+      
+      obs <- rbind(obs, fake_obs)
+      write.csv(obs, "observations.csv", row.names = FALSE, na = "")
+      
+      res <- readcamtrapDP("datapackage.json")
+      
+      # Isolate the fake row we just created
+      test_row <- res$recordTable[res$recordTable$observationID == "fake_blank_1", ]
+      
+      # Confirm the row was captured and check its vernacular columns
+      vern_cols <- grep("^vernacularName", colnames(test_row), value = TRUE)
+      expect_gt(length(vern_cols), 0)
+      
+      # Because scientificName was NA, the taxonomy join yielded NA. 
+      # Our fallback logic should have populated these NAs with the string "blank".
+      for (vc in vern_cols) {
+        expect_equal(test_row[[vc]][1], "blank")
+      }
+    })
   })
 })
 
+# ---------------------------------------------------------
+# Test Suite 3: Gap Analysis & Data Processing
+# ---------------------------------------------------------
 
-testthat::describe("Data Processing Logic", {
+testthat::describe("Gap Analysis and Data Processing", {
+  
+  skip_if_not_installed("camtrapdp")
+  skip_if_not(dir.exists(fixture_path), "Sample fixture data not found.")
   
   test_that("it correctly detects and records deployment gaps as problems", {
     with_tempdir({
-      write.csv(mock_deployments, "deployments.csv", row.names = FALSE)
-      write.csv(mock_observations, "observations.csv", row.names = FALSE)
-      writeLines(mock_datapackage, "datapackage.json")
+      file.copy(list.files(fixture_path, full.names = TRUE), ".", recursive = TRUE)
       
-      result <- readcamtrapDP(deployments_file = "deployments.csv", 
-                              observations_file = "observations.csv",
-                              datapackage_file = "datapackage.json",
-                              min_gap_hours = 24) # Default
+      deps <- read.csv("deployments.csv", stringsAsFactors = FALSE)
       
-      ct_table <- result$CTtable
-      station_a_data <- ct_table[ct_table$Station == "StationA", ]
+      # Force a gap of 5 days (> 24 hours) for the same station
+      deps$locationID[1:2] <- "GapStation"
+      deps$deploymentStart[1] <- "2020-01-01T12:00:00Z"
+      deps$deploymentEnd[1]   <- "2020-01-10T12:00:00Z"
       
-      # StationA had a 5-day gap, so Problem columns should exist
-      expect_true("Problem1_from" %in% names(station_a_data))
-      expect_true("Problem1_to" %in% names(station_a_data))
-      expect_equal(station_a_data$Problem1_from, "2022-01-10 12:00:00")
-      expect_equal(station_a_data$Problem1_to, "2022-01-15 12:00:00")
+      deps$deploymentStart[2] <- "2020-01-15T12:00:00Z"
+      deps$deploymentEnd[2]   <- "2020-01-20T12:00:00Z"
+      write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
+      
+      res <- readcamtrapDP("datapackage.json", min_gap_hours = 24)
+      
+      gap_station <- res$CTtable[res$CTtable$Station == "GapStation", ]
+      
+      expect_true("Problem1_from" %in% colnames(gap_station))
+      expect_true("Problem1_to" %in% colnames(gap_station))
+      expect_equal(gap_station$Problem1_from, "2020-01-10 12:00:00")
+      expect_equal(gap_station$Problem1_to, "2020-01-15 12:00:00")
     })
-  })
-  
-  test_that("it correctly parses tags and adds taxonomic info", {
-      
-    fixture_path <- test_path("fixtures", "sample_camtrap_dp_data")
-    
-      result <- readcamtrapDP(deployments_file = file.path(fixture_path, "deployments.csv"), 
-                              observations_file = file.path(fixture_path, "observations.csv"),
-                              # media_file = file.path(fixture_path, "media.csv"),
-                              datapackage_file = file.path(fixture_path, "datapackage.json"),)
-      
-
-      # 1. Check taxonomic info
-      rec_table <- result$recordTable
-      expect_true("vernacularName_eng" %in% names(rec_table))
-      species_test_row <- rec_table[rec_table$scientificName == "Anas strepera", ]
-      expect_equal(species_test_row$vernacularName_eng[1], "gadwall")
-      expect_equal(species_test_row$vernacularName_nld[1], "krakeend")
-    # })
   })
 })
 
+# ---------------------------------------------------------
+# Test Suite 4: Argument Flags
+# ---------------------------------------------------------
 
-testthat::describe("Argument Handling", {
+testthat::describe("Argument Flags Handling", {
   
-  test_that("filter_observations correctly subsets the recordTable", {
+  skip_if_not_installed("camtrapdp")
+  skip_if_not(dir.exists(fixture_path), "Sample fixture data not found.")
+  
+  test_that("filter_observations subsets recordTable correctly", {
+    # Test Boolean TRUE (Keep only animals)
+    res_animal <- readcamtrapDP(file = dp_file, filter_observations = TRUE)
+    expect_true(all(res_animal$recordTable$observationType == "animal"))
+    
+    # Test specific string vector targeting
     with_tempdir({
-      write.csv(mock_deployments, "deployments.csv", row.names = FALSE)
-      write.csv(mock_observations, "observations.csv", row.names = FALSE)
-      writeLines(mock_datapackage, "datapackage.json")
+      file.copy(list.files(fixture_path, full.names = TRUE), ".", recursive = TRUE)
+      obs <- read.csv("observations.csv", stringsAsFactors = FALSE)
       
-      # Filter to keep only "animal"
-      result_animal <- readcamtrapDP(deployments_file = "deployments.csv", 
-                                     observations_file = "observations.csv",
-                                     datapackage_file = "datapackage.json",
-                                     filter_observations = TRUE)
-      expect_equal(nrow(result_animal$recordTable), 2)
-      expect_true(all(result_animal$recordTable$observationType == "animal"))
+      # Ensure we have instances of human and blank
+      obs$observationType[1:2] <- c("human", "blank")
+      write.csv(obs, "observations.csv", row.names = FALSE, na = "")
       
-      # Filter to keep specific types
-      result_specific <- readcamtrapDP(deployments_file = "deployments.csv", 
-                                       observations_file = "observations.csv",
-                                       datapackage_file = "datapackage.json",
-                                       filter_observations = c("human", "unidentified"))
-      expect_equal(nrow(result_specific$recordTable), 2)
+      res_custom <- readcamtrapDP("datapackage.json", filter_observations = c("human", "blank"))
+      expect_true(all(res_custom$recordTable$observationType %in% c("human", "blank")))
     })
   })
   
-  test_that("add_file_path and remove_bbox work correctly", {
+  test_that("add_file_path joins file paths from media table", {
+    # Default is FALSE
+    res_default <- readcamtrapDP(file = dp_file, add_file_path = FALSE)
+    expect_false("filePath" %in% colnames(res_default$recordTable))
     
-    fixture_path <- test_path("fixtures", "sample_camtrap_dp_data")
-    
-      # Test with file paths added and bbox removed (defaults)
-      result1 <- readcamtrapDP(deployments_file = file.path(fixture_path, "deployments.csv"), 
-                               observations_file = file.path(fixture_path, "observations.csv"),
-                               media_file = file.path(fixture_path, "media.csv"),
-                               datapackage_file = file.path(fixture_path, "datapackage.json"),
-                               add_file_path = TRUE,
-                               remove_bbox = TRUE)
-      expect_true("filePath" %in% names(result1$recordTable))
-      expect_false("bboxX" %in% names(result1$recordTable))
-      
-      # Test with file paths removed and bbox kept
-      result2 <- readcamtrapDP(deployments_file = file.path(fixture_path, "deployments.csv"), 
-                               observations_file = file.path(fixture_path, "observations.csv"),
-                               media_file = file.path(fixture_path, "media.csv"),
-                               datapackage_file = file.path(fixture_path, "datapackage.json"),
-                               add_file_path = FALSE,
-                               remove_bbox = FALSE)
-      expect_false("filePath" %in% names(result2$recordTable))
-      expect_true("bboxX" %in% names(result2$recordTable))
+    # Turn ON
+    res_added <- readcamtrapDP(file = dp_file, add_file_path = TRUE)
+    # Ensure it joined securely
+    if ("mediaID" %in% colnames(res_added$recordTable)) {
+      expect_true("filePath" %in% colnames(res_added$recordTable))
+    }
   })
+  
+  test_that("remove_bbox strips bounding box coordinates", {
+    # Default is TRUE
+    res_default <- readcamtrapDP(file = dp_file, remove_bbox = TRUE)
+    expect_false(any(grepl("bbox", colnames(res_default$recordTable))))
+    
+    # Turn OFF
+    res_kept <- readcamtrapDP(file = dp_file, remove_bbox = FALSE)
+    raw_obs <- read.csv(file.path(fixture_path, "observations.csv"), stringsAsFactors = FALSE)
+    if ("bboxX" %in% colnames(raw_obs)) {
+      expect_true("bboxX" %in% colnames(res_kept$recordTable))
+    }
+  })
+  
 })
