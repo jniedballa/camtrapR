@@ -7,14 +7,13 @@
 ^.github
 ^R/_not_for_CRAN$
 ^.travis\.yml$
-^Image-ExifTool-11.94\.tar\.gz$
-^Image-ExifTool-11.94$
 ^to_do.txt$
 ^vignettes/camtrapr1.Rmd$
 ^vignettes/camtrapr2.Rmd$
 ^vignettes/camtrapr3.Rmd$
 ^vignettes/camtrapr4.Rmd$
 ^vignettes/camtrapr5.Rmd$
+^vignettes/camtrapr6.Rmd$
 ^vignettes/mapview_example\.png$
 ^vignettes/SpeciesID_digiKam\.png$
 ^\.github$
@@ -24,3 +23,4 @@
 ^.stignore
 ^.stfolder
 ^.stversions
+.vscode

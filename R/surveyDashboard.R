@@ -128,21 +128,22 @@
 #' 
 #' @author Juergen Niedballa
 #'  
-#' @importFrom grDevices hcl.colors colorRampPalette
-#' @importFrom graphics layout pairs plot.new title
-#' @importFrom lubridate is.Date parse_date_time
-#' @importFrom utils read.csv str unzip sessionInfo
-#' @importFrom shiny renderUI renderText outputOptions req observe observeEvent reactiveVal reactiveValues renderTable renderPrint renderPlot updateSelectInput updateSelectizeInput updateTextInput updateNumericInput updateSliderInput updateCheckboxInput updateCheckboxGroupInput updateActionButton removeNotification showNotification showModal removeModal modalDialog modalButton HTML tags tabsetPanel tabPanel actionButton checkboxInput checkboxGroupInput fileInput numericInput radioButtons selectInput sliderInput textInput uiOutput verbatimTextOutput plotOutput textOutput wellPanel withProgress fluidRow column div hr h4 h5 conditionalPanel helpText tagList tableOutput reactive reactiveTimer varSelectizeInput icon h1 h2 h3 isolate need validate span htmlOutput
-#' @importFrom shinydashboard dropdownMenu dropdownMenuOutput renderMenu
-#' @importFrom DT renderDT DTOutput datatable
-#' @importFrom dplyr %>% group_by summarize n n_distinct pull sym
-#' @importFrom sf st_buffer st_convex_hull st_drop_geometry st_intersection st_transform st_union st_make_valid
-#' @importFrom terra rast vect project resample nlyr values<- mask
-#' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
-#' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline median_hilow scale_x_continuous stat_summary theme_void
-#' @importFrom shinyBS bsTooltip
-#' @importFrom reshape2 melt
 #' @importFrom checkmate assert assert_data_frame assert_logical assert_character assert_choice checkClass makeAssertCollection reportAssertions
+#' @importFrom grDevices hcl.colors colorRampPalette
+#' @importFrom dplyr %>% group_by summarize n n_distinct pull sym
+#' @importFrom DT renderDT DTOutput datatable
+#' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline median_hilow scale_x_continuous stat_summary theme_void
+#' @importFrom graphics layout pairs plot.new title
+#' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
+#' @importFrom lubridate is.Date parse_date_time
+#' @importFrom reshape2 melt
+#' @importFrom sf st_buffer st_convex_hull st_drop_geometry st_intersection st_transform st_union st_make_valid
+#' @importFrom shiny renderUI renderText outputOptions req observe observeEvent reactiveVal reactiveValues renderTable renderPrint renderPlot updateSelectInput updateSelectizeInput updateTextInput updateNumericInput updateSliderInput updateCheckboxInput updateCheckboxGroupInput updateActionButton removeNotification showNotification showModal removeModal modalDialog modalButton HTML tags tabsetPanel tabPanel actionButton checkboxInput checkboxGroupInput fileInput numericInput radioButtons selectInput sliderInput textInput uiOutput verbatimTextOutput plotOutput textOutput wellPanel withProgress fluidRow column div hr h4 h5 conditionalPanel helpText tagList tableOutput reactive reactiveTimer varSelectizeInput icon h1 h2 h3 isolate need validate span htmlOutput dateRangeInput updateDateRangeInput
+#' @importFrom shinyBS bsTooltip
+#' @importFrom shinydashboard dropdownMenu dropdownMenuOutput renderMenu
+#' @importFrom terra rast vect project resample nlyr values<- mask
+#' @importFrom utils read.csv str unzip sessionInfo
+
 #' @export
 
 
@@ -435,9 +436,10 @@ surveyDashboard <- function(CTtable = NULL,
         # Add new dedicated Filters section
         shinydashboard::menuItem("Data Filters", icon = shiny::icon("filter"),
                                  shinydashboard::menuSubItem("Filter Overview", tabName = "filter_overview"),
-                                 shinydashboard::menuSubItem("Station Filters", tabName = "filterCTData"),
-                                 shinydashboard::menuSubItem("Temporal Filters", tabName = "filterRecords"),
-                                 shinydashboard::menuSubItem("Species Filters", tabName = "filterSpecies")
+                                 shinydashboard::menuSubItem("Station Filter", tabName = "filterCTData"),
+                                 shinydashboard::menuSubItem("Date Range Filter", tabName = "filterCTData_by_date"),
+                                 shinydashboard::menuSubItem("Temporal Filter", tabName = "filterRecords"),
+                                 shinydashboard::menuSubItem("Species Filter", tabName = "filterSpecies")
         ),
         add_tooltip(id = "Data Filters", title = "Apply filters to refine the dataset used for analysis.", placement = "right"),
         
@@ -501,7 +503,7 @@ surveyDashboard <- function(CTtable = NULL,
         
         ## Tab: Import data ----
         
-        ###  csv ----
+        ###  CSV ----
         shinydashboard::tabItem(
           tabName = "import_csv",
           shiny::tabsetPanel(
@@ -845,7 +847,7 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
-        ## Tab: Summary  ----
+        ## Tab: Data Summary  ----
         # (No input elements here)
         shinydashboard::tabItem(
           tabName = "Summary",
@@ -948,8 +950,10 @@ surveyDashboard <- function(CTtable = NULL,
                                 )
         ),
         
-        ## Tab: Camera table  ----
+        ## Tab: Tables ----
         # (No input elements here)
+        
+        ### Tab: Camera table  ----
         shinydashboard::tabItem(tabName = "camera_table",
                                 shiny::tabsetPanel(
                                   shiny::tabPanel(title = "Current Camera trap table",
@@ -961,8 +965,7 @@ surveyDashboard <- function(CTtable = NULL,
                                 )
         ),
         
-        ## Tab: Record table  ----
-        # (No input elements here)
+        ### Tab: Record table  ----
         shinydashboard::tabItem(tabName = "record_table",
                                 DT::dataTableOutput("record_table")),
         
@@ -1002,8 +1005,9 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
+        ## Tab: Activity ----
         
-        ## Tab:  Activity (single)  ----
+        ### Tab:  Activity (single)  ----
         shinydashboard::tabItem(
           tabName = "ActivityDensity",
           shiny::fluidRow(
@@ -1024,8 +1028,8 @@ surveyDashboard <- function(CTtable = NULL,
                                             height = "600px"))
           )
         ),
-        
-        ## Tab: Activity ( species overlap)  ----
+     
+        ### Tab: Activity ( species overlap)  ----
         shinydashboard::tabItem(
           tabName = "TwoSpeciesOverlap",
           shiny::fluidRow(
@@ -1056,9 +1060,10 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
+      
+        ## Tab: Filters ----  
         
-        
-        ## Tab: filter summary ----
+        ### Filter summary ----
         shinydashboard::tabItem(
           tabName = "filter_overview",
           fluidRow(
@@ -1066,7 +1071,7 @@ surveyDashboard <- function(CTtable = NULL,
                    shinydashboard::box(
                      title = "Active Filters Summary",
                      width = NULL,
-                     status = "warning",
+                     status = "primary",
                      solidHeader = TRUE,
                      
                      # Summary counts
@@ -1081,8 +1086,10 @@ surveyDashboard <- function(CTtable = NULL,
                               shinydashboard::valueBoxOutput("summary_species_filtered", width = NULL)
                        ),
                        column(3,
-                              shiny::actionButton("resetAllFiltersOverview", "Reset All Filters",
-                                                  icon = icon("sync"), class = "btn-danger btn-block"),
+                              shiny::actionButton("resetAllFiltersOverview", 
+                                                  "Reset All Filters",
+                                                  icon = icon("undo"), 
+                                                  class = "btn-warning"),
                               add_tooltip("resetAllFiltersOverview", "Click to remove all station, temporal, and species filters (does not bring back species removed by 'exclude').")
                        )
                      )
@@ -1091,7 +1098,7 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
-        ## Tab: Filter Stations  ----
+        ### Filter Stations  ----
         shinydashboard::tabItem(
           tabName = "filterCTData",
           fluidRow(
@@ -1111,9 +1118,13 @@ surveyDashboard <- function(CTtable = NULL,
                                           title = "Select the camera trap table column to filter by.")
                                    ),
                                    choices = NULL),
-                       uiOutput("filterControls"), # Tooltips added dynamically via renderUI
-                       shiny::actionButton("applyFilter", "Apply Filter", class = "btn-primary"),
-                       add_tooltip(id = "applyFilter", title = "Apply the currently defined filter to the camera trap stations.")
+                       uiOutput("filterControlsCamtrap"), # Tooltips added dynamically via renderUI
+                       shiny::actionButton("applyFilter_camtrap_properties", 
+                                           "Apply Filter", 
+                                           icon = icon("filter"),
+                                           class = "btn-success",
+                                           style = "margin-top: 10px;"), # green
+                       add_tooltip(id = "applyFilter_camtrap_properties", title = "Apply the currently defined filter to the camera trap stations.")
                 ),
                 
                 # Active filters display
@@ -1123,15 +1134,23 @@ surveyDashboard <- function(CTtable = NULL,
                          width = NULL,
                          status = "info",
                          uiOutput("activeFilters"), # Dynamic buttons, tooltips added via server
-                         shiny::actionButton("clearAllFilters", "Clear All Camera Trap Filters", class = "btn-warning"),
+                         shiny::actionButton("clearAllFilters", 
+                                             "Clear All Camera Trap Filters", 
+                                             class = "btn-warning",
+                                             icon = icon("undo"),
+                                             style = "margin-left: 10px;"),
                          add_tooltip(id = "clearAllFilters", title = "Remove all active filters applied to the camera trap stations.")
                        )
                 )
               ),
               hr(),
               fluidRow(
-                column(12,
-                       uiOutput("filterSummary")
+                shinydashboard::box(
+                  title = "Filter Summary",
+                  width = 12,
+                  status = "info",
+                  solidHeader = TRUE,
+                  uiOutput("overallFilterSummary")
                 )
               ),
               fluidRow(
@@ -1162,7 +1181,74 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
-        ## Tab: Filter records temporally ----
+        
+        ### Filter Deployments by Date ----
+        shinydashboard::tabItem(
+          tabName = "filterCTData_by_date",
+          fluidRow(
+            shinydashboard::box(
+              title = "Filter Deployments & Records by Date",
+              width = 12,
+              status = "primary",
+              solidHeader = TRUE,
+              
+              # Informational text explaining the biological/ecological logic to the user
+              p("Select a study window. Deployments that do not overlap with this range 
+                will be excluded. Overlapping deployments will have their setup/retrieval 
+                dates temporarily clipped to match this window, and records outside this 
+                range will be filtered out."),
+              
+              # TODO: changing setup date when CTdateFormat is date (not date-time) causes cameraOperation to assume setup was at 12 noon, losing half a day of effort
+              
+              
+              # Date Range Selection Widget (Calendar)
+              fluidRow(
+                column(6,
+                       dateRangeInput(
+                         inputId = "date_range_filter",
+                         label = tagList(
+                           "Select Active Window (Start & End Date):",
+                           span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                title = "Define the global date boundaries for deployments and records.")
+                         ),
+                         start = NULL, # Populated dynamically on data load via server-side update
+                         end = NULL,
+                         separator = " to ",
+                         format = "yyyy-mm-dd",
+                         weekstart = 1
+                       )
+                )
+              ),
+              
+              hr(),
+              
+              # Action and Clear buttons
+              fluidRow(
+                column(12,
+                       actionButton(
+                         inputId = "apply_date_filter",
+                         label = "Apply Date Constraints",
+                         icon = icon("filter"),
+                         class = "btn-success" # green
+                       ),
+                       add_tooltip(id = "apply_date_filter", title = "Recalculate deploy effort and slice records according to this date range."),
+                       
+                       actionButton(
+                         inputId = "clear_date_filter",
+                         label = "Clear Date Constraints",
+                         icon = icon("undo"),
+                         class = "btn-warning", # orange
+                         style = "margin-left: 10px;"
+                       ),
+                       add_tooltip(id = "clear_date_filter", title = "Reset start and end date boundary filtering to original values.")
+                )
+              )
+            )
+          )
+        ),
+        
+        
+        ### Filter records temporally ----
         shinydashboard::tabItem(
           tabName = "filterRecords",
           fluidRow(
@@ -1186,9 +1272,17 @@ surveyDashboard <- function(CTtable = NULL,
                             value = TRUE
               ),
               # buttons keep tooltips separate to avoid clickable icons inside buttons
-              shiny::actionButton("runTemporalFilter", "Apply Temporal Filter"),
+              shiny::actionButton("runTemporalFilter", 
+                                  "Apply Temporal Filter",
+                                  icon = icon("filter"),
+                                  class = "btn-success" # green
+                                  ),
               add_tooltip(id = "runTemporalFilter", title = "Apply the temporal independence filter to the record table."),
-              shiny::actionButton("restoreOriginalRecordTable", "Restore Original Record Table", class = "btn-warning"),
+              shiny::actionButton("restoreOriginalRecordTable", 
+                                  "Clear temporal record filter", 
+                                  class = "btn-warning",
+                                  icon = icon("undo"),
+                                  style = "margin-left: 10px;"),
               add_tooltip(id = "restoreOriginalRecordTable", title = "Remove the temporal filter and revert to the record table prior to temporal filtering (other filters may still apply).")
             )
           ),
@@ -1208,7 +1302,7 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
-        ## Tab: Species filter ----
+        ### Species filter ----
         shinydashboard::tabItem(
           tabName = "filterSpecies",
           fluidRow(
@@ -1229,7 +1323,8 @@ surveyDashboard <- function(CTtable = NULL,
                                                  class = "btn-success btn-block",
                                                  icon = icon("check")),
                              add_tooltip(id = "keepSelectedSpecies", title = "Keep only the species selected in the table, filtering out all others."),
-                             shiny::actionButton("removeSelectedSpecies", "Remove Selected Species",
+                             shiny::actionButton("removeSelectedSpecies", 
+                                                 "Remove Selected Species",
                                                  class = "btn-danger btn-block",
                                                  icon = icon("trash")),
                              add_tooltip(id = "removeSelectedSpecies", title = "Filter out the species selected in the table."),
@@ -1256,7 +1351,12 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
-        ## Tab: Extract covariates  ----
+
+
+
+        ## Covariates ----
+        
+        ### Tab: Extract covariates  ----
         shinydashboard::tabItem(tabName = "extract",
                                 shiny::tabsetPanel(
                                   selected = "Extract Covariates",
@@ -1445,7 +1545,7 @@ surveyDashboard <- function(CTtable = NULL,
         ),
         
         
-        ## Tab: Covariate correlation ----
+        ### Tab: Covariate correlation ----
         shinydashboard::tabItem(
           tabName = "covariateCorrelation",
           shiny::tabsetPanel(
@@ -3819,7 +3919,7 @@ surveyDashboard <- function(CTtable = NULL,
     # camera operation matrix ----
     
     
-    # # Reactive value for camop
+    # Initialize Reactive value for camop
     camop <- shiny::reactiveVal(NULL)
     
     # Create a function to compute camera operation
@@ -3894,6 +3994,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Render the plotly output for the camera operation matrix
     output$camop <- plotly::renderPlotly({
+      # TODO: rename this output to output$camop_plotly
       req(camop(), data$stationCol)
       
       camop_df <- as.data.frame(camop())
@@ -3948,12 +4049,12 @@ surveyDashboard <- function(CTtable = NULL,
     
     # 4. Clear cached camera operation when CTtable or key parameters change
     observeEvent(c(data$CTtable, data$setupCol, data$retrievalCol, data$CTdateFormat, data$stationCol, data$cameraCol, data$camerasIndependent), {
-      camop(NULL)
+      camop(compute_camop())
     }, ignoreNULL = TRUE)
     
-    # 5. If input$applyFilter is clicked, we need to update camop
-    observeEvent(input$applyFilter, {
-      camop(NULL)  # Clear first
+    # 5. If input$applyFilter_camtrap_properties is clicked, we need to update camop
+    observeEvent(input$applyFilter_camtrap_properties, {
+      # camop(NULL)  # Clear first
       # Only recompute if we're currently viewing the CameraOperation tab
       # this would make sense but the commented if() below crashed the app with: 
       # Warning: Error in if: argument is of length zero don't know why
@@ -3962,6 +4063,11 @@ surveyDashboard <- function(CTtable = NULL,
       # if(input$tabName == "CameraOperation") {    # this line causes crash with
       camop(compute_camop())
       # }
+    }, ignoreNULL = TRUE)
+    
+    # 6 if user filters camera traps by date range, calculate camop
+    observeEvent(input$apply_date_filter, {
+      camop(compute_camop())
     }, ignoreNULL = TRUE)
     
     
@@ -3981,7 +4087,6 @@ surveyDashboard <- function(CTtable = NULL,
     shiny::observe({
       df <- data$recordTable
       shiny::req(df) # Pauses here if no data has been loaded yet
-      
       if (!is.null(exclude)) {
         # Check which rows actually match the exclusion criteria
         to_exclude <- df[, speciesCol] %in% exclude
@@ -4003,6 +4108,7 @@ surveyDashboard <- function(CTtable = NULL,
     # Maybe just remove the exclude argument and do all filtering in the app
     
     
+    # Tab: Data summary ----
     # Calculate the number of unique stations and species
     # Reactive expressions for calculations
     num_stations <- shiny::reactive({
@@ -4176,6 +4282,7 @@ surveyDashboard <- function(CTtable = NULL,
       df
     })
     
+    
     output$plot_n_species <- plotly::renderPlotly({
       req(df_n_species())
       plotly::ggplotly(
@@ -4214,14 +4321,7 @@ surveyDashboard <- function(CTtable = NULL,
       )
     })
     
-    
-    # Update the max value of occasionLength slider based on camop
-    observe({
-      req(camop())
-      updateSliderInput(session, "occasionLength_single_species", max = ncol(camop()))
-      updateSliderInput(session, "occasionLength_community", max = ncol(camop()))
-    })
-    
+
     
     
     # Tab: camera traps table     ####
@@ -4462,7 +4562,7 @@ surveyDashboard <- function(CTtable = NULL,
         showNotification("Cannot apply filters: Original data is incomplete", type = "error")
         return()
       }
-      
+
       # Get original data
       original_CT <- isolate(original_data())$CTtable_sf
       original_records <- original_record_table()
@@ -4470,9 +4570,101 @@ surveyDashboard <- function(CTtable = NULL,
       # Get current filter state
       current_filters <- filter_state()
       
-      # 1. Apply camera trap filter to get filtered stations
+      # ----------------------------------------------------------------- # #
+      # 1. Apply Global Date Filter to DEPLOYMENTS (Setup & Retrieval)
+      # ----------------------------------------------------------------- # #
       filtered_CT <- original_CT
       
+      # Check if our new date range filter input is active/set
+      if (!is.null(current_filters$date_range)) {
+        tryCatch({
+          user_start <- current_filters$date_range$start  # class "Date"
+          user_end <- current_filters$date_range$end
+          
+          setup_col     <- data$setupCol
+          retrieval_col <- data$retrievalCol
+          
+          # 1. Drop cameras whose active period does not overlap with the user window at all
+          overlapping_CT <- filtered_CT[
+            as.Date(parse_date_time(filtered_CT[[setup_col]], orders = data$CTdateFormat)) <= user_end & 
+              as.Date(parse_date_time(filtered_CT[[retrieval_col]], orders = data$CTdateFormat)) >= user_start, 
+          ]
+          
+          
+          # Extra Safeguard Check before execution
+          if (nrow(overlapping_CT) >= 2) { 
+            
+            # We handle Date vs Class-POSIXt (Datetime) distinctions here.
+            clip_dates <- function(df, setup_col, retrieval_col, u_start, u_end) {
+              # Check if columns are Date-Times (POSIXct/POSIXlt)
+              # is_datetime <- inherits(df[[setup_col]], "POSIXt")
+              is_datetime <- grepl("H", data$CTdateFormat)
+              
+              col_setup_posix     <- "setup_posix"
+              col_retrieval_posix <- "retrieval_posix"
+
+              col_setup_posix     <- parse_date_time(df[[setup_col]], orders = data$CTdateFormat)
+              col_retrieval_posix <- parse_date_time(df[[retrieval_col]], orders = data$CTdateFormat)
+              
+              # create a "stamping" function based on the original format to reapply format later
+              date_formatter <- stamp(df[[setup_col]], orders = data$CTdateFormat, quiet = TRUE)
+
+
+              if (is_datetime) {
+                # Convert boundaries to midnight and just before midnight
+                u_start_dt <- as.POSIXct(paste(u_start, "00:00:00"))
+                u_end_dt   <- as.POSIXct(paste(u_end, "23:59:59"))
+                
+                col_setup_posix     <- safe_ifelse_posix(col_setup_posix < u_start_dt, u_start_dt, col_setup_posix)
+                col_retrieval_posix <- safe_ifelse_posix(col_retrieval_posix > u_end_dt, u_end_dt, col_retrieval_posix)
+              } else {
+                # Standard Date class
+                u_start_d <- as.Date(u_start)
+                u_end_d   <- as.Date(u_end)
+                
+                
+                col_setup_posix     <- as.Date(col_setup_posix)
+                col_retrieval_posix <- as.Date(col_retrieval_posix)
+
+                col_setup_posix     <- as.Date(ifelse(col_setup_posix < u_start_d, u_start_d, col_setup_posix), origin = "1970-01-01")
+                col_retrieval_posix <- as.Date(ifelse(col_retrieval_posix > u_end_d, u_end_d, col_retrieval_posix), origin = "1970-01-01")
+
+              }
+
+               # Format the new dates back to character
+                df[[setup_col]] <- date_formatter(col_setup_posix)
+                df[[retrieval_col]] <- date_formatter(col_retrieval_posix)
+                # TODO: Long term we really need to do everything in proper dates and date-time throughout the package, not these character strings. But for now, we will just reformat the dates back to the original format.
+              
+              return(df)
+            }
+            
+            # Helper function to prevent ifelse from stripping POSIXct attributes
+            safe_ifelse_posix <- function(cond, yes, no) {
+              class_posix <- class(no)
+              res <- ifelse(cond, yes, no)
+              class(res) <- class_posix
+              return(res)
+            }
+            
+            filtered_CT <- clip_dates(overlapping_CT, setup_col, retrieval_col, user_start, user_end)
+          } else {
+            # Notify user is no date filter applied
+            showNotification("Date range would leave fewer than 2 active stations. Bypassing date application.", type = "warning")
+          }
+          
+        }, error = function(e) {
+          showNotification(paste("Error applying deployment date constraints:", e$message), type = "error")
+
+          filtered_CT <- original_CT # Fallback on error
+          
+          # re-apply the date/time format 
+        })
+      }
+      
+      # ----------------------------------------------------------------- # #
+      # 2. Apply Custom Camera Trap Property Filter
+      # ----------------------------------------------------------------- # #
       if (!is.null(current_filters$camera_trap)) {
         filter_def <- current_filters$camera_trap
         
@@ -4497,7 +4689,7 @@ surveyDashboard <- function(CTtable = NULL,
           
           # Safety check
           if (nrow(filtered_CT) < 2) {
-            showNotification("Filter would remove too many stations! Reverting to original data.", type = "error")
+            showNotification("Properties filter would leave fewer than 2 stations! Reverting.", type = "error")
             filtered_CT <- original_CT
           }
         }, error = function(e) {
@@ -4509,10 +4701,35 @@ surveyDashboard <- function(CTtable = NULL,
       # Get filtered station list
       filtered_stations <- filtered_CT[[data$stationCol]]
       
-      # 2. First filter records by station (performance optimization)
+      # ----------------------------------------------------------------- #
+      # 3. First filter records by station mapping limit
+      # ----------------------------------------------------------------- #
       filtered_records <- original_records[original_records[[data$stationCol]] %in% filtered_stations, ]
       
-      # 3. Then apply temporal filter to station-filtered records
+      # ----------------------------------------------------------------- #
+      # 4. Filter RECORDS dynamically by selected Date Range
+      # ----------------------------------------------------------------- #
+      if (!is.null(current_filters$date_range)) {
+        tryCatch({
+          user_start <- current_filters$date_range$start
+          user_end <- current_filters$date_range$end
+                    
+              user_start_dt <- as.POSIXct(paste(user_start, "00:00:00"))
+              user_end_dt   <- as.POSIXct(paste(user_end, "23:59:59"))
+              
+              filtered_records <- filtered_records[
+                as.POSIXct(filtered_records[[data$recordDateTimeCol]]) >= user_start_dt & 
+                  as.POSIXct(filtered_records[[data$recordDateTimeCol]]) <= user_end_dt, 
+              ]
+
+        }, error = function(e) {
+          showNotification(paste("Error filtering records by date range:", e$message), type = "error")
+        })
+      }
+      
+      # ----------------------------------------------------------------- #
+      # 5. Then apply temporal filter to remaining records
+      # ----------------------------------------------------------------- #
       if (!is.null(current_filters$temporal)) {
         tryCatch({
           # Copy temporal filter parameters but use the station-filtered records
@@ -4526,7 +4743,9 @@ surveyDashboard <- function(CTtable = NULL,
         })
       }
       
-      # 4. Apply species filter if active
+      # ----------------------------------------------------------------- #
+      # 6. Apply species filters
+      # ----------------------------------------------------------------- #
       if (!is.null(current_filters$species)) {
         tryCatch({
           # Filter out excluded species
@@ -4536,7 +4755,9 @@ surveyDashboard <- function(CTtable = NULL,
         })
       }
       
-      # Update all data structures
+      # ----------------------------------------------------------------- #
+      # Write changes to data objects
+      # ----------------------------------------------------------------- #
       data$CTtable_sf <- filtered_CT
       data$CTtable <- sf::st_drop_geometry(filtered_CT)
       data$recordTable <- filtered_records
@@ -4568,7 +4789,7 @@ surveyDashboard <- function(CTtable = NULL,
       })
       
       # Re-trigger camop computation after filtering
-      camop(compute_camop())
+      # camop(compute_camop())
       
       # Update species inputs after filtering
       update_species_inputs()
@@ -4782,7 +5003,7 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     # Dynamic filter controls based on column type
-    output$filterControls <- renderUI({
+    output$filterControlsCamtrap <- renderUI({
       req(input$filterColumn, data$CTtable_sf)
       column_data <- data$CTtable_sf[[input$filterColumn]]
       
@@ -4837,7 +5058,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Camera Trap Filtering
     
-    observeEvent(input$applyFilter, {
+    observeEvent(input$applyFilter_camtrap_properties, {
       req(input$filterColumn, data$CTtable_sf)
       
       # Create filter definition
@@ -5045,12 +5266,12 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     # Filter summary
-    output$filterSummary <- renderUI({
+    output$overallFilterSummary <- renderUI({
       req(data$CTtable_sf, data$recordTable, original_data())
       
       orig <- original_data()
-      curr_stations <- length(unique(data$CTtable_sf[[data$stationCol]])) #nrow(data$CTtable_sf)
-      orig_stations <- length(unique(orig$CTtable_sf[[data$stationCol]])) #nrow(orig$CTtable_sf)
+      curr_stations <- length(unique(data$CTtable_sf[[data$stationCol]])) 
+      orig_stations <- length(unique(orig$CTtable_sf[[data$stationCol]])) 
       curr_records <- nrow(data$recordTable)
       orig_records <- nrow(orig$recordTable)
       
@@ -5058,35 +5279,34 @@ surveyDashboard <- function(CTtable = NULL,
       filtered_stations <- orig_stations - curr_stations
       filtered_records <- orig_records - curr_records
       
-      # Safety check for valid percentages
-      station_percent <- if(orig_stations > 0) {
-        sprintf(" (%.1f%%)", curr_stations/orig_stations * 100)
-      } else {
-        " (N/A)"
-      }
+      # Calculate percentages without the parentheses for cleaner formatting
+      station_percent <- if(orig_stations > 0) sprintf("%.1f%%", curr_stations/orig_stations * 100) else "N/A"
+      record_percent <- if(orig_records > 0) sprintf("%.1f%%", curr_records/orig_records * 100) else "N/A"
       
-      record_percent <- if(orig_records > 0) {
-        sprintf(" (%.1f%%)", curr_records/orig_records * 100)
-      } else {
-        " (N/A)"
-      }
-      
-      div(
-        class = "well",
-        tags$p(
-          "Stations: ", 
-          tags$strong(curr_stations), " of ", tags$strong(orig_stations),
-          station_percent
+      fluidRow(
+        column(4, 
+               align = "center",
+               div(
+                 h4("Stations", class = "text-muted"),
+                 h3(tags$strong(paste0(curr_stations, " / ", orig_stations))),
+                 tags$span(class = "text-muted", paste0("(", station_percent, " retained)"))
+               )
         ),
-        tags$p(
-          "Records: ",
-          tags$strong(curr_records), " of ", tags$strong(orig_records),
-          record_percent
+        column(4, 
+               align = "center",
+               div(
+                 h4("Records", class = "text-muted"),
+                 h3(tags$strong(paste0(curr_records, " / ", orig_records))),
+                 tags$span(class = "text-muted", paste0("(", record_percent, " retained)"))
+               )
         ),
-        tags$p(
-          "Filtered out: ",
-          tags$strong(filtered_stations), " stations and ",
-          tags$strong(filtered_records), " records"
+        column(4, 
+               align = "center",
+               div(
+                 h4("Filtered Out", class = "text-muted"),
+                 h3(tags$strong(paste0(filtered_stations, " / ", filtered_records))),
+                 tags$span(class = "text-muted", "(Stations / Records)")
+               )
         )
       )
     })
@@ -5185,14 +5405,124 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
-    # Tab: Filter records temporally ####
+    # Tab: Filter by Date ----
     
-    output$camerasIndependentUI <- renderUI({
-      if (!is.null(data$cameraCol) && data$cameraCol != "") {
-        checkboxInput("camerasIndependent", "Cameras are independent", value = FALSE)
+    
+    # ----------------------------------------------------------------- # #
+    # Auto-initialize Date Filter Range to Study Duration on Data Load
+    # ----------------------------------------------------------------- # #
+    observe({
+      req(original_data()$CTtable_sf)
+      
+      original_CT <- original_data()$CTtable_sf
+      setup_col <- data$setupCol
+      retrieval_col <- data$retrievalCol
+      
+      
+      setup_dates <- as.Date(parse_date_time(original_CT[[setup_col]], orders = data$CTdateFormat))
+      retrieval_dates <- as.Date(parse_date_time(original_CT[[retrieval_col]], orders = data$CTdateFormat))
+      
+      # Calculate dynamic range boundary
+      min_date <- min(setup_dates, na.rm = TRUE)
+      max_date <- max(retrieval_dates, na.rm = TRUE)
+      
+      # Update the UI date widget bounds and selected default state
+      if (!is.na(min_date) && !is.na(max_date)) {
+        updateDateRangeInput(
+          session = session,
+          inputId = "date_range_filter",
+          start = min_date,
+          end = max_date,
+          min = min_date,
+          max = max_date
+        )
       }
+      
     })
     
+    # ----------------------------------------------------------------- #
+    # Apply global date filters with safeguards
+    # ----------------------------------------------------------------- #
+    observeEvent(input$apply_date_filter, {
+      req(input$date_range_filter)
+
+      
+      original_CT <- isolate(original_data())$CTtable_sf
+      setup_col <- data$setupCol
+      retrieval_col <- data$retrievalCol
+      
+      
+      # Safeguard Check 1: Check if date selection results in any active stations
+      user_start <- input$date_range_filter[1]
+      user_end <- input$date_range_filter[2]
+      
+      overlapping_stations <- original_CT[
+        as.Date(parse_date_time(original_CT[[setup_col]], orders = data$CTdateFormat)) <= user_end & 
+          as.Date(parse_date_time(original_CT[[retrieval_col]], orders = data$CTdateFormat)) >= user_start, 
+      ]
+      
+      
+      if (nrow(overlapping_stations) == 0) {
+        # Trigger blocking Modal Dialog
+        showModal(modalDialog(
+          title = "Date Input Error",
+          tags$div(
+            style = "text-align: center; color: #a94442;",
+            icon("exclamation-triangle", class = "fa-3x"),
+            tags$h4("No Active Deployments in Selected Range", style = "font-weight: bold; margin-top: 15px;")
+          ),
+          p("The selected date range does not overlap with any station deployment dates. Applying this filter would remove all stations from your session."),
+          p("Please choose a date range that falls within your study period."),
+          footer = modalButton("Dismiss & Adjust Dates"),
+          easyClose = TRUE,
+          size = "m"
+        ))
+        return() # Abort run
+      }
+      
+      # All checks passed, apply changes to state
+      curr_state <- filter_state()
+      curr_state$date_range <- list(
+        start = user_start,
+        end = user_end
+      )
+      filter_state(curr_state)
+      
+      withProgress(message = 'Recalculating deployment effort and filtering records...', {
+        applyAllFilters()
+      })
+      
+      showNotification("Date range constraints applied successfully.", type = "message")
+    })
+    
+    # ----------------------------------------------------------------- #
+    # Clear date filters
+    # ----------------------------------------------------------------- #
+    observeEvent(input$clear_date_filter, {
+      curr_state <- filter_state()
+      curr_state$date_range <- NULL
+      filter_state(curr_state)
+      
+      # Re-initialize widget back to absolute dataset limits
+      original_CT <- isolate(original_data())$CTtable_sf
+      if (!is.null(original_CT)) {
+        setup_vals     <- as.Date(original_CT[[data$setupCol]])
+        retrieval_vals <- as.Date(original_CT[[data$retrievalCol]])
+        
+        updateDateRangeInput(
+          session, 
+          "date_range_filter",
+          start = min(setup_vals, na.rm = TRUE),
+          end = max(retrieval_vals, na.rm = TRUE)
+        )
+      }
+      
+      withProgress(message = 'Reverting constraints...', {
+        applyAllFilters()
+      })
+      
+      showNotification("Date range filters cleared.", type = "message")
+    })
     
     # Initialize the original_record_table when the app starts
     observe({
@@ -7247,6 +7577,14 @@ surveyDashboard <- function(CTtable = NULL,
     
     # container for saving reactive objects
     single_species_occu_objects <- shiny::reactiveValues()
+    
+    
+    # Update the max value of occasionLength slider based on camop
+    observe({
+      req(camop())
+      updateSliderInput(session, "occasionLength_single_species", max = ncol(camop()))
+      updateSliderInput(session, "occasionLength_community", max = ncol(camop()))
+    })
     
     
     detection_hist <- reactive({

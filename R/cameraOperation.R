@@ -345,6 +345,8 @@ cameraOperation <- function(CTtable,
                                     )
     # dateFormat <- "%Y-%m-%d %H:%M:%S"
     dateFormat <- "%Y-%m-%d"
+    # TODO: If camera trap table contains date columns other than setupCol and retrievalCol, this changes the expected dateFormat. Should check if setupCol and retrievalCol are in date_columns and only change dateFormat if they are?
+
   }
   
   # Convert POSIX columns to character
@@ -355,6 +357,7 @@ cameraOperation <- function(CTtable,
                                      FUN = function(col) format(col, format = "%Y-%m-%d %H:%M:%S")
                                      )
     dateFormat <- "%Y-%m-%d %H:%M:%S"
+     # TODO: If camera trap table contains date-time columns other than setupCol and retrievalCol, this changes the expected dateFormat. Should check if setupCol and retrievalCol are in date_columns and only change dateFormat if they are?
   }
   
   # if(exists("dateFormat_new")) dateFormat <- dateFormat_new
