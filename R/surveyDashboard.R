@@ -9093,47 +9093,84 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Spatial predictions - Basic workflow
     observeEvent(input$basic_run_prediction, {
-      req(basic_model())
       
-      
-      # Get prediction raster
-      # should probably be replaced with get_prediction_raster()
-      pred_raster <- if (input$basic_pred_source == "extracted") {
-        req(data$prediction_raster, 
-            message = "No extracted covariates available. Please extract covariates first.")
-        data$prediction_raster
-      } else {
-        req(input$basic_custom_raster,
-            message = "Please upload a custom raster.")
-        terra::rast(input$basic_custom_raster$datapcath)
+      # 1. Check Model Availability
+      current_model <- basic_model()
+      if (is.null(current_model)) {
+        showNotification("Please fit a model first before creating predictions.", 
+                         type = "warning", duration = 5)
+        return()
       }
       
-      # ensure that all cells have NA at the same locations
-      na_mask <- !is.na(prod(pred_raster))
-      pred_raster <- mask(pred_raster, na_mask, maskvalues = FALSE)
+      # 2. Get prediction raster
+      pred_raster <- NULL
+      if (input$basic_pred_source == "extracted") {
+        if (is.null(data$prediction_raster)) {
+          showNotification("No extracted covariates available. Please extract covariates first.", 
+                           type = "warning", duration = 5)
+          return()
+        }
+        pred_raster <- data$prediction_raster
+      } else {
+        if (is.null(input$basic_custom_raster)) {
+          showNotification("Please upload a custom raster first.", 
+                           type = "warning", duration = 5)
+          return()
+        }
+        # tryCatch to handle corrupted/unreadable raster files safely
+        pred_raster <- try(terra::rast(input$basic_custom_raster$datapath), silent = TRUE)
+        if (inherits(pred_raster, "try-error") || is.null(pred_raster)) {
+          showNotification("Failed to load the uploaded custom raster. Please check the file.", 
+                           type = "error", duration = 5)
+          return()
+        }
+      }
       
+      # 3. Ensure that all cells have NA at the same locations
+      tryCatch({
+        # anyNA returns TRUE if any layer has NA. We invert it for the mask.
+        na_mask <- !terra::anyNA(pred_raster) 
+        pred_raster <- terra::mask(pred_raster, na_mask, maskvalues = FALSE)
+      }, error = function(e) {
+        showNotification(paste("Error aligning raster NA values:", e$message), 
+                         type = "error", duration = 5)
+        return()
+      })
       
+      # 4. Generate Predictions
       withProgress(message = 'Generating predictions...', value = 0, {
+        incProgress(0.2, detail = "Running predictions...")
+        
         tryCatch({
           # Generate predictions based on model type
           if (input$basic_model_package == "unmarked") {
-            predictions <- predict(basic_model(), 
+            predictions <- predict(current_model, 
                                    type = input$basic_pred_type,
                                    newdata = pred_raster)
           } else {
-            pred_raster <- raster::stack(pred_raster)
             
-            predictions <- ubms::predict(object = basic_model(),
+            
+            predictions <- ubms::predict(object = current_model,
                                          submodel = input$basic_pred_type,
                                          newdata = pred_raster)
-            predictions <- rast(predictions)
+            
+
           }
+          
+          incProgress(0.6, detail = "Updating map...")
           
           # Update map
           updatePredictionMap("basic_prediction_map", predictions, "basic")
           
+          incProgress(1, detail = "Done!")
+          
+          # Success Notification
+          showNotification("Predictions generated successfully!", 
+                           type = "message", duration = 3)
+          
         }, error = function(e) {
-          showNotification(paste("Error generating predictions:", e$message), type = "error")
+          showNotification(paste("Error generating predictions:", e$message), 
+                           type = "error", duration = 10)
         })
       })
     })
