@@ -25,3 +25,5 @@
 ^.stfolder
 ^.stversions
 .vscode
+^Image-ExifTool-11.94\.tar\.gz$
+^Image-ExifTool-11.94$
