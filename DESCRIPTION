@@ -51,6 +51,7 @@ Imports:
     DT,
     generics,
     ggplot2,
+    htmltools,
     leaflet,
     lubridate,
     methods,

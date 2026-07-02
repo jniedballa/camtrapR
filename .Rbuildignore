@@ -5,6 +5,7 @@
 ^pkgdown$
 ^README\.Rmd
 ^.github
+^.git
 ^R/_not_for_CRAN$
 ^.travis\.yml$
 ^to_do.txt$

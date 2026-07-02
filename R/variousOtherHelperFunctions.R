@@ -2418,3 +2418,63 @@ notificationItem_blank <- function(text, icon = shiny::icon("warning"), status =
     tags$a(href = href, target = "_blank", icon, text)
   )
 }
+
+
+# log function output, errors, warnings and messages separately
+# used in dashboard for printing unmarked model summary and warnings
+
+
+capture_conditions <- function(expr) {
+  logs <- list(messages = character(), warnings = character(), errors = character())
+  
+  # Helper to format the condition with its call (like base R does)
+  format_cond <- function(cond, type = "Warning") {
+    msg <- conditionMessage(cond)
+    call_obj <- conditionCall(cond)
+    
+    # If the warning has a calling function (call. = TRUE)
+    if (!is.null(call_obj)) {
+      # deparse() can return multiple lines for long calls, so we collapse them
+      call_str <- paste(deparse(call_obj), collapse = " ")
+      
+      # Truncate extremely long function calls so they don't break the UI
+      if (nchar(call_str) > 150) {
+        call_str <- paste0(substr(call_str, 1, 147), "...")
+      }
+      
+      return(sprintf("%s in %s : %s", type, call_str, msg))
+    } else {
+      # If the warning was thrown with call. = FALSE
+      return(sprintf("%s: %s", type, msg))
+    }
+  }
+  
+  # Capture the printed text (standard output)
+  printed_output <- capture.output({
+    result <- withCallingHandlers(
+      tryCatch(
+        expr,
+        error = function(e) {
+          logs$errors <<- c(logs$errors, format_cond(e, "Error"))
+          NULL # Return NULL on error so app doesn't crash
+        }
+      ),
+      warning = function(w) {
+        logs$warnings <<- c(logs$warnings, format_cond(w, "Warning"))
+        invokeRestart("muffleWarning") # Suppress console warning
+      },
+      message = function(m) {
+        logs$messages <<- c(logs$messages, conditionMessage(m))
+        invokeRestart("muffleMessage") # Suppress console message
+      }
+    )
+  })
+  
+  list(
+    result = result,
+    printed_output = paste(printed_output, collapse = "\n"),
+    messages = logs$messages,
+    warnings = logs$warnings,
+    errors = logs$errors
+  )
+}

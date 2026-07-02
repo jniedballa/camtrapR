@@ -1915,7 +1915,7 @@ surveyDashboard <- function(CTtable = NULL,
                                     
                                     numericInput("basic_ubms_iter", 
                                                  label = label_with_info("Number of iterations:", "Total MCMC iterations per chain (including warmup)."), 
-                                                 value = 2000, min = 100
+                                                 value = 2000, min = 100, step = 100
                                     ), 
                                     
                                     # TODO: Allow user to set burnin (as in community models). Parameter warmup in stan_occu (currently defaults to iteration / 2 - reasonable)
@@ -1961,6 +1961,14 @@ surveyDashboard <- function(CTtable = NULL,
                                            textOutput("basic_coef_det_header", inline = TRUE), verbatimTextOutput("basic_coef_det"),
                                            textOutput("basic_coef_state_header", inline = TRUE), verbatimTextOutput("basic_coef_state")
                                          )
+                                  )
+                                ),
+                               fluidRow(
+                                  shinydashboard::box(       
+                                    title = "Model Diagnostics", status = "warning", solidHeader = TRUE, collapsible = TRUE, width = 12, 
+                                    uiOutput("basic_occu_model_log_messages"),
+                                    uiOutput("basic_occu_model_log_warnings"),
+                                    uiOutput("basic_occu_model_log_errors")
                                   )
                                 )
                          )
@@ -2756,7 +2764,7 @@ surveyDashboard <- function(CTtable = NULL,
     # single species occupancy
     #  reactive values to track models for each workflow
     basic_model <- reactiveVal(NULL)
-    basic_model_formula <- reactiveVal(NULL)
+    print_basic_model <- reactiveVal(NULL)
     advanced_model <- reactiveVal(NULL)
     modelEffects <- reactiveVal(list(detection = list(), occupancy = list()))
     
@@ -3131,6 +3139,7 @@ surveyDashboard <- function(CTtable = NULL,
         # x_label = x_label,
         species_accumulation_objects = species_accumulation_objects,
         basic_model = basic_model,
+        print_basic_model = print_basic_model,
         advanced_model = advanced_model,
         modelEffects = modelEffects,
         commOccu_model = commOccu_model,
@@ -3188,6 +3197,7 @@ surveyDashboard <- function(CTtable = NULL,
         # x_label = x_label,
         species_accumulation_objects = species_accumulation_objects,
         basic_model = basic_model,
+        print_basic_model = print_basic_model,
         advanced_model = advanced_model,
         modelEffects = modelEffects,
         commOccu_model = commOccu_model,
@@ -3348,6 +3358,7 @@ surveyDashboard <- function(CTtable = NULL,
             # x_label = x_label,
             species_accumulation_objects = species_accumulation_objects,
             basic_model = basic_model,
+            print_basic_model = print_basic_model,
             advanced_model = advanced_model,
             modelEffects = modelEffects,
             commOccu_model = commOccu_model,
@@ -3748,6 +3759,7 @@ surveyDashboard <- function(CTtable = NULL,
             original_record_table = original_record_table,
             species_accumulation_objects = species_accumulation_objects,
             basic_model = basic_model,
+            print_basic_model = print_basic_model,
             advanced_model = advanced_model,
             modelEffects = modelEffects,
             commOccu_model = commOccu_model,
@@ -8026,10 +8038,10 @@ surveyDashboard <- function(CTtable = NULL,
       # Clear the model if it exists (or if models were added to model selection)
       if (!is.null(basic_model()) || length(single_species_occu_objects$basic_modList) > 0) {
         basic_model(NULL)
-        basic_model_formula(NULL)
+        print_basic_model(NULL)
         single_species_occu_objects$basic_modList <- list()
         # the following was stupid. Overwriting the original render function with function that can only output NULL
-        # "output$id <- " may only appear once in function!
+        # because: "output$id <- " may only appear once in function!
         # output$basic_model_selection <- renderTable({ NULL })    
         # output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
         shiny::showNotification("Basic model cleared due to input changes", type = "warning")
@@ -8110,6 +8122,8 @@ surveyDashboard <- function(CTtable = NULL,
       }
     }, label = "Select model package (single)")
     
+    basic_model_formula <- reactiveVal(NULL)
+
     observeEvent(input$basic_run_model, {
       req(umf())
       
@@ -8172,44 +8186,71 @@ surveyDashboard <- function(CTtable = NULL,
       basic_model_formula(list(detection = det_formula,
                                occupancy = occ_formula))
       
-
-
+      ### Fit basic occupancy model   ----
+      ### Fit basic occupancy model   ----
       withProgress(message = 'Fitting basic model...', value = 0, {
         tryCatch({
-          model <- switch(
-            paste(input$basic_model_package, input$basic_model_type, sep = "_"),
-            
-            "unmarked_Occupancy" = unmarked::occu(formula = formula_tmp, data = umf()),
-            "unmarked_Royle-Nichols" = unmarked::occuRN(formula = formula_tmp, data = umf()),
-            
-            "ubms_Occupancy" = eval(bquote(ubms::stan_occu(
-              formula = .(formula_tmp),       # Evaluate to show the actual formula (e.g. ~1 ~1)
-              data    = umf(),                # Leave as text (so it doesn't print the giant S4 object!)
-              chains  = .(input$basic_ubms_chains),  # Evaluate to a number (e.g., 3)
-              iter    = .(input$basic_ubms_iter), 
-              warmup  = .(floor(input$basic_ubms_iter/2)), 
-              thin    = .(input$basic_ubms_thin), 
-              cores   = .(input$basic_ubms_cores),   # Evaluate to a number (so cores > 1 works)
-              refresh = 0
-            ))),
-            
-            "ubms_Royle-Nichols" = eval(bquote(ubms::stan_occuRN(
-              formula = .(formula_tmp),
-              data    = umf(), 
-              chains  = .(input$basic_ubms_chains), 
-              iter    = .(input$basic_ubms_iter), 
-              warmup  = .(floor(input$basic_ubms_iter/2)), 
-              thin    = .(input$basic_ubms_thin), 
-              cores   = .(input$basic_ubms_cores),
-              refresh = 0
-            )))
-          )
           
-          # Store the model in basic workflow reactive
-          basic_model(model)
-          shiny::showNotification("Basic model fitted successfully", type = "message")
+          if (input$basic_model_package == "unmarked") {
+            
+            # 1. Fit the model
+            if (input$basic_model_type == "Occupancy") {
+              model_unmarked <- eval(bquote(unmarked::occu(formula = .(formula_tmp), data = umf())))
+            } else if (input$basic_model_type == "Royle-Nichols") {
+              model_unmarked <- eval(bquote(unmarked::occuRN(formula = .(formula_tmp), data = umf())))
+            }
+            
+            # 2. Save model to reactive
+            basic_model(model_unmarked)
+            
+            # 3. Capture printed summary (unmarked outputs warnings/errors on print, not on fit)
+            print_basic_model(capture_conditions(print(model_unmarked)))
+            
+          } else if (input$basic_model_package == "ubms") {
+            
+            # 1. Fit the model (ubms outputs warnings/errors on fit, not on print)
+            if (input$basic_model_type == "Occupancy") {
+              model_ubms_capture <- capture_conditions(eval(bquote(ubms::stan_occu(
+                formula = .(formula_tmp),
+                data    = umf(), 
+                chains  = .(input$basic_ubms_chains), 
+                iter    = .(input$basic_ubms_iter), 
+                warmup  = .(floor(input$basic_ubms_iter/2)), 
+                thin    = .(input$basic_ubms_thin), 
+                cores   = .(input$basic_ubms_cores),
+                refresh = 0
+              ))))
+            } else if (input$basic_model_type == "Royle-Nichols") {
+              model_ubms_capture <- capture_conditions(eval(bquote(ubms::stan_occuRN(
+                formula = .(formula_tmp),
+                data    = umf(), 
+                chains  = .(input$basic_ubms_chains), 
+                iter    = .(input$basic_ubms_iter), 
+                warmup  = .(floor(input$basic_ubms_iter/2)), 
+                thin    = .(input$basic_ubms_thin), 
+                cores   = .(input$basic_ubms_cores),
+                refresh = 0
+              ))))
+            }
+            
+            # 2. Save model to reactive
+            basic_model(model_ubms_capture$result)
+            
+            # 3. Capture printed model summary
+            model_ubms_capture$printed_output <- capture_conditions(print(model_ubms_capture$result))$printed_output
+
+            # 4. Save outputs to print_basic_model reactive
+            print_basic_model(model_ubms_capture) 
+          }
           
-          # print(class(basic_model()))
+          # Check for errors/warnings in the captured output
+          if (length(print_basic_model()$errors) >= 1) {
+            shiny::showNotification("Basic model fitted with error", type = "error")
+          } else if (length(print_basic_model()$warnings) >= 1) {
+            shiny::showNotification("Basic model fitted with warnings", type = "warning")
+          } else {
+            shiny::showNotification("Basic model fitted successfully", type = "message")
+          }
           
         }, error = function(e) {
           shiny::showNotification(paste("Error fitting basic model:", e$message), type = "error")
@@ -8242,6 +8283,9 @@ surveyDashboard <- function(CTtable = NULL,
       ))
     }, label = "Export model (single)")
     
+    
+    
+
     ## Advanced workflow server logic  ----
     # TODO: reimplement advanced model properly and activate in UI
     # Generate formula for the model
@@ -8754,14 +8798,22 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     ## Model summaries ----
-    output$basic_model_summary <- renderPrint({
+    output$basic_model_summary <- renderText({
       req(basic_model())
+      #browser()
       if (input$basic_model_package == "unmarked") {
-        print(basic_model())
+        summary_text <- print_basic_model()$printed_output
       } 
-      if (input$basic_model_package == "ubms") {
-        print(basic_model())
+      if (input$basic_model_package == "ubms"){
+        
+        # print_basic_model()$printed_output
+        # Catch the console text into a character vector
+        summary_text <- capture.output(print(print_basic_model()$result))
+        
+        # Combine it into one single block of text with linebreaks
+        summary_text <- paste(summary_text, collapse = "\n")
       }
+      return(summary_text)
     })
     
     output$adv_model_summary <- renderPrint({
@@ -8773,6 +8825,52 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
+    
+    ## Model summary warnings ----
+    
+    output$basic_occu_model_log_messages <- renderUI({
+      req(basic_model())
+      msgs <- print_basic_model()$messages
+      if (length(msgs) > 0) {
+        safe_msgs <- htmltools::htmlEscape(msgs)
+        
+        HTML(paste0(
+          '<div class="alert alert-info"><strong>Messages:</strong><br>', 
+          paste(safe_msgs, collapse = "<br><br>"), 
+          '</div>'
+        ))
+      }
+    })
+    
+    output$basic_occu_model_log_warnings <- renderUI({
+      req(basic_model())
+      warns <- print_basic_model()$warnings
+      if (length(warns) > 0) {
+        # 1. Escape HTML characters so code calls display correctly
+        safe_warns <- htmltools::htmlEscape(warns)
+        
+        # 2. Combine them with <br> tags
+        HTML(paste0(
+          '<div class="alert alert-warning"><strong>Warnings:</strong><br>', 
+          paste(safe_warns, collapse = "<br><br>"), 
+          '</div>'
+        ))
+      }
+    })
+
+    output$basic_occu_model_log_errors <- renderUI({
+      req(print_basic_model())
+      errs <- print_basic_model()$errors
+      if (length(errs) > 0) {
+        safe_errs <- htmltools::htmlEscape(errs)
+        
+        HTML(paste0(
+          '<div class="alert alert-danger"><strong>Errors:</strong><br>', 
+          paste(safe_errs, collapse = "<br><br>"), 
+          '</div>'
+        ))
+      }
+    })
     
     ## Parameter estimates   ----
     
@@ -9198,7 +9296,7 @@ surveyDashboard <- function(CTtable = NULL,
       df_scaled <- df
       
       # Scale each numeric column and store parameters
-      for (col in names(df)[numeric_cols][-1]) {
+      for (col in names(df)[numeric_cols]) {   # had subsetting with [-1]. Unclear why, caused covariates to go unscaled.
         # Calculate mean and sd
         col_mean <- mean(df[[col]], na.rm = TRUE)
         col_sd <- sd(df[[col]], na.rm = TRUE)
