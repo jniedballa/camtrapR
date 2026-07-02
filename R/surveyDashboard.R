@@ -1256,19 +1256,22 @@ surveyDashboard <- function(CTtable = NULL,
               title = "Temporal Filtering Settings", width = 12, status = "primary",
               solidHeader = TRUE,
               numericInput("minDeltaTime", 
-                           label = label_with_info("Minimum time difference (minutes)", "Specify the minimum time gap (in minutes) required between consecutive records of the same species at the same location to be considered independent."), 
+                           label = label_with_info("Minimum time difference (minutes)", 
+                                                   "Set the minimum time gap (in minutes) between consecutive records of the same species at the same station. Records closer in time than this threshold are considered non-independent and will be collapsed into a single independent record."), 
                            value = 0, min = 0
               ),
               
               selectInput("deltaTimeComparedTo", 
-                          label = label_with_info("Compare delta time to:", "Choose whether the time difference is calculated relative to the last record overall or only the last *independent* record."),
+                          label = label_with_info("Independence definition:", 
+                                                  "Determines how the time gap is measured. 'Last record' compares each record to the immediately preceding one. 'Last independent record' compares each record to the last record that already passed the independence threshold."),
                           choices = c("Last independent record" = "lastIndependentRecord", "Last record" = "lastRecord")
               ),
               
               uiOutput("camerasIndependentUI"), # Tooltip added dynamically via renderUI
               
               checkboxInput("removeDuplicateRecords", 
-                            label = label_with_info("Remove duplicate records", "Remove records that have the exact same timestamp, species, and station/camera ID."), 
+                            label = label_with_info("Remove exact duplicate records", 
+                                                    "If checked, records with the exact same timestamp, species, and station/camera ID are removed. This is useful for cleaning data where the camera may have logged identical entries multiple times."), 
                             value = TRUE
               ),
               # buttons keep tooltips separate to avoid clickable icons inside buttons
@@ -1807,10 +1810,10 @@ surveyDashboard <- function(CTtable = NULL,
                                                         min = 1, max = 20, value = 10, step = 1, ticks = FALSE)),
                               shiny::column(3, 
                                             selectInput("day1_single_species",
-                                                        label = label_with_info("Day 1",
-                                                                                "'survey'=align all to survey start; 'station'=align to station setup date."),
+                                                        label = label_with_info("Occasion start date", 
+                                                                                "Defines when the first sampling occasion begins. 'survey' aligns all stations to the overall first day of the study, ensuring temporal consistency across sites. 'station' aligns each station's timeline to its individual camera setup date. Using 'station' results in more compact detection matrices (avoiding leading zero-occasions), which can speed up model fitting, particularly for Bayesian models ('ubms')."),
                                                         choices = c("survey", "station"), selected = "survey")
-                              )               
+                              )              
                             ),
                             shiny::fluidRow(
                               shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_n_records", width = NULL)),
@@ -1873,34 +1876,40 @@ surveyDashboard <- function(CTtable = NULL,
                                   h4("Model Configuration", class = "text-primary"),
                                   uiOutput("model_config_header"),
                                   selectInput("basic_model_package",
-                                              label = label_with_info("Package:", "Select R package: 'unmarked' (frequentist) or 'ubms' (Bayesian)."),
+                                              label = label_with_info("Modeling package:", 
+                                                                      "Select the R package for model fitting. 'unmarked' runs frequentist models (faster, uses Maximum Likelihood). 'ubms' runs Bayesian models (slower, uses MCMC via Stan)."),
                                               choices = c("unmarked", "ubms"), selected = "unmarked"
                                   ),
                                   
                                   selectInput("basic_model_type",
-                                              label = label_with_info("Model type:", "'Occupancy' (estimates presence/absence) or 'Royle-Nichols' (links detection to abundance)."),
+                                              label = label_with_info("Model type:", 
+                                                                      "'Occupancy' estimates the probability a site is occupied (presence/absence). 'Royle-Nichols' models detection heterogeneity as a function of site abundance, providing estimates of mean abundance per site."),
                                               choices = c("Occupancy", "Royle-Nichols"), selected = "Occupancy"
                                   ),
                                   hr(),
                                   h4("Covariates", class = "text-primary"),
                                   
                                   varSelectizeInput("basic_det_covs", 
-                                                    label = label_with_info("Detection covariates", "Select site-level covariates assumed to influence detection probability."), 
+                                                    label = label_with_info("Detection covariates", 
+                                                                            "Select site-level covariates that are assumed to influence detection probability (e.g., camera placement, habitat type). These explain why a species might be missed if it is actually present."), 
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)
                                   ), 
                                   
                                   checkboxInput("basic_effort_on_detection", 
-                                                label = label_with_info("Include effort on detection", "Check to include camera effort (active days/occasion) as an observation-level covariate influencing detection."), 
+                                                label = label_with_info("Include effort on detection", 
+                                                                        "If checked, camera effort (number of active days per occasion) is included as an observation-level covariate. This accounts for varying sampling effort across sites or occasions."), 
                                                 value = FALSE
                                   ), 
                                   
                                   varSelectizeInput("basic_occ_covs", 
-                                                    label = label_with_info("Occupancy covariates", "Select site-level covariates assumed to influence occupancy probability (or abundance)."), 
+                                                    label = label_with_info("Occupancy covariates", 
+                                                                            "Select site-level covariates assumed to influence occupancy probability (for 'Occupancy' models) or abundance (for 'Royle-Nichols' models). Examples include habitat features or management interventions."), 
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)
                                   ), 
                                   
                                   checkboxInput("basic_scale_covariates", 
-                                                label = label_with_info("Scale covariates", "Check to standardize numeric covariates (mean=0, sd=1). Recommended."), 
+                                                label = label_with_info("Scale covariates", 
+                                                                        "If checked, numeric covariates are standardized (mean = 0, standard deviation = 1) before modeling. This is highly recommended to improve model convergence and interpretability of coefficient estimates."), 
                                                 value = TRUE
                                   ), 
                                   
@@ -1909,36 +1918,43 @@ surveyDashboard <- function(CTtable = NULL,
                                     hr(), h4("MCMC Settings", class = "text-primary"),
                                     
                                     numericInput("basic_ubms_chains", 
-                                                 label = label_with_info("Number of chains:", "Number of independent Markov chains (min 3 recommended)."), 
+                                                 label = label_with_info("Number of chains:", 
+                                                                         "Number of independent Markov chains to run in the Bayesian model. A minimum of 3 chains is recommended to properly assess model convergence."), 
                                                  value = 3, min = 1
                                     ), 
                                     
                                     numericInput("basic_ubms_iter", 
-                                                 label = label_with_info("Number of iterations:", "Total MCMC iterations per chain (including warmup)."), 
+                                                 label = label_with_info("Number of iterations:", 
+                                                                         "Total number of MCMC iterations per chain, including the warmup/burn-in phase. Higher values generally yield more precise estimates but increase computation time."), 
                                                  value = 2000, min = 100, step = 100
                                     ), 
                                     
                                     # TODO: Allow user to set burnin (as in community models). Parameter warmup in stan_occu (currently defaults to iteration / 2 - reasonable)
                                     
                                     numericInput("basic_ubms_thin", 
-                                                 label = label_with_info("Thinning:", "Thinning interval for MCMC samples (keep every nth sample)."), 
+                                                 label = label_with_info("Thinning interval:", 
+                                                                         "Thinning interval for MCMC samples. If set to 1, all post-warmup samples are kept. Higher values keep only every 'nth' sample, reducing memory usage if chains are highly autocorrelated."), 
                                                  value = 1, min = 1
                                     ), 
                                     
                                     uiOutput("basic_ubms_cores_input"), # Tooltip added dynamically
-                                    add_tooltip(id = "basic_ubms_cores_input", title = "Number of CPU cores to use for parallel chain execution (maximum limited by available cores). For simple model 1 core is often faster than multiple (due to Shiny overhead).")
+                                    add_tooltip(id = "basic_ubms_cores_input", 
+                                                title = "Number of CPU cores to use for running chains in parallel. For simple models, using 1 core may actually be faster due to the computational overhead of parallelization. The maximum is limited by your system's available cores.")
                                   ),
                                   hr(),
                                   div(style = "text-align: center; margin-top: 20px;",
                                       actionButton("basic_run_model", "Run Model", class = "btn-primary btn-lg btn-block"), 
-                                      add_tooltip(id = "basic_run_model", title = "Fit the occupancy model with the current specifications."),
+                                      add_tooltip(id = "basic_run_model", 
+                                                  title = "Runs the model fitting process using the currently selected package, model type, and covariates."),
                                       div(style = "margin-top: 10px;",
                                           actionButton("basic_add_to_modsel", "Add to Model Selection", class = "btn-success btn-block"), 
-                                          add_tooltip(id = "basic_add_to_modsel", title = "Add the currently fitted model to the model selection table for comparison.")
+                                          add_tooltip(id = "basic_add_to_modsel", 
+                                                      title = "Saves the currently fitted model to a list for model comparison (via AIC for unmarked models and LOOIC for ubms models).")
                                       ),
                                       div(style = "margin-top: 10px;",
                                           actionButton("export_basic_model", "Export Model", class = "btn-info btn-block"), 
-                                          add_tooltip(id = "export_basic_model", title = "Exports the fitted model to your R workspace.")
+                                          add_tooltip(id = "export_basic_model", 
+                                                      title = "Exports the fitted model object to your R workspace or local environment for further analysis.")
                                       ),
                                   )
                                 )
@@ -1953,9 +1969,11 @@ surveyDashboard <- function(CTtable = NULL,
                                            title = "Parameter Estimates", status = "primary", width = NULL, solidHeader = TRUE, collapsible = TRUE,
                                            fluidRow(
                                              column(width = 6, numericInput("basic_pval", "Interval width:", min = 0, max = 1, value = 0.95, step = 0.01), 
-                                                    add_tooltip(id = "basic_pval", title = "Set the confidence/credible interval width (e.g., 0.95 for 95%).")),
+                                                    add_tooltip(id = "basic_pval", 
+                                                                title = "Set the width of the confidence (for unmarked) or credible (for ubms) intervals. For example, enter 0.95 for 95% intervals.")),
                                              column(width = 6, numericInput("basic_digits", "Decimal places:", value = 2, min = 0, max = 5, step = 1), 
-                                                    add_tooltip(id = "basic_digits", title = "Number of decimal places for displaying estimates."))
+                                                    add_tooltip(id = "basic_digits", 
+                                                                title = "Number of decimal places to display in the parameter estimates table."))
                                            ),
                                            hr(),
                                            textOutput("basic_coef_det_header", inline = TRUE), verbatimTextOutput("basic_coef_det"),
@@ -1963,7 +1981,7 @@ surveyDashboard <- function(CTtable = NULL,
                                          )
                                   )
                                 ),
-                               fluidRow(
+                                fluidRow(
                                   shinydashboard::box(       
                                     title = "Model Diagnostics", status = "warning", solidHeader = TRUE, collapsible = TRUE, width = 12, 
                                     uiOutput("basic_occu_model_log_messages"),
@@ -1994,7 +2012,7 @@ surveyDashboard <- function(CTtable = NULL,
                                             label = label_with_info("Plot type:", "Choose whether to display response curves for detection or occupancy/abundance covariates."), 
                                             choices = c("Detection covariates", "Occupancy covariates")
                                 ), 
-                                
+                                # TODO: Would be better to calculate all response plots and present them in tabs rather than the drop down menu.
                                 numericInput("basic_ci_level", 
                                              label = label_with_info("Confidence level:", "Set the confidence level for the shaded uncertainty intervals on the response curves."), 
                                              value = 0.95, min = 0, max = 1, step = 0.01
@@ -2025,7 +2043,8 @@ surveyDashboard <- function(CTtable = NULL,
                                 
                                 # Tooltip kept separate for button
                                 actionButton("basic_run_prediction", "Generate Predictions", class = "btn-primary"), 
-                                add_tooltip(id = "basic_run_prediction", title = "Generate spatial predictions based on the fitted model and the selected covariate source."),
+                                add_tooltip(id = "basic_run_prediction", 
+                                            title = "Generate spatial predictions based on the fitted model and the selected covariate source."),
                                 
                                 uiOutput("basic_prediction_layer_choices"), # Tooltip added dynamically
                                 
@@ -2259,27 +2278,28 @@ surveyDashboard <- function(CTtable = NULL,
                          fluidRow(
                            column(3, 
                                   selectInput("communityModelType",
-                                              label = label_with_info("Model Type:", "'Occupancy' (estimates presence/absence) or 'Royle-Nichols' (links detection to abundance)."),
+                                              label = label_with_info("Model Type:", "'Occupancy' estimates presence/absence. 'Royle-Nichols' links detection probability to abundance."),
                                               choices = c("Occupancy" = "Occupancy", "Royle-Nichols" = "RN"), 
                                               selected = "Occupancy"
                                   )
                            ),
                            column(3, 
                                   sliderInput("occasionLength_community", 
-                                              label = label_with_info("Occasion Length (days)", "Define the length of sampling occasions (in days) for creating detection histories."),
+                                              label = label_with_info("Occasion Length (days)", "Defines the number of days grouped into a single sampling occasion for the detection history. Shorter lengths increase temporal resolution but may lower per-occasion detection."),
                                               min = 1, max = 20, value = 10, step = 1, ticks = FALSE
                                   )
                            ),
                            column(3, 
                                   selectInput("day1_community",
-                                              label = label_with_info("Day 1", "'survey'=align all to survey start; 'station'=align to station setup date."),
+                                              label = label_with_info("Occasion start date", 
+                                                                      "Defines when the first sampling occasion begins. 'survey' aligns all stations to the overall first day of the study, ensuring temporal consistency across sites. 'station' aligns each station's timeline to its individual camera setup date. Using 'station' results in more compact detection matrices (avoiding leading zero-occasions), which can speed up model fitting considerably."),
                                               choices = c("survey", "station"), 
                                               selected = "survey"
                                   )
                            ),
                            column(3, 
                                   checkboxInput("useNimble", 
-                                                label = label_with_info("Use Nimble", "Use the NIMBLE package for MCMC fitting instead of JAGS (experimental)."), 
+                                                label = label_with_info("Use NIMBLE", "If checked, uses the NIMBLE package for MCMC fitting instead of JAGS (experimental, requires NIMBLE to be installed)."), 
                                                 value = FALSE
                                   )
                            )
@@ -2292,7 +2312,8 @@ surveyDashboard <- function(CTtable = NULL,
                          fluidRow(
                            column(4, 
                                   selectInput("augmentationType",
-                                              label = label_with_info("Data Augmentation Type:", "Augmentation for estimating richness ('maxknown' or 'full')."),
+                                              label = label_with_info("Data Augmentation Type:", 
+                                                                      "Method to augment data for estimating community richness. 'Max Known' augments up to the maximum number of observed species, while 'Full' allows specifying a larger number to account for unobserved species."),
                                               choices = c("None" = "none", "Max Known" = "maxknown", "Full" = "full"), 
                                               selected = "none"
                                   )
@@ -2300,14 +2321,16 @@ surveyDashboard <- function(CTtable = NULL,
                            column(4, 
                                   conditionalPanel(condition = "input.augmentationType != 'none'", 
                                                    numericInput("augmentationValue", 
-                                                                label = label_with_info("Number of Potential Species:", "If using augmentation, specify the total number of potential species (observed + unobserved) in the community."), 
+                                                                label = label_with_info("Number of Potential Species:", 
+                                                                                        "If using augmentation, specify the total number of potential species (observed + unobserved) in the community."), 
                                                                 value = NULL, min = 1
                                                    )
                                   )
                            ),
                            column(4, 
                                   textInput("richnessCategories", 
-                                            label = label_with_info("Richness Categories (optional)", "Optional: Provide the name of a column in the site covariates table that defines categories for stratified richness estimation."), 
+                                            label = label_with_info("Richness Categories (optional)", 
+                                                                    "Optional: Provide the exact name of a column in the site covariates table that defines categories for stratified richness estimation (e.g., habitat types)."), 
                                             placeholder = "Enter column name"
                                   )
                            )
@@ -2315,13 +2338,15 @@ surveyDashboard <- function(CTtable = NULL,
                          fluidRow(
                            column(6, 
                                   textInput("keyword_quadratic",
-                                            label = label_with_info("Keyword for Quadratic Effects", "Suffix to identify quadratic terms (e.g., 'elevation_squared')."),
+                                            label = label_with_info("Keyword for Quadratic Effects", 
+                                                                    "Suffix to identify quadratic terms in the covariate names (e.g., 'elevation_squared')."),
                                             value = "_squared"
                                   )
                            ),
                            column(6, 
                                   textInput("modelFile", 
-                                            label = label_with_info("Model File Name (optional)", "Optional: Specify a file path to save the generated JAGS or NIMBLE model code."), 
+                                            label = label_with_info("Model File Name (optional)", 
+                                                                    "Optional: Specify a file path to save the generated JAGS or NIMBLE model code for inspection."), 
                                             placeholder = "Leave blank for temporary file"
                                   )
                            )
@@ -2336,67 +2361,57 @@ surveyDashboard <- function(CTtable = NULL,
                                   h4("Detection Covariates"),
                                   selectInput("detIntercept",
                                               label = label_with_info("Detection Intercept:",
-                                                                      "Model detection intercept: 'fixed', 'ranef', or 'independent'."),
+                                                                      "Defines how baseline detection probability is shared across species: 'fixed' (identical for all), 'ranef' (species-specific, drawn from a common distribution), or 'independent' (completely separate for each species)."),
                                               choices = c("fixed", "ranef", "independent"), selected = "ranef"),
                                   varSelectizeInput("detCovFixed", 
                                                     label_with_info("Fixed Effects", 
-                                                                    "Select covariates with a single effect across all species on detection."),
+                                                                    "Select site-level covariates that have a single, constant effect across all species on detection."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "detCovFixed", title = "Select covariates with a single effect across all species on detection."),
                                   varSelectizeInput("detCovRanef", label_with_info("Species Random Effects", 
-                                                                                   "Select covariates with species-specific but related effects on detection (drawn from a common distribution)."), 
+                                                                                   "Select covariates with species-specific but related effects on detection (effects are drawn from a shared community-level distribution)."), 
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "detCovRanef", title = "Select covariates with species-specific but related effects on detection (drawn from a common distribution)."),
                                   varSelectizeInput("detCovIndep", label_with_info("Independent Effects", 
-                                                                                   "Select covariates with completely independent effects for each species on detection."),
+                                                                                   "Select covariates with completely independent, unrelated effects for each species on detection."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "detCovIndep", title = "Select covariates with completely independent effects for each species on detection."),
                                   checkboxInput("speciesSiteRandomEffectDet", 
-                                                label_with_info("Species-Site Random Effect on Detection", 
-                                                                "Include a random effect term for each species at each specific site to account for unexplained variation in detection."), value = FALSE), 
-                                  # add_tooltip(id = "speciesSiteRandomEffectDet", title = "Include a random effect term for each species at each specific site to account for unexplained variation in detection."),
+                                                label = label_with_info("Species-Site Random Effect on Detection", 
+                                                                "Include a random effect term for each species at each specific site to account for unexplained, localized variation in detection."), value = FALSE), 
                                   h4("Effort as Detection Covariate"),
                                   checkboxInput("useEffortAsDetCov", 
-                                                label_with_info("Use Effort as Detection Covariate", 
+                                                label = label_with_info("Use Effort as Detection Covariate", 
                                                                 "Include camera trap effort (scaled trap days per occasion) as an observation-level covariate influencing detection."),
                                                 value = FALSE), 
-                                  # add_tooltip(id = "useEffortAsDetCov", title = "Include camera trap effort (scaled trap days per occasion) as an observation-level covariate influencing detection."),
                                   conditionalPanel(condition = "input.useEffortAsDetCov == true", 
                                                    radioButtons("effortDetCovType", 
                                                                 label_with_info("Effort Effect Type:", 
-                                                                                "Choose how the effort effect is modeled: 'Fixed' (same effect for all species) or 'Species random effect' (species-specific related effects)."),
-                                                                choices = c("Fixed (contant across species)" = "fixed", "Species random effect" = "ranef"), selected = "fixed")) #,
-                                                   # add_tooltip(id = "effortDetCovType", title = "Choose how the effort effect is modeled: 'Fixed' (same effect for all species) or 'Species random effect' (species-specific related effects)."))
+                                                                                "Choose how the effort effect is modeled across species: 'Fixed' (same effect for all species) or 'Species random effect' (species-specific related effects)."),
+                                                                choices = c("Fixed (constant across species)" = "fixed", "Species random effect" = "ranef"), selected = "fixed")) 
                            ),
                            column(6,
                                   h4("Occupancy Covariates"),
                                   selectInput("occuIntercept",
-                                              label = label_with_info(
-                                                "Occupancy Intercept:",
-                                                "Model occupancy/abundance intercept: 'fixed', 'ranef', or 'independent'."),
+                                              label = label_with_info("Occupancy Intercept:",
+                                                                      "Defines how baseline occupancy/abundance is shared across species: 'fixed' (identical for all), 'ranef' (species-specific, drawn from a common distribution), or 'independent' (completely separate for each species)."),
                                               choices = c("fixed", "ranef", "independent"), selected = "ranef"),
                                   varSelectizeInput("occuCovFixed", 
                                                     label_with_info("Fixed Effects", 
-                                                                    "Select covariates with a single effect across all species on occupancy/abundance."),
+                                                                    "Select site-level covariates that have a single, constant effect across all species on occupancy/abundance."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "occuCovFixed", title = "Select covariates with a single effect across all species on occupancy/abundance."),
                                   varSelectizeInput("occuCovRanef", 
                                                     label_with_info("Species Random Effects", 
-                                                                    "Select covariates with species-specific but related effects on occupancy/abundance."),
+                                                                    "Select covariates with species-specific but related effects on occupancy/abundance (effects drawn from a shared community-level distribution)."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "occuCovRanef", title = "Select covariates with species-specific but related effects on occupancy/abundance."),
                                   varSelectizeInput("occuCovIndep", 
                                                     label_with_info("Independent Effects", 
-                                                                    "Select covariates with completely independent effects for each species on occupancy/abundance."),
+                                                                    "Select covariates with completely independent, unrelated effects for each species on occupancy/abundance."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE))
-                                  # add_tooltip(id = "occuCovIndep", title = "Select covariates with completely independent effects for each species on occupancy/abundance.")
-                           )
+                                  )
                          )
                        )
                      ),
                      fluidRow(column(12, align = "left", 
                                      shiny::actionButton("createCommunityModel", "Create Model", class = "btn-primary btn-lg"), 
-                                     add_tooltip(id = "createCommunityModel", title = "Generate the community model structure based on the specified configuration. Does not fit the model yet."))
+                                     add_tooltip(id = "createCommunityModel", title = "Generate the community model structure based on the specified configuration. This prepares the model but does not start fitting it yet."))
                               ),
                      fluidRow(shinydashboard::box(title = "Model Summary", width = 12, status = "success", collapsible = TRUE,
                                                   verbatimTextOutput("communityModelSummary"))
@@ -2418,21 +2433,21 @@ surveyDashboard <- function(CTtable = NULL,
                            column(3, 
                                   numericInput("nburn", 
                                                label_with_info("Burn-in", 
-                                                               "Number of initial iterations to discard as burn-in."), 
+                                                               "Number of initial iterations to discard as burn-in to allow the chain to reach the target distribution."), 
                                                value = 500, min = 0)), 
                            column(3, 
                                   numericInput("nthin", 
                                                label_with_info("Thinning", 
-                                                               "Thinning interval (keep every nth sample) to reduce autocorrelation."), 
+                                                               "Thinning interval (keep every nth sample) to reduce autocorrelation and save memory."), 
                                                value = 1, min = 1)), 
                            column(3, 
                                   numericInput("nchains", 
                                                label_with_info("Number of Chains", 
-                                                               "Number of independent MCMC chains to run (minimum 3 recommended)."), 
+                                                               "Number of independent MCMC chains to run (minimum 3 recommended to assess convergence)."), 
                                                value = 3, min = 1))
                          ),
                          shiny::actionButton("fitCommunityModel", "Fit Model", class = "btn-primary"), 
-                         add_tooltip(id = "fitCommunityModel", title = "Start fitting the community model using the specified MCMC settings. This may take a significant amount of time.")
+                         add_tooltip(id = "fitCommunityModel", title = "Start fitting the community model using the specified MCMC settings. This may take a significant amount of time depending on model complexity.")
                        )
                      )
             ),
@@ -2449,7 +2464,7 @@ surveyDashboard <- function(CTtable = NULL,
                                 fluidRow(shinydashboard::box(title = "Trace Plots", width = 12, status = "warning", 
                                                              selectInput("trace_parameter", 
                                                                          label_with_info("Select Parameter:", 
-                                                                                         "Select a model parameter to view its MCMC trace plot across all chains."),
+                                                                                         "Select a model parameter to view its MCMC trace plot across all chains. Good mixing looks 'grassy' or like a 'hairy caterpillar'."),
                                                                          choices = NULL), 
                                                              # add_tooltip(id = "trace_parameter", title = "Select a model parameter to view its MCMC trace plot across all chains."), 
                                                              plotOutput("trace_plot", height = "400px")))
@@ -2488,16 +2503,14 @@ surveyDashboard <- function(CTtable = NULL,
                                                                numericInput("gof_plot_scale", "Plot size scale:", value = 1.5, min = 0.5, max = 3, step = 0.1), 
                                                                add_tooltip(id = "gof_plot_scale", title = "Adjust the overall size of text and elements in the residual plots.")),
                                                         column(3, 
-                                                               # checkboxInput("gof_plot_free_scales", "Use free scales", value = FALSE), 
                                                                checkboxInput("gof_plot_free_scales",
                                                                              label = tagList(
                                                                                "Use free scales",
                                                                                span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
                                                                                     title = "Allow axes scales to vary between species residual plots?")
                                                                              ),
-                                                                             value = FALSE),
-                                                               # add_tooltip(id = "gof_plot_free_scales", title = "Allow the x and y axes scales to vary between species plots ('free') or keep them the same ('fixed').")
-                                                        )
+                                                                             value = FALSE)
+                                                               )
                                                       ),
                                                       plotOutput("gof_residual_plot", height = "auto")
                                                     )
@@ -2528,7 +2541,7 @@ surveyDashboard <- function(CTtable = NULL,
                                     class = "settings-group", style = "margin-top: 20px;", h4("Plot Settings"),
                                     selectInput("selectedPlot", "Select Effect:", choices = NULL), 
                                       add_tooltip(id = "selectedPlot", title = "Select the specific covariate effect to visualize in the plots.", placement = "top"),
-                                    numericInput("plotDraws", "Number of Draws", value = 1000, min = 100), 
+                                    numericInput("plotDraws", "Number of Draws", value = 1000, min = 100, step = 100), 
                                       add_tooltip(id = "plotDraws", title = "Number of posterior draws used to calculate uncertainty intervals for the effect plots."),
                                     numericInput("plotLevelOuter", "Confidence Level", value = 0.95, min = 0, max = 1, step = 0.01), 
                                       add_tooltip(id = "plotLevelOuter", title = "Set the confidence level for the outer uncertainty interval (e.g., 0.95 for 95% CI)."),
@@ -2563,9 +2576,9 @@ surveyDashboard <- function(CTtable = NULL,
                               wellPanel(
                                 h4("Input Settings", class = "text-primary"),
                                 selectInput("prediction_raster_source", "Prediction Surface:", choices = c("Use extracted covariates" = "extracted", "Upload custom raster" = "custom")), 
-                                add_tooltip(id = "prediction_raster_source", title = "Choose the source for the covariate rasters needed for prediction.", placement = "top"),
+                                add_tooltip(id = "prediction_raster_source", title = "Choose the source for the covariate rasters needed for prediction. 'Extracted' uses rasters already loaded in the app, while 'Custom' lets you upload your own.", placement = "top"),
                                 conditionalPanel(condition = "input.prediction_raster_source == 'custom'", fileInput("covariate_raster", "Upload Raster:", accept = c(".tif")), 
-                                                 add_tooltip(id = "covariate_raster", title = "Upload a multi-layer raster file (.tif) containing all necessary covariates. Layer names must match model covariates.")),
+                                                 add_tooltip(id = "covariate_raster", title = "Upload a multi-layer raster file (.tif) containing all necessary covariates. Layer names must exactly match the model covariate names.")),
                                 hr(),
                                 h4("MCMC Settings", class = "text-primary"),
                                 numericInput("predictionDraws", "Posterior Draws:", value = 1000, min = 100), 
@@ -2594,7 +2607,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                           div(
                                                             style = "display: flex; gap: 10px; align-items: center;",
                                                             shiny::actionButton("runOccupancyPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), 
-                                                              add_tooltip(id = "runOccupancyPrediction", title = "Generate spatial predictions for species occupancy probabilities."),
+                                                              add_tooltip(id = "runOccupancyPrediction", title = "Generate spatial predictions for species occupancy probabilities across the prediction surface."),
                                                             selectInput("occupancySpecies", "Select Species:", choices = NULL, width = "300px"), 
                                                               add_tooltip(id = "occupancySpecies", title = "Select the species for which to display the occupancy map.", placement = "top"),
                                                             selectInput("occupancyMapType", "Display:", choices = c("Mean Occupancy" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), 
@@ -2618,7 +2631,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                           div(
                                                             style = "display: flex; gap: 10px; align-items: center;",
                                                             shiny::actionButton("runRichnessPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), 
-                                                              add_tooltip(id = "runRichnessPrediction", title = "Generate spatial predictions for species richness."),
+                                                              add_tooltip(id = "runRichnessPrediction", title = "Generate spatial predictions for species richness across the prediction surface."),
                                                             selectInput("richnessType", "Display:", choices = c("Mean Richness" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), 
                                                               add_tooltip(id = "richnessType", title = "Choose which richness layer to display: Mean, Standard Deviation, or Confidence Interval bounds.", placement = "top"),
                                                             selectInput("richnessColorPalette", "Color Palette:", choices = c("Viridis", "Plasma", "Inferno", "Rocket"), selected = "Viridis", width = "200px"), 
@@ -9148,7 +9161,7 @@ surveyDashboard <- function(CTtable = NULL,
                                    type = input$basic_pred_type,
                                    newdata = pred_raster)
           } else {
-            
+
             
             predictions <- ubms::predict(object = current_model,
                                          submodel = input$basic_pred_type,
@@ -9173,7 +9186,7 @@ surveyDashboard <- function(CTtable = NULL,
                            type = "error", duration = 10)
         })
       })
-    })
+    })   
     
     # # Spatial predictions - Advanced workflow
     # observeEvent(input$adv_run_prediction, {
