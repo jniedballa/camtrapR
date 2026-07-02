@@ -1,0 +1,859 @@
+{
+  "input": {
+    ".clientValue-default-plotlyCrosstalkOpts": {
+      "on": "plotly_click",
+      "persistent": false,
+      "dynamic": false,
+      "selectize": false,
+      "opacityDim": 0.2,
+      "selected": {
+        "opacity": 1
+      },
+      "debounce": 0,
+      "color": [
+
+      ]
+    },
+    "CTdateFormat": "ymd",
+    "acc_conf": 0.95,
+    "acc_deselectAll": 0,
+    "acc_knots": 40,
+    "acc_minRecords": 1,
+    "acc_minStations": 1,
+    "acc_nboot": 50,
+    "acc_plot_scale": 1.5,
+    "acc_q": 0,
+    "acc_selectAll": 0,
+    "acc_selectByBoth": 0,
+    "acc_selectByRecords": 0,
+    "acc_selectByStations": 0,
+    "acc_x_unit": "station",
+    "ad_species": "EGY",
+    "addDetectionEffect": 0,
+    "addOccupancyEffect": 0,
+    "adv_add_to_modsel": 0,
+    "adv_digits": 2,
+    "adv_effort_on_detection": false,
+    "adv_model_package": "unmarked",
+    "adv_model_type": "Occupancy",
+    "adv_pval": 0.95,
+    "adv_scale_covariates": true,
+    "adv_ubms_chains": 3,
+    "adv_ubms_iter": 2000,
+    "adv_ubms_thin": 1,
+    "advanced_workflow_tabs": "Model Setup",
+    "aoi_done": 0,
+    "aoi_path": "",
+    "applyFilter_camtrap_properties": 0,
+    "apply_date_filter": 0,
+    "augmentationType": "none",
+    "augmentationValue": null,
+    "basic_add_to_modsel": 0,
+    "basic_ci_level": 0.95,
+    "basic_clear_modsel": 0,
+    "basic_custom_raster": null,
+    "basic_det_covs": [
+
+    ],
+    "basic_digits": 2,
+    "basic_effort_on_detection": false,
+    "basic_invertPredictionColors": false,
+    "basic_model_package": "unmarked",
+    "basic_model_type": "Occupancy",
+    "basic_occ_covs": [
+
+    ],
+    "basic_plot_type": "Detection covariates",
+    "basic_pred_source": "extracted",
+    "basic_pred_type": "state",
+    "basic_predictionColorPalette": "Inferno",
+    "basic_pval": 0.95,
+    "basic_run_model": 0,
+    "basic_run_prediction": 0,
+    "basic_scale_covariates": true,
+    "basic_ubms_chains": 3,
+    "basic_ubms_iter": 2000,
+    "basic_ubms_thin": 1,
+    "basic_workflow_tabs": "Model Setup",
+    "batchSize": 1000,
+    "bilinear": false,
+    "browse_camtrapdp": 0,
+    "browse_wi_directory": 0,
+    "bufferCT": 0,
+    "bufferPrediction": 1000,
+    "cameraCol": "",
+    "camtrapdp_cameras_independent": false,
+    "camtrapdp_custom_filter": "",
+    "camtrapdp_directory": "",
+    "camtrapdp_filter_observations": "none",
+    "camtrapdp_import": 0,
+    "camtrapdp_min_gap_hours": 24,
+    "camtrapdp_remove_empty": true,
+    "camtrapdp_remove_na": true,
+    "clearAllCovariates": 0,
+    "clearAllFilters": 0,
+    "clear_date_filter": 0,
+    "colorPalette": "Inferno",
+    "colorPalettePrediction": "Inferno",
+    "communityModelType": "Occupancy",
+    "confirmDetectionEffect": 0,
+    "confirmOccupancyEffect": 0,
+    "correlationMethod": "pearson",
+    "correlationThreshold": 0.7,
+    "corrplotMethod": "color",
+    "corrplotOrder": "hclust",
+    "covariate_raster": null,
+    "createCommunityModel": 1,
+    "crs": "",
+    "ctColorBy": "white",
+    "ctColorByPrediction": "white",
+    "ctPointSize": 6,
+    "ctPointSizePrediction": 6,
+    "ct_done": 0,
+    "ct_file": null,
+    "date_range_filter": [
+      "2009-04-02",
+      "2009-05-17"
+    ],
+    "day1_community": "survey",
+    "day1_single_species": "survey",
+    "deltaTimeComparedTo": "lastIndependentRecord",
+    "deselectAllSpecies": 0,
+    "detCovFixed": [
+      {
+
+      }
+    ],
+    "detCovIndep": [
+      {
+
+      }
+    ],
+    "detCovRanef": [
+
+    ],
+    "detIntercept": "ranef",
+    "detectionEffectType": "linear",
+    "detectionSecondCovariate": "",
+    "directory": "",
+    "effortDetCovType": "fixed",
+    "elevationZoom": "10",
+    "exclude": "",
+    "excludeNonNumeric": true,
+    "export_all_data": 0,
+    "export_basic_model": 0,
+    "filenames": "",
+    "filterColumn": "Station",
+    "fitCommunityModel": 0,
+    "formats": ".tif",
+    "gof_draws": 1000,
+    "gof_plot_columns": 3,
+    "gof_plot_free_scales": false,
+    "gof_plot_height": 400,
+    "gof_plot_scale": 1.5,
+    "gof_residual_type": "FT",
+    "gof_z_cond": true,
+    "hasProblems": false,
+    "inputType": "directory",
+    "invertColors": false,
+    "invertColorsPrediction": false,
+    "invertOccupancyColors": false,
+    "invertRichnessColors": false,
+    "keepSelectedSpecies": 0,
+    "keyword_quadratic": "_squared",
+    "maxPixels": 1,
+    "maxPixelsPrediction": 1,
+    "max_file_size": 500,
+    "minDeltaTime": 0,
+    "minRecords": 1,
+    "minStations": 1,
+    "modelFile": "",
+    "nburn": 50,
+    "nchains": 3,
+    "niter": 100,
+    "no_record_more_transparent": true,
+    "nthin": 1,
+    "occasionLength_community": 15,
+    "occasionLength_single_species": 10,
+    "occuCovFixed": [
+
+    ],
+    "occuCovIndep": [
+
+    ],
+    "occuCovRanef": [
+      {
+
+      }
+    ],
+    "occuIntercept": "ranef",
+    "occupancyColorPalette": "Viridis",
+    "occupancyEffectType": "linear",
+    "occupancyMapType": "mean",
+    "occupancySecondCovariate": "",
+    "occupancySpecies": "",
+    "occupancy_workflow": "basic",
+    "orderByEffect": true,
+    "plotDraws": 1000,
+    "plotLevelInner": 0.75,
+    "plotLevelOuter": 0.95,
+    "plotResponse": "occupancy",
+    "plotScale": 1.5,
+    "plotSpeciesSubset": null,
+    "plotSubmodel": "state",
+    "plotType": "matrix",
+    "plotly_afterplot-A": "\"plot_n_records\"",
+    "plotly_relayout-A": "{\"width\":1322,\"height\":500}",
+    "predictionBatch": false,
+    "predictionDraws": 1000,
+    "predictionExtent": "none",
+    "predictionLevel": 0.95,
+    "predictionRasterBand": "",
+    "predictionSeed": null,
+    "predictionTabs": "Species Occupancy",
+    "prediction_raster_source": "extracted",
+    "rasterBand": "",
+    "rasterTemplate": null,
+    "recordDateTimeCol": "",
+    "recordDateTimeFormat": "ymd HMS",
+    "record_done": 0,
+    "record_file": null,
+    "recursive": false,
+    "removeDuplicateRecords": true,
+    "removeSelectedSpecies": 0,
+    "resetAllFiltersOverview": 0,
+    "resetSpeciesFilter": 0,
+    "resolution": 500,
+    "restoreOriginalRecordTable": 0,
+    "retrievalCol": "",
+    "return_dethist": 0,
+    "return_umf": 0,
+    "richnessCategories": "",
+    "richnessColorPalette": "Viridis",
+    "richnessType": "mean",
+    "runAccumulation": 0,
+    "runAdvancedModel": 0,
+    "runOccupancyPrediction": 0,
+    "runPAOPrediction": 0,
+    "runRichnessPrediction": 0,
+    "runTemporalFilter": 0,
+    "run_covariate_extraction": 0,
+    "run_gof": 0,
+    "scale_size": true,
+    "selectAllSpecies": 0,
+    "selectByBoth": 0,
+    "selectByRecords": 0,
+    "selectByStations": 0,
+    "selectedPlot": "",
+    "setupCol": "",
+    "sidebarCollapsed": false,
+    "sidebarItemExpanded": null,
+    "speciesA": "EGY",
+    "speciesB": "MNE",
+    "speciesCol": "",
+    "speciesSiteRandomEffectDet": false,
+    "species_dethist": "EGY",
+    "species_for_map": "n_species",
+    "stationCol": "",
+    "terrainMeasures": [
+      "slope",
+      "TRI"
+    ],
+    "timeZone": "UTC",
+    "trace_parameter": "",
+    "updatePlotSettings": 0,
+    "update_max_size": 0,
+    "useEffortAsDetCov": true,
+    "useNimble": false,
+    "use_elevation": false,
+    "use_local_rasters": false,
+    "wi_cameras_independent": false,
+    "wi_deployment_file": null,
+    "wi_detection_file": null,
+    "wi_directory": "",
+    "wi_import_button": 0,
+    "wi_import_type": "zip",
+    "wi_zip_file": null,
+    "xcol": "",
+    "ycol": ""
+  },
+  "output": {
+    "area_mcp": {
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>3.57 km²<\/h3>\n    <p>Survey area (MCP)<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-vector-square\" role=\"presentation\" aria-label=\"vector-square icon\"><\/i>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "avg_records_per_station": {
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>13<\/h3>\n    <p>Avg records per station<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-table\" role=\"presentation\" aria-label=\"table icon\"><\/i>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "data_loaded": "TRUE",
+    "date_range_max": {
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>2009-05-17<\/h3>\n    <p>Last survey day<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"far fa-calendar-minus\" role=\"presentation\" aria-label=\"calendar-minus icon\"><\/i>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "date_range_min": {
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>2009-04-02<\/h3>\n    <p>First survey day<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"far fa-calendar-plus\" role=\"presentation\" aria-label=\"calendar-plus icon\"><\/i>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "num_images": {
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>39<\/h3>\n    <p>Images<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-camera\" role=\"presentation\" aria-label=\"camera icon\"><\/i>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "num_species": {
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>5<\/h3>\n    <p>Species detected<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-paw\" role=\"presentation\" aria-label=\"paw icon\"><\/i>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "num_stations": {
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>3<\/h3>\n    <p>Stations<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-location-pin\" role=\"presentation\" aria-label=\"location-pin icon\"><\/i>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "plot_n_records": {
+      "x": {
+        "data": [
+          {
+            "orientation": "v",
+            "width": [
+              6,
+              2,
+              18,
+              8,
+              5
+            ],
+            "base": [
+              2.5499999999999998,
+              0.55000000000000004,
+              4.5499999999999998,
+              3.5499999999999998,
+              1.55
+            ],
+            "x": [
+              3,
+              1,
+              9,
+              4,
+              2.5
+            ],
+            "y": [
+              0.90000000000000036,
+              0.89999999999999991,
+              0.90000000000000036,
+              0.90000000000000036,
+              0.90000000000000013
+            ],
+            "text": [
+              "Count:  6<br />Species: EGY",
+              "Count:  2<br />Species: MNE",
+              "Count: 18<br />Species: PBE",
+              "Count:  8<br />Species: TRA",
+              "Count:  5<br />Species: VTA"
+            ],
+            "type": "bar",
+            "textposition": "none",
+            "marker": {
+              "autocolorscale": false,
+              "color": "rgba(89,89,89,1)",
+              "line": {
+                "width": 1.8897637795275593,
+                "color": "transparent"
+              }
+            },
+            "showlegend": false,
+            "xaxis": "x",
+            "yaxis": "y",
+            "hoverinfo": "text",
+            "frame": null
+          }
+        ],
+        "layout": {
+          "margin": {
+            "t": 40.840182648401829,
+            "r": 7.3059360730593621,
+            "b": 37.260273972602747,
+            "l": 43.105022831050235
+          },
+          "plot_bgcolor": "rgba(255,255,255,1)",
+          "paper_bgcolor": "rgba(255,255,255,1)",
+          "font": {
+            "color": "rgba(0,0,0,1)",
+            "family": "",
+            "size": 14.611872146118724
+          },
+          "title": {
+            "text": "Number of records by species",
+            "font": {
+              "color": "rgba(0,0,0,1)",
+              "family": "",
+              "size": 17.534246575342465
+            },
+            "x": 0,
+            "xref": "paper"
+          },
+          "xaxis": {
+            "domain": [
+              0,
+              1
+            ],
+            "automargin": true,
+            "type": "linear",
+            "autorange": false,
+            "range": [
+              -0.90000000000000002,
+              18.899999999999999
+            ],
+            "tickmode": "array",
+            "ticktext": [
+              "0",
+              "5",
+              "10",
+              "15"
+            ],
+            "tickvals": [
+              0,
+              5.0000000000000009,
+              10,
+              15
+            ],
+            "categoryorder": "array",
+            "categoryarray": [
+              "0",
+              "5",
+              "10",
+              "15"
+            ],
+            "nticks": null,
+            "ticks": "outside",
+            "tickcolor": "rgba(51,51,51,1)",
+            "ticklen": 3.6529680365296811,
+            "tickwidth": 0.66417600664176002,
+            "showticklabels": true,
+            "tickfont": {
+              "color": "rgba(77,77,77,1)",
+              "family": "",
+              "size": 11.68949771689498
+            },
+            "tickangle": 0,
+            "showline": false,
+            "linecolor": null,
+            "linewidth": 0,
+            "showgrid": true,
+            "gridcolor": "rgba(235,235,235,1)",
+            "gridwidth": 0.66417600664176002,
+            "zeroline": false,
+            "anchor": "y",
+            "title": {
+              "text": "Count",
+              "font": {
+                "color": "rgba(0,0,0,1)",
+                "family": "",
+                "size": 14.611872146118724
+              }
+            },
+            "hoverformat": ".2f"
+          },
+          "yaxis": {
+            "domain": [
+              0,
+              1
+            ],
+            "automargin": true,
+            "type": "linear",
+            "autorange": false,
+            "range": [
+              0.40000000000000002,
+              5.5999999999999996
+            ],
+            "tickmode": "array",
+            "ticktext": [
+              "MNE",
+              "VTA",
+              "EGY",
+              "TRA",
+              "PBE"
+            ],
+            "tickvals": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "categoryorder": "array",
+            "categoryarray": [
+              "MNE",
+              "VTA",
+              "EGY",
+              "TRA",
+              "PBE"
+            ],
+            "nticks": null,
+            "ticks": "outside",
+            "tickcolor": "rgba(51,51,51,1)",
+            "ticklen": 3.6529680365296811,
+            "tickwidth": 0.66417600664176002,
+            "showticklabels": true,
+            "tickfont": {
+              "color": "rgba(77,77,77,1)",
+              "family": "",
+              "size": 11.68949771689498
+            },
+            "tickangle": 0,
+            "showline": false,
+            "linecolor": null,
+            "linewidth": 0,
+            "showgrid": true,
+            "gridcolor": "rgba(235,235,235,1)",
+            "gridwidth": 0.66417600664176002,
+            "zeroline": false,
+            "anchor": "x",
+            "title": {
+              "text": "Species",
+              "font": {
+                "color": "rgba(0,0,0,1)",
+                "family": "",
+                "size": 14.611872146118724
+              }
+            },
+            "hoverformat": ".2f"
+          },
+          "shapes": [
+            {
+              "type": "rect",
+              "fillcolor": "rgba(255,255,255,1)",
+              "line": {
+                "color": "rgba(51,51,51,1)",
+                "width": 0.66417600664176002,
+                "linetype": "solid"
+              },
+              "yref": "paper",
+              "xref": "paper",
+              "layer": "below",
+              "x0": 0,
+              "x1": 1,
+              "y0": 0,
+              "y1": 1
+            }
+          ],
+          "showlegend": false,
+          "legend": {
+            "bgcolor": "rgba(255,255,255,1)",
+            "bordercolor": "transparent",
+            "borderwidth": 1.8897637795275593,
+            "font": {
+              "color": "rgba(0,0,0,1)",
+              "family": "",
+              "size": 11.68949771689498
+            }
+          },
+          "hovermode": "closest",
+          "barmode": "relative"
+        },
+        "config": {
+          "doubleClick": "reset",
+          "modeBarButtonsToAdd": [
+            "hoverclosest",
+            "hovercompare"
+          ],
+          "showSendToCloud": false
+        },
+        "source": "A",
+        "highlight": {
+          "on": "plotly_click",
+          "persistent": false,
+          "dynamic": false,
+          "selectize": false,
+          "opacityDim": 0.20000000000000001,
+          "selected": {
+            "opacity": 1
+          },
+          "debounce": 0
+        },
+        "shinyEvents": [
+          "plotly_hover",
+          "plotly_click",
+          "plotly_selected",
+          "plotly_relayout",
+          "plotly_brushed",
+          "plotly_brushing",
+          "plotly_clickannotation",
+          "plotly_doubleclick",
+          "plotly_deselect",
+          "plotly_afterplot",
+          "plotly_sunburstclick"
+        ],
+        "base_url": "https://plot.ly"
+      },
+      "evals": [
+
+      ],
+      "jsHooks": [
+
+      ],
+      "deps": [
+        {
+          "name": "setprototypeof",
+          "version": "0.1",
+          "src": {
+            "href": "setprototypeof-0.1"
+          },
+          "meta": null,
+          "script": "setprototypeof.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "typedarray",
+          "version": "0.1",
+          "src": {
+            "href": "typedarray-0.1"
+          },
+          "meta": null,
+          "script": "typedarray.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "jquery",
+          "version": "3.5.1",
+          "src": {
+            "href": "jquery-3.5.1"
+          },
+          "meta": null,
+          "script": "jquery.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "crosstalk",
+          "version": "1.2.2",
+          "src": {
+            "href": "crosstalk-1.2.2"
+          },
+          "meta": null,
+          "script": "js/crosstalk.min.js",
+          "stylesheet": "css/crosstalk.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "plotly-htmlwidgets-css",
+          "version": "2.25.2",
+          "src": {
+            "href": "plotly-htmlwidgets-css-2.25.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "plotly-htmlwidgets.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "plotly-main",
+          "version": "2.25.2",
+          "src": {
+            "href": "plotly-main-2.25.2"
+          },
+          "meta": null,
+          "script": "plotly-latest.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        }
+      ]
+    },
+    "stateMenu": {
+      "html": "<li class=\"dropdown tasks-menu\">\n  <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">\n    <i class=\"far fa-floppy-disk\" role=\"presentation\" aria-label=\"floppy-disk icon\"><\/i>\n  <\/a>\n  <ul class=\"dropdown-menu\">\n    <li class=\"header\">App State<\/li>\n    <li>\n      <ul class=\"menu\">\n        <li class=\"menuitem\">\n          <a href=\"#\" onclick=\"Shiny.setInputValue(&#39;saveState&#39;, true, {priority: &#39;event&#39;});\">\n            <i class=\"far fa-floppy-disk\" role=\"presentation\" aria-label=\"floppy-disk icon\"><\/i>\n            Save current state\n          <\/a>\n        <\/li>\n        <li class=\"menuitem\">\n          <a href=\"#\" onclick=\"Shiny.setInputValue(&#39;loadState&#39;, true, {priority: &#39;event&#39;});\">\n            <i class=\"fas fa-upload\" role=\"presentation\" aria-label=\"upload icon\"><\/i>\n            Load saved state\n          <\/a>\n        <\/li>\n      <\/ul>\n    <\/li>\n  <\/ul>\n<\/li>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "trap_nights": {
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>128<\/h3>\n    <p>Trap nights (total)<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"far fa-calendar-days\" role=\"presentation\" aria-label=\"calendar-days icon\"><\/i>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "trap_nights_avg": {
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>42.7<\/h3>\n    <p>Trap nights (average per station)<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-calendar-day\" role=\"presentation\" aria-label=\"calendar-day icon\"><\/i>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "6.5.2",
+          "src": {
+            "href": "font-awesome-6.5.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "welcome_screen": null
+  },
+  "export": {
+
+  }
+}

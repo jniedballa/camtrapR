@@ -1,0 +1,102 @@
+library(shinytest2)
+
+load_timeout <- 30 * 1000  # 20 seconds
+
+
+
+test_that("{shinytest2} recording: surveyDashboard_builtin_filters", {
+  local_app_support(test_path("apps/surveyDashboard_builtin"))
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_filters",
+                       height = 993, width = 1619, load_timeout = load_timeout)
+  app$set_inputs(sidebarItemExpanded = "DataFilters")
+  app$set_inputs(categoryValues = c("StationB", "StationC"))
+  app$click("applyFilter_camtrap_properties")
+  app$set_inputs(date_range_filter = c("2009-04-10", "2009-05-17"))
+  app$click("apply_date_filter")
+  app$click("removeSelectedSpecies")
+  app$set_inputs(sidebarItemExpanded = "Tables")
+  app$expect_values()
+})
+
+
+test_that("{shinytest2} recording: surveyDashboard_builtin_launch", {
+  local_app_support(test_path("apps/surveyDashboard_builtin"))
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_launch",
+      height = 993, width = 1619, load_timeout = load_timeout)
+  app$expect_values()
+})
+
+
+test_that("{shinytest2} recording: surveyDashboard_builtin_correlations", {
+  local_app_support(test_path("apps/surveyDashboard_builtin"))
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_correlations",
+      height = 993, width = 1619, load_timeout = 30000)
+  app$set_inputs(sidebarItemExpanded = "DataProcessing")
+  app$set_inputs(correlationMethod = "spearman")
+  app$set_inputs(correlationMethod = "kendall")
+  app$set_inputs(corrplotMethod = "circle")
+  app$set_inputs(corrplotMethod = "square")
+  app$set_inputs(corrplotMethod = "ellipse")
+  app$set_inputs(corrplotMethod = "shade")
+  app$set_inputs(corrplotMethod = "pie")
+  app$set_inputs(corrplotOrder = "original")
+  app$set_inputs(corrplotOrder = "FPC")
+  app$set_inputs(corrplotOrder = "AOE")
+  app$set_inputs(corrplotOrder = "alphabet")
+  app$set_inputs(plotType = "pairs")
+  app$set_inputs(correlationMethod = "pearson")
+  app$set_inputs(correlationMethod = "spearman")
+  app$set_inputs(correlationThreshold = 0.4)
+  app$expect_values()
+})
+
+
+test_that("{shinytest2} recording: surveyDashboard_builtin_detectionHistory", {
+  local_app_support(test_path("apps/surveyDashboard_builtin"))
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_detectionHistory",
+      height = 993, width = 1619, load_timeout = 30000)
+  app$set_inputs(sidebarItemExpanded = "Single-speciesOccupancy")
+  app$set_inputs(species_dethist = "MNE")
+  app$set_inputs(day1_single_species = "station")
+  app$set_inputs(occasionLength_single_species = 6)
+  app$set_inputs(occasionLength_single_species = 5)
+  app$expect_values()
+})
+
+
+
+test_that("{shinytest2} recording: surveyDashboard_builtin_occupancy", {
+  local_app_support(test_path("apps/surveyDashboard_builtin"))
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_occupancy",
+      height = 993, width = 1619, load_timeout = 30000)
+  app$set_inputs(sidebarItemExpanded = "Single-speciesOccupancy")
+  app$click("basic_run_model")
+  app$click("basic_add_to_modsel")
+  app$set_inputs(basic_effort_on_detection = TRUE)
+  app$click("basic_run_model")
+  app$click("basic_add_to_modsel")
+  app$set_inputs(basic_occ_covs = "utm_y")
+  app$set_inputs(basic_occ_covs = c("utm_y", "utm_x"))
+  app$click("basic_run_model")
+  app$click("basic_add_to_modsel")
+  app$set_inputs(basic_workflow_tabs = "Model selection")
+  app$set_inputs(basic_workflow_tabs = "Response Plots")
+  app$set_inputs(basic_plot_type = "Occupancy covariates")
+  app$expect_values()
+})
+
+
+
+test_that("{shinytest2} recording: surveyDashboard_builtin_communiy_UI", {
+  local_app_support(test_path("apps/surveyDashboard_builtin"))
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_communiy_UI", 
+      height = 993, width = 1619, load_timeout = 30000)
+  app$set_inputs(detCovFixed = "utm_y")
+  app$set_inputs(occuCovRanef = "utm_x")
+  app$set_inputs(detCovIndep = "utm_y")
+  app$set_inputs(useEffortAsDetCov = TRUE)
+  app$set_inputs(occasionLength_community = 15)
+  app$click("createCommunityModel")
+  app$set_inputs(niter = 100)
+  app$expect_values()
+})
