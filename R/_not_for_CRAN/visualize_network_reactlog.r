@@ -25,7 +25,8 @@ surveyDashboard(
   stationCol = "Station",
   setupCol = "Setup_date",
   retrievalCol = "Retrieval_date",
-  CTdateFormat = "dmy"
+  CTdateFormat = "dmy",
+  exclude = "blank"
 )
 
 
