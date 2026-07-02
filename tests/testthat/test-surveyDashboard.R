@@ -116,6 +116,7 @@ test_that("surveyDashboard server logic initializes correctly with camtrap DP da
       expect_equal(dim(data$recordTable), c(549,34))
       expect_equal(dim(df_n_records()), c(14, 2))
       
+      expect_equal(dim(detmaps_sf()), c(4,19))
     }
   )
 })
