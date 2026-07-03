@@ -57,7 +57,7 @@ camera trap data.
 \details{
 While the 'camtrapdp' package provides general functionality for reading, 
 manipulating, and transforming Camtrap DP data, this function specifically converts Camtrap DP 
-data directly into the format required by camtrapR, producing the CTtable and recordTable objects 
+data directly into the format required by camtrapR, producing the camera trap table and recordTable objects 
 that camtrapR functions expect.
 
 This function acts as a wrapper around \code{\link[camtrapdp]{read_camtrapdp}}, utilizing it to 
