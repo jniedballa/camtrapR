@@ -9141,9 +9141,9 @@ surveyDashboard <- function(CTtable = NULL,
       
       # 3. Ensure that all cells have NA at the same locations
       tryCatch({
-        # anyNA returns TRUE if any layer has NA. We invert it for the mask.
-        na_mask <- !terra::anyNA(pred_raster) 
-        pred_raster <- terra::mask(pred_raster, na_mask, maskvalues = FALSE)
+        # all returns TRUE if all layer have values, NA otherwise
+        na_mask <- all(pred_raster) 
+        pred_raster <- terra::mask(pred_raster, na_mask, maskvalues = NA)
       }, error = function(e) {
         showNotification(paste("Error aligning raster NA values:", e$message), 
                          type = "error", duration = 5)
