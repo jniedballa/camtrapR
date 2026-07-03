@@ -6097,6 +6097,7 @@ surveyDashboard <- function(CTtable = NULL,
           point_size <- input$ctPointSizePrediction
           color_palette <- input$colorPalettePrediction
           invert_colors <- input$invertColorsPrediction
+          rasterband <- input$predictionRasterBand
           # full_resolution <- input$fullResolutionPrediction
         } else {
           req(raster, input$rasterBand, input$colorPalette)
@@ -6105,13 +6106,14 @@ surveyDashboard <- function(CTtable = NULL,
           point_size <- input$ctPointSize
           color_palette <- input$colorPalette
           invert_colors <- input$invertColors
+          rasterband <- input$rasterBand
         }
         
         ct_sf <- aggregated_CTtable_sf()
         
         # Get value range from raster and camera traps
         value_range_raster <- terra::minmax(raster)
-        value_range_station <- range(ct_sf[[input$predictionRasterBand]])
+        value_range_station <- range(ct_sf[[rasterband]])
         # get combined value range
         value_range <- c(min(value_range_raster, value_range_station),
                          max(value_range_raster, value_range_station))
@@ -6290,7 +6292,9 @@ surveyDashboard <- function(CTtable = NULL,
       req(selected_raster, inherits(selected_raster, "SpatRaster"))
 
       # Render the map using the selected single-band raster
-      render_raster_map(selected_raster, raster_display_name, is_prediction = FALSE)
+      render_raster_map(selected_raster, 
+                        raster_name = input$rasterBand, 
+                        is_prediction = FALSE)
     })
     
     # Render prediction raster map
@@ -8805,7 +8809,6 @@ surveyDashboard <- function(CTtable = NULL,
     ## Model summaries ----
     output$basic_model_summary <- renderText({
       req(basic_model())
-      #browser()
       if (input$basic_model_package == "unmarked") {
         summary_text <- print_basic_model()$printed_output
       } 
