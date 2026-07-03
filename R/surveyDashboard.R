@@ -713,9 +713,10 @@ surveyDashboard <- function(CTtable = NULL,
               # Directory selection
               fluidRow(
                 column(8,
-                       textInput("camtrapdp_directory", "Path to camtrapDP Directory:",
-                                 placeholder = "C:/path/to/camtrapdp_directory"),
-                       add_tooltip(id = "camtrapdp_directory", title = "Enter the path to the root directory of the camtrapDP dataset (the folder containing 'datapackage.json').")
+                       textInput("camtrapdp_directory", 
+                                 label = label_with_info("Path to camtrapDP directory:", 
+                                                         "Enter the path to the root folder of the camtrapDP dataset. This folder must contain the 'datapackage.json' file."),
+                                 placeholder = "C:/path/to/camtrapdp_directory")
                 ),
                 column(4,
                        style = "margin-top: 25px;",
@@ -730,47 +731,37 @@ surveyDashboard <- function(CTtable = NULL,
                 column(6,
                        h4("Basic Import Options"),
                        numericInput("camtrapdp_min_gap_hours",
-                                    label = tagList(
-                                      "Min. gap for camera interruption (hours)",
-                                      span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
-                                           title = "Min duration (hours) without observations to mark a deployment interruption.")
-                                    ),
+                                    label = label_with_info("Min. gap for camera interruption (hours)", 
+                                                            "Minimum duration (in hours) between the end of one deployment and the start of the next at the same station. If the gap exceeds this value, it is logged as a 'Problem' period (camera inactive) in the resulting camera trap table. This calculation is based solely on deployment start and end dates, not on species observation records."),
                                     value = 24, min = 1),
-                       # add_tooltip(id = "camtrapdp_min_gap_hours", title = "Define the minimum duration (in hours) without observations to consider a camera deployment interrupted (used for 'Problem' columns)."),
+                       
                        radioButtons("camtrapdp_filter_observations",
-                                    label = tagList(
-                                      "Filter observations:",
-                                      span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
-                                           title = "Import all records or only those classified as 'animal'.")
-                                    ),
+                                    label = label_with_info("Filter observations:", 
+                                                            "Choose whether to import all observation records or only those explicitly classified as 'animal'."),
                                     choices = c("All observation types" = "none", "Animal observations only" = "animals"),
                                     selected = "none"),
-                       # add_tooltip(id = "camtrapdp_filter_observations", title = "Choose whether to import all observation records or only those classified as 'animal'."),
+                       
                        checkboxInput("camtrapdp_cameras_independent",
-                                     label = tagList(
-                                       "Cameras are independent",
-                                       span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
-                                            title = "If multiple cameras per location ('locationName'), treat as independent units?")
-                                     ),
+                                     label = label_with_info("Treat multiple cameras as independent", 
+                                                             "If the dataset includes multiple cameras deployed at the same location, check this box to treat each camera (identified by 'cameraID') as an independent sampling unit. Uncheck if cameras were paired."),
                                      value = FALSE),
-                       # add_tooltip(id = "camtrapdp_cameras_independent", title = "If the dataset includes a 'cameraID' and multiple cameras are deployed per 'locationName', check this to treat them as independent units."),
+                       
                        checkboxInput("camtrapdp_remove_na",
-                                     "Remove columns with only NA values", value = TRUE),
-                       add_tooltip(id = "camtrapdp_remove_na", title = "Automatically remove columns from the imported tables if they contain only missing (NA) values."),
+                                     label = label_with_info("Remove columns with only NA values", 
+                                                             "Automatically removes columns from the imported tables if they contain only missing (NA) values."),
+                                     value = TRUE),
+                       
                        checkboxInput("camtrapdp_remove_empty",
-                                     "Remove columns with only empty values", value = TRUE),
-                       add_tooltip(id = "camtrapdp_remove_empty", title = "Automatically remove columns from the imported tables if they contain only empty strings or blanks.")
+                                     label = label_with_info("Remove columns with only empty values", 
+                                                             "Automatically removes columns from the imported tables if they contain only empty strings or whitespace."),
+                                     value = TRUE)
                 ),
                 column(6,
                        h4("Advanced Options"),
                        textInput("camtrapdp_custom_filter",
-                                 label = tagList(
-                                   "Custom observation types to include (comma-separated):",
-                                   span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
-                                        title = "Enter comma-separated 'observationType' values to keep. Overrides basic filter.")
-                                 ),
+                                 label = label_with_info("Custom observation types to include (comma-separated):", 
+                                                         "Enter a comma-separated list of 'observationType' values to keep (e.g., animal, human, vehicle). If provided, this overrides the basic filter setting on the left."),
                                  placeholder = "e.g., animal,human,vehicle")
-                       # add_tooltip(id = "camtrapdp_custom_filter", title = "Enter a comma-separated list of observation types (from 'observationType' column) to keep. This overrides the basic filter setting.")
                 )
               ),
               
@@ -781,7 +772,8 @@ surveyDashboard <- function(CTtable = NULL,
                          style = "margin-top: 20px;",
                          actionButton("camtrapdp_import", "Import Data",
                                       class = "btn-primary btn-lg"),
-                         add_tooltip(id = "camtrapdp_import", title = "Start importing the camtrapDP data with the specified options.")
+                         add_tooltip(id = "camtrapdp_import", 
+                                     title = "Imports the camtrapDP dataset into the application using the specified options.")
                        )
                 )
               ),
