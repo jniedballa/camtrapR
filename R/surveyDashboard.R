@@ -507,6 +507,17 @@ surveyDashboard <- function(CTtable = NULL,
         shinydashboard::tabItem(
           tabName = "import_csv",
           shiny::tabsetPanel(
+            selected = "Camera Trap Data",
+            shiny::tabPanel("Instructions",
+                            fluidRow(
+                              shinydashboard::box(
+                                title = "Data Format for CSV Import",
+                                width = 12,
+                                status = "info",
+                                shiny::HTML(paste(help_text("csv_upload_help.html"), collapse = "\n"))
+                              )
+                            )
+            ),
 
             shiny::tabPanel("Camera Trap Data",
                             shinydashboard::box(
@@ -701,6 +712,9 @@ surveyDashboard <- function(CTtable = NULL,
         ),
         
         ### camtrap DP ----
+        
+        # TODO: When loading camtrap DP data, applying species filter, then loading a new dataset, the filters don't reset.
+        
         shinydashboard::tabItem(
           tabName = "import_camtrapdp",
           fluidRow(
@@ -3115,15 +3129,15 @@ surveyDashboard <- function(CTtable = NULL,
       data$hasProblems <- input$hasProblems
       data$camerasIndependent <- if(!is.null(input$camerasIndependentImport)) input$camerasIndependentImport else FALSE
       
-      # Reset original_data() when new data is loaded
-      observe({
-        req(data$CTtable_sf)     # Need to make sure CTtable_sf is updated first
-        original_data(list(
-          CTtable_sf = data$CTtable_sf,
-          recordTable = data$recordTable,
-          aggregated_CTtable = data$aggregated_CTtable
-        ))
-      })
+      # # Reset original_data() when new data is loaded
+      # observe({
+      #   req(data$CTtable_sf)     # Need to make sure CTtable_sf is updated first
+      #   original_data(list(
+      #     CTtable_sf = data$CTtable_sf,
+      #     recordTable = data$recordTable,
+      #     aggregated_CTtable = data$aggregated_CTtable
+      #   ))
+      # })
       
       # Clear active filters
       active_filters(list())
@@ -3596,6 +3610,9 @@ surveyDashboard <- function(CTtable = NULL,
       output$camtrapdp_preview_deployments <- DT::renderDT(NULL)
       output$camtrapdp_preview_observations <- DT::renderDT(NULL)
       output$camtrapdp_project_info <- renderUI(NULL)
+      active_filters(list())
+      filter_state <- reactiveVal(list(camera_trap = NULL, temporal = NULL, species = NULL))
+
       
       # Validate directory exists
       if (!dir.exists(input$camtrapdp_directory)) {
@@ -4844,6 +4861,7 @@ surveyDashboard <- function(CTtable = NULL,
       showNotification("All filters have been reset", type = "message")
     })
     
+    # update the species select inputs throughout the dashboard when new data become available
     update_species_inputs <- function() {
       req(data$recordTable, data$speciesCol)
       species_list <- sort(unique(data$recordTable[[data$speciesCol]]))
@@ -11902,6 +11920,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Single species occupancy
       basic_model = NULL,
+      print_basic_model = NULL,
       advanced_model = NULL,
       modelEffects = NULL,
       
