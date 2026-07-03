@@ -1,0 +1,89 @@
+<h4>Instructions for Data Formatting and Import</h4>
+<ol>
+    <li><strong>Camera Trap Data (Deployment Information)</strong>
+    <ul>
+    <li><em>General Structure:</em>
+        <ul>
+            <li>Upload a CSV file containing 1 row per station (if 1 camera per station) or 1 row per camera (if >1 camera per station).</li>
+            <li>Station and Camera IDs can be any combination of characters and numbers. <strong>Do not use double underscores ("__")</strong> in IDs, as these are used internally by camtrapR.</li>
+            </ul>
+            </li>
+            <li><em>Location Information:</em>
+            <ul>
+                <li>Station Column: A unique identifier for each camera trap station.</li>
+                <li>Camera Column (optional): An identifier for individual cameras if multiple exist per station.</li>
+                <li>X & Y Coordinate Columns: Geographic coordinates (e.g., Longitude/Easting and Latitude/Northing).</li>
+                <li>Coordinate Reference System (CRS): Provide as an EPSG code (e.g., 4326 for WGS84, 32650 for UTM Zone 50N) without quotes.</li>
+                </ul>
+                </li>
+      <li><em>Date Columns (Setup & Retrieval):</em>
+      <ul>
+  <li>Must contain the setup and retrieval dates as <strong>character</strong> data type (do not use R's native Date type).</li>
+          <li>Specify the date format using lubridate codes (e.g., "ymd") or base R formats (e.g., "%Y-%m-%d"). The format must be consistent across all date columns.</li>
+          <li>Use date format (e.g. "ymd") or date-time format (e.g. "ymd HM".</li>
+        </ul>
+      </li>
+      <li><em>Problem Columns (Optional):</em>
+        <ul>
+          <li>Check the box if your data includes camera malfunction periods.</li>
+          <li>Column names <strong>must strictly follow</strong> the pattern: "Problem1_from", "Problem1_to", with additional pairs for further problem periods: "Problem2_from", "Problem2_to", etc.</li>
+        </ul>
+      </li>
+      <li><em>Station/Camera-level Covariates:</em>
+        <ul>
+          <li>Additional covariates (e.g., habitat type, trail type, camera model) can be included as extra columns in this CSV for use in later analyses.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Record Data (Detection Information)</strong>
+    <ul>
+      <li><em>General Structure:</em>
+        <ul>
+          <li>Upload a CSV file containing the species detection records (e.g., output from the <code>recordTable</code> functions).</li>
+          <li>If you encounter a "maximum upload size exceeded" error, please adjust the maximum allowed file size in the dashboard sidebar under "File Size Control".</li>
+        </ul>
+      </li>
+      <li><em>Required Columns:</em>
+        <ul>
+          <li>Species Column: Contains the species names (common or scientific).</li>
+          <li>Date/Time Column: Contains the timestamp of each detection record.</li>
+        </ul>
+      </li>
+      <li><em>Temporal Settings:</em>
+        <ul>
+          <li>Date/Time Format: Specify using lubridate codes (e.g., "ymd HMS") or base R formats (e.g., "%Y-%m-%d %H:%M:%S").</li>
+          <li>Time Zone: Specify using standard Olson names (e.g., "UTC", "Asia/Singapore"). UTC is recommended if your area uses Daylight Saving Time (DST) but your cameras do not record or adjust for it.</li>
+        </ul>
+      </li>
+      <li><em>Species Exclusion:</em>
+        <ul>
+          <li>Provide a comma-separated list of species names to exclude from all analyses (e.g., "UNID, team, Human"). Names must match exactly as they appear in the Species column.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Import Workflow</strong>
+    <ul>
+      <li>Upload the CSV file for each data type. Once uploaded, the column selection dropdowns will populate automatically.</li>
+      <li>Map the appropriate columns and enter the specific formatting details (CRS, Date Format, Time Zone).</li>
+      <li>Click the "Done" button to confirm import and settings. A data preview will appear below the input box.</li>
+    </ul>
+  </li>
+</ol>
+<h4>Notes:</h4>
+<ul>
+  <li>Consistency is key: Ensure date and time formats are identical across all relevant columns within a file.</li>
+  <li>Do not convert date columns to R's native <code>Date</code> type before saving your CSV; keep them as text/character strings to ensure proper parsing via the specified formats.</li>
+  <li>Avoid special characters like double underscores ("__") in Station and Camera IDs, as these are reserved for internal package operations (e.g., file naming).</li>
+  <li>If you have multiple cameras per station, ensure each camera has its own row in the Camera Trap Data CSV and include a camera ID column to properly assess independence.</li>
+  <li>If you are unsure have a look at the built-in datasets: <code>camtraps</code> and <code>recordTableSample</code>.</li>
+</ul>
+
+
+<h4>Relevant functions and data sets</h4>
+<ul>
+  <li><a href="https://jniedballa.github.io/camtrapR/reference/recordTable.html"><code>recordTable</code> </a></li>
+<li><a href="https://jniedballa.github.io/camtrapR/reference/camtraps.html"><code>camtraps </code> sample data </a></li>
+<li><a href="https://jniedballa.github.io/camtrapR/reference/recordTableSample.html"><code>recordTable</code> sample data</a></li>
+</ul>
