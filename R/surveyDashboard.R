@@ -3474,11 +3474,14 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Extract spatial coverage
       spatial_coverage <- "Unknown"
-        if (!is.null(metadata$spatial$bbox)) {
-          extent <- metadata$spatial$bbox
-          spatial_coverage <- sprintf("Lon: %s to %s, Lat: %s to %s",
-                                      extent[1], extent[3], extent[2], extent[4])
-      }
+      # if (!is.null(metadata$spatial$bbox)) {
+        # extent <- metadata$spatial$bbox
+      # } else {
+        extent <- st_bbox(data$CTtable_sf)
+      # }
+      spatial_coverage <- sprintf("Lon: %s to %s, Lat: %s to %s",
+                                  extent[1], extent[3], extent[2], extent[4])
+      
       
       # Safe Contributor Extraction
       authors <- "Unknown"
@@ -3511,13 +3514,16 @@ surveyDashboard <- function(CTtable = NULL,
       taxonomic_info <- "No taxonomic information available"
       if (!is.null(metadata$taxonomic)) {
         tax_data <- metadata$taxonomic
-        n_species <- length(unique(tax_data$scientificName %||% tax_data$species %||% character(0)))
-          taxonomic_info <- sprintf("%d animal species in dataset", n_species)
+        tax_df <- do.call("rbind", lapply(tax_data, as.data.frame))
+        # NOTE:  might be better to separate this by taxonRank (XY species, Z genera, 1 family, ...)
+        n_species <- length(unique(tax_df$scientificName))
+          taxonomic_info <- sprintf("%d taxa in dataset", n_species)
         }
       
       keywords <- if (!is.null(metadata$keywords) && length(metadata$keywords) > 0) paste(metadata$keywords, collapse = ", ") else "None"
       
       # Create HTML output
+      # TODO: Better present this in native dashboard boxes (similar to filter summary)
       html_output <- tags$div(
         class = "project-info",
         style = "padding: 15px;",
