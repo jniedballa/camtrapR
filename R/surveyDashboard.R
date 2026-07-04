@@ -137,7 +137,7 @@
 #' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
 #' @importFrom lubridate is.Date parse_date_time
 #' @importFrom reshape2 melt
-#' @importFrom sf st_buffer st_convex_hull st_drop_geometry st_intersection st_transform st_union st_make_valid
+#' @importFrom sf st_buffer st_convex_hull st_drop_geometry st_intersection st_transform st_union st_make_valid st_bbox
 #' @importFrom shiny renderUI renderText outputOptions req observe observeEvent reactiveVal reactiveValues renderTable renderPrint renderPlot updateSelectInput updateSelectizeInput updateTextInput updateNumericInput updateSliderInput updateCheckboxInput updateCheckboxGroupInput updateActionButton removeNotification showNotification showModal removeModal modalDialog modalButton HTML tags tabsetPanel tabPanel actionButton checkboxInput checkboxGroupInput fileInput numericInput radioButtons selectInput sliderInput textInput uiOutput verbatimTextOutput plotOutput textOutput wellPanel withProgress fluidRow column div hr h4 h5 conditionalPanel helpText tagList tableOutput reactive reactiveTimer varSelectizeInput icon h1 h2 h3 isolate need validate span htmlOutput dateRangeInput updateDateRangeInput incProgress
 #' @importFrom shinyBS bsTooltip
 #' @importFrom shinydashboard dropdownMenu dropdownMenuOutput renderMenu
@@ -10755,9 +10755,34 @@ surveyDashboard <- function(CTtable = NULL,
     output$activity_density_plot <- shiny::renderPlot({
       req(data$recordTable, input$ad_species, data$speciesCol, data$recordDateTimeCol, data$recordDateTimeFormat)
       
+      # if data are from camtrap DP, keep event-based observations only
+      if("observationLevel" %in% colnames(data$recordTable)) {
+        recs <- data$recordTable
+        if(all(levels(data$recordTable$observationLevel) %in% c("event", "media"))) {
+          
+          if(sum(data$recordTable$observationLevel == "event") == 0) {
+            # use all records (media only)
+            recs <- data$recordTable
+          } else {
+            # use events only
+            recs <- data$recordTable[data$recordTable$observationLevel == "event", ]
+            showNotification("Using only event-based observations for activity analysis.", 
+                             type = "message", duration = 3)
+          }
+          
+        } else {
+          recs <- data$recordTable
+          showNotification("Column observationLevel in recordTable contains more values than 'event' and 'media'. Ignoring.",
+                           type = "warning")
+        }
+      } else {
+        recs <- data$recordTable
+      }
+      
+      
       tryCatch({
         activityDensity(
-          recordTable = data$recordTable,
+          recordTable = recs,
           species = input$ad_species,
           speciesCol = data$speciesCol,
           recordDateTimeCol = data$recordDateTimeCol,
@@ -10780,9 +10805,33 @@ surveyDashboard <- function(CTtable = NULL,
     output$actOverlapPlot <- shiny::renderPlot({
       req(data$recordTable, input$speciesA, input$speciesB, data$speciesCol, data$recordDateTimeCol, data$recordDateTimeFormat)
       
+      # if data are from camtrap DP, keep event-based observations only
+      if("observationLevel" %in% colnames(data$recordTable)) {
+        recs <- data$recordTable
+        if(all(levels(data$recordTable$observationLevel) %in% c("event", "media"))) {
+          
+          if(sum(data$recordTable$observationLevel == "event") == 0) {
+            # use all records (media only)
+            recs <- data$recordTable
+          } else {
+            # use events only
+            recs <- data$recordTable[data$recordTable$observationLevel == "event", ]
+            showNotification("Using only event-based observations for activity analysis.", 
+                             type = "message", duration = 3)
+          }
+          
+        } else {
+          recs <- data$recordTable
+          showNotification("Column observationLevel in recordTable contains more values than 'event' and 'media'. Ignoring.",
+                           type = "warning")
+        }
+      } else {
+        recs <- data$recordTable
+      }
+      
       tryCatch({
         activityOverlap(
-          recordTable = data$recordTable,
+          recordTable = recs,
           speciesA = input$speciesA,
           speciesB = input$speciesB,
           speciesCol = data$speciesCol,
