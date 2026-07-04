@@ -112,5 +112,5 @@ Suggests:
 VignetteBuilder: 
     R.rsp
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 SystemRequirements: ExifTool (https://exiftool.org/)
+Config/roxygen2/version: 8.0.0
