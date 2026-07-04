@@ -6,8 +6,10 @@ load_timeout <- 30 * 1000  # 20 seconds
 
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_launch", {
+  skip_on_cran() 
+  
   local_app_support(test_path("apps/surveyDashboard_builtin"))
-  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_launch",
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_launch",
       height = 993, width = 1619, load_timeout = load_timeout)
   
   # Ensure the R session closes when the test ends
@@ -21,8 +23,10 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_launch", {
 
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_filters", {
+  skip_on_cran() 
+  
   local_app_support(test_path("apps/surveyDashboard_builtin"))
-  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_filters",
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_filters",
                        height = 993, width = 1619, load_timeout = load_timeout)
   
   withr::defer(app$stop()) 
@@ -39,8 +43,10 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_filters", {
 
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_correlations", {
+  skip_on_cran() 
+  
   local_app_support(test_path("apps/surveyDashboard_builtin"))
-  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_correlations",
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_correlat",
       height = 993, width = 1619, load_timeout = 30000)
 
   withr::defer(app$stop()) 
@@ -66,8 +72,10 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_correlations", {
 
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_detectionHistory", {
+  skip_on_cran() 
+  
   local_app_support(test_path("apps/surveyDashboard_builtin"))
-  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_detectionHistory",
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_detHist",
       height = 993, width = 1619, load_timeout = 30000)
   
   withr::defer(app$stop()) 
@@ -82,8 +90,10 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_detectionHistory", {
 
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_occupancy", {
+  skip_on_cran() 
+  
   local_app_support(test_path("apps/surveyDashboard_builtin"))
-  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_occupancy",
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_occu",
       height = 993, width = 1619, load_timeout = 30000)
   
   withr::defer(app$stop()) 
@@ -108,8 +118,10 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_occupancy", {
 
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_communiy_UI", {
+  skip_on_cran() 
+  
   local_app_support(test_path("apps/surveyDashboard_builtin"))
-  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "surveyDashboard_builtin_communiy_UI",
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_commun_UI",
       height = 993, width = 1619, load_timeout = 30000)
   
   withr::defer(app$stop()) 
@@ -121,5 +133,28 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_communiy_UI", {
   app$set_inputs(occasionLength_community = 15)
   app$click("createCommunityModel")
   app$set_inputs(niter = 100)
+  app$expect_values()
+})
+
+
+test_that("{shinytest2} recording: surveyDashboard_builtin_covariate_extraction_dem", {
+  skip_on_cran() 
+  
+  local_app_support(test_path("apps/surveyDashboard_builtin"))
+  app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_covs_DEM", 
+      height = 993, width = 1619, load_timeout = 30000)
+  
+  withr::defer(app$stop()) 
+  
+  app$set_inputs(sidebarItemExpanded = "DataProcessing")
+  app$set_inputs(use_elevation = TRUE)
+  app$set_inputs(elevationZoom = "9")
+  app$set_inputs(terrainMeasures = c("slope", "TRI", "TPI"))
+  app$click("run_covariate_extraction")
+  app$set_inputs(rasterBand = "slope")
+  app$set_inputs(rasterBand = "TRI")
+  app$set_inputs(colorPalette = "Plasma")
+  app$set_inputs(rasterBand = "TPI")
+  app$set_inputs(predictionRasterBand = "TRI")
   app$expect_values()
 })
