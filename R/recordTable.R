@@ -143,8 +143,9 @@
 #' @param video list. Contains information on how to handle video data
 #' (optional). See details.
 #' 
-#' @return A data frame containing species records and additional information
-#' about stations, date, time and (optionally) further metadata.
+#' @return An object of class `ctrpr_rectbl` containing a data frame with species
+#' records and additional information about stations, date, time and
+#' (optionally) further metadata.
 #' 
 #' @note The results of a number of other function will depend on the output of
 #' this function (namely on the arguments \code{exclude} for excluding species
@@ -670,5 +671,20 @@ recordTable <- function(inDir,
     }
   write.csv(record.table3, file = outtable_filename)
   }
+  
+  # declare specific class and store attributes
+  class(record.table3) <- c("ctrpr_rectbl", class(record.table3))
+  attr(record.table3, "stationCol") <- stationCol
+  
   return(record.table3)
+}
+
+#' @export
+#' @method print ctrpr_rectbl
+print.ctrpr_rectbl <- function(x, ...) {
+  n.station <- length(unique(x[, attr(x, "stationCol")]))
+  station.wording <- if (n.station > 1) " stations" else " station"
+  message("Record table with ", n.station, station.wording, ":")
+  print.data.frame(x)
+  invisible(x)
 }

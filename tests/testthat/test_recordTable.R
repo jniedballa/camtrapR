@@ -78,14 +78,24 @@ rec_table4 <- recordTable(inDir                  = wd_images_ID_species,
 
 # Test section
   
-test_that("recordTable output has correct class", {
+test_that("recordTable output has correct camtrapR class", {
+  expect_is(rec_table0,   "ctrpr_rectbl")
+  expect_is(rec_table1,   "ctrpr_rectbl")
+  expect_is(rec_table2_1, "ctrpr_rectbl")
+  expect_is(rec_table2_2, "ctrpr_rectbl")
+  expect_is(rec_table3a,  "ctrpr_rectbl")
+  expect_is(rec_table3b,  "ctrpr_rectbl")
+  expect_is(rec_table4,   "ctrpr_rectbl")
+})
+
+test_that("recordTable output has correct inherited class", {
   expect_is(rec_table0,   "data.frame")
   expect_is(rec_table1,   "data.frame")
   expect_is(rec_table2_1, "data.frame")
   expect_is(rec_table2_2, "data.frame")
   expect_is(rec_table3a,  "data.frame")
   expect_is(rec_table3b,  "data.frame")
-  expect_is(rec_table4,  "data.frame")
+  expect_is(rec_table4,   "data.frame")
 })
 
 test_that("recordTable output has correct dimensions", {
