@@ -3491,7 +3491,7 @@ surveyDashboard <- function(CTtable = NULL,
       # if (!is.null(metadata$spatial$bbox)) {
         # extent <- metadata$spatial$bbox
       # } else {
-        extent <- st_bbox(data$CTtable_sf)
+        extent <- sf::st_bbox(data$CTtable_sf)
       # }
       spatial_coverage <- sprintf("Lon: %s to %s, Lat: %s to %s",
                                   extent[1], extent[3], extent[2], extent[4])
