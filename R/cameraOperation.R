@@ -835,5 +835,80 @@ cameraOperation <- function(CTtable,
     }
     if(missing(outDir)) message(paste("writecsv was TRUE, but outDir was not defined. Saved camera operation matrix in:", getwd(), sep = "   "))
   }
-  return(as.matrix(dat2))
+  
+  dat3 <- as.matrix(dat2)
+  
+  # declare specific class and store attributes
+  class(dat3) <- unique(c("ctrpr_opermat", class(dat3)))
+  attr(dat3, "stationCol")   <- stationCol
+  attr(dat3, "cameraCol")    <- cameraCol
+  attr(dat3, "sessionCol")   <- sessionCol
+  attr(dat3, "setupCol")     <- setupCol
+  attr(dat3, "retrievalCol") <- retrievalCol
+  
+  return(dat3)
+}
+
+
+#' Printing method for camera trap station operation matrix
+#' 
+#' @export
+#' @param x an object used to select a method
+#' @param nRows the number of first and last rows to display
+#' @param nCols the number of first and last columns to display
+#' @param digits the number of digits to use within cells
+#' @param ... further arguments passed to or from other methods
+#' @method print ctrpr_opermat
+#' @keywords internal
+print.ctrpr_opermat <- function(x, nRows = 4, nCols = 4, digits = 3, ...) {
+  
+  stopifnot(is.matrix(x))
+  
+  nr <- nrow(x)
+  nc <- ncol(x)
+  
+  ## index of columns to display
+  row_idx <- if (nr > 2 * nRows) c(seq_len(nRows), (nr - nRows + 1):nr) else seq_len(nr)
+  col_idx <- if (nc > 2 * nCols) c(seq_len(nCols), (nc - nCols + 1):nc) else seq_len(nc)
+  
+  ## matrix subset
+  sub <- x[row_idx, col_idx, drop = FALSE]
+  
+  ## convert digits inside cells into txt
+  fmt <- formatC(sub, digits = digits, format = "g", width = digits + 4)
+  dim(fmt) <- dim(sub)
+  
+  ## transform row and column names
+  rn <- rownames(x)[row_idx]
+  if (is.null(rn)) rn <- paste0("[", row_idx, ",]")
+  
+  cn <- colnames(x)[col_idx]
+  if (is.null(cn)) cn <- paste0("[,", col_idx, "]")
+  
+  if (nc > 2 * nCols) {
+    fmt <- cbind(fmt[, seq_len(nCols), drop = FALSE], "...",
+                 fmt[, (nCols + 1):ncol(fmt), drop = FALSE])
+    cn <- c(cn[seq_len(nCols)], "...", cn[(nCols + 1):length(cn)])
+  }
+  
+  if (nr > 2 * nRows) {
+    dots_row <- rep("...", ncol(fmt))
+    fmt <- rbind(fmt[seq_len(nRows), , drop = FALSE], dots_row,
+                 fmt[(nRows + 1):nrow(fmt), , drop = FALSE])
+    rn <- c(rn[seq_len(nRows)], "...", rn[(nRows + 1):length(rn)])
+  }
+  
+  dimnames(fmt) <- list(rn, cn)
+  
+  ## output
+  station.wording <- if (nr > 1) " stations" else " station"
+  date.wording  <- if (nc > 1) " dates" else " date"
+  message(crayon::cyan("Camera trap station operation matrix"),
+          " containing ", crayon::blue(nr), station.wording, 
+          " and ", crayon::blue(nc), date.wording, ":")
+  print(fmt, quote = FALSE, right = TRUE, ...)
+  crayon_grey_0.6 <- crayon::make_style(grDevices::grey(0.6), grey = TRUE) # mimic pillar
+  cat(crayon_grey_0.6("# Use `print(nRows = ...)` to see more rows\n"))
+  cat(crayon_grey_0.6("# Use `print(nCols = ...)` to see more columns\n"))
+  invisible(x)
 }
