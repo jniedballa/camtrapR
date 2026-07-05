@@ -26,7 +26,7 @@ camop_problem <- cameraOperation(
   dateFormat   = "dmy"
 )
 
-# camtrapR:::camopPlot(camop_problem)
+# plot(camop_problem)
 
 # --- Test Suite ---
 
