@@ -5,7 +5,7 @@
 
 ## Other changes
 * recordTable & filterRecordTable now output an object of class ctrpr_rectbl with dedicated print method
-* cameraOperation now outputs an object of class ctrpr_opermat with dedicated print method
+* cameraOperation now outputs an object of class ctrpr_opermat with dedicated print and plot methods
 
 
 # camtrapR 3.0.5

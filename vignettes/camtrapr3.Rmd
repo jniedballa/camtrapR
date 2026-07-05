@@ -438,15 +438,15 @@ Here's how the daily aggregates are calculate for the different combinations of 
 
 ## Plotting camera operation matrices
 
-There is a little function for plotting the camera operation matrix included in the package, but not exported in the Namespace. It is accessible with camtrapR:::camopPlot(). Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.
+There is a little function for plotting the camera operation matrix included in the package, accessible directly via plot(). Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.
 
 
 Here is the camera operation matrix calculated above  (in two different color palettes, the default being the viridis palette - requires R 3.6.0 or higher).
 
 ```{r}
 par(mfrow = c(1,2))
-camtrapR:::camopPlot(camOp = camop_problem)
-camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat")
+plot(camOp = camop_problem)
+plot(camOp = camop_problem, palette = "Heat")
 ```
 
 <!--  ```{r include = FALSE} -->
@@ -455,8 +455,8 @@ camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat")
 
 One can also plot with the levelplot function from the lattice package:
 ```{r}
-camtrapR:::camopPlot(camOp = camop_problem, lattice = TRUE)
-camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat", lattice = TRUE)
+plot(camOp = camop_problem, lattice = TRUE)
+plot(camOp = camop_problem, palette = "Heat", lattice = TRUE)
 ```
 
 
@@ -475,7 +475,7 @@ camop_typo <- cameraOperation(CTtable      = camtraps_typo,
                                  hasProblems  = TRUE,
                                  dateFormat   = dateFormat
 )
-camtrapR:::camopPlot(camop_typo)
+plot(camop_typo)
 ```
 
 
@@ -695,7 +695,7 @@ camop_season <- cameraOperation(CTtable         = camtrapsMultiSeason,
 
 # plot camera operation matrix
 par(oma = c(0,7,0,0))
-camtrapR:::camopPlot(camop_season)
+plot(camop_season)
 
 
 # make multi-season detection history

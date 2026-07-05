@@ -191,6 +191,9 @@ camop_no_problem <- cameraOperation(CTtable      = camtraps,
                                     hasProblems  = FALSE,
                                     dateFormat   = "dmy"
 )
+camop_no_problem
+
+plot(camop_no_problem)
 
 # with problems/malfunction
 camop_problem <- cameraOperation(CTtable      = camtraps,

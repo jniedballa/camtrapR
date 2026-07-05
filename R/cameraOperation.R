@@ -154,6 +154,9 @@
 #'                                     hasProblems  = FALSE,
 #'                                     dateFormat   = "dmy"
 #' )
+#' camop_no_problem
+#' 
+#' plot(camop_no_problem)
 #' 
 #' # with problems/malfunction
 #' camop_problem <- cameraOperation(CTtable      = camtraps,
@@ -915,4 +918,17 @@ print.ctrpr_opermat <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
     cat(crayon_grey_0.6("# Use `print(nCols = ...)` to see more columns\n"))
   }
   invisible(x)
+}
+
+#' Plotting method for camera trap station operation matrix
+#' 
+#' @export
+#' @param x an object used to select a method
+#' @param palette the color palette to use (default: `"viridis"`)
+#' @param lattice whether or not to plot using lattice (default: `FALSE`)
+#' @param ... further arguments passed to or from other methods
+#' @method plot ctrpr_opermat
+#' @keywords internal
+plot.ctrpr_opermat <- function(x, palette = "viridis", lattice = FALSE, ...) {
+  camopPlot(camOp = x, palette = palette, lattice = lattice)
 }
