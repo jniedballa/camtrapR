@@ -4,7 +4,7 @@
 \alias{print.ctrpr_opermat}
 \title{Printing method for camera trap station operation matrix}
 \usage{
-\method{print}{ctrpr_opermat}(x, nRows = 4, nCols = 4, digits = 3, ...)
+\method{print}{ctrpr_opermat}(x, nRows = 4, nCols = 3, digits = 3, ...)
 }
 \arguments{
 \item{x}{an object used to select a method}

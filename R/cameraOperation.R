@@ -860,7 +860,7 @@ cameraOperation <- function(CTtable,
 #' @param ... further arguments passed to or from other methods
 #' @method print ctrpr_opermat
 #' @keywords internal
-print.ctrpr_opermat <- function(x, nRows = 4, nCols = 4, digits = 3, ...) {
+print.ctrpr_opermat <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
   
   stopifnot(is.matrix(x))
   
@@ -908,7 +908,11 @@ print.ctrpr_opermat <- function(x, nRows = 4, nCols = 4, digits = 3, ...) {
           " and ", crayon::blue(nc), date.wording, ":")
   print(fmt, quote = FALSE, right = TRUE, ...)
   crayon_grey_0.6 <- crayon::make_style(grDevices::grey(0.6), grey = TRUE) # mimic pillar
-  cat(crayon_grey_0.6("# Use `print(nRows = ...)` to see more rows\n"))
-  cat(crayon_grey_0.6("# Use `print(nCols = ...)` to see more columns\n"))
+  if (nr > 2 * nRows) {
+    cat(crayon_grey_0.6("# Use `print(nRows = ...)` to see more rows\n"))
+  }
+  if (nc > 2 * nCols) {
+    cat(crayon_grey_0.6("# Use `print(nCols = ...)` to see more columns\n"))
+  }
   invisible(x)
 }
