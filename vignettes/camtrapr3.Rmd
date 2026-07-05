@@ -61,7 +61,7 @@ Now we can run `recordTable`. Here is a minimal example:
 rec.db.species0 <- recordTable(inDir  = wd_images_ID,
                                IDfrom = "directory")
 
-head(rec.db.species0)
+rec.db.species0
 ```
 
 Argument `IDfrom` tells the function to look for species directories within the station directories and to take species IDs from these. `IDfrom` must be set to "metadata" if metadata tagging was used for species identification.
@@ -187,7 +187,7 @@ rec.db.species.metadata1 <- recordTable(inDir                  = wd_images_ID,
                                         timeZone               = "Asia/Kuala_Lumpur",
                                         additionalMetadataTags = c("EXIF:Model", "EXIF:Make"))
 
-head(rec.db.species.metadata1)
+rec.db.species.metadata1
 ```
 
 There are 2 additional columns containing the information from the metadata we requested.
