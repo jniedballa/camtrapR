@@ -197,6 +197,7 @@
 #'                              timeZone             = "Asia/Kuala_Lumpur"
 #' )
 #' 
+#' DetHist2
 #' DetHist2$detection_history  # detection history  (alternatively, use: DetHist2[[1]])
 #' DetHist2$effort             # effort (alternatively, use: DetHist2[[2]])
 #' 
@@ -216,6 +217,7 @@
 #'                                  timeZone             = "Asia/Kuala_Lumpur"
 #' )    
 #' 
+#' DetHist2_lub
 #' DetHist2_lub$detection_history  # detection history  (alternatively, use: DetHist2_lub[[1]])
 #' DetHist2_lub$effort             # effort (alternatively, use: DetHist2_lub[[2]])
 #' 
@@ -252,6 +254,7 @@
 #' )
 #' 
 #' DetHist_multi_season
+#' print(DetHist_multi_season, nRows = 1, nCols = Inf)
 #' 
 #' 
 #' # Multi-species example for community occupancy analysis with communityModel()
@@ -313,6 +316,14 @@ detectionHistory <- function(recordTable,
   # Check if species is vector
   is_multispecies <- length(species) > 1
   
+  # Wrapper to add class and attributes to output
+  addClass <- function(list) {
+    class(list) <- unique(c("ctrpr_dethist", class(list)))
+    attr(list, "stationCol") <- stationCol
+    attr(list, "speciesCol") <- speciesCol
+    attr(list, "recordDateTimeCol") <- recordDateTimeCol
+    list
+  }
   
   # single-species case ----
   if(!is_multispecies) { 
@@ -799,15 +810,15 @@ detectionHistory <- function(recordTable,
   
   if(includeEffort){
     if(scaleEffort){
-      return(list(detection_history = record.hist,
-                  effort = effort,
-                  effort_scaling_parameters = scale.eff.tmp.attr))
+      return(addClass(list(detection_history = record.hist,
+                           effort = effort,
+                           effort_scaling_parameters = scale.eff.tmp.attr)))
     } else {
-      return(list(detection_history = record.hist,
-                  effort = effort))
+      return(addClass(list(detection_history = record.hist,
+                           effort = effort)))
     }
   } else {
-    return(list(detection_history = record.hist))
+    return(addClass(list(detection_history = record.hist)))
   }
   
   }  # end is_multispecies
@@ -858,18 +869,36 @@ detectionHistory <- function(recordTable,
   # Return modified structure
   if(includeEffort) {
     if(scaleEffort) {
-      return(list(
+      return(addClass(list(
         detection_history = results,
         effort = full_result$effort,
         effort_scaling_parameters = full_result$effort_scaling_parameters
-      ))
+      )))
     } else {
-      return(list(
+      return(addClass(list(
         detection_history = results,
         effort = full_result$effort
-      ))
+      )))
     }
   } else {
-    return(list(detection_history = results))
+    return(addClass(list(detection_history = results)))
   }
 }
+
+
+#' Printing method for detection history
+#' 
+#' @export
+#' @param x an object used to select a method
+#' @param nRows the number of first and last rows to display
+#' @param nCols the number of first and last columns to display
+#' @param digits the number of digits to use within cells
+#' @param ... further arguments passed to or from other methods
+#' @method print ctrpr_dethist
+#' @keywords internal
+print.ctrpr_dethist <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
+  message(crayon::cyan("Detection history list"))
+  print(lapplyLeaf(x, \(m) showMatrixCorner(m, nRows = nRows, nCols = nCols, digits = digits)),
+        quote = FALSE, right  = TRUE, ...)
+  invisible(x)
+} 

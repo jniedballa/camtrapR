@@ -246,6 +246,7 @@ DetHist2 <- detectionHistory(recordTable          = recordTableSample,
                              timeZone             = "Asia/Kuala_Lumpur"
 )
 
+DetHist2
 DetHist2$detection_history  # detection history  (alternatively, use: DetHist2[[1]])
 DetHist2$effort             # effort (alternatively, use: DetHist2[[2]])
 
@@ -265,6 +266,7 @@ DetHist2_lub <- detectionHistory(recordTable          = recordTableSample,
                                  timeZone             = "Asia/Kuala_Lumpur"
 )    
 
+DetHist2_lub
 DetHist2_lub$detection_history  # detection history  (alternatively, use: DetHist2_lub[[1]])
 DetHist2_lub$effort             # effort (alternatively, use: DetHist2_lub[[2]])
 
@@ -301,6 +303,7 @@ DetHist_multi_season <- detectionHistory(recordTable      = recordTableSampleMul
 )
 
 DetHist_multi_season
+print(DetHist_multi_season, nRows = 1, nCols = Inf)
 
 
 # Multi-species example for community occupancy analysis with communityModel()

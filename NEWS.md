@@ -1,11 +1,15 @@
-# camtrapR 3.0.6
-
-## new features
-* readCamtrapDP now uses the camtrapdp package for reading camtrap DP data
+# camtrapR devel
 
 ## Other changes
 * recordTable & filterRecordTable now output an object of class ctrpr_rectbl with dedicated print method
 * cameraOperation now outputs an object of class ctrpr_opermat with dedicated print and plot methods
+* detectionHistory now outputs an object of class ctrpr_dethist with a dedicated print method
+
+
+# camtrapR 3.0.6
+
+## new features
+* readCamtrapDP now uses the camtrapdp package for reading camtrap DP data
 
 
 # camtrapR 3.0.5
