@@ -63,7 +63,8 @@ Imports:
     shinyBS,
     shinydashboard,
     shinyjs,
-    terra
+    terra,
+    tibble
 Suggests: 
     abind,
     bayesplot,
