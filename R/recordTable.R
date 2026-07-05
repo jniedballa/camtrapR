@@ -679,8 +679,14 @@ recordTable <- function(inDir,
   return(record.table3)
 }
 
+
+#' Printing method for record tables
+#' 
 #' @export
+#' @param x an object used to select a method
+#' @param ... further arguments passed to or from other methods
 #' @method print ctrpr_rectbl
+#' @keywords internal
 print.ctrpr_rectbl <- function(x, ...) {
   n.station <- length(unique(x[, attr(x, "stationCol")]))
   n.record <- nrow(x)
