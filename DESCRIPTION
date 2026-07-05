@@ -46,6 +46,7 @@ Depends:
     R (>= 4.1.0)
 Imports: 
     checkmate,
+    crayon,
     data.table,
     dplyr,
     DT,

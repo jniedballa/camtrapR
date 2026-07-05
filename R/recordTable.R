@@ -681,10 +681,20 @@ recordTable <- function(inDir,
 
 #' @export
 #' @method print ctrpr_rectbl
-print.ctrpr_rectbl <- function(x, ...) {
+print.ctrpr_rectbl <- function(x, n = 3L, ...) {
   n.station <- length(unique(x[, attr(x, "stationCol")]))
+  n.record <- nrow(x)
   station.wording <- if (n.station > 1) " stations" else " station"
-  message("Record table with ", n.station, station.wording, ":")
-  print.data.frame(x)
+  record.wording  <- if (n.record > 1) " records" else " record"
+  msg <- if (n.record > n) paste(".\nHere are the first", crayon::blue(n), "records:") else ":"
+  message(crayon::cyan("Record table"), " containing ", crayon::blue(n.station), station.wording, 
+          " and ", crayon::blue(n.record), record.wording, msg)
+  print.data.frame(head(x, n = n)) # NOTE: a more elegant way to handle the display would be to convert `x` into a tibble
+  if (n.record > n) {
+    message(crayon::magenta(crayon::underline("Tip:"),
+                            "you can see more records calling `"), "print(<your_record_table>, n = X)",
+            crayon::magenta("`,\nwith `"), "X",
+            crayon::magenta("` the number of records you want to see. Use `n = Inf` for all."))
+  }
   invisible(x)
 }
