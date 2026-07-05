@@ -104,7 +104,6 @@ Suggests:
     taxize,
     tesseract,
     testthat,
-    tibble,
     ubms,
     units,
     unmarked,
