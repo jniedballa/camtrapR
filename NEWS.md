@@ -4,7 +4,8 @@
 * readCamtrapDP now uses the camtrapdp package for reading camtrap DP data
 
 ## Other changes
-* recordTable now outputs an object of class ctrpr_rectbl with dedicated print method
+* recordTable & filterRecordTable now output an object of class ctrpr_rectbl with dedicated print method
+
 
 # camtrapR 3.0.5
 

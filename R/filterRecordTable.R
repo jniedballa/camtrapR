@@ -114,6 +114,7 @@ filterRecordTable <- function(#inDir,
   # wd0 <- getwd()
   # on.exit(setwd(wd0))
   
+  ## FIXME: use attribute "stationCol" provided by recordTable() instead
   if(!hasArg(stationCol)) stationCol <- "Station"
   if(!is.character(stationCol)) stop("stationCol must be of class 'character'")
   if(!stationCol %in% colnames(recordTable)) stop("stationCol is not a column name in recordTable")
@@ -514,5 +515,10 @@ filterRecordTable <- function(#inDir,
     # }
     write.csv(record.table3, file = outtable_filename)
   }
+  
+  # declare specific class and store attributes
+  class(record.table3) <- unique(c("ctrpr_rectbl", class(record.table3)))
+  attr(record.table3, "stationCol") <- stationCol
+  
   return(record.table3)
 }
