@@ -877,9 +877,10 @@ print.camOp <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
 
   station.wording <- if (nr > 1) " stations" else " station"
   date.wording  <- if (nc > 1) " days" else " day"
-  message(crayon::cyan("Camera trap station operation matrix"), " containing:\n",
-          crayon::blue(nr), station.wording, " monitored from ", attr(x, "from"), " till ", attr(x, "to"), "\n",
-          crayon::blue(nc), date.wording, " (" , crayon::blue(active.days), " active)")
+  message(crayon::cyan("Camera trap station operation matrix"), " based on\n",
+          crayon::blue(nr), station.wording, " monitored from ", crayon::blue(attr(x, "from")),
+          " till ", crayon::blue(attr(x, "to")), ",\n",
+          "representing ", crayon::blue(nc), date.wording, " (" , crayon::blue(active.days), " active):")
   print(fmt, quote = FALSE, right = TRUE, ...)
   crayon_grey_0.6 <- crayon::make_style(grDevices::grey(0.6), grey = TRUE) # mimic pillar
   if (nr > 2 * nRows) {
