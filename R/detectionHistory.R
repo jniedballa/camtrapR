@@ -318,7 +318,7 @@ detectionHistory <- function(recordTable,
   
   # Wrapper to add class and attributes to output
   addClass <- function(list) {
-    class(list) <- unique(c("ctrpr_dethist", class(list)))
+    class(list) <- unique(c("detHist", class(list)))
     attr(list, "stationCol") <- stationCol
     attr(list, "speciesCol") <- speciesCol
     attr(list, "recordDateTimeCol") <- recordDateTimeCol
@@ -894,9 +894,9 @@ detectionHistory <- function(recordTable,
 #' @param nCols the number of first and last columns to display
 #' @param digits the number of digits to use within cells
 #' @param ... further arguments passed to or from other methods
-#' @method print ctrpr_dethist
+#' @method print detHist
 #' @keywords internal
-print.ctrpr_dethist <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
+print.detHist <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
   message(crayon::cyan("Detection history list"))
   print(lapplyLeaf(x, \(m) showMatrixCorner(m, nRows = nRows, nCols = nCols, digits = digits)),
         quote = FALSE, right  = TRUE, ...)

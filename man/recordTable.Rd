@@ -98,7 +98,7 @@ a metadata tag) by to summarise non-independent records (those within
 (optional). See details.}
 }
 \value{
-An object of class `ctrpr_rectbl` containing a data frame with species
+An object of class `records` containing a data frame with species
 records and additional information about stations, date, time and
 (optionally) further metadata.
 }

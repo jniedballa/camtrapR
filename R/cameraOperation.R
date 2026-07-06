@@ -842,7 +842,7 @@ cameraOperation <- function(CTtable,
   dat3 <- as.matrix(dat2)
   
   # declare specific class and store attributes
-  class(dat3) <- unique(c("ctrpr_opermat", class(dat3)))
+  class(dat3) <- unique(c("camOp", class(dat3)))
   attr(dat3, "stationCol")   <- stationCol
   attr(dat3, "cameraCol")    <- cameraCol
   attr(dat3, "sessionCol")   <- sessionCol
@@ -861,9 +861,9 @@ cameraOperation <- function(CTtable,
 #' @param nCols the number of first and last columns to display
 #' @param digits the number of digits to use within cells
 #' @param ... further arguments passed to or from other methods
-#' @method print ctrpr_opermat
+#' @method print camOp
 #' @keywords internal
-print.ctrpr_opermat <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
+print.camOp <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
   
   nr <- nrow(x)
   nc <- ncol(x)
@@ -895,8 +895,8 @@ print.ctrpr_opermat <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
 #' @param palette the color palette to use (default: `"viridis"`)
 #' @param lattice whether or not to plot using lattice (default: `FALSE`)
 #' @param ... further arguments passed to or from other methods
-#' @method plot ctrpr_opermat
+#' @method plot camOp
 #' @keywords internal
-plot.ctrpr_opermat <- function(x, palette = "viridis", lattice = FALSE, ...) {
+plot.camOp <- function(x, palette = "viridis", lattice = FALSE, ...) {
   camopPlot(camOp = x, palette = palette, lattice = lattice)
 }

@@ -143,7 +143,7 @@
 #' @param video list. Contains information on how to handle video data
 #' (optional). See details.
 #' 
-#' @return An object of class `ctrpr_rectbl` containing a data frame with species
+#' @return An object of class `records` containing a data frame with species
 #' records and additional information about stations, date, time and
 #' (optionally) further metadata.
 #' 
@@ -673,7 +673,7 @@ recordTable <- function(inDir,
   }
   
   # declare specific class and store attributes
-  class(record.table3) <- c("ctrpr_rectbl", class(record.table3))
+  class(record.table3) <- unique(c("records", class(record.table3)))
   attr(record.table3, "stationCol") <- stationCol
   
   return(record.table3)
@@ -685,9 +685,9 @@ recordTable <- function(inDir,
 #' @export
 #' @param x an object used to select a method
 #' @param ... further arguments passed to or from other methods
-#' @method print ctrpr_rectbl
+#' @method print records
 #' @keywords internal
-print.ctrpr_rectbl <- function(x, ...) {
+print.records <- function(x, ...) {
   n.station <- length(unique(x[, attr(x, "stationCol")]))
   n.record <- nrow(x)
   station.wording <- if (n.station > 1) " stations" else " station"

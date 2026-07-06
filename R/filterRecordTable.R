@@ -517,7 +517,7 @@ filterRecordTable <- function(#inDir,
   }
   
   # declare specific class and store attributes
-  class(record.table3) <- unique(c("ctrpr_rectbl", class(record.table3)))
+  class(record.table3) <- unique(c("records", class(record.table3)))
   attr(record.table3, "stationCol") <- stationCol
   
   return(record.table3)
