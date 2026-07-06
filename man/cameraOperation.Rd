@@ -80,7 +80,7 @@ begin occasions. Replaces \code{occasionStartTime} from
 \item{outDir}{character. Directory into which csv is saved}
 }
 \value{
-A matrix. Row names always indicate Station IDs. If
+A matrix of class "camOp". Row names always indicate Station IDs. If
 \code{sessionCol} and/or \code{cameraCol} are defined, they are contained in
 the row names also (camera ID only if \code{byCamera = TRUE}). Column names
 are dates. \cr Legend: NA: camera(s) not set up, 0: camera(s) not

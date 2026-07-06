@@ -125,7 +125,7 @@
 #' .csv?
 #' @param outDir character. Directory into which csv is saved
 #' 
-#' @return A matrix. Row names always indicate Station IDs. If
+#' @return A matrix of class "camOp". Row names always indicate Station IDs. If
 #' \code{sessionCol} and/or \code{cameraCol} are defined, they are contained in
 #' the row names also (camera ID only if \code{byCamera = TRUE}). Column names
 #' are dates. \cr Legend: NA: camera(s) not set up, 0: camera(s) not
@@ -848,7 +848,8 @@ cameraOperation <- function(CTtable,
   attr(dat3, "sessionCol")   <- sessionCol
   attr(dat3, "setupCol")     <- setupCol
   attr(dat3, "retrievalCol") <- retrievalCol
-  
+  attr(dat3, "from") <- as.Date(min(date0))
+  attr(dat3, "to") <- as.Date(max(date1))
   return(dat3)
 }
 
@@ -872,11 +873,13 @@ print.camOp <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
   fmt <- showMatrixCorner(x, nRows = nRows, nCols = nCols, digits = digits)
   
   ## output
+  active.days <- sum(colSums(x, na.rm = TRUE) > 1)
+
   station.wording <- if (nr > 1) " stations" else " station"
-  date.wording  <- if (nc > 1) " dates" else " date"
-  message(crayon::cyan("Camera trap station operation matrix"),
-          " containing ", crayon::blue(nr), station.wording, 
-          " and ", crayon::blue(nc), date.wording, ":")
+  date.wording  <- if (nc > 1) " days" else " day"
+  message(crayon::cyan("Camera trap station operation matrix"), " containing:\n",
+          crayon::blue(nr), station.wording, " monitored from ", attr(x, "from"), " till ", attr(x, "to"), "\n",
+          crayon::blue(nc), date.wording, " (" , crayon::blue(active.days), " active)")
   print(fmt, quote = FALSE, right = TRUE, ...)
   crayon_grey_0.6 <- crayon::make_style(grDevices::grey(0.6), grey = TRUE) # mimic pillar
   if (nr > 2 * nRows) {
