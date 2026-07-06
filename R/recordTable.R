@@ -675,6 +675,7 @@ recordTable <- function(inDir,
   # declare specific class and store attributes
   class(record.table3) <- unique(c("records", class(record.table3)))
   attr(record.table3, "stationCol") <- stationCol
+  attr(record.table3, "speciesCol") <- speciesCol
   
   return(record.table3)
 }
@@ -688,12 +689,14 @@ recordTable <- function(inDir,
 #' @method print records
 #' @keywords internal
 print.records <- function(x, ...) {
+  n.species <- length(unique(x[, attr(x, "speciesCol")]))
   n.station <- length(unique(x[, attr(x, "stationCol")]))
   n.record <- nrow(x)
   station.wording <- if (n.station > 1) " stations" else " station"
   record.wording  <- if (n.record > 1) " records" else " record"
-  message(crayon::cyan("Record table"), " containing ", crayon::blue(n.station), station.wording, 
-          " and ", crayon::blue(n.record), record.wording, ":")
+  message(crayon::cyan("Record table"), " based on ",
+          crayon::blue(n.station), station.wording, 
+          " and ", crayon::blue(n.record), record.wording, " of a total of ", crayon::blue(n.species), " species:")
   print(tibble::as_tibble(x))
   invisible(x)
 }
