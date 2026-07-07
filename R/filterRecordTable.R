@@ -40,8 +40,9 @@
 #' (optional)
 #' @param quiet logical. If TRUE, suppress printing of progress.
 #'
-#' @return A data frame containing species records and additional information
-#' about stations, date, time, filtered for temporal independence.
+#' @return An object of class `records` containing a data frame with species
+#' records and additional information about stations, date, time, filtered for
+#' temporal independence.
 #' 
 #' @export
 #' @importFrom lubridate ymd_hms is.POSIXt tz parse_date_time
@@ -519,6 +520,7 @@ filterRecordTable <- function(#inDir,
   # declare specific class and store attributes
   class(record.table3) <- unique(c("records", class(record.table3)))
   attr(record.table3, "stationCol") <- stationCol
+  attr(record.table3, "speciesCol") <- speciesCol
   
   return(record.table3)
 }

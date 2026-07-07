@@ -13,5 +13,6 @@ subset-assignment use cases.}
 \item{template}{Template data frame to use for restoring attributes.}
 }
 \description{
-Wrapper to discard class in dplyr
+This function is called internally by dplyr. It prevents the propagation of
+attributes dependent on columns when such columns are filtered out.
 }
