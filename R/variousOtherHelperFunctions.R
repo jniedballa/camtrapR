@@ -2515,16 +2515,20 @@ showMatrixCorner <- function(x, nRows = 4, nCols = 3, digits = 3) {
   if (is.null(cn)) cn <- paste0("[,", col_idx, "]")
   
   if (nc > 2 * nCols) {
+    n_hidden_cols <- nc - 2 * nCols
     fmt <- cbind(fmt[, seq_len(nCols), drop = FALSE], "...",
                  fmt[, (nCols + 1):ncol(fmt), drop = FALSE])
-    cn <- c(cn[seq_len(nCols)], "...", cn[(nCols + 1):length(cn)])
+    cn <- c(cn[seq_len(nCols)], sprintf("...(%d more)", n_hidden_cols),
+            cn[(nCols + 1):length(cn)])
   }
   
   if (nr > 2 * nRows) {
+    n_hidden_rows <- nr - 2 * nRows
     dots_row <- rep("...", ncol(fmt))
     fmt <- rbind(fmt[seq_len(nRows), , drop = FALSE], dots_row,
                  fmt[(nRows + 1):nrow(fmt), , drop = FALSE])
-    rn <- c(rn[seq_len(nRows)], "...", rn[(nRows + 1):length(rn)])
+    rn <- c(rn[seq_len(nRows)], sprintf("...(%d more)", n_hidden_rows),
+            rn[(nRows + 1):length(rn)])
   }
   
   dimnames(fmt) <- list(rn, cn)
