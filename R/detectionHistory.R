@@ -198,8 +198,9 @@
 #' )
 #' 
 #' DetHist2
-#' DetHist2$detection_history  # detection history  (alternatively, use: DetHist2[[1]])
-#' DetHist2$effort             # effort (alternatively, use: DetHist2[[2]])
+#' DetHist2["detection_history"] # detection history as list, and thus keeping nice printing
+#' DetHist2$detection_history    # raw detection history  (alternatively, use: DetHist2[[1]])
+#' DetHist2$effort               # effort (alternatively, use: DetHist2[[2]])
 #' 
 #' # with effort / using lubridate package to define recordDateTimeFormat
 #' DetHist2_lub <- detectionHistory(recordTable          = recordTableSample,
@@ -902,3 +903,55 @@ print.detHist <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
         quote = FALSE, right  = TRUE, ...)
   invisible(x)
 } 
+
+
+#' Subsetting method for detection history
+#' 
+#' Ensures that subsetting a \code{detHist} object (e.g. \code{x[1]},
+#' \code{x["detection_history"]}) retains the \code{detHist} class and its
+#' attributes, so the result still prints via \code{\link{print.detHist}}
+#' instead of falling back to the default list print.
+#' 
+#' @export
+#' @param x an object of class \code{detHist}
+#' @param i index specifying elements to extract
+#' @param ... further arguments passed to or from other methods
+#' @method [ detHist
+#' @keywords internal
+`[.detHist` <- function(x, i, ...) {
+  
+  if (!missing(i)) {
+    if (is.character(i)) {
+      unmatched <- setdiff(i, names(x))
+      if (length(unmatched) > 0) {
+        stop("Undefined element(s) selected: ",
+             paste(sQuote(unmatched), collapse = ", "),
+             ". Available elements: ",
+             paste(names(x), collapse = ", "), call. = FALSE)
+      }
+    } else if (is.numeric(i)) {
+      i_pos <- i[i > 0]   # ignore negative (exclusion) indices
+      if (length(i_pos) > 0 && any(i_pos > length(x))) {
+        stop("Subscript out of bounds: detHist object has ", length(x),
+             " element(s), requested index ", max(i_pos), ".", call. = FALSE)
+      }
+    }
+  }
+  
+  station.col   <- attr(x, "stationCol")
+  species.col   <- attr(x, "speciesCol")
+  datetime.col  <- attr(x, "recordDateTimeCol")
+  
+  out <- NextMethod()   # default list subsetting: drops class/attributes
+  
+  # unlike records' speciesCol/stationCol, these attributes describe
+  # provenance (which recordTable columns were used upstream), not live
+  # references into x itself -- so they remain valid regardless of which
+  # elements of the list were kept
+  class(out) <- unique(c("detHist", class(out)))
+  attr(out, "stationCol")          <- station.col
+  attr(out, "speciesCol")          <- species.col
+  attr(out, "recordDateTimeCol")   <- datetime.col
+  
+  out
+}

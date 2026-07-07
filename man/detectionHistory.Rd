@@ -247,8 +247,9 @@ DetHist2 <- detectionHistory(recordTable          = recordTableSample,
 )
 
 DetHist2
-DetHist2$detection_history  # detection history  (alternatively, use: DetHist2[[1]])
-DetHist2$effort             # effort (alternatively, use: DetHist2[[2]])
+DetHist2["detection_history"] # detection history as list, and thus keeping nice printing
+DetHist2$detection_history    # raw detection history  (alternatively, use: DetHist2[[1]])
+DetHist2$effort               # effort (alternatively, use: DetHist2[[2]])
 
 # with effort / using lubridate package to define recordDateTimeFormat
 DetHist2_lub <- detectionHistory(recordTable          = recordTableSample,
