@@ -199,6 +199,9 @@
 #' )
 #' # note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames
 #' 
+#' rec_table1
+#' summary(rec_table1)
+#' 
 #' rec_table2 <- recordTable(inDir               = wd_images_ID_species,
 #'                        IDfrom                 = "directory",
 #'                        minDeltaTime           = 60,
@@ -736,46 +739,139 @@ dplyr_reconstruct.records <- function(data, template) {
     data
   } else {
     # drop back to a plain tibble/data.frame — no more "records" class
-    tibble::as_tibble(data)
+    if (inherits(data, "tbl_df")) {
+      tibble::as_tibble(data)
+    } else {
+      as.data.frame(data)
+    }
   }
+}
+
+
+#' Subsetting method for record tables
+#' 
+#' Ensures the \code{records} class (and its attributes) is only retained when 
+#' the columns they point to are still present after subsetting. This covers 
+#' base R subsetting (\code{x[...]}), which does not go through dplyr's 
+#' \code{dplyr_reconstruct} machinery.
+#' 
+#' @export
+#' @param x an object used to select a method
+#' @param i row index
+#' @param j column index
+#' @param drop logical, whether to simplify to a vector when selecting a single column
+#' @param ... further arguments passed to or from other methods
+#' @method [ records
+#' @keywords internal
+`[.records` <- function(x, i, j, ..., drop) {
+
+  species.col <- attr(x, "speciesCol")
+  station.col <- attr(x, "stationCol")
+  
+  out <- NextMethod()   # let [.data.frame do the real subsetting
+  
+  # drop = TRUE with a single selected column returns an atomic vector,
+  # not a data.frame -- nothing to reconstruct
+  if (!is.data.frame(out)) return(out)
+  
+  keeps.class <- !is.null(species.col) && species.col %in% names(out) &&
+    !is.null(station.col) && station.col %in% names(out)
+  
+  if (keeps.class) {
+    attr(out, "speciesCol") <- species.col
+    attr(out, "stationCol") <- station.col
+    class(out) <- class(x)
+  } else {
+    class(out) <- setdiff(class(out), "records")
+    attr(out, "speciesCol") <- NULL
+    attr(out, "stationCol") <- NULL
+  }
+  
+  out
 }
 
 
 #' Summary method for record tables
 #' 
 #' @export
+#' @param object an object of class \code{records}
+#' @param nSpeciesMax integer for the maximum number of species to show in the
+#'   per-species detection table (defaults = 5)
 #' @param ... further arguments passed to or from other methods
+#' @return the species table (returned invisibly and unfiltered)
 #' @method summary records
 #' @keywords internal
-summary.records <- function(object, nSpeciesMax = 6, ...) {
+summary.records <- function(object, nSpeciesMax = 5, ...) {
   
-  species.col  <- attr(object, "speciesCol")
-  station.col  <- attr(object, "stationCol")
+  species.col <- attr(object, "speciesCol")
+  station.col <- attr(object, "stationCol")
+
+  has.cols <- !is.null(species.col) && species.col %in% names(object) &&
+    !is.null(station.col) && station.col %in% names(object)
+  
+  if (!has.cols) {
+    stop("'object' no longer has the species/station columns needed to summarise it as a records table (likely lost through subsetting).", call. = FALSE)
+  }
   
   n.species <- length(unique(object[[species.col]]))
   n.station <- length(unique(object[[station.col]]))
+  n.record  <- nrow(object)
+
+  # TABLE SPECIFICATION section
+  cat("=== Record Table Summary ===\n\n")
+  cat("TABLE SPECIFICATION\n")
+  cat(sprintf("  Species column:  %s\n", species.col))
+  cat(sprintf("  Station column:  %s\n", station.col))
+  cat("\n")
   
-  n.record <- nrow(object)
-  n.subset <- min(c(n.species, nSpeciesMax))
+  # DIMENSIONS section
+  cat("DIMENSIONS\n")
+  cat(sprintf("  Species:  %d\n", n.species))
+  cat(sprintf("  Stations: %d\n", n.station))
+  cat(sprintf("  Records:  %d\n\n", n.record))
   
-  station.wording <- if (n.station > 1) " stations" else " station"
-  record.wording  <- if (n.record > 1) " records" else " record"
-  
-  message("The ", crayon::cyan("record table"), " consists of ",
-          crayon::blue(n.station), station.wording, 
-          " and ", crayon::blue(n.record), record.wording, " of a total of ", crayon::blue(n.species), " species.")
-  
-  if (n.species > 1) {
-    message("Here are the top ", crayon::cyan(n.subset), " number of sightings per species:")
-    object |> 
-      dplyr::count(.data[[species.col]], sort = TRUE) |> 
-      dplyr::slice_head(n = n.subset) -> sp.tbl
+  # PERIOD section (if Date is available)
+  if ("Date" %in% names(object) && !all(is.na(object$Date))) {
+    date.range <- range(object$Date, na.rm = TRUE)
+    cat("PERIOD\n")
+    cat(sprintf("  From: %s\n", format(date.range[1])))
+    cat(sprintf("  To:   %s\n\n", format(date.range[2])))
   }
   
-  print(sp.tbl)
+  # SPECIES DETECTIONS section
+  cat("SPECIES DETECTIONS\n")
   
-  if (n.species > n.subset) {
-    cat(crayon_grey_0.6("# Use `summary(nSpeciesMax = ...)` to see more species\n"))
+  sp.tbl <- as.data.frame(table(object[[species.col]]), stringsAsFactors = FALSE)
+  names(sp.tbl) <- c("Species", "Records")
+  sp.tbl$Stations <- vapply(sp.tbl$Species, function(sp) {
+    length(unique(object[[station.col]][object[[species.col]] == sp]))
+  }, integer(1))
+  sp.tbl <- sp.tbl[order(-sp.tbl$Records), ]
+  rownames(sp.tbl) <- NULL
+  
+  n.subset  <- min(nrow(sp.tbl), nSpeciesMax)
+  sp.shown  <- sp.tbl[seq_len(n.subset), , drop = FALSE]
+  
+  # column widths (max content length + padding), mirroring print_covariate_table
+  sp.width   <- max(nchar("Species"),  nchar(sp.shown$Species)) + 2
+  rec.width  <- max(nchar("Records"),  nchar(as.character(sp.shown$Records))) + 2
+  stat.width <- max(nchar("Stations"), nchar(as.character(sp.shown$Stations))) + 2
+  
+  header_fmt <- paste0("    %-", sp.width, "s %-", rec.width, "s %-", stat.width, "s\n")
+  
+  cat(sprintf(header_fmt, "Species", "Records", "Stations"))
+  separator <- paste(rep("-", sp.width + rec.width + stat.width + 2), collapse = "")
+  cat(paste0("    ", separator, "\n"))
+  
+  for (i in seq_len(nrow(sp.shown))) {
+    cat(sprintf(header_fmt, sp.shown$Species[i], sp.shown$Records[i], sp.shown$Stations[i]))
   }
-  invisible(sp.tbl) # or invisible(object) ?
+  cat("\n")
+  
+  if (nrow(sp.tbl) > n.subset) {
+    cat(sprintf(crayon_grey_0.6("  ... %d more species not shown (use `summary(nSpeciesMax = ...)` to see more)\n\n"),
+                nrow(sp.tbl) - n.subset))
+  }
+  
+  invisible(sp.tbl)
 }

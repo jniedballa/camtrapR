@@ -247,6 +247,9 @@ rec_table1 <- recordTable(inDir               = wd_images_ID_species,
 )
 # note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames
 
+rec_table1
+summary(rec_table1)
+
 rec_table2 <- recordTable(inDir               = wd_images_ID_species,
                        IDfrom                 = "directory",
                        minDeltaTime           = 60,
