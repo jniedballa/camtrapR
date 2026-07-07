@@ -2531,3 +2531,6 @@ showMatrixCorner <- function(x, nRows = 4, nCols = 3, digits = 3) {
   
   fmt
 }
+
+## color to mimic pillar output
+crayon_grey_0.6 <- crayon::make_style(grDevices::grey(0.6), grey = TRUE) # mimic pillar

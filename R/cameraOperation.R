@@ -882,7 +882,6 @@ print.camOp <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
           " till ", crayon::blue(attr(x, "to")), ",\n",
           "representing ", crayon::blue(nc), date.wording, " (" , crayon::blue(active.days), " active):")
   print(fmt, quote = FALSE, right = TRUE, ...)
-  crayon_grey_0.6 <- crayon::make_style(grDevices::grey(0.6), grey = TRUE) # mimic pillar
   if (nr > 2 * nRows) {
     cat(crayon_grey_0.6("# Use `print(nRows = ...)` to see more rows\n"))
   }
