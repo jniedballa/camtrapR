@@ -689,8 +689,20 @@ recordTable <- function(inDir,
 #' @method print records
 #' @keywords internal
 print.records <- function(x, ...) {
-  n.species <- length(unique(x[, attr(x, "speciesCol")]))
-  n.station <- length(unique(x[, attr(x, "stationCol")]))
+  
+  species.col <- attr(x, "speciesCol")
+  station.col <- attr(x, "stationCol")
+  
+  has.cols <- !is.null(species.col) && species.col %in% names(x) &&
+    !is.null(station.col) && station.col %in% names(x)
+  
+  if (!has.cols) {
+    print(tibble::as_tibble(x))
+    return(invisible(x))
+  }
+  
+  n.species <- length(unique(x[[species.col]]))
+  n.station <- length(unique(x[[station.col]]))
   n.record <- nrow(x)
   station.wording <- if (n.station > 1) " stations" else " station"
   record.wording  <- if (n.record > 1) " records" else " record"
@@ -699,4 +711,71 @@ print.records <- function(x, ...) {
           " and ", crayon::blue(n.record), record.wording, " of a total of ", crayon::blue(n.species), " species:")
   print(tibble::as_tibble(x))
   invisible(x)
+}
+
+
+#' Wrapper to discard class in dplyr
+#' 
+#' This function is called internally by dplyr. It prevents the propagation of
+#' attributes dependent on columns when such columns are filtered out.
+#' 
+#' @export
+#' @inheritParams dplyr::dplyr_reconstruct
+#' @importFrom dplyr dplyr_reconstruct
+dplyr_reconstruct.records <- function(data, template) {
+  species.col  <- attr(template, "speciesCol")
+  station.col  <- attr(template, "stationCol")
+  
+  keeps.class <- !is.null(species.col)  && species.col %in% names(data) &&
+    !is.null(station.col) && station.col %in% names(data)
+  
+  if (keeps.class) {
+    attr(data, "speciesCol")  <- species.col
+    attr(data, "stationCol")  <- station.col
+    class(data) <- class(template)
+    data
+  } else {
+    # drop back to a plain tibble/data.frame — no more "records" class
+    tibble::as_tibble(data)
+  }
+}
+
+
+#' Summary method for record tables
+#' 
+#' @export
+#' @param ... further arguments passed to or from other methods
+#' @method summary records
+#' @keywords internal
+summary.records <- function(object, nSpeciesMax = 6, ...) {
+  
+  species.col  <- attr(object, "speciesCol")
+  station.col  <- attr(object, "stationCol")
+  
+  n.species <- length(unique(object[[species.col]]))
+  n.station <- length(unique(object[[station.col]]))
+  
+  n.record <- nrow(object)
+  n.subset <- min(c(n.species, nSpeciesMax))
+  
+  station.wording <- if (n.station > 1) " stations" else " station"
+  record.wording  <- if (n.record > 1) " records" else " record"
+  
+  message("The ", crayon::cyan("record table"), " consists of ",
+          crayon::blue(n.station), station.wording, 
+          " and ", crayon::blue(n.record), record.wording, " of a total of ", crayon::blue(n.species), " species.")
+  
+  if (n.species > 1) {
+    message("Here are the top ", crayon::cyan(n.subset), " number of sightings per species:")
+    object |> 
+      dplyr::count(.data[[species.col]], sort = TRUE) |> 
+      dplyr::slice_head(n = n.subset) -> sp.tbl
+  }
+  
+  print(sp.tbl)
+  
+  if (n.species > n.subset) {
+    cat(crayon_grey_0.6("# Use `summary(nSpeciesMax = ...)` to see more species\n"))
+  }
+  invisible(sp.tbl) # or invisible(object) ?
 }
