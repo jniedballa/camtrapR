@@ -11,6 +11,7 @@
 * camera tables contained in readcamtrapDP and simulateCamtrapData outpus now are of class "cams" with a dedicated print method
 * internal function stripClass to remove added (S3) class and attributes
 * new package dependencies: "crayon", "tibble" (now direct and formerly indirect dependency)
+* Rproj options changed so that Ctrl-Shift-D generates the documentation in RStudio
 
 
 # camtrapR 3.0.6
