@@ -496,7 +496,6 @@ surveyDashboard <- function(CTtable = NULL,
     shinydashboard::dashboardBody(
       # Add bsAlert anchor (needed for bsAlerts)
       shinyBS::bsAlert("alert"),
-      shiny::uiOutput("welcome_screen"),
       
       shinydashboard::tabItems(
         
@@ -2692,58 +2691,60 @@ surveyDashboard <- function(CTtable = NULL,
   # Server function definition ####
   server <- function(input, output, session) { 
 
+
+    # Welcome screen modal (if dashboards started without data)
+    rv_welcome <- reactiveValues(welcome_shown = FALSE) # to track if it's been shown already
     
-    # Welcome screen (if dashboards started without data)
-    output$welcome_screen <- renderUI({
-      if (!is.null(CTtable) && !is.null(recordTable)) {
-        return(NULL)
-      }
+    observe({
+      # Check if data is NOT loaded based on your original conditions
+      data_not_loaded <- is.null(CTtable) && is.null(recordTable) && 
+        is.null(data$CTtable) && is.null(data$recordTable)
       
-      if (!is.null(data$CTtable) && !is.null(data$recordTable)) {
-        return(NULL)
-      }
-      
-      
-      
-      shinydashboard::box(
-        width = 12,
-        status = "info",
-        solidHeader = TRUE,
-        title = "Welcome to the Camera Trap Survey Dashboard",
+      # Show modal only if data is missing and we haven't shown it yet
+      if (data_not_loaded && !rv_welcome$welcome_shown) {
         
-        #if (!is.null(version_info)) version_alert,
+        rv_welcome$welcome_shown <- TRUE # Mark as shown so it doesn't pop up again
         
-        tags$div(
-          style = "padding: 20px;",
-          tags$h4("Getting Started"),
-          tags$p("To begin analyzing your camera trap data, you'll need to import:"),
-          tags$ul(
-            tags$li(tags$strong("Camera Trap Table:"), " Contains deployment information for each station"),
-            tags$li(tags$strong("Record Table:"), " Contains species detection records")
+        showModal(modalDialog(
+          title = "Welcome to the Camera Trap Survey Dashboard",
+          size = "l", # Large modal to fit the text nicely
+          
+          tags$div(
+            style = "padding: 10px;",
+            tags$h4("Getting Started"),
+            tags$p("To begin analyzing your camera trap data, you'll need to import:"),
+            tags$ul(
+              tags$li(tags$strong("Camera Trap Table:"), " Contains deployment information for each station"),
+              tags$li(tags$strong("Record Table:"), " Contains species detection records")
+            ),
+            
+            tags$h4("Import Options"),
+            tags$ul(
+              tags$li(tags$strong("CSV Import:"), " Upload data directly from CSV files"),
+              tags$li(tags$strong("Wildlife Insights:"), " Import from Wildlife Insights export"),
+              tags$li(tags$strong("camtrapDP:"), " Import camera trap data package")
+            ),
+            
+            tags$hr(),
+            
+            tags$p("Use the 'Import Data' menu on the left to get started."),
+            tags$p("Once your data is imported, you'll have access to:",
+                   tags$ul(
+                     tags$li("Data summaries and visualizations"),
+                     tags$li("Interactive maps"),
+                     tags$li("Species activity patterns"),
+                     tags$li("Occupancy modeling"),
+                     tags$li("And more...")
+                   )
+            )
           ),
           
-          tags$h4("Import Options"),
-          tags$ul(
-            tags$li(tags$strong("CSV Import:"), " Upload data directly from CSV files"),
-            tags$li(tags$strong("Wildlife Insights:"), " Import from Wildlife Insights export"),
-            tags$li(tags$strong("camtrapDP:"), " Import camera trap data package")
-          ),
-          
-          tags$hr(),
-          
-          tags$p("Use the Import Data menu on the left to get started."),
-          tags$p("Once your data is imported, you'll have access to:",
-                 tags$ul(
-                   tags$li("Data summaries and visualizations"),
-                   tags$li("Interactive maps"),
-                   tags$li("Species activity patterns"),
-                   tags$li("Occupancy modeling"),
-                   tags$li("And more...")
-                 )
-          )
-        )
-      )
+          easyClose = TRUE, # Disappears if user clicks outside the modal
+          footer = modalButton("Get Started") # Disappears when user clicks the button
+        ))
+      }
     })
+    
     
     
     # Initialize reactive values ----
