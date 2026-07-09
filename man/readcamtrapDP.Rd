@@ -42,7 +42,7 @@ readcamtrapDP(
 \item{filter_observations}{Controls which observation types to include. \code{NULL} or \code{FALSE} keeps all (default), \code{TRUE} keeps only animal, or provide a character vector of types.}
 }
 \value{
-List containing three elements:
+List (of class `cams_dp`) containing three elements:
 \itemize{
   \item \strong{CTtable}: Data frame with camera trap deployment information in camtrapR format
   \item \strong{recordTable}: Data frame with species records in camtrapR format
@@ -128,7 +128,7 @@ To handle this, the function applies this taxonomic fallback hierarchy:
  path_camtrapdp <- system.file("sample_data/tdwg_camtrap-dp_1.0.2_example", 
                                package = "camtrapR")
 camtrapdp_data <- readcamtrapDP(file = file.path(path_camtrapdp, "datapackage.json")) 
-
+camtrapdp_data
 
 # Extract components
 ct_table     <- camtrapdp_data$CTtable

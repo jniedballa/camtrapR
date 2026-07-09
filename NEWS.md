@@ -1,13 +1,15 @@
-# camtrapR devel
+# camtrapR 3.0.7
 
 ## New features
 * improved displays and new summary functions for several functions (see below for details)
 
 ## Other changes
-* recordTable, recordTableIndividual & filterRecordTable now output an object of class records with dedicated print, `]`, summary, and dplyr_reconstruct methods
-* cameraOperation now outputs an object of class camOp with dedicated print, `]`, summary, and plot methods
-* detectionHistory now outputs an object of class detHist with a dedicated print and `]` method
-* internal function stripClass to remove added (S3) class and attributes (for testing purposes)
+* recordTable, recordTableIndividual & filterRecordTable now output an object of class "records" with dedicated print, `]`, summary, and dplyr_reconstruct methods
+* cameraOperation now outputs an object of class "camOp" with dedicated print, `]`, summary, and plot methods
+* detectionHistory now outputs an object of class "detHist" with a dedicated print and `]` method
+* readcamtrapDP now outputs an object of class "cams_dp" with a dedicated print method
+* camera tables contained in readcamtrapDP and simulateCamtrapData outpus now are of class "cams" with a dedicated print method
+* internal function stripClass to remove added (S3) class and attributes
 * new package dependencies: "crayon", "tibble" (now direct and formerly indirect dependency)
 
 

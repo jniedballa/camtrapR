@@ -282,6 +282,14 @@ simulateCamtrapData <- function(nStations = 10,
   recordTable <- recordTable[order(recordTable$Station, recordTable$DateTimeOriginal), ]
   rownames(recordTable) <- NULL
   
+  # declare specific classes and store attributes
+  class(camtraps) <- unique(c("cams", class(camtraps)))
+  attr(camtraps, "stationCol") <- "Station"
+  
+  class(recordTable) <- unique(c("records", class(recordTable)))
+  attr(recordTable, "stationCol") <- "Station"
+  attr(recordTable, "speciesCol") <- "Species"
+  
   return(list(camtraps = camtraps, recordTable = recordTable))
 }
 

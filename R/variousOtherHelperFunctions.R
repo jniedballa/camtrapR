@@ -2544,7 +2544,7 @@ crayon_grey_0.6 <- crayon::make_style(grDevices::grey(0.6), grey = TRUE) # mimic
 
 # function to strip camtrapR class and associated camtrapR attributes
 stripClass <- function(x) {
-  class(x) <- setdiff(class(x), c("camOp", "records", "detHist"))
+  class(x) <- setdiff(class(x), c("cams", "cams_dp", "camOp", "records", "detHist"))
   all_attributes <- names(attributes(x))
   attributes_to_remove <- all_attributes[grepl("Col", all_attributes) | all_attributes %in% c("from", "to")]
   if (length(attributes_to_remove) > 0) {

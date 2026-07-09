@@ -81,7 +81,7 @@
 #'
 #' 
 #' 
-#' @return List containing three elements:
+#' @return List (of class `cams_dp`) containing three elements:
 #' \itemize{
 #'   \item \strong{CTtable}: Data frame with camera trap deployment information in camtrapR format
 #'   \item \strong{recordTable}: Data frame with species records in camtrapR format
@@ -108,7 +108,7 @@
 #'  path_camtrapdp <- system.file("sample_data/tdwg_camtrap-dp_1.0.2_example", 
 #'                                package = "camtrapR")
 #' camtrapdp_data <- readcamtrapDP(file = file.path(path_camtrapdp, "datapackage.json")) 
-#' 
+#' camtrapdp_data
 #' 
 #' # Extract components
 #' ct_table     <- camtrapdp_data$CTtable
@@ -414,12 +414,24 @@ readcamtrapDP <- function(
   ctTable <- reorder_deployment_columns(ctTable)
   recordTable <- reorder_observation_columns(recordTable)
   
-  # Return the finalized list
-  return(list(
+  # Assemble the list
+  out <- list(
     CTtable = ctTable,
     recordTable = recordTable,
     metadata = metadata
-  ))
+  )
+  
+  # declare specific classes and store attributes
+  class(out$CTtable) <- unique(c("cams", class(out$CTtable)))
+  attr(out$CTtable, "stationCol") <- "Station" #FIXME: is the name stable?
+
+  class(out$recordTable) <- unique(c("records", class(out$recordTable)))
+  attr(out$recordTable, "stationCol") <- "Station" #FIXME: is the name stable?
+  attr(out$recordTable, "speciesCol") <- "scientificName" #FIXME: is the name stable?
+  
+  class(out) <- unique(c("cams_dp", class(out)))
+  
+  out
 }
 
 # ---------------------------------------------------------
@@ -571,3 +583,70 @@ remove_empty_columns <- function(df) {
   if (any(keep_cols)) return(df[, keep_cols, drop = FALSE])
   return(df)
 }
+
+
+#' Printing method for Camtrap DP objects
+#' 
+#' @export
+#' @param x an object used to select a method
+#' @param ... further arguments passed to or from other methods
+#' @method print cams_dp
+#' @keywords internal
+print.cams_dp <- function(x, ...) {
+  
+  ## prevent nested pillar advice
+  old.opt <- options(pillar.advice = FALSE)
+  on.exit(options(old.opt))
+  
+  message(crayon::cyan("Camtrap DP"), " list with the following elements:")
+  
+  if ("CTtable" %in% names(x)) {
+    cat("$CTtable\n")
+    print(x$CTtable)
+    cat("\n")
+  }
+  if ("recordTable" %in% names(x)) {
+    cat("$recordTable\n")
+    print(x$recordTable)
+    cat("\n")
+  }
+  if ("metadata" %in% names(x)) {
+    cat("$metadata\n")
+    message(crayon::cyan("Metadata"), " available:")
+    print(names(x$metadata))
+  }
+  invisible(x)
+}
+
+
+#' Printing method for camera table objects
+#' 
+#' @export
+#' @param x an object used to select a method
+#' @param ... further arguments passed to or from other methods
+#' @method print cams
+#' @keywords internal
+print.cams <- function(x, ...) {
+  
+  station.col <- attr(x, "stationCol")
+  
+  has.cols <- !is.null(station.col) && station.col %in% names(x)
+  
+  if (!has.cols) {
+    print(tibble::as_tibble(x))
+    return(invisible(x))
+  }
+  
+  n.station <- length(unique(x[[station.col]]))
+  n.record <- nrow(x)
+  station.wording <- if (n.station > 1) " stations" else " station"
+  record.wording  <- if (n.record > 1) " records" else " record"
+  message(crayon::cyan("Camera table"), " based on ",
+          crayon::blue(n.station), station.wording, 
+          " and ", crayon::blue(n.record), record.wording, ":")
+  
+  print(tibble::as_tibble(x), ...)
+  invisible(x)
+}
+
+
