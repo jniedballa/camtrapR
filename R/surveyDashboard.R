@@ -532,6 +532,13 @@ surveyDashboard <- function(CTtable = NULL,
                                                accept = c(".csv")),
                               add_tooltip(id = "ct_file", title = "Upload the CSV file containing camera deployment information (locations, setup/retrieval dates)."), # Keep bsTooltip for fileInput
                               
+                              # # --- CSV delimiter ---
+                              # shiny::selectInput("csvDelimiter_CT",
+                              #                    label = label_with_info("CSV file delimiter", "Specify the field separator character used to separate columns within each line of the input file."),
+                              #                    selected = ",",
+                              #                    choices = c(",", ";")  
+                              # ),
+                              
                               shiny::selectInput("stationCol", 
                                                  label = label_with_info("Station Column", "Select the column identifying unique camera trap stations."), 
                                                  choices = NULL
@@ -578,6 +585,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                value = "ymd"
                               ),
                               
+                              
                               # --- Problem Columns Checkbox ---
                               shiny::checkboxInput("hasProblems",
                                                    label = label_with_info("Problem columns ('Problem1_from' / 'Problem1_to')?", "Check if your data has columns like 'Problem1_from', 'Problem1_to', etc., indicating camera malfunction periods."),
@@ -605,6 +613,13 @@ surveyDashboard <- function(CTtable = NULL,
                                                                        "Upload the CSV file containing species detection records. If you see an error 'maximum upload size exceeded', please restart dashboard and adjust maximum allowed file size in sidebar, under 'File Size Control'."),
                                                accept = c(".csv")
                               ),
+                              
+                              # # --- CSV delimiter ---
+                              # shiny::selectInput("csvDelimiter_recs",
+                              #                    label = label_with_info("CSV file delimiter", "Specify the field separator character used to separate columns within each line of the input file."),
+                              #                    selected = ",",
+                              #                    choices = c(",", ";", "\t")
+                              # ),
                               
                               shiny::selectInput("speciesCol", 
                                                  label = label_with_info("Species Column", "Select the column containing the species names (common or scientific)."), 
@@ -2997,7 +3012,27 @@ surveyDashboard <- function(CTtable = NULL,
     # Observer for CT file upload
     shiny::observeEvent(input$ct_file, {
       req(input$ct_file)
-      data$CTtable_temp <- read.csv(input$ct_file$datapath, stringsAsFactors = FALSE)
+      data$CTtable_temp <- read.csv(input$ct_file$datapath, 
+                                    stringsAsFactors = FALSE)
+      
+      # If table has only one column, the delimiter is wrong -> stop with modal
+      if (ncol(data$CTtable_temp) == 1) {
+        data$CTtable_temp <- NULL
+        showModal(modalDialog(
+          title = "Wrong CSV separator",
+          p(sprintf(
+            "The file '%s' was read with separator \",\" and resulted in a single column.",
+            input$ct_file$name #, 
+            #input$csvDelimiter_CT
+          )),
+          p("Please re-save your CSV file using a comma (\",\") as the field separator and upload it again."),
+          easyClose = FALSE,
+          footer = modalButton("OK")
+        ))
+        return()
+      }
+      # TODO: guess delimiter from data, or let user decide in UI. Or at least unify reading of csvs in validate_csv_upload(path, sep), outputting either data.frame or error.
+      
       updateSelectInput(session, "stationCol", choices = names(data$CTtable_temp))
       updateSelectInput(session, "cameraCol", choices = c("", names(data$CTtable_temp)))
       updateSelectInput(session, "xcol", choices = names(data$CTtable_temp))
@@ -3014,7 +3049,26 @@ surveyDashboard <- function(CTtable = NULL,
     # Observer for record file upload
     shiny::observeEvent(input$record_file, {
       req(input$record_file)
-      data$recordTable_temp <- read.csv(input$record_file$datapath, stringsAsFactors = FALSE)
+      data$recordTable_temp <- read.csv(input$record_file$datapath, 
+                                        stringsAsFactors = FALSE                                        )
+      
+      if (ncol(data$recordTable_temp) == 1) {
+        data$recordTable_temp <- NULL
+        showModal(modalDialog(
+          title = "Wrong CSV separator",
+          p(sprintf(
+            "The file '%s' was read with separator \",\" and resulted in a single column.",
+            input$record_file$name #,
+            # input$csvDelimiter_recs
+          )),
+          p("Please re-save your CSV file using a comma (\",\") as the field separator and upload it again."),
+          easyClose = FALSE,
+          footer = modalButton("OK")
+        ))
+        return()
+      }
+      
+      
       updateSelectInput(session, "speciesCol", choices = names(data$recordTable_temp))
       updateSelectInput(session, "recordDateTimeCol", choices = names(data$recordTable_temp))
       
