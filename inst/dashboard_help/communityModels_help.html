@@ -6,7 +6,8 @@
               <li>Review the species table showing detections and number of sites for each species</li>
               <li>Use the filtering options to select species based on minimum number of detections or sites</li>
               <li>You can manually select/deselect individual species by clicking the rows</li>
-              <li>Consider removing rare species with too few detections for reliable parameter estimation</li>
+              <li>Consider removing rare species with too few detections for reliable parameter estimation; for rarely detection species, parameters will be driven by the overall community</li>
+              <li>Do not fit community models to fewer than 6 species, as community level parameters are challenging to estimate for very small communities</li>
             </ul>
           </li>
 
@@ -75,7 +76,8 @@
           <li>More species and covariates increase computation time</li>
           <li>Check convergence diagnostics before interpreting results</li>
           <li>Covariates are scaled to mean = 0 and standard deviation = 1 automatically.</li>
-          <li>Prediction rasters shuold be provided in original scale. They are scaled automatically to match model covariatesy</li>
+          <li>Lack of model fit requires close examination of the data and model; in simple cases, adding important covariates may remedy lack of fit, but you may need to consult with an experienced user of these models</li>
+          <li>Prediction rasters should be provided in original scale. They are scaled automatically to match model covariates.</li>
           <li>Species with very few detections may have unreliable estimates</li>
           <li>Save your model objects to avoid rerunning long computations</li>
         </ul>
@@ -84,7 +86,7 @@
         <ul>
           <li>Start with simpler models and gradually add complexity</li>
           <li>Covariates are standardized automatically</li>
-          <li>Increase iterations if chains haven't converged</li>
+          <li>Increase iterations if chains haven't converged or if effective sample size is very low</li>
           <li>Check for highly correlated covariates</li>
           <li>Consider removing rare species or combining similar species</li>
         </ul>
