@@ -62,7 +62,7 @@ test_that("surveyDashboard server logic initializes correctly with sample data",
       expect_equal(num_images(), 39)
       expect_equal(avg_records_per_station(), 13)
       expect_equal(dim(data$CTtable), c(3,7))
-      expect_equal(dim(data$recordTable), c(39,11))
+      expect_equal(dim(data$recordTable), c(39,12))
       expect_equal(dim(df_n_records()), c(5, 2))
       
       # objects not available without user interaction (still NULL)

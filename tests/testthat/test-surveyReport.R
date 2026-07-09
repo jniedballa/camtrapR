@@ -186,6 +186,7 @@ testthat::describe("Date/time column checks", {
   camtraps_retrieval_blank$Retrieval_date[1] <- ""
   
   recordTableSample_datetime_blank <- recordTableSample
+  recordTableSample_datetime_blank$DateTimeOriginal <- as.character(recordTableSample_datetime_blank$DateTimeOriginal)
   recordTableSample_datetime_blank$DateTimeOriginal[1] <- ""
   
   camtraps_setup_NA <- camtraps_setup_blank
@@ -308,3 +309,4 @@ actual:    2009-04-21 00:40:00", fixed = TRUE)
     
   })
 })
+
