@@ -34,9 +34,6 @@
 NULL
 
 
-
-
-
 #' Sample multi-season camera trap station information
 #' 
 #' Example multi-season camera trap station information table
@@ -112,9 +109,6 @@ NULL
 NULL
 
 
-
-
-
 #' Sample single-species record table with custom metadata from camera trap
 #' images
 #' 
@@ -150,9 +144,6 @@ NULL
 #' @format A data frame with 21 rows and 17 variables
 #' @keywords datasets
 NULL
-
-
-
 
 
 #' Sample single-species multi-season record table with custom metadata from
@@ -204,9 +195,6 @@ NULL
 NULL
 
 
-
-
-
 #' Sample species record table from camera trap images
 #' 
 #' Sample species record table from camera trap images generated from the
@@ -235,9 +223,6 @@ NULL
 #' @format A data frame with 39 rows and 12 variables
 #' @keywords datasets
 NULL
-
-
-
 
 
 #' Sample multi-season species record table from camera trap images
@@ -283,9 +268,6 @@ NULL
 #' 	recordTableSampleMultiSeason <- rbind(recordTableSample, recordTableSample_season2)    
 #' 
 NULL
-
-
-
 
 
 #' Sample camera trap time shift table
