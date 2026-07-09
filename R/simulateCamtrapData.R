@@ -100,6 +100,8 @@
 #'                                  allCamsOn = FALSE,
 #'                                  camerasIndependent = FALSE,   # this is made up, not simulated
 #'                                  dateFormat = "ymd HMS")
+#'                                  
+#' summary(camop_complex)
 #' 
 #' plot(camop_complex)
 

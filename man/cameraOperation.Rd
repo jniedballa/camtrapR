@@ -192,6 +192,7 @@ camop_no_problem <- cameraOperation(CTtable      = camtraps,
                                     dateFormat   = "dmy"
 )
 camop_no_problem
+summary(camop_no_problem)
 
 plot(camop_no_problem)
 
@@ -204,6 +205,8 @@ camop_problem <- cameraOperation(CTtable      = camtraps,
                                  hasProblems  = TRUE,
                                  dateFormat   = "dmy"
 )
+camop_problem
+summary(camop_problem)
 
 # The examples above specified dateFormat using lubdridate package, which is more intuitive. 
 # Alternatively one can used in base-R date conversions (strptime) as below:
@@ -218,9 +221,8 @@ camop_problem_oldformat <- cameraOperation(CTtable      = camtraps,
                                            dateFormat   = "\%d/\%m/\%Y"
 )
 
-camop_no_problem
-camop_problem
 camop_problem_oldformat
+summary(camop_problem_oldformat)
 
 }
 \author{
