@@ -4,10 +4,12 @@
 \alias{plot.camOp}
 \title{Plotting method for camera trap station operation matrix}
 \usage{
-\method{plot}{camOp}(x, palette = "viridis", lattice = FALSE, ...)
+\method{plot}{camOp}(x, camOp = NULL, palette = "viridis", lattice = FALSE, ...)
 }
 \arguments{
 \item{x}{an object used to select a method}
+
+\item{camOp}{alternative to `x` (for backward compatibility)}
 
 \item{palette}{the color palette to use (default: `"viridis"`)}
 

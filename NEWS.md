@@ -4,8 +4,8 @@
 * improved displays and new summary functions for several functions (see below for details)
 
 ## Other changes
-* recordTable & filterRecordTable now output an object of class records with dedicated print, summary, `]`, and dplyr_reconstruct methods
-* cameraOperation now outputs an object of class camOp with dedicated print, summary, and plot methods
+* recordTable, recordTableIndividual & filterRecordTable now output an object of class records with dedicated print, `]`, summary, and dplyr_reconstruct methods
+* cameraOperation now outputs an object of class camOp with dedicated print, `]`, summary, and plot methods
 * detectionHistory now outputs an object of class detHist with a dedicated print and `]` method
 * internal function stripClass to remove added (S3) class and attributes (for testing purposes)
 * new package dependencies: "crayon", "tibble" (now direct and formerly indirect dependency)

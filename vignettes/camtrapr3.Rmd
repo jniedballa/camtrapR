@@ -224,7 +224,7 @@ In addition to the metadata that were saved when the image was taken (see above)
 
 
 ```{r eval = exiftool_present}
-head(rec.db.pbe)
+rec.db.pbe
 ```
 
 
@@ -412,7 +412,7 @@ Now let's see how the daily effort was combined for the different combinations o
    camOp_station_aggregation [camOp_station_aggregation$hasProblems == FALSE, -3]
 ```
 
-sS you can see, allCamsOn has no effect if all cameras were active (due to hasProblems = FALSE). The differences on the setup/retrieval day are due to camerasIndependent.
+As you can see, allCamsOn has no effect if all cameras were active (due to hasProblems = FALSE). The differences on the setup/retrieval day are due to camerasIndependent.
 
 Now with hasProblems = TRUE:
 
@@ -445,8 +445,8 @@ Here is the camera operation matrix calculated above  (in two different color pa
 
 ```{r}
 par(mfrow = c(1,2))
-plot(camOp = camop_problem)
-plot(camOp = camop_problem, palette = "Heat")
+plot(camop_problem)
+plot(camop_problem, palette = "Heat")
 ```
 
 <!--  ```{r include = FALSE} -->
@@ -455,8 +455,8 @@ plot(camOp = camop_problem, palette = "Heat")
 
 One can also plot with the levelplot function from the lattice package:
 ```{r}
-plot(camOp = camop_problem, lattice = TRUE)
-plot(camOp = camop_problem, palette = "Heat", lattice = TRUE)
+plot(camop_problem, lattice = TRUE)
+plot(camop_problem, palette = "Heat", lattice = TRUE)
 ```
 
 

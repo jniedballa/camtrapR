@@ -893,6 +893,71 @@ print.camOp <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
   invisible(x)
 }
 
+
+#' Subsetting method for camera trap station operation matrices
+#' 
+#' Ensures that subsetting a \code{camOp} object (e.g. \code{x[1:5, ]},
+#' \code{x[, 1:30]}) retains the \code{camOp} class and its provenance
+#' attributes (\code{stationCol}, \code{cameraCol}, \code{sessionCol},
+#' \code{setupCol}, \code{retrievalCol}). Unlike those, the \code{from}/\code{to}
+#' attributes are recomputed from the remaining column names (dates) rather
+#' than carried over unchanged, since they describe the date range actually
+#' covered by \code{x} and would otherwise go stale after column subsetting.
+#' 
+#' @export
+#' @param x an object of class \code{camOp}
+#' @param i row index
+#' @param j column index
+#' @param drop logical, whether to simplify to a vector when selecting a single row/column
+#' @param ... further arguments passed to or from other methods
+#' @method [ camOp
+#' @keywords internal
+`[.camOp` <- function(x, i, j, ..., drop) {
+  
+  station.col   <- attr(x, "stationCol")
+  camera.col    <- attr(x, "cameraCol")
+  session.col   <- attr(x, "sessionCol")
+  setup.col     <- attr(x, "setupCol")
+  retrieval.col <- attr(x, "retrievalCol")
+  
+  out <- NextMethod()   # let the default matrix `[` do the real subsetting
+  
+  # drop = TRUE with a single row or column returns a plain vector, not
+  # a matrix -- nothing to reconstruct in that case
+  if (!is.matrix(out)) return(out)
+  
+  class(out) <- unique(c("camOp", class(out)))
+  attr(out, "stationCol")   <- station.col
+  attr(out, "cameraCol")    <- camera.col
+  attr(out, "sessionCol")   <- session.col
+  attr(out, "setupCol")     <- setup.col
+  attr(out, "retrievalCol") <- retrieval.col
+  
+  # recompute from/to from the columns that actually remain, since column
+  # names are dates -- carrying over the original from/to would misrepresent
+  # the date range after column subsetting
+  cn <- colnames(out)
+  parsed <- if (!is.null(cn) && length(cn) > 0) {
+    # colnames may carry a "+Xh" suffix when occasionStartTime != 0
+    suppressWarnings(as.Date(sub("\\+[0-9]+h$", "", cn)))
+  } else {
+    NA
+  }
+  
+  if (length(parsed) > 0 && !anyNA(parsed)) {
+    attr(out, "from") <- min(parsed)
+    attr(out, "to")   <- max(parsed)
+  } else {
+    # fall back to the original range if column names couldn't be parsed
+    # as dates (e.g. after colnames<- was used to rename them)
+    attr(out, "from") <- attr(x, "from")
+    attr(out, "to")   <- attr(x, "to")
+  }
+  
+  out
+}
+
+
 #' Summary method for camera trap station operation matrices
 #' 
 #' @export
@@ -1005,11 +1070,18 @@ summary.camOp <- function(object, nStationsMax = 10, ...) {
 #' 
 #' @export
 #' @param x an object used to select a method
+#' @param camOp alternative to `x` (for backward compatibility)
 #' @param palette the color palette to use (default: `"viridis"`)
 #' @param lattice whether or not to plot using lattice (default: `FALSE`)
 #' @param ... further arguments passed to or from other methods
 #' @method plot camOp
 #' @keywords internal
-plot.camOp <- function(x, palette = "viridis", lattice = FALSE, ...) {
+plot.camOp <- function(x, camOp = NULL, palette = "viridis", lattice = FALSE, ...) {
+  if (!is.null(camOp) & missing(x)) {
+    x <- camOp
+  }
   camopPlot(camOp = x, palette = palette, lattice = lattice)
 }
+
+
+
