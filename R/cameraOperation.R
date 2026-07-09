@@ -902,15 +902,7 @@ print.camOp <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
 #' @param ... further arguments passed to or from other methods
 #' @method summary camOp
 #' @keywords internal
-#' Summary method for camera trap station operation matrices
-#' 
-#' @export
-#' @param object an object of class \code{camOp}
-#' @param nStationsMax integer. Maximum number of rows to show in the
-#'   station-level table.
-#' @param ... further arguments passed to or from other methods
-#' @method summary camOp
-#' @keywords internal
+
 summary.camOp <- function(object, nStationsMax = 10, ...) {
   
   x  <- object

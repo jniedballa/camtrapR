@@ -9,20 +9,12 @@
 \arguments{
 \item{object}{an object of class \code{camOp}}
 
-\item{nStationsMax}{integer. Maximum number of rows to show in the
-station-level table.}
+\item{nStationsMax}{integer providing the maximum number of rows to show in
+the station-level table.}
 
 \item{...}{further arguments passed to or from other methods}
 }
 \description{
 Summary method for camera trap station operation matrices
 }
-\keyword{Summary}
-\keyword{camera}
-\keyword{for}
 \keyword{internal}
-\keyword{matrices}
-\keyword{method}
-\keyword{operation}
-\keyword{station}
-\keyword{trap}
