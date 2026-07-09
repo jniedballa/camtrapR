@@ -206,7 +206,7 @@
     "predictionSeed": null,
     "predictionTabs": "Species Occupancy",
     "prediction_raster_source": "extracted",
-    "rasterBand": "TPI",
+    "rasterBand": "elevation",
     "rasterTemplate": null,
     "recordDateTimeCol": "",
     "recordDateTimeFormat": "ymd HMS",
