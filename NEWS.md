@@ -1,9 +1,10 @@
 # camtrapR devel
 
 ## Other changes
-* recordTable & filterRecordTable now output an object of class records with dedicated print method
-* cameraOperation now outputs an object of class camOp with dedicated print and plot methods
-* detectionHistory now outputs an object of class detHist with a dedicated print method
+* recordTable & filterRecordTable now output an object of class records with dedicated print, summary, `]`, and dplyr_reconstruct methods
+* cameraOperation now outputs an object of class camOp with dedicated print, summary, and plot methods
+* detectionHistory now outputs an object of class detHist with a dedicated print and `]` method
+* new package dependencies: crayon, tibble (now direct and formerly indirect dependency)
 
 
 # camtrapR 3.0.6
