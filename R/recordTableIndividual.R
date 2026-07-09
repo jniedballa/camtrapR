@@ -139,9 +139,9 @@
 #' @param video list. Contains information on how to handle video data
 #' (optional). See details.
 #' 
-#' @return A data frame containing species records with individual IDs and
-#' additional information about stations, date, time and (optionally) further
-#' metadata.
+#' @return An object of class `records` containing a data frame containing
+#' species records with individual IDs and additional information about 
+#' stations, date, time and (optionally) further metadata.
 #' 
 #' @section Warning : Be sure to read the section on individual identification
 #' in the package vignette
@@ -632,5 +632,12 @@ recordTableIndividual <- function(inDir,
     }
   write.csv(record.table3, file = outtable_filename)
   }
+  
+  # declare specific class and store attributes
+  class(record.table3) <- unique(c("records", class(record.table3)))
+  attr(record.table3, "stationCol") <- stationCol
+  attr(record.table3, "individualCol") <- individualCol
+  attr(record.table3, "speciesCol") <- speciesCol
+  
   return(record.table3)
 }
