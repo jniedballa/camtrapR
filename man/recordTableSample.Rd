@@ -7,7 +7,7 @@
 \format{
 A data frame with 39 rows and 11 variables
 
-A data frame with 39 rows and 11 variables
+A data frame with 39 rows and 12 variables
 }
 \usage{
 data(recordTableSample)
