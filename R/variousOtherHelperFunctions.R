@@ -2536,5 +2536,20 @@ showMatrixCorner <- function(x, nRows = 4, nCols = 3, digits = 3) {
   fmt
 }
 
-## color to mimic pillar output
+## color to mimic pillar output (not a function)
 crayon_grey_0.6 <- crayon::make_style(grDevices::grey(0.6), grey = TRUE) # mimic pillar
+
+# function to strip camtrapR class and associated camtrapR attributes (for testing only)
+stripClass <- function(x) {
+  class(x) <- setdiff(class(x), c("camOp", "records", "detHist"))
+  all_attributes <- names(attributes(x))
+  attributes_to_remove <- all_attributes[grepl("Col", all_attributes) | all_attributes %in% c("from", "to")]
+  if (length(attributes_to_remove) > 0) {
+    for (a in attributes_to_remove) {
+      attr(x, a) <- NULL
+    }
+  }
+  x
+}
+
+
