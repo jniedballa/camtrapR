@@ -875,7 +875,7 @@ print.camOp <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
   fmt <- showMatrixCorner(x, nRows = nRows, nCols = nCols, digits = digits)
   
   ## output
-  active.days <- sum(colSums(x, na.rm = TRUE) > 1)
+  active.days <- sum(colSums(x, na.rm = TRUE) > 0)
 
   station.wording <- if (nr > 1) " stations" else " station"
   date.wording  <- if (nc > 1) " days" else " day"
@@ -984,7 +984,7 @@ summary.camOp <- function(object, nStationsMax = 10, ...) {
   n.camera  <- if (has.camera)  length(unique(camop.info$camera))  else NA
   
   active.trap.days <- sum(x, na.rm = TRUE)
-  active.days      <- sum(colSums(x, na.rm = TRUE) > 1)
+  active.days      <- sum(colSums(x, na.rm = TRUE) > 0)
   problem.days     <- sum(x == 0, na.rm = TRUE)
   notset.days      <- sum(is.na(x))
   total.cells      <- length(x)
