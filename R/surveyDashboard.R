@@ -373,6 +373,10 @@ surveyDashboard <- function(CTtable = NULL,
                        options = options)
   }
   
+  
+  # add debug button in UI (for developers, not user)
+  show_debug <- identical(Sys.getenv("CAMTRAPR_DEBUG"), "true")
+  
   # UI definition ####
   ui <- shinydashboard::dashboardPage(
     
@@ -490,7 +494,17 @@ surveyDashboard <- function(CTtable = NULL,
           actionButton("export_all_data", "Export Data",
                        icon = icon("download")),
           add_tooltip(id = "export_all_data", title = "Export processed data, models, and plots.") # Default placement=bottom is fine here
-        )
+        ),
+        
+        if (show_debug) {
+          tags$div(
+            class = "sidebar-button-container",
+            actionButton("debug_button", "Debug", 
+                         icon = icon("bug")),
+            add_tooltip(id = "debug_button", 
+                        title = "Triggers browser() for debugging.")
+          )
+        }
       )
     ),
     shinydashboard::dashboardBody(
@@ -2977,7 +2991,7 @@ surveyDashboard <- function(CTtable = NULL,
         if (anyDuplicated(data$CTtable[[data$stationCol]])) {
           showModal(modalDialog(
             title = "Input Error",
-            "Duplicate values in stationCol. Do you need to specify a cameraCol?",
+            "Duplicate values in stationCol. If this is a single-season dataset, do you need to specify a cameraCol? Please be aware that the dashboard currently does not support multi-season datasets. Subset to a single season if relevant.",
             footer    = modalButton("Dismiss"),
             easyClose = FALSE
           ))
@@ -11393,6 +11407,13 @@ surveyDashboard <- function(CTtable = NULL,
         )
       ))
     })
+    
+    # Stop execution and drops into the R debugger environment when clicking debug button
+    if (identical(Sys.getenv("CAMTRAPR_DEBUG"), "true")) {
+      observeEvent(input$debug_button, {
+        browser()
+      }, ignoreInit = TRUE)
+    }
     
     # Save / Restore app state ----
     
