@@ -98,6 +98,16 @@ test_that("recordTable output has correct inherited class", {
   expect_is(rec_table4,   "data.frame")
 })
 
+
+test_that("class is kept after dplyr operations on recordTable output", {
+  expect_true("records" %in% class(dplyr::slice(rec_table0, 1:10)))
+})
+
+
+test_that("class is kept after subsetting a recordTable output", {
+  expect_true("records" %in% class(rec_table0[1:10, ]))
+})
+
 test_that("recordTable output has correct dimensions", {
   expect_equal(dim(rec_table0),   c(56,12))
   expect_equal(dim(rec_table1),   c(40,14))
