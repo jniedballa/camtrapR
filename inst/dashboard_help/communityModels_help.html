@@ -71,6 +71,7 @@
           </li>
         </ol>
 
+        
         <h4>Important Notes:</h4>
         <ul>
           <li>More species and covariates increase computation time</li>
@@ -89,6 +90,26 @@
           <li>Increase iterations if chains haven't converged or if effective sample size is very low</li>
           <li>Check for highly correlated covariates</li>
           <li>Consider removing rare species or combining similar species</li>
+        </ul>
+        
+        
+        <h4>Bayesian Priors</h4>
+        <p>All models in this tool utilize hard-coded, weakly informative (vague) priors. 
+        The goal is to allow the observed data to drive parameter estimation while providing enough structural constraints to ensure computational stability. 
+        Because all continuous covariates are automatically standardized to a mean of 0 and standard deviation of 1, these priors span a very wide range of plausible effect sizes.</p>
+        <ul>
+          <li><em>Community Means (Intercepts & Covariate Effects):</em> 
+            <ul>
+              <li><code>dnorm(0, 0.05)</code></li>
+              <li>Used for all community-level means (shared across species), such as the detection and occupancy intercepts and mean covariate effects. This normal distribution is centered at 0 with a precision of 0.05, which translates to a standard deviation of roughly 4.47. On the logit scale (used for occupancy and detection probabilities), a standard deviation of 4.47 is extremely wide, making it a vague prior.</li>
+            </ul>
+          </li>
+          <li><em>Variance of Random Effects (Precision, <code>tau</code>):</em> 
+            <ul>
+              <li><code>dgamma(0.1, 0.1)</code></li>
+              <li>Used for the precision parameter <code>tau</code>, which controls the degree of variation among species-specific random effects (both intercepts and covariates). This Gamma prior (shape = 0.1, rate = 0.1) is a classic vague prior in Bayesian hierarchical models. It is highly diffuse, allowing the data to completely dictate the true level of variation across species. The corresponding standard deviation for the random effects is calculated as <code>sigma &lt;- sqrt(1 / tau)</code>.</li>
+            </ul>
+          </li>
         </ul>
         
   <h4>Relevant functions</h4>
