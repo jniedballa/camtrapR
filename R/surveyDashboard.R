@@ -2215,7 +2215,7 @@ surveyDashboard <- function(CTtable = NULL,
                              title = "UBMS Settings", status = "primary", width = 12,
                              fluidRow(
                                column(3, numericInput("adv_ubms_chains", "Number of chains:", value = 3, min = 1), add_tooltip(id = "adv_ubms_chains", title = "Number of MCMC chains.")),
-                               column(3, numericInput("adv_ubms_iter", "Number of iterations:", value = 2000, min = 100), add_tooltip(id = "adv_ubms_iter", title = "Total MCMC iterations per chain.")),
+                               column(3, numericInput("adv_ubms_iter", "Number of iterations:", value = 2000, min = 100, step = 100), add_tooltip(id = "adv_ubms_iter", title = "Total MCMC iterations per chain.")),
                                column(3, numericInput("adv_ubms_thin", "Thinning:", value = 1, min = 1), add_tooltip(id = "adv_ubms_thin", title = "MCMC thinning interval.")),
                                column(3, uiOutput("adv_ubms_cores_input")) # Tooltip added dynamically
                              )
@@ -2463,12 +2463,12 @@ surveyDashboard <- function(CTtable = NULL,
                                   numericInput("niter", 
                                                label_with_info("Number of Iterations", 
                                                                "Total number of MCMC iterations per chain (including burn-in)."),
-                                               value = 1000, min = 100)), 
+                                               value = 1000, min = 100, step = 100)), 
                            column(3, 
                                   numericInput("nburn", 
                                                label_with_info("Burn-in", 
                                                                "Number of initial iterations to discard as burn-in to allow the chain to reach the target distribution."), 
-                                               value = 500, min = 0)), 
+                                               value = 500, min = 0, step = 100)), 
                            column(3, 
                                   numericInput("nthin", 
                                                label_with_info("Thinning", 
@@ -9893,6 +9893,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Convert to data frame for display
       diag_df <- process_gelman_diag(gelman_diag)
+      
       
       # Initialize DT output
       output$gelman_diagnostics_table <- DT::renderDT({
