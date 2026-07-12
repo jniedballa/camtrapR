@@ -638,12 +638,15 @@ print.cams <- function(x, ...) {
   }
   
   n.station <- length(unique(x[[station.col]]))
-  n.record <- nrow(x)
+  n.rows <- nrow(x)
   station.wording <- if (n.station > 1) " stations" else " station"
-  record.wording  <- if (n.record > 1) " records" else " record"
-  message(crayon::cyan("Camera table"), " based on ",
+  record.wording  <- if (n.rows > 1) " rows" else " row"
+  message(crayon::cyan("Camera table"), " with ",
           crayon::blue(n.station), station.wording, 
-          " and ", crayon::blue(n.record), record.wording, ":")
+          " in ", crayon::blue(n.rows), record.wording, ":")
+  # TODO: include information about cameraCol / sessionCol, if available
+  
+  # TODO: Not ideal that print() shows "# A tibble: ", when the class is "data.frame". Might confuse users since tibble is only applied for printing-
   
   print(tibble::as_tibble(x), ...)
   invisible(x)
