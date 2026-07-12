@@ -5,10 +5,10 @@ library(testthat)
 library(withr)
 
 # --- Setup Fixture Paths ---
-# automatic tests
-# fixture_path <- test_path("fixtures", "sample_camtrap_dp_data")
-# local tests
-fixture_path <- file.path(Sys.getenv("CAMTRAPR_DIR"), "tests", "testthat", "fixtures", "sample_camtrap_dp_data")
+fixture_path <- normalizePath(
+  test_path("fixtures", "sample_camtrap_dp_data"),
+  mustWork = TRUE
+)
 
 dp_file <- file.path(fixture_path, "datapackage.json")
 
