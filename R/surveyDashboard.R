@@ -422,6 +422,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     shinydashboard::dashboardSidebar(
       shinydashboard::sidebarMenu(
+        id = "tabs",  # enables input$tabs (active top-level tabName) for the warning system
         # Add shinyBS init here - this dummy tooltip helps ensure library loads if no other tooltips are immediately visible.
         add_tooltip(id = "sidebarMenu_init", title = ""), # Optional dummy tooltip
         
@@ -492,16 +493,43 @@ surveyDashboard <- function(CTtable = NULL,
         tags$div(
           class = "sidebar-button-container",
           actionButton("export_all_data", "Export Data",
-                       icon = icon("download")),
-          add_tooltip(id = "export_all_data", title = "Export processed data, models, and plots.") # Default placement=bottom is fine here
+                       icon = icon("download"),
+                       class = "btn-primary"),
+          add_tooltip(id = "export_all_data",
+                      title = "Export processed data, models, and plots.")
+        ),
+        
+        tags$div(
+          tags$hr(class = "sidebar-divider")
+        ),
+        
+        # Data warnings review button
+        tags$div(
+          class = "sidebar-button-container",
+          actionButton("show_data_warnings", "Data Warnings",
+                       icon = icon("exclamation-triangle"),
+                       class = "btn-warning"),
+          add_tooltip(id = "show_data_warnings",
+                      title = "Review all active data-quality warnings (station count, species count, low detections).")
+        ),
+        
+        # Model warnings review button
+        tags$div(
+          class = "sidebar-button-container",
+          actionButton("show_model_warnings", "Model Warnings",
+                       icon = icon("exclamation-circle"),
+                       class = "btn-warning"),
+          add_tooltip(id = "show_model_warnings",
+                      title = "Review all active model warnings (convergence, effective sample size, lack of fit).")
         ),
         
         if (show_debug) {
           tags$div(
             class = "sidebar-button-container",
-            actionButton("debug_button", "Debug", 
-                         icon = icon("bug")),
-            add_tooltip(id = "debug_button", 
+            actionButton("debug_button", "Debug",
+                         icon = icon("bug"),
+                         class = "btn-default"),
+            add_tooltip(id = "debug_button",
                         title = "Triggers browser() for debugging.")
           )
         }
@@ -2261,6 +2289,7 @@ surveyDashboard <- function(CTtable = NULL,
         shinydashboard::tabItem(
           tabName = "CommunityOccupancy",
           tabsetPanel(
+            id = "commOccu_tabs",  # enables input$commOccu_tabs (active sub-tab title) for the warning system
             selected = "Species Selection",
             tabPanel("Instructions", 
                      fluidRow(shinydashboard::box(title = "Community Occupancy Model Workflow", width = 12, status = "info", 
@@ -2826,6 +2855,13 @@ surveyDashboard <- function(CTtable = NULL,
     coef_plot <- reactiveVal(NULL)
     gof_results <- reactiveVal(NULL)
     
+    # Warning system: track which warning IDs the user has already
+    # acknowledged (so popups only show once per dataset). Cleared on
+    # new dataset import via resetAppState().
+    acknowledged_warnings <- reactiveVal(NULL)
+    # Temporarily stores the IDs of warnings shown in the current modal
+    # so the dismiss handler can acknowledge them.
+    pending_acknowledgment <- reactiveVal(NULL)
     
     
     data <- shiny::reactiveValues(
@@ -3239,7 +3275,8 @@ surveyDashboard <- function(CTtable = NULL,
         gof_results = gof_results,
         output = output,
         single_species_occu_objects = single_species_occu_objects,
-        spatial_predictions_community = spatial_predictions_community
+        spatial_predictions_community = spatial_predictions_community,
+        acknowledged_warnings = acknowledged_warnings
       )
       
       shiny::showNotification("Camera Trap data updated", type = "message")
@@ -3297,7 +3334,8 @@ surveyDashboard <- function(CTtable = NULL,
         gof_results = gof_results,
         output = output,
         single_species_occu_objects = single_species_occu_objects,
-        spatial_predictions_community = spatial_predictions_community
+        spatial_predictions_community = spatial_predictions_community,
+        acknowledged_warnings = acknowledged_warnings
       )
       
       shiny::showNotification("Record data updated", type = "message")
@@ -3458,7 +3496,8 @@ surveyDashboard <- function(CTtable = NULL,
             gof_results = gof_results,
             output = output,
             single_species_occu_objects = single_species_occu_objects,
-            spatial_predictions_community = spatial_predictions_community
+            spatial_predictions_community = spatial_predictions_community,
+            acknowledged_warnings = acknowledged_warnings
           )
           
           # Show success message
@@ -3560,7 +3599,7 @@ surveyDashboard <- function(CTtable = NULL,
       # if (!is.null(metadata$spatial$bbox)) {
         # extent <- metadata$spatial$bbox
       # } else {
-        extent <- st_bbox(data$CTtable_sf)
+        extent <- sf::st_bbox(data$CTtable_sf)
       # }
       spatial_coverage <- sprintf("Lon: %s to %s, Lat: %s to %s",
                                   extent[1], extent[3], extent[2], extent[4])
@@ -3868,7 +3907,8 @@ surveyDashboard <- function(CTtable = NULL,
             gof_results = gof_results,
             output = output,
             single_species_occu_objects = single_species_occu_objects,
-            spatial_predictions_community = spatial_predictions_community
+            spatial_predictions_community = spatial_predictions_community,
+            acknowledged_warnings = acknowledged_warnings
           )
           
         }, error = function(e) {
@@ -9868,16 +9908,27 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Function to process Gelman diagnostics into a data frame
-    process_gelman_diag <- function(gd) {
+    process_gelman_diag <- function(gd, mcmc_list = NULL) {
       # Extract point estimates and upper CI
       estimates <- gd$psrf[, 1]
       upper_ci <- gd$psrf[, 2]
+      
+      # Compute effective sample size (ESS) if an mcmc.list is provided
+      if (!is.null(mcmc_list)) {
+        ess <- tryCatch(
+          as.numeric(coda::effectiveSize(mcmc_list)),
+          error = function(e) rep(NA_real_, length(estimates))
+        )
+      } else {
+        ess <- rep(NA_real_, length(estimates))
+      }
       
       # Create data frame
       data.frame(
         Parameter = rownames(gd$psrf),
         Point_Est = round(estimates, 3),
         Upper_CI = round(upper_ci, 3),
+        ESS = round(ess, 1),
         Converged = ifelse(upper_ci < 1.1, "Yes", "No"),
         stringsAsFactors = FALSE
       )
@@ -9892,7 +9943,7 @@ surveyDashboard <- function(CTtable = NULL,
       gelman_diag <- coda::gelman.diag(fitted_comm_model(), multivariate = FALSE)
       
       # Convert to data frame for display
-      diag_df <- process_gelman_diag(gelman_diag)
+      diag_df <- process_gelman_diag(gelman_diag, fitted_comm_model())
       
       
       # Initialize DT output
@@ -9920,10 +9971,15 @@ surveyDashboard <- function(CTtable = NULL,
       cat("Total parameters:", nrow(diag_df), "\n")
       cat("Converged parameters:", sum(diag_df$Converged == "Yes", na.rm = T), "\n")
       cat("Non-converged parameters:", sum(diag_df$Converged == "No", na.rm = T), "\n")
+      cat("Parameters with Rhat (point estimate) >= 1.1:", sum(diag_df$Point_Est >= 1.1, na.rm = T), "\n")
+      cat("Parameters with effective sample size < 100:", sum(diag_df$ESS < 100, na.rm = T), "\n")
       cat("\nPotential scale reduction factors:\n")
       print(summary(gelman_diag$psrf[,1]))
+      cat("\nEffective sample sizes:\n")
+      print(summary(diag_df$ESS))
       cat("\nNote: Values close to 1 indicate convergence.\n")
       cat("Values > 1.1 suggest lack of convergence.\n")
+      cat("Effective sample sizes should be > 100 for reliable inference.\n")
     })
     
     
@@ -10294,12 +10350,345 @@ surveyDashboard <- function(CTtable = NULL,
           gof_results(results)
           
           showNotification("Goodness of fit test completed", type = "message")
+          
+          # Warning #5: lack of fit (pops up when GOF is run and trigger occurs)
+          w5 <- compute_lack_of_fit_warning(results)
+          if (!is.null(w5) && !(w5$id %in% acknowledged_warnings())) {
+            showWarningModal(list(w5))
+          }
         }, error = function(e) {
           showNotification(paste("Error in GOF test:", e$message), type = "error")
         })
       })
     })
     
+    ## ============================================================
+    ## Warning system (data-quality & model-convergence warnings)
+    ## ------------------------------------------------------------
+    ## A warning is a list with fields:
+    ##   id       : unique warning identifier (character)
+    ##   title    : short heading shown in the modal (character)
+    ##   message  : explanatory text shown in the modal (character)
+    ##   severity : "warning" (default) or "danger"
+    ## The warning reactives below each return a warning list if their
+    ## trigger condition is TRUE, or NULL otherwise. They deliberately
+    ## avoid req() so they can be safely called from inside observers
+    ## without raising silent validation errors.
+    ## ============================================================
+    
+    ## Helper: render a single warning as a block of tags ----
+    renderWarningBlock <- function(w) {
+      sev        <- if (is.null(w$severity)) "warning" else w$severity
+      icon_name  <- if (sev == "danger") "exclamation-triangle" else "exclamation-circle"
+      icon_color <- if (sev == "danger") "#d9534f" else "#f0ad4e"
+      div(
+        style = "margin-bottom: 15px;",
+        h4(
+          icon(icon_name),
+          span(w$title, style = paste0("color:", icon_color, ";"))
+        ),
+        p(w$message, style = "margin-left: 10px;")
+      )
+    }
+    
+    ## Helper: show a modal dialog listing all collected warnings ----
+    ## acknowledge = TRUE  -> footer is "Acknowledge" button; shown IDs are
+    ##                        stored in pending_acknowledgment so the dismiss
+    ##                        handler can mark them as seen (suppresses future
+    ##                        auto-popups until a new dataset is loaded).
+    ## acknowledge = FALSE -> footer is "Close"; used by sidebar review buttons.
+    showWarningModal <- function(warnings, acknowledge = TRUE) {
+      if (length(warnings) == 0) return(invisible(NULL))
+      
+      if (acknowledge) {
+        pending_acknowledgment(vapply(warnings, function(w) w$id, character(1)))
+      }
+      
+      body_blocks <- lapply(warnings, renderWarningBlock)
+      body <- do.call(tagList, c(body_blocks, list(
+        hr(),
+        p(
+          HTML("<strong>Note:</strong> These warnings are advisory. You can proceed, but interpret the results with extra caution."),
+          style = "color: #6c757d; font-size: 0.9em;"
+        )
+      )))
+      
+      footer_btn <- if (acknowledge) {
+        actionButton("dismissWarnings", "Acknowledge", class = "btn-primary")
+      } else {
+        modalButton("Close")
+      }
+      
+      showModal(modalDialog(
+        title    = tagList(icon("exclamation-triangle"), "Data Quality Warnings"),
+        body,
+        footer   = tagList(footer_btn),
+        size      = "l",
+        easyClose = !acknowledge
+      ))
+    }
+    
+    ## Helper: collect non-NULL warnings from a variable argument list ----
+    collect_warnings <- function(...) {
+      ws <- list(...)
+      ws[!sapply(ws, is.null)]
+    }
+    
+    ## Warning #1: station sample size ----
+    warn_station_sample_size <- reactive({
+      if (is.null(data$aggregated_CTtable)) return(NULL)
+      n <- nrow(data$aggregated_CTtable)
+      if (!is.null(n) && !is.na(n) && n < 20) {
+        list(
+          id       = "station_sample_size",
+          title    = "Warning: station sample size",
+          message  = paste0(
+            "You are about to fit an occupancy model to a data set with fewer than 20 sampling locations (n = ",
+            n, "). This can lead to high uncertainty in estimates; some parameters in your model may not be ",
+            "estimable. Your power to detect covariate effects will be low and you should strictly limit the ",
+            "number of covariates in your model."
+          ),
+          severity = "warning"
+        )
+      } else NULL
+    })
+
+    ## Warning #3: number of species ----
+    warn_n_species <- reactive({
+      if (is.null(input$speciesTable_rows_selected)) return(NULL)
+      n <- length(input$speciesTable_rows_selected)
+      if (n <= 5) {
+        list(
+          id       = "n_species",
+          title    = "Warning: number of species",
+          message  = paste0(
+            "You are about to fit a community occupancy model with ", n, " species (<6). For reliable ",
+            "estimation of community level parameters, there should be at least 6 species in the data set. ",
+            "Consider running multiple single-species occupancy models instead."
+          ),
+          severity = "warning"
+        )
+      } else NULL
+    })
+
+    ## Warning #4a: low number of detections (community workflow) ----
+    warn_low_detections_community <- reactive({
+      if (is.null(input$speciesTable_rows_selected)) return(NULL)
+      if (is.null(species_summary())) return(NULL)
+      ss <- species_summary()
+      selected_rows    <- input$speciesTable_rows_selected
+      selected_species <- sort(ss[[data$speciesCol]][selected_rows])
+      ss_subset <- ss[ss[[data$speciesCol]] %in% selected_species, ]
+      if (nrow(ss_subset) > 0 && any(ss_subset$Stations <= 3, na.rm = TRUE)) {
+        list(
+          id       = "low_detections",
+          title    = "Warning: low number of detections (community model)",
+          message  = paste0(
+            "At least one of the species in your data set is detected very rarely; parameter estimates for ",
+            "these species will likely have high uncertainty or may not be estimable at all; in a community ",
+            "occupancy model, they will be strongly influenced by the average community level parameters."
+          ),
+          severity = "warning"
+        )
+      } else NULL
+    })
+
+    ## Warning #4b: low number of detections (single-species workflow) ----
+    warn_low_detections_single <- reactive({
+      if (is.null(input$species_dethist) || input$species_dethist == "") return(NULL)
+      if (is.null(species_summary())) return(NULL)
+      ss <- species_summary()
+      stations <- ss$Stations[ss[[data$speciesCol]] == input$species_dethist]
+      if (length(stations) > 0 && !is.na(stations[1]) && stations[1] <= 3) {
+        list(
+          id       = "low_detections",
+          title    = "Warning: low number of detections (single species model)",
+          message  = paste0(
+            "The selected species (", input$species_dethist, ") is detected very rarely (at ",
+            stations[1], " station(s)); parameter estimates for this species will likely have high ",
+            "uncertainty or may not be estimable at all."
+          ),
+          severity = "warning"
+        )
+      } else NULL
+    })
+
+    ## Warning #5: lack of fit (helper + reactive) ----
+    ## Helper: compute lack-of-fit warning from a GOF results object.
+    ## Used both inline in the run_gof handler (passing `results` directly)
+    ## and in the warn_lack_of_fit reactive (passing gof_results()).
+    compute_lack_of_fit_warning <- function(gof_res) {
+      if (is.null(gof_res) || is.null(gof_res$BP)) return(NULL)
+      bp_df        <- gof_res$BP
+      bp_lower     <- 0.1
+      bp_upper     <- 0.9
+      bp_community <- bp_df$BP[nrow(bp_df)]
+      bp_species   <- bp_df$BP[-nrow(bp_df)]
+      lof_community <- isTRUE(bp_community < bp_lower || bp_community > bp_upper)
+      lof_species   <- isTRUE(any(bp_species < bp_lower | bp_species > bp_upper))
+      if (lof_community || lof_species) {
+        list(
+          id       = "lack_of_fit",
+          title    = "Warning: lack of fit",
+          message  = paste0(
+            "Posterior predictive checks indicate that the model does not fit the data ",
+            "at the community and/or species level (for at least one species). In some ",
+            "cases, this can be remedied by including important predictor variables currently ",
+            "missing from the model. If poor fit only affects a small number of species, ",
+            "consider excluding them or interpreting their results with extra caution. ",
+            "Causes, consequences and remedies for lack of fit are a complex topic and you ",
+            "may need to consult with an experienced user of these models."
+          ),
+          severity = "danger"
+        )
+      } else NULL
+    }
+    
+    warn_lack_of_fit <- reactive({
+      compute_lack_of_fit_warning(gof_results())
+    })
+    
+    ## Warning #2: convergence / effective sample size ----
+    warn_convergence <- reactive({
+      if (is.null(fitted_comm_model())) return(NULL)
+      fm  <- fitted_comm_model()
+      gd  <- tryCatch(coda::gelman.diag(fm, multivariate = FALSE), error = function(e) NULL)
+      ess <- tryCatch(as.numeric(coda::effectiveSize(fm)), error = function(e) NULL)
+      if (is.null(gd)) return(NULL)
+      point_est <- gd$psrf[, 1]
+      rhat_bad  <- any(point_est >= 1.1, na.rm = TRUE)
+      ess_bad   <- FALSE
+      if (!is.null(ess)) ess_bad <- any(ess < 100, na.rm = TRUE)
+      if (rhat_bad || ess_bad) {
+        problems <- character(0)
+        if (rhat_bad) problems <- c(problems, "at least one parameter has Rhat (point estimate) >= 1.1")
+        if (ess_bad)  problems <- c(problems, "at least one parameter has effective sample size < 100")
+        list(
+          id       = "convergence",
+          title    = "Warning: convergence, effective sample size",
+          message  = paste0(
+            "Some parameters in your community occupancy model have not converged and/or have extremely ",
+            "low effective sample size (", paste(problems, collapse = "; "), "). Estimates, and any ",
+            "products based on these estimates (distribution maps, response curves, etc) may not be ",
+            "reliable. Consider re-fitting the model with a larger number of iterations."
+          ),
+          severity = "danger"
+        )
+      } else NULL
+    })
+
+    ## Helper: filter out already-acknowledged warnings ----
+    filter_unacknowledged <- function(warnings) {
+      ack <- acknowledged_warnings()
+      if (is.null(ack) || length(ack) == 0) return(warnings)
+      Filter(function(w) !(w$id %in% ack), warnings)
+    }
+
+    ## Dismiss the warning modal (acknowledge shown warnings) ----
+    observeEvent(input$dismissWarnings, {
+      ids <- pending_acknowledgment()
+      if (!is.null(ids) && length(ids) > 0) {
+        acknowledged_warnings(unique(c(acknowledged_warnings(), ids)))
+      }
+      pending_acknowledgment(NULL)
+      removeModal()
+    })
+
+    ## Top-level tab navigation -> warnings #1, #4b ----
+    ## #1  pops up on "Detection History" and "Community Occupancy Models"
+    ## #4b pops up on "Occupancy models" (single-species)
+    ## Only shows warnings the user has NOT yet acknowledged.
+    observeEvent(input$tabs, {
+      active_tab <- input$tabs
+
+      if (active_tab == "DetectionHistory") {
+        ws <- filter_unacknowledged(list(warn_station_sample_size()))
+        if (length(ws) > 0) showWarningModal(ws)
+
+      } else if (active_tab == "CommunityOccupancy") {
+        ws <- filter_unacknowledged(list(warn_station_sample_size()))
+        if (length(ws) > 0) showWarningModal(ws)
+
+      } else if (active_tab == "Occupancy") {
+        ws <- filter_unacknowledged(list(warn_low_detections_single()))
+        if (length(ws) > 0) showWarningModal(ws)
+      }
+    }, ignoreInit = TRUE)
+
+    ## Community occupancy sub-tab navigation -> warnings #2, #3, #4a ----
+    ## #3 and #4a pop up on "Model Configuration"
+    ## #2  pops up on Results / Diagnostics / Effect Plots / Spatial Predictions (after model fit)
+    observeEvent(input$commOccu_tabs, {
+      active_subtab <- input$commOccu_tabs
+
+      if (active_subtab == "Model Configuration") {
+        ws <- filter_unacknowledged(collect_warnings(
+          warn_n_species(),
+          warn_low_detections_community()
+        ))
+        if (length(ws) > 0) showWarningModal(ws)
+
+      } else if (active_subtab %in% c("Results", "Diagnostics", "Effect Plots", "Spatial Predictions")) {
+        # only relevant after a community model has been fitted
+        if (is.null(fitted_comm_model())) return()
+        ws <- filter_unacknowledged(list(warn_convergence()))
+        if (length(ws) > 0) showWarningModal(ws)
+      }
+    }, ignoreInit = TRUE)
+
+    ## Sidebar: review all active DATA warnings ----
+    ## Shows ALL currently-active data warnings regardless of acknowledgment.
+    observeEvent(input$show_data_warnings, {
+      ws <- collect_warnings(
+        warn_station_sample_size(),
+        warn_n_species(),
+        warn_low_detections_community(),
+        warn_low_detections_single()
+      )
+      if (length(ws) > 0) {
+        showWarningModal(ws, acknowledge = FALSE)
+      } else {
+        showNotification("No active data warnings.", type = "message", duration = 5)
+      }
+    })
+
+    ## Sidebar: review all active MODEL warnings ----
+    ## Shows ALL currently-active model warnings regardless of acknowledgment.
+    observeEvent(input$show_model_warnings, {
+      ws <- collect_warnings(
+        warn_convergence(),
+        warn_lack_of_fit()
+      )
+      if (length(ws) > 0) {
+        showWarningModal(ws, acknowledge = FALSE)
+      } else {
+        showNotification("No active model warnings.", type = "message", duration = 5)
+      }
+    })
+
+    ## Update sidebar button labels with active warning counts ----
+    observe({
+      data_ws <- collect_warnings(
+        warn_station_sample_size(),
+        warn_n_species(),
+        warn_low_detections_community(),
+        warn_low_detections_single()
+      )
+      n_data <- length(data_ws)
+      label  <- if (n_data > 0) paste0("Data Warnings (", n_data, ")") else "Data Warnings"
+      updateActionButton(session, "show_data_warnings", label = label)
+    })
+
+    observe({
+      model_ws <- collect_warnings(
+        warn_convergence(),
+        warn_lack_of_fit()
+      )
+      n_model <- length(model_ws)
+      label   <- if (n_model > 0) paste0("Model Warnings (", n_model, ")") else "Model Warnings"
+      updateActionButton(session, "show_model_warnings", label = label)
+    })
+
     # Reset gof_results when input changes
     observeEvent(c(input$gof_draws, input$gof_z_cond, input$gof_residual_type,
                    # Also reset if the underlying fitted model changes
@@ -12068,6 +12457,9 @@ surveyDashboard <- function(CTtable = NULL,
       # Spatial predictions 
       spatial_predictions_community = NULL,
       
+      # Warning system
+      acknowledged_warnings = NULL,
+      
       # UI control
       notification = TRUE
     ) {
@@ -12151,6 +12543,11 @@ surveyDashboard <- function(CTtable = NULL,
           spatial_predictions_community$occupancy <- NULL
           spatial_predictions_community$richness <- NULL
           spatial_predictions_community$pao <- NULL
+        }
+        
+        # Reset warning acknowledgment (so warnings show again for new data)
+        if (!is.null(acknowledged_warnings)) {
+          acknowledged_warnings(NULL)
         }
         
         # Reset output elements if output reference provided
