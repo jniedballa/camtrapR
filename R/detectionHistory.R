@@ -904,6 +904,9 @@ print.detHist <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
   invisible(x)
 } 
 
+# TODO: Make print more informative (when including effort especially)
+# TODO: Add summary method. 
+
 
 #' Subsetting method for detection history
 #' 
