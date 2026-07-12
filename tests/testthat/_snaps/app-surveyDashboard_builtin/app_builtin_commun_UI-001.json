@@ -95,6 +95,7 @@
     "clear_date_filter": 0,
     "colorPalette": "Inferno",
     "colorPalettePrediction": "Inferno",
+    "commOccu_tabs": "Species Selection",
     "communityModelType": "Occupancy",
     "confirmDetectionEffect": 0,
     "confirmOccupancyEffect": 0,
@@ -117,6 +118,7 @@
     ],
     "day1_community": "survey",
     "day1_single_species": "survey",
+    "debug_button": 0,
     "deltaTimeComparedTo": "lastIndependentRecord",
     "deselectAllSpecies": 0,
     "detCovFixed": [
@@ -246,6 +248,8 @@
     "selectByStations": 0,
     "selectedPlot": "",
     "setupCol": "",
+    "show_data_warnings": 0,
+    "show_model_warnings": 0,
     "sidebarCollapsed": false,
     "sidebarItemExpanded": null,
     "speciesA": "EGY",
@@ -255,6 +259,7 @@
     "species_dethist": "EGY",
     "species_for_map": "n_species",
     "stationCol": "",
+    "tabs": "Summary",
     "terrainMeasures": [
       "slope",
       "TRI"
@@ -850,8 +855,7 @@
           "all_files": true
         }
       ]
-    },
-    "welcome_screen": null
+    }
   },
   "export": {
 
