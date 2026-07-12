@@ -2478,3 +2478,81 @@ capture_conditions <- function(expr) {
     errors = logs$errors
   )
 }
+
+# apply function to last element within nested list ----
+lapplyLeaf <- function(x, f) {
+  if (is.list(x)) {
+    lapply(x, lapplyLeaf, f = f)
+  } else {
+    f(x)
+  }
+}
+
+# reformat matrix for display ----
+showMatrixCorner <- function(x, nRows = 4, nCols = 3, digits = 3) {
+  
+  x <- stripClass(x)
+  
+  stopifnot(is.matrix(x))
+  
+  nr <- nrow(x)
+  nc <- ncol(x)
+  
+  ## index of columns to display
+  row_idx <- if (nr > 2 * nRows) c(seq_len(nRows), (nr - nRows + 1):nr) else seq_len(nr)
+  col_idx <- if (nc > 2 * nCols) c(seq_len(nCols), (nc - nCols + 1):nc) else seq_len(nc)
+  
+  ## matrix subset
+  sub <- x[row_idx, col_idx, drop = FALSE]
+  
+  ## convert digits inside cells into txt
+  fmt <- formatC(sub, digits = digits, format = "g", width = digits + 4)
+  dim(fmt) <- dim(sub)
+  
+  ## transform row and column names
+  rn <- rownames(x)[row_idx]
+  if (is.null(rn)) rn <- paste0("[", row_idx, ",]")
+  
+  cn <- colnames(x)[col_idx]
+  if (is.null(cn)) cn <- paste0("[,", col_idx, "]")
+  
+  if (nc > 2 * nCols) {
+    n_hidden_cols <- nc - 2 * nCols
+    fmt <- cbind(fmt[, seq_len(nCols), drop = FALSE], "...",
+                 fmt[, (nCols + 1):ncol(fmt), drop = FALSE])
+    cn <- c(cn[seq_len(nCols)], sprintf("...(%d more)", n_hidden_cols),
+            cn[(nCols + 1):length(cn)])
+  }
+  
+  if (nr > 2 * nRows) {
+    n_hidden_rows <- nr - 2 * nRows
+    dots_row <- rep("...", ncol(fmt))
+    fmt <- rbind(fmt[seq_len(nRows), , drop = FALSE], dots_row,
+                 fmt[(nRows + 1):nrow(fmt), , drop = FALSE])
+    rn <- c(rn[seq_len(nRows)], sprintf("...(%d more)", n_hidden_rows),
+            rn[(nRows + 1):length(rn)])
+  }
+  
+  dimnames(fmt) <- list(rn, cn)
+  
+  fmt
+}
+
+## color to mimic pillar output (not a function)
+crayon_grey_0.6 <- crayon::make_style(grDevices::grey(0.6), grey = TRUE) # mimic pillar
+
+
+# function to strip camtrapR class and associated camtrapR attributes
+stripClass <- function(x) {
+  class(x) <- setdiff(class(x), c("cams", "cams_dp", "camOp", "records", "detHist"))
+  all_attributes <- names(attributes(x))
+  attributes_to_remove <- all_attributes[grepl("Col", all_attributes) | all_attributes %in% c("from", "to")]
+  if (length(attributes_to_remove) > 0) {
+    for (a in attributes_to_remove) {
+      attr(x, a) <- NULL
+    }
+  }
+  x
+}
+
+

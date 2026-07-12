@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^_pkgdown\.yml$
 ^docs$
+^data-raw$
 ^pkgdown$
 ^README\.Rmd
 ^.github

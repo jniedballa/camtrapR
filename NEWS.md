@@ -1,16 +1,32 @@
+# camtrapR 3.0.7
+
+## New features
+* improved displays and new summary functions for several functions (see below for details)
+
+## Other changes
+* recordTable, recordTableIndividual & filterRecordTable now output an object of class "records" with dedicated print, `]`, summary, and dplyr_reconstruct methods
+* cameraOperation now outputs an object of class "camOp" with dedicated print, `]`, summary, and plot methods
+* detectionHistory now outputs an object of class "detHist" with a dedicated print and `]` method
+* readcamtrapDP now outputs an object of class "cams_dp" with a dedicated print method
+* camera tables contained in readcamtrapDP and simulateCamtrapData outputs now are of class "cams" with a dedicated print method
+* internal function stripClass to remove added (S3) class and attributes
+* new package dependencies: "crayon", "tibble" (now direct and formerly indirect dependency)
+* Rproj options changed so that Ctrl-Shift-D generates the documentation in RStudio
+
+
 # camtrapR 3.0.6
 
-## new features
+## New features
 * readCamtrapDP now uses the camtrapdp package for reading camtrap DP data
 
 
 # camtrapR 3.0.5
 
-## new function
+## New function
 * simulateCamtrapData: simulate camera trap data with custom properties
 
 
-## bugfixes
+## Bugfixes
 * surveyDashboard: 
   - fix error in export of covariate rasters
   - assert validity of parameter inputs (prevents opening app when e.g. column names specified wrongly)
@@ -23,7 +39,7 @@ maintenance release to avoid potential problems in CRAN checks (unit tests)
 
 # camtrapR 3.0.3
 
-## bugfixes
+## Bugfixes
 * surveyDashboard: in covariate extraction, fix "Error in date$retrievalCol: object of type 'closure' is not subsettable"
 
 ## Other changes
@@ -32,12 +48,12 @@ maintenance release to avoid potential problems in CRAN checks (unit tests)
 
 # camtrapR 3.0.2
 
-## bugfixes
+## Bugfixes
 * fixed plot_effects with continuous covariates
 
 # camtrapR 3.0.1
 
-## bugfixes
+## Bugfixes
 * fixed plot_effects with categorical covariates
 
 ## Other changes

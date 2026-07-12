@@ -4,7 +4,7 @@
 #' \code{\link{detectionHistory}} and \code{\link{spatialDetectionHistory}},
 #' where it is needed for calculating trapping effort per occasion. It is also
 #' used in \code{\link{surveyReport}} to calculate the number of trap nights
-#' durig a survey. If several cameras were deployed per station, the matrix can
+#' during a survey. If several cameras were deployed per station, the matrix can
 #' contain camera- or station-specific trap operation information, or
 #' information about sessions during repeated surveys.
 #' 
@@ -27,7 +27,7 @@
 #' worked again. This information is used to calculate the daily trapping
 #' effort more precisely on days with incomplete effort.
 #' 
-#' Previously, setup and retrival day were counted as 1, indicating a whole day
+#' Previously, setup and retrieval day were counted as 1, indicating a whole day
 #' of effort on those days. Since version 2.1, setup and retrieval are assumed
 #' to have happened at 12 noon (resulting in daily effort of 0.5 instead of 1).
 #' Users can also specify the exact time cameras were set up (by providing a
@@ -125,7 +125,7 @@
 #' .csv?
 #' @param outDir character. Directory into which csv is saved
 #' 
-#' @return A matrix. Row names always indicate Station IDs. If
+#' @return A matrix of class "camOp". Row names always indicate Station IDs. If
 #' \code{sessionCol} and/or \code{cameraCol} are defined, they are contained in
 #' the row names also (camera ID only if \code{byCamera = TRUE}). Column names
 #' are dates. \cr Legend: NA: camera(s) not set up, 0: camera(s) not
@@ -154,6 +154,10 @@
 #'                                     hasProblems  = FALSE,
 #'                                     dateFormat   = "dmy"
 #' )
+#' camop_no_problem
+#' summary(camop_no_problem)
+#' 
+#' plot(camop_no_problem)
 #' 
 #' # with problems/malfunction
 #' camop_problem <- cameraOperation(CTtable      = camtraps,
@@ -164,6 +168,8 @@
 #'                                  hasProblems  = TRUE,
 #'                                  dateFormat   = "dmy"
 #' )
+#' camop_problem
+#' summary(camop_problem)
 #' 
 #' # The examples above specified dateFormat using lubdridate package, which is more intuitive. 
 #' # Alternatively one can used in base-R date conversions (strptime) as below:
@@ -178,9 +184,8 @@
 #'                                            dateFormat   = "%d/%m/%Y"
 #' )
 #' 
-#' camop_no_problem
-#' camop_problem
 #' camop_problem_oldformat
+#' summary(camop_problem_oldformat)
 #' 
 #' @importFrom data.table rbindlist setDF setDT setkey foverlaps ":="
 #' @importFrom lubridate as_date as_datetime ddays dhours dseconds interval int_start int_end int_overlaps is.Date time_length "%within%" 
@@ -678,7 +683,7 @@ cameraOperation <- function(CTtable,
         interval.tmp.prob <- sapply(camop_daily_intervals[run_these], intersect.Interval.fast, problem_intervals_by_row[[i]])   # intersection of day and total trapping period
         # total Problem value per day
         if(inherits(interval.tmp.prob, "array")) {
-          fraction_to_remove <- time_length(colSums(interval.tmp.prob, na.rm = TRUE), unit = "days")   # if mutliple problem periods are defined, they show up as rows here and are combined with colSums
+          fraction_to_remove <- time_length(colSums(interval.tmp.prob, na.rm = TRUE), unit = "days")   # if multiple problem periods are defined, they show up as rows here and are combined with colSums
         } else {
           fraction_to_remove <- time_length(interval.tmp.prob, unit = "days")
         }
@@ -835,5 +840,248 @@ cameraOperation <- function(CTtable,
     }
     if(missing(outDir)) message(paste("writecsv was TRUE, but outDir was not defined. Saved camera operation matrix in:", getwd(), sep = "   "))
   }
-  return(as.matrix(dat2))
+  
+  dat3 <- as.matrix(dat2)
+  
+  # declare specific class and store attributes
+  class(dat3) <- unique(c("camOp", class(dat3)))
+  attr(dat3, "stationCol")   <- stationCol
+  attr(dat3, "cameraCol")    <- cameraCol
+  attr(dat3, "sessionCol")   <- sessionCol
+  attr(dat3, "setupCol")     <- setupCol
+  attr(dat3, "retrievalCol") <- retrievalCol
+  attr(dat3, "from") <- as.Date(min(date0))
+  attr(dat3, "to") <- as.Date(max(date1))
+  return(dat3)
 }
+
+
+#' Printing method for camera trap station operation matrix
+#' 
+#' @export
+#' @param x an object used to select a method
+#' @param nRows the number of first and last rows to display
+#' @param nCols the number of first and last columns to display
+#' @param digits the number of digits to use within cells
+#' @param ... further arguments passed to or from other methods
+#' @method print camOp
+#' @keywords internal
+print.camOp <- function(x, nRows = 4, nCols = 3, digits = 3, ...) {
+  
+  nr <- nrow(x)
+  nc <- ncol(x)
+  
+  ## reformat matrix
+  fmt <- showMatrixCorner(x, nRows = nRows, nCols = nCols, digits = digits)
+  
+  ## output
+  active.days <- sum(colSums(x, na.rm = TRUE) > 0)
+
+  station.wording <- if (nr > 1) " stations" else " station"
+  date.wording  <- if (nc > 1) " days" else " day"
+  message(crayon::cyan("Camera trap station operation matrix"), " based on\n",
+          crayon::blue(nr), station.wording, " monitored from ", crayon::blue(attr(x, "from")),
+          " till ", crayon::blue(attr(x, "to")), ",\n",
+          "representing ", crayon::blue(nc), date.wording, " (" , crayon::blue(active.days), " active):")
+  print(fmt, quote = FALSE, right = TRUE, ...)
+  if (nr > 2 * nRows) {
+    cat(crayon_grey_0.6("# Use `print(nRows = ...)` to see more rows\n"))
+  }
+  if (nc > 2 * nCols) {
+    cat(crayon_grey_0.6("# Use `print(nCols = ...)` to see more columns\n"))
+  }
+  invisible(x)
+}
+
+
+#' Subsetting method for camera trap station operation matrices
+#' 
+#' Ensures that subsetting a \code{camOp} object (e.g. \code{x[1:5, ]},
+#' \code{x[, 1:30]}) retains the \code{camOp} class and its provenance
+#' attributes (\code{stationCol}, \code{cameraCol}, \code{sessionCol},
+#' \code{setupCol}, \code{retrievalCol}). Unlike those, the \code{from}/\code{to}
+#' attributes are recomputed from the remaining column names (dates) rather
+#' than carried over unchanged, since they describe the date range actually
+#' covered by \code{x} and would otherwise go stale after column subsetting.
+#' 
+#' @export
+#' @param x an object of class \code{camOp}
+#' @param i row index
+#' @param j column index
+#' @param drop logical, whether to simplify to a vector when selecting a single row/column
+#' @param ... further arguments passed to or from other methods
+#' @method [ camOp
+#' @keywords internal
+`[.camOp` <- function(x, i, j, ..., drop) {
+  
+  station.col   <- attr(x, "stationCol")
+  camera.col    <- attr(x, "cameraCol")
+  session.col   <- attr(x, "sessionCol")
+  setup.col     <- attr(x, "setupCol")
+  retrieval.col <- attr(x, "retrievalCol")
+  
+  out <- NextMethod()   # let the default matrix `[` do the real subsetting
+  
+  # drop = TRUE with a single row or column returns a plain vector, not
+  # a matrix -- nothing to reconstruct in that case
+  if (!is.matrix(out)) return(out)
+  
+  class(out) <- unique(c("camOp", class(out)))
+  attr(out, "stationCol")   <- station.col
+  attr(out, "cameraCol")    <- camera.col
+  attr(out, "sessionCol")   <- session.col
+  attr(out, "setupCol")     <- setup.col
+  attr(out, "retrievalCol") <- retrieval.col
+  
+  # recompute from/to from the columns that actually remain, since column
+  # names are dates -- carrying over the original from/to would misrepresent
+  # the date range after column subsetting
+  cn <- colnames(out)
+  parsed <- if (!is.null(cn) && length(cn) > 0) {
+    # colnames may carry a "+Xh" suffix when occasionStartTime != 0
+    suppressWarnings(as.Date(sub("\\+[0-9]+h$", "", cn)))
+  } else {
+    NA
+  }
+  
+  if (length(parsed) > 0 && !anyNA(parsed)) {
+    attr(out, "from") <- min(parsed)
+    attr(out, "to")   <- max(parsed)
+  } else {
+    # fall back to the original range if column names couldn't be parsed
+    # as dates (e.g. after colnames<- was used to rename them)
+    attr(out, "from") <- attr(x, "from")
+    attr(out, "to")   <- attr(x, "to")
+  }
+  
+  out
+}
+
+
+#' Summary method for camera trap station operation matrices
+#' 
+#' @export
+#' @param object an object of class \code{camOp}
+#' @param nStationsMax integer providing the maximum number of rows to show in
+#'   the station-level table.
+#' @param ... further arguments passed to or from other methods
+#' @method summary camOp
+#' @keywords internal
+
+summary.camOp <- function(object, nStationsMax = 10, ...) {
+  
+  x  <- object
+  nr <- nrow(x)
+  nc <- ncol(x)
+  
+  # reuse the package's own rowname parser (station/session/camera)
+  camop.info  <- deparseCamOpRownames(x)
+  has.session <- "session" %in% colnames(camop.info)
+  has.camera  <- "camera"  %in% colnames(camop.info)
+  
+  n.station <- length(unique(camop.info$station))
+  n.session <- if (has.session) length(unique(camop.info$session)) else NA
+  n.camera  <- if (has.camera)  length(unique(camop.info$camera))  else NA
+  
+  active.trap.days <- sum(x, na.rm = TRUE)
+  active.days      <- sum(colSums(x, na.rm = TRUE) > 0)
+  problem.days     <- sum(x == 0, na.rm = TRUE)
+  notset.days      <- sum(is.na(x))
+  total.cells      <- length(x)
+  
+  # SURVEY SPECIFICATION section
+  cat("=== Camera Trap Station Operation Summary ===\n\n")
+  cat("SURVEY SPECIFICATION\n")
+  cat(sprintf("  Station column:    %s\n", attr(x, "stationCol")))
+  if (has.camera)  cat(sprintf("  Camera column:     %s\n", attr(x, "cameraCol")))
+  if (has.session) cat(sprintf("  Session column:    %s\n", attr(x, "sessionCol")))
+  cat(sprintf("  Setup column:      %s\n", attr(x, "setupCol")))
+  cat(sprintf("  Retrieval column:  %s\n\n", attr(x, "retrievalCol")))
+  
+  # PERIOD section
+  cat("PERIOD\n")
+  cat(sprintf("  From: %s\n", format(attr(x, "from"))))
+  cat(sprintf("  To:   %s\n\n", format(attr(x, "to"))))
+  
+  # DIMENSIONS section
+  cat("DIMENSIONS\n")
+  cat(sprintf("  Stations: %d\n", n.station))
+  if (has.camera)  cat(sprintf("  Cameras:  %d\n", n.camera))
+  if (has.session) cat(sprintf("  Sessions: %d\n", n.session))
+  cat(sprintf("  Days:     %d\n\n", nc))
+  
+  # EFFORT section
+  cat("EFFORT\n")
+  cat(sprintf("  Active days:            %d out of %d days (at least 1 station active)\n", active.days, nc))
+  cat(sprintf("  Active trap-days:       %s (sum of effort across all stations and days)\n",
+              formatC(active.trap.days, format = "f", digits = 1)))
+  cat(sprintf("  Problem trap-days:      %d (%.1f%% of %d station-days)\n",
+              problem.days, 100 * problem.days / total.cells, total.cells))
+  cat(sprintf("  Not set up trap-days:   %d (%.1f%% of %d station-days)\n\n",
+              notset.days, 100 * notset.days / total.cells, total.cells))
+  
+  # STATION-LEVEL SUMMARY table (one row per matrix row, i.e. per
+  # station/session/camera combination as applicable)
+  cat("STATION-LEVEL SUMMARY\n")
+  
+  row.tbl <- data.frame(Station = camop.info$station, stringsAsFactors = FALSE)
+  if (has.session) row.tbl$Session <- camop.info$session
+  if (has.camera)  row.tbl$Camera  <- camop.info$camera
+  
+  row.tbl$Monitored <- apply(x, 1, function(r) sum(!is.na(r)))
+  row.tbl$Active    <- apply(x, 1, function(r) sum(r, na.rm = TRUE))
+  row.tbl$Problem   <- apply(x, 1, function(r) sum(r == 0, na.rm = TRUE))
+  
+  n.subset  <- min(nrow(row.tbl), nStationsMax)
+  row.shown <- row.tbl[seq_len(n.subset), , drop = FALSE]
+  
+  # build final display strings for EVERY column first, then measure widths
+  # off those -- not off the raw (pre-formatting) values, since e.g. Active
+  # sums of fractional effort can be long floating-point strings
+  # (e.g. "19.85975") that would otherwise inflate the column width
+  disp <- row.shown
+  disp$Active <- formatC(row.shown$Active, format = "f", digits = 1)
+  disp[] <- lapply(disp, as.character)
+  
+  col.widths <- vapply(names(disp), function(cn) {
+    as.integer(max(nchar(cn), nchar(disp[[cn]])) + 2)}, integer(1))
+  
+  header_fmt <- paste0("    ", paste0("%-", col.widths, "s", collapse = " "), "\n")
+  
+  cat(do.call(sprintf, c(list(header_fmt), as.list(names(disp)))))
+  separator <- paste(rep("-", sum(col.widths) + length(col.widths) - 1), collapse = "")
+  cat(paste0("    ", separator, "\n"))
+  
+  for (i in seq_len(nrow(disp))) {
+    cat(do.call(sprintf, c(list(header_fmt), as.list(unlist(disp[i, ])))))
+  }
+  cat("\n")
+  
+  if (nrow(row.tbl) > n.subset) {
+    cat(sprintf(crayon_grey_0.6("  ... %d more row(s) not shown (use `summary(nStationsMax = ...)` to see more)\n\n"),
+                nrow(row.tbl) - n.subset))
+  }
+  
+  invisible(row.tbl)
+}
+
+
+#' Plotting method for camera trap station operation matrix
+#' 
+#' @export
+#' @param x an object used to select a method
+#' @param camOp alternative to `x` (for backward compatibility)
+#' @param palette the color palette to use (default: `"viridis"`)
+#' @param lattice whether or not to plot using lattice (default: `FALSE`)
+#' @param ... further arguments passed to or from other methods
+#' @method plot camOp
+#' @keywords internal
+plot.camOp <- function(x, camOp = NULL, palette = "viridis", lattice = FALSE, ...) {
+  if (!is.null(camOp) & missing(x)) {
+    x <- camOp
+  }
+  camopPlot(camOp = x, palette = palette, lattice = lattice)
+}
+
+
+

@@ -299,7 +299,7 @@
       ]
     },
     "avg_records_per_station": {
-      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>11.3<\/h3>\n    <p>Avg records per station<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-table\" role=\"presentation\" aria-label=\"table icon\"><\/i>\n  <\/div>\n<\/div>",
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>10.7<\/h3>\n    <p>Avg records per station<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-table\" role=\"presentation\" aria-label=\"table icon\"><\/i>\n  <\/div>\n<\/div>",
       "deps": [
         {
           "name": "font-awesome",
@@ -363,7 +363,7 @@
       ]
     },
     "num_images": {
-      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>34<\/h3>\n    <p>Images<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-camera\" role=\"presentation\" aria-label=\"camera icon\"><\/i>\n  <\/div>\n<\/div>",
+      "html": "<div class=\"small-box bg-aqua\">\n  <div class=\"inner\">\n    <h3>32<\/h3>\n    <p>Images<\/p>\n  <\/div>\n  <div class=\"icon-large\">\n    <i class=\"fas fa-camera\" role=\"presentation\" aria-label=\"camera icon\"><\/i>\n  <\/div>\n<\/div>",
       "deps": [
         {
           "name": "font-awesome",
@@ -433,9 +433,9 @@
             "width": [
               5,
               2,
-              14,
+              13,
               8,
-              5
+              4
             ],
             "base": [
               2.5499999999999998,
@@ -447,9 +447,9 @@
             "x": [
               2.5,
               1,
-              7,
+              6.5,
               4,
-              2.5
+              2
             ],
             "y": [
               0.90000000000000036,
@@ -461,9 +461,9 @@
             "text": [
               "Count:  5<br />Species: EGY",
               "Count:  2<br />Species: MNE",
-              "Count: 14<br />Species: PBE",
+              "Count: 13<br />Species: PBE",
               "Count:  8<br />Species: TRA",
-              "Count:  5<br />Species: VTA"
+              "Count:  4<br />Species: VTA"
             ],
             "type": "bar",
             "textposition": "none",
@@ -515,8 +515,8 @@
             "type": "linear",
             "autorange": false,
             "range": [
-              -0.70000000000000007,
-              14.699999999999999
+              -0.65000000000000002,
+              13.65
             ],
             "tickmode": "array",
             "ticktext": [

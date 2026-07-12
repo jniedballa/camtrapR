@@ -91,7 +91,7 @@ camop_simple <- cameraOperation(camera_data_simple$camtraps,
                                 setupCol = "Setup_date",
                                 retrievalCol = "Retrieval_date")
 
-camtrapR:::camopPlot(camop_simple)
+plot(camop_simple)
 
 
 
@@ -124,8 +124,10 @@ camop_complex <- cameraOperation(camera_data_complex$camtraps,
                                  allCamsOn = FALSE,
                                  camerasIndependent = FALSE,   # this is made up, not simulated
                                  dateFormat = "ymd HMS")
+                                 
+summary(camop_complex)
 
-camtrapR:::camopPlot(camop_complex)
+plot(camop_complex)
 }
 \author{
 Juergen Niedballa

@@ -348,6 +348,7 @@ test_that("Error when camOp is not a matrix", {
 test_that("Error when NAs/blanks in DateTimeOriginal", {
   recordTableSample_withNA <- recordTableSample_with_blank <- recordTableSample
   recordTableSample_withNA$DateTimeOriginal[1] <- NA
+  recordTableSample_with_blank$DateTimeOriginal <- as.character(recordTableSample_with_blank$DateTimeOriginal)
   recordTableSample_with_blank$DateTimeOriginal[1] <- ""
   
   expect_error(detectionHistory(recordTable          = recordTableSample_withNA,
@@ -422,7 +423,7 @@ camop_no_problem_frac <- cameraOperation(CTtable      = camtraps_hrs,
 recordTableSample_extra <- recordTableSample_extra2 <- recordTableSample[5,]
 recordTableSample_extra$DateTimeOriginal  <- "2009-04-02 05:07:00"  # on first day / StationA
 recordTableSample_extra2$DateTimeOriginal <- "2009-05-14 05:07:00"  # on last day / StationA
-
+recordTableSample$DateTimeOriginal <- as.character(recordTableSample$DateTimeOriginal)
 
 recordTableSample2 <- rbind(recordTableSample_extra, recordTableSample, recordTableSample_extra2)
 

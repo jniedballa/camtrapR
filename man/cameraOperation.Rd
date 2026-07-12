@@ -80,7 +80,7 @@ begin occasions. Replaces \code{occasionStartTime} from
 \item{outDir}{character. Directory into which csv is saved}
 }
 \value{
-A matrix. Row names always indicate Station IDs. If
+A matrix of class "camOp". Row names always indicate Station IDs. If
 \code{sessionCol} and/or \code{cameraCol} are defined, they are contained in
 the row names also (camera ID only if \code{byCamera = TRUE}). Column names
 are dates. \cr Legend: NA: camera(s) not set up, 0: camera(s) not
@@ -93,7 +93,7 @@ Construct a matrix of daily camera trap station operation for use in
 \code{\link{detectionHistory}} and \code{\link{spatialDetectionHistory}},
 where it is needed for calculating trapping effort per occasion. It is also
 used in \code{\link{surveyReport}} to calculate the number of trap nights
-durig a survey. If several cameras were deployed per station, the matrix can
+during a survey. If several cameras were deployed per station, the matrix can
 contain camera- or station-specific trap operation information, or
 information about sessions during repeated surveys.
 }
@@ -117,7 +117,7 @@ specify the exact time cameras were set up / retrieved / malfunctioned /
 worked again. This information is used to calculate the daily trapping
 effort more precisely on days with incomplete effort.
 
-Previously, setup and retrival day were counted as 1, indicating a whole day
+Previously, setup and retrieval day were counted as 1, indicating a whole day
 of effort on those days. Since version 2.1, setup and retrieval are assumed
 to have happened at 12 noon (resulting in daily effort of 0.5 instead of 1).
 Users can also specify the exact time cameras were set up (by providing a
@@ -191,6 +191,10 @@ camop_no_problem <- cameraOperation(CTtable      = camtraps,
                                     hasProblems  = FALSE,
                                     dateFormat   = "dmy"
 )
+camop_no_problem
+summary(camop_no_problem)
+
+plot(camop_no_problem)
 
 # with problems/malfunction
 camop_problem <- cameraOperation(CTtable      = camtraps,
@@ -201,6 +205,8 @@ camop_problem <- cameraOperation(CTtable      = camtraps,
                                  hasProblems  = TRUE,
                                  dateFormat   = "dmy"
 )
+camop_problem
+summary(camop_problem)
 
 # The examples above specified dateFormat using lubdridate package, which is more intuitive. 
 # Alternatively one can used in base-R date conversions (strptime) as below:
@@ -215,9 +221,8 @@ camop_problem_oldformat <- cameraOperation(CTtable      = camtraps,
                                            dateFormat   = "\%d/\%m/\%Y"
 )
 
-camop_no_problem
-camop_problem
 camop_problem_oldformat
+summary(camop_problem_oldformat)
 
 }
 \author{
