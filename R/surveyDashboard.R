@@ -7979,6 +7979,8 @@ surveyDashboard <- function(CTtable = NULL,
       # detection_hist() returns a list with [[1]] = detection matrix, [[2]] = effort matrix
       tryCatch({
         sitecovs_umf <- st_drop_geometry(data$aggregated_CTtable)
+        #NOTE: unmarkedFrameOccu fails when passing "cams" object (even though it inherits from data.frame). Coerce for now.
+        if("cams" %in% class(sitecovs_umf)) {sitecovs_umf <- as.data.frame(sitecovs_umf)}
         
         unmarked::unmarkedFrameOccu(
           y = detection_hist()[[1]],          # Detection/non-detection matrix
