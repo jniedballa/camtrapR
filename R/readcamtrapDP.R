@@ -143,9 +143,9 @@ readcamtrapDP <- function(
     stop("The 'camtrapdp' package is required. Please install it using install.packages('camtrapdp').")
   }
   
-  # ---------------------------------------------------------
-  # ARGUMENT HANDLING & DATA INGESTION
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  # ARGUMENT HANDLING & DATA INGESTION   ----
+  # --------------------------------------------------------- #
   
   # Handle legacy arguments to ensure backwards compatibility with older camtrapR scripts
   if (!is.null(datapackage_file)) {
@@ -174,9 +174,9 @@ readcamtrapDP <- function(
   metadata <- unclass(dp)
   metadata$data <- NULL
   
-  # ---------------------------------------------------------
-  # ROBUST COLUMN MAPPING
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  #  COLUMN MAPPING   ----
+  # --------------------------------------------------------- #
   # The Camtrap DP standard specifies that certain columns are optional. 
   # camtrapR expects specific identifiers to group deployments (stations) and cameras.
   
@@ -220,9 +220,9 @@ readcamtrapDP <- function(
     deployments$deploymentEnd <- as.POSIXct(deployments$deploymentEnd, format="%Y-%m-%dT%H:%M:%S", tz="UTC")
   }
   
-  # ---------------------------------------------------------
-  # TAG PARSING
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  # TAG PARSING ----
+  # --------------------------------------------------------- #
   # Camtrap DP allows pipe-separated tags (e.g., "bait:meat | setup:tree"). 
   # We expand these into wide format boolean/value columns.
   
@@ -241,9 +241,9 @@ readcamtrapDP <- function(
     if (ncol(obs_tag_columns) > 0) observations <- cbind(observations, obs_tag_columns)
   }
   
-  # ---------------------------------------------------------
-  # PHASE 1: GENERATE CTtable (Deployment summary)
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  # PHASE 1: GENERATE CTtable (Deployment summary)   ----
+  # ---------------------------------------------------------  #
   
   stations <- unique(deployments[[station_id_col]])
   ctTable <- data.frame(stringsAsFactors = FALSE)
@@ -324,9 +324,9 @@ readcamtrapDP <- function(
     }
   }
   
-  # ---------------------------------------------------------
-  # PHASE 2: GENERATE recordTable (Observations summary)
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  # PHASE 2: GENERATE recordTable (Observations summary) ----
+  # --------------------------------------------------------- #
   
   recordTable <- observations
   
@@ -364,9 +364,9 @@ readcamtrapDP <- function(
     }
   }
   
-  # ---------------------------------------------------------
-  # PHASE 3: TAXONOMY PROCESSING
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  # PHASE 3: TAXONOMY PROCESSING   ----
+  # --------------------------------------------------------- #
   # camtrapdp already joined taxonomic metadata, prefixing them with 'taxon.'
   # rename these columns for camtrapR compatibility (e.g. taxon.vernacularNames.en -> vernacularName_en)
   colnames(recordTable) <- gsub("^taxon\\.vernacularNames\\.", "vernacularName_", colnames(recordTable))
@@ -395,9 +395,9 @@ readcamtrapDP <- function(
     }
   }
   
-  # ---------------------------------------------------------
-  # PHASE 4: FINAL CLEANUP & REORDERING
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  # PHASE 4: FINAL CLEANUP & REORDERING  ----
+  # --------------------------------------------------------- #
   
   # Drop completely uninformative columns if requested
   if (removeNA) {
@@ -434,9 +434,9 @@ readcamtrapDP <- function(
   out
 }
 
-# ---------------------------------------------------------
-# HELPER FUNCTIONS
-# ---------------------------------------------------------
+# --------------------------------------------------------- #
+# HELPER FUNCTIONS  ----
+# --------------------------------------------------------- #
 
 # Reorders the deployment table columns logically (locations first, then dates, problems, coordinates, tags, etc.)
 reorder_deployment_columns <- function(df) {

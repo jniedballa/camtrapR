@@ -121,9 +121,9 @@ simulateCamtrapData <- function(nStations = 10,
                                 
 ) {
   
-  # ---------------------------------------------------------
-  # 0. HELPER: Translate Lubridate string to base R format
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  # 0. HELPER: Translate Lubridate string to base R format  ----
+  # --------------------------------------------------------- #
   translate_format <- function(fmt) {
     f <- tolower(fmt)
     f <- gsub("ymd", "%Y-%m-%d", f)
@@ -141,9 +141,9 @@ simulateCamtrapData <- function(nStations = 10,
   # Extract just the date part for the 'Problem' columns
   fmt_date <- trimws(gsub("%H:%M:%S|%H:%M", "", fmt_full))
   
-  # ---------------------------------------------------------
-  # 1. SETUP CAMTRAP (STATION) METADATA
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  # 1. SETUP CAMTRAP (STATION) METADATA   ----
+  # --------------------------------------------------------- #
   stations <- sprintf("Station%03d", 1:nStations)
   
   if (camerasPerStation == 2) {
@@ -245,9 +245,9 @@ simulateCamtrapData <- function(nStations = 10,
   
   
   
-  # ---------------------------------------------------------
-  # 2. SETUP RECORD TABLE
-  # ---------------------------------------------------------
+  # --------------------------------------------------------- #
+  # 2. SETUP RECORD TABLE  ----
+  # --------------------------------------------------------- #
   species_pool <- sprintf("Sp_%02d", 1:nSpecies)
   species_probs <- 1 / (1:nSpecies)
   
