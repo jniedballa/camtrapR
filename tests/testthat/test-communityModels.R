@@ -207,8 +207,8 @@ local({
     
     # 1. Fit the model
     
-    fit.jags    <- fit(mod.jags, n.iter = 100, n.burnin = 50, chains = 3)
-    fit.jags_RN <- fit(mod.jags_RN, n.iter = 100, n.burnin = 50, chains = 3)
+    fit.jags    <- quiet(fit(mod.jags, n.iter = 100, n.burnin = 50, chains = 3))
+    fit.jags_RN <- quiet(fit(mod.jags_RN, n.iter = 100, n.burnin = 50, chains = 3))
     
     
     
@@ -436,7 +436,7 @@ local({
     
     # check that nimble models can be fit
     
-    fit.nimble1 <- fit(mod.jags_fixed_nimble, n.iter = 100, n.burnin = 50, chains = 3)
+    fit.nimble1 <- quiet(fit(mod.jags_fixed_nimble, n.iter = 100, n.burnin = 50, chains = 3))
     
     expect_s3_class(fit.nimble1, "mcmc.list")
   })
@@ -452,11 +452,11 @@ local({
     mod.jags_ranef@data$effort_categ <- NULL
     
     # first fit the models above
-    fit.mod.jags.fixed <- fit(mod.jags_fixed, n.iter = 100, n.burnin = 50, chains = 3)
-    fit.mod.jags.ranef <- fit(mod.jags_ranef, n.iter = 100, n.burnin = 50, chains = 3)
-    fit.mod.jags.indep <- fit(mod.jags_indep, n.iter = 100, n.burnin = 50, chains = 3)
-    fit.mod.jags.quad1 <- fit(mod.jags_quad1, n.iter = 100, n.burnin = 50, chains = 3)
-    fit.mod.jags.quad2 <- fit(mod.jags_quad2, n.iter = 100, n.burnin = 50, chains = 3)
+    fit.mod.jags.fixed <- quiet(fit(mod.jags_fixed, n.iter = 100, n.burnin = 50, chains = 3))
+    fit.mod.jags.ranef <- quiet(fit(mod.jags_ranef, n.iter = 100, n.burnin = 50, chains = 3))
+    fit.mod.jags.indep <- quiet(fit(mod.jags_indep, n.iter = 100, n.burnin = 50, chains = 3))
+    fit.mod.jags.quad1 <- quiet(fit(mod.jags_quad1, n.iter = 100, n.burnin = 50, chains = 3))
+    fit.mod.jags.quad2 <- quiet(fit(mod.jags_quad2, n.iter = 100, n.burnin = 50, chains = 3))
     
     
     #  plot

@@ -1093,7 +1093,7 @@ calculateTrappingEffort <- function(cam.op,
 
 
 
-##########################################################################################################
+# ------
 # for function surveyReport
 
 makeSurveyZip <- function(output,
@@ -2553,6 +2553,14 @@ stripClass <- function(x) {
     }
   }
   x
+}
+
+
+# Helper to suppress cat() output but return the evaluated expression's value
+quiet <- function(expr) {
+  sink(nullfile())
+  on.exit(sink())
+  eval.parent(substitute(expr))
 }
 
 
