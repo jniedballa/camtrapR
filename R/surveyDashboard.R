@@ -3221,6 +3221,15 @@ surveyDashboard <- function(CTtable = NULL,
         }
       }
       
+      # ensure user actually defined crs
+      if(is.null(data$crs)) {
+        showModal(modalDialog(
+          title = "Input Error",
+          "CRS undefined. Please define the coordinate system X and Y coordinate columns use.",
+          easyClose = TRUE
+        ))
+      }
+      
 
       data$CTtable <- data$CTtable_temp
       data$stationCol <- input$stationCol
