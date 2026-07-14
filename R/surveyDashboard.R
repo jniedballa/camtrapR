@@ -10400,6 +10400,9 @@ surveyDashboard <- function(CTtable = NULL,
     ##                        auto-popups until a new dataset is loaded).
     ## acknowledge = FALSE -> footer is "Close"; used by sidebar review buttons.
     showWarningModal <- function(warnings, acknowledge = TRUE) {
+      # Strip out any NULL elements just in case
+      warnings <- warnings[!sapply(warnings, is.null)]
+      
       if (length(warnings) == 0) return(invisible(NULL))
       
       if (acknowledge) {
@@ -10604,15 +10607,15 @@ surveyDashboard <- function(CTtable = NULL,
       active_tab <- input$tabs
 
       if (active_tab == "DetectionHistory") {
-        ws <- filter_unacknowledged(list(warn_station_sample_size()))
+        ws <- filter_unacknowledged(collect_warnings(warn_station_sample_size()))
         if (length(ws) > 0) showWarningModal(ws)
 
       } else if (active_tab == "CommunityOccupancy") {
-        ws <- filter_unacknowledged(list(warn_station_sample_size()))
+        ws <- filter_unacknowledged(collect_warnings(warn_station_sample_size()))
         if (length(ws) > 0) showWarningModal(ws)
 
       } else if (active_tab == "Occupancy") {
-        ws <- filter_unacknowledged(list(warn_low_detections_single()))
+        ws <- filter_unacknowledged(collect_warnings(warn_low_detections_single()))
         if (length(ws) > 0) showWarningModal(ws)
       }
     }, ignoreInit = TRUE)
