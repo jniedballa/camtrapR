@@ -16,3 +16,4 @@ subset-assignment use cases.}
 This function is called internally by dplyr. It prevents the propagation of
 attributes dependent on columns when such columns are filtered out.
 }
+\keyword{internal}

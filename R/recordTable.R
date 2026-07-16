@@ -723,6 +723,7 @@ print.records <- function(x, ...) {
 #' attributes dependent on columns when such columns are filtered out.
 #' 
 #' @export
+#' @keywords internal
 #' @inheritParams dplyr::dplyr_reconstruct
 #' @importFrom dplyr dplyr_reconstruct
 dplyr_reconstruct.records <- function(data, template) {
