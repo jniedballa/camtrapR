@@ -723,7 +723,7 @@ plot_coef_commOccu <- function(object,
     if(!combine){
       
       
-      p_list[[cov]] <- ggplot (df_quantiles_i, aes(y = .data[["species"]], x = .data[["median"]], color = color_by))
+      p_list[[cov]] <- ggplot (df_quantiles_i, aes(y = .data[["species"]], x = .data[["median"]], color = .data[[color_by]]))
         
         if(community_lines) {
         # community effect
@@ -838,7 +838,7 @@ plot_coef_commOccu <- function(object,
   
   #' Plot effect sizes of covariates in community occupancy model
   #' 
-  #' Plot effect sizes for all species in a community (multi-species) occupancy model. Currently only supports continuous covariates, not categorical covariates.
+  #' Plot effect sizes for all species in a community occupancy model. Currently only supports continuous covariates, not categorical covariates.
   #'
   #' @aliases plot_coef
   #' @param object \code{commOccu} object
