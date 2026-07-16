@@ -56,7 +56,7 @@ reference:
       - '`communityModel`'
       - '`surveyDashboard`'
   - title: Community occupancy models
-    desc: Functions to create, fit and analyse community (multi-species) occupancy models
+    desc: Functions to create, fit and analyse community occupancy models
     contents: 
       - '`communityModel`'
       - '`commOccu-class`'

@@ -2,7 +2,7 @@
 #' 
 #' This function generates species detection histories that can be used in
 #' single-species occupancy analyses with packages \link[unmarked:unmarked-package]{unmarked} 
-#' and \pkg{ubms}, as well as multi-species/community occupancy models via 
+#' and \pkg{ubms}, as well as community occupancy models via 
 #' \code{\link{communityModel}}. It generates detection histories in different formats, 
 #' with adjustable occasion length and occasion start time.
 #'  

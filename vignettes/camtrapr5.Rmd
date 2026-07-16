@@ -1,5 +1,5 @@
 ---
-title: "5. Multi-species occupancy models"
+title: "5. Community occupancy models"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output:
@@ -10,7 +10,7 @@ output:
       df_print: kable
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{5. Multi-species occupancy models}
+  %\VignetteIndexEntry{5. Community occupancy models}
   %\VignetteDepends{terra, sf}
   \usepackage[utf8]{inputenc}
 ---
@@ -707,9 +707,9 @@ model1_nimble_na <- communityModel(
   nimble = T)
 ```
 
-When fitting the model there will be numerous warnings about values of data nodes y[,,] and determinisitc nodes res[,], R2[] and R3 being NA (not shown here).
+When fitting the model there will be numerous warnings about values of data nodes y[,,] and determinisitc nodes res[,], R2[] and R3 being NA (not shown here). In recent versions of Nimble it causes an error because of partly observed nodes.
 
-```{r results="hide"}
+```{r results="hide", eval = F}
 out_ahm_nimble_na <- fit(model1_nimble_na, 
                     n.iter = 5000, 
                     n.burnin = 2500,

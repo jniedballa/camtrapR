@@ -1,5 +1,5 @@
 
-#' Create a community (multi-species) occupancy model for JAGS or Nimble
+#' Create a community occupancy model for JAGS or Nimble
 #' 
 #' @description 
 #' Flexibly creates complete code and input data for community occupancy models for JAGS amd Nimble (both standard occupancy models and Royle-Nichols occupancy models), and automatically sets initial values and parameters to monitor. 
@@ -34,7 +34,7 @@
 #'
 #'
 #' @details
-#' For examples of implementation, see Vignette 5: Multi-species occupancy models.
+#' For examples of implementation, see Vignette 5: Community occupancy models.
 #' 
 #' Fixed effects of covariates are constant across species, whereas random effect covariates differ between species. Independent effect differ between species and are independent (there is no underlying hyperdistribution).
 #' Fixed, independent and random effects are allowed for station-level detection and occupancy covariates (a.k.a. site covariates). Fixed and random effects are also allowed for station-occasion level covariates (a.k.a. observation covariates). 
@@ -414,6 +414,11 @@ communityModel <- function(data_list,
   # define prior distributions to be used throughout (maybe make it an argument later)
   prior_list <- list(dnorm = "dnorm(0, 0.05)",
                      dgamma = "dgamma(0.1, 0.1)")
+  # TODO: change to uniform(0,1) or beta(1,1) priors directly on probabilities, which are then converted to the logit scale to serve as means for the community distributions. 
+  # As an example code snippet:
+  # p.mean~dbeta(1,1)
+  # alpha0.mu<-ilogit(p.mean)
+  # alpha0[i]~dnorm(alpha0.mu, sd.alpha)
   
   # define inits
   inits_list <- list(
@@ -2089,7 +2094,7 @@ fit.commOccu <- function(object,
 setGeneric("fit", function(object, ...){})
 
 
-#' Fit a community (multi-species) occupancy model
+#' Fit a community occupancy model
 #'
 #' Convenience function for fitting community occupancy models (defined in a commOccu object) in JAGS or Nimble.
 #'

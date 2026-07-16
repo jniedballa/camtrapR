@@ -9445,7 +9445,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
-    # Tab: Multi-species occupancy   ----
+    # Tab: Community occupancy   ----
     
     
     ### Functions to prepare covariates and prediction raster ----

@@ -98,7 +98,7 @@ The camtrapR workflow consists of a series of functions that build upon one anot
 1. `cameraOperation`
 1. `detectionHistory` (for occupancy analyses)
 1. `spatialDetectionHistory	` (for spatial capture-recapture analyses)
-1. `communityModel` (for multi-species occupancy models)
+1. `communityModel` (for community occupancy models)
 
 
 ## General sampling situation
