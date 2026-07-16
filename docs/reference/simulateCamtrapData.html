@@ -20,7 +20,7 @@ package functionality."><!-- mathjax --><script src="https://cdnjs.cloudflare.co
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.7</span>
       </span>
     </div>
 
@@ -47,7 +47,7 @@ package functionality."><!-- mathjax --><script src="https://cdnjs.cloudflare.co
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
     <li>
-      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
+      <a href="../articles/camtrapr5.html">5. Community occupancy models</a>
     </li>
     <li>
       <a href="../articles/camtrapr6.html">6. Sample camera trap datasets and the `surveyDashboard`</a>
@@ -202,27 +202,33 @@ of an AI language model and subsequently modified.</p>
 <span class="r-in"><span>                                setupCol <span class="op">=</span> <span class="st">"Setup_date"</span>,</span></span>
 <span class="r-in"><span>                                retrievalCol <span class="op">=</span> <span class="st">"Retrieval_date"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">camtrapR</span><span class="fu">:::</span><span class="fu">camopPlot</span><span class="op">(</span><span class="va">camop_simple</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">camop_simple</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="simulateCamtrapData-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">camera_data_simple</span><span class="op">$</span><span class="va">camtraps</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Station longitude latitude Setup_date Retrieval_date   elev   habitat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Station001  117.2702  5.47492 2022-12-30     2023-02-06 1187.1 habitat_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Station002  117.4586  5.33499 2023-01-02     2023-02-09 1035.3 habitat_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Station003  117.4002  5.30685 2023-01-02     2023-02-10 1048.7 habitat_1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Station004  117.2893  5.36408 2022-12-30     2023-02-08 1324.7 habitat_3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 Station005  117.2519  5.38047 2023-01-03     2023-02-12 1022.4 habitat_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Station006  117.3666  5.33913 2023-01-02     2023-02-11  973.2 habitat_2</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">camera_data_simple</span><span class="op">$</span><span class="va">recordTable</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Station Species    DateTimeOriginal       Date     Time</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Station001   Sp_01 2022-12-31 21:43:55 2022-12-31 21:43:55</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Station001   Sp_01 2023-01-02 09:10:09 2023-01-02 09:10:09</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Station001   Sp_01 2023-01-02 14:47:08 2023-01-02 14:47:08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Station001   Sp_06 2023-01-05 21:57:05 2023-01-05 21:57:05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 Station001   Sp_01 2023-01-06 13:33:55 2023-01-06 13:33:55</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Station001   Sp_01 2023-01-07 13:58:01 2023-01-07 13:58:01</span>
+<span class="r-in"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">camera_data_simple</span><span class="op">$</span><span class="va">camtraps</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Camera table</span> with <span style="color: #0000BB;">6</span> stations in <span style="color: #0000BB;">6</span> rows:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Station    longitude latitude Setup_date Retrieval_date  elev habitat  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Station001      117.     5.47 2022-12-30 2023-02-06     <span style="text-decoration: underline;">1</span>187. habitat_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Station002      117.     5.33 2023-01-02 2023-02-09     <span style="text-decoration: underline;">1</span>035. habitat_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Station003      117.     5.31 2023-01-02 2023-02-10     <span style="text-decoration: underline;">1</span>049. habitat_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Station004      117.     5.36 2022-12-30 2023-02-08     <span style="text-decoration: underline;">1</span>325. habitat_3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Station005      117.     5.38 2023-01-03 2023-02-12     <span style="text-decoration: underline;">1</span>022. habitat_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Station006      117.     5.34 2023-01-02 2023-02-11      973. habitat_2</span>
+<span class="r-in"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">camera_data_simple</span><span class="op">$</span><span class="va">recordTable</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Record table</span> based on <span style="color: #0000BB;">1</span> station and <span style="color: #0000BB;">6</span> records of a total of <span style="color: #0000BB;">2</span> species:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Station    Species DateTimeOriginal    Date       Time    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Station001 Sp_01   2022-12-31 21:43:55 2022-12-31 21:43:55</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Station001 Sp_01   2023-01-02 09:10:09 2023-01-02 09:10:09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Station001 Sp_01   2023-01-02 14:47:08 2023-01-02 14:47:08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Station001 Sp_06   2023-01-05 21:57:05 2023-01-05 21:57:05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Station001 Sp_01   2023-01-06 13:33:55 2023-01-06 13:33:55</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Station001 Sp_01   2023-01-07 13:58:01 2023-01-07 13:58:01</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
@@ -250,8 +256,50 @@ of an AI language model and subsequently modified.</p>
 <span class="r-in"><span>                                 allCamsOn <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>                                 camerasIndependent <span class="op">=</span> <span class="cn">FALSE</span>,   <span class="co"># this is made up, not simulated</span></span></span>
 <span class="r-in"><span>                                 dateFormat <span class="op">=</span> <span class="st">"ymd HMS"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                                 </span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">camop_complex</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> === Camera Trap Station Operation Summary ===</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SURVEY SPECIFICATION</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Station column:    Station</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Session column:    Season</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Setup column:      Setup_date</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Retrieval column:  Retrieval_date</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PERIOD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   From: 2022-12-29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   To:   2023-08-13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> DIMENSIONS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Stations: 10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Sessions: 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Days:     228</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> EFFORT</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Active days:            94 out of 228 days (at least 1 station active)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Active trap-days:       739.9 (sum of effort across all stations and days)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Problem trap-days:      4 (0.1% of 4560 station-days)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Not set up trap-days:   3738 (82.0% of 4560 station-days)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> STATION-LEVEL SUMMARY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station      Session   Monitored   Active   Problem  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     -----------------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station001   1         42          37.4     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station002   1         43          37.7     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station003   1         40          36.6     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station004   1         41          39.3     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station005   1         40          37.8     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station006   1         42          35.4     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station007   1         40          35.4     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station008   1         41          39.6     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station009   1         41          36.3     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Station010   1         39          33.7     0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">  ... 10 more row(s) not shown (use `summary(nStationsMax = ...)` to see more)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">camtrapR</span><span class="fu">:::</span><span class="fu">camopPlot</span><span class="op">(</span><span class="va">camop_complex</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">camop_complex</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="simulateCamtrapData-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
@@ -267,7 +315,7 @@ of an AI language model and subsequently modified.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>
