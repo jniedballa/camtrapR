@@ -3730,8 +3730,10 @@ surveyDashboard <- function(CTtable = NULL,
       output$camtrapdp_preview_observations <- DT::renderDT(NULL)
       output$camtrapdp_project_info <- renderUI(NULL)
       active_filters(list())
-      filter_state <- reactiveVal(list(camera_trap = NULL, temporal = NULL, species = NULL))
-
+      filter_state (list(camera_trap = NULL, 
+                         temporal = NULL, 
+                         species = NULL))
+      
       
       # Validate directory exists
       if (!dir.exists(input$camtrapdp_directory)) {
@@ -3890,6 +3892,8 @@ surveyDashboard <- function(CTtable = NULL,
             recordTable = data$recordTable,
             aggregated_CTtable = data$aggregated_CTtable
           ))
+          
+          original_record_table(data$recordTable)
           
           update_species_inputs()
           
