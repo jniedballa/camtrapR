@@ -4232,14 +4232,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
 
-    df_covariates <- observe({
-      req(data$CTtable_aggregated, camop())
-      stopifnot(rownames(camop()) == data$CTtable_aggregated[, data$stationCol])
-      data$CTtable_aggregated
-    })
-    
-    
-    
+
     # remove excluded records (silently at the moment)
 
     num_images_excluded <- shiny::reactiveVal(0)
