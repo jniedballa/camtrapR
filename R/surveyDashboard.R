@@ -4329,7 +4329,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     output$num_images_removed <- shinydashboard::renderValueBox({
       shinydashboard::valueBox(
-        value = data$num_images_excluded(),
+        value = num_images_excluded(),
         subtitle = "Images",
         icon = shiny::icon("user-minus")
       )
