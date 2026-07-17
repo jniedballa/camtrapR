@@ -3610,6 +3610,7 @@ surveyDashboard <- function(CTtable = NULL,
         # extent <- metadata$spatial$bbox
       # } else {
         extent <- sf::st_bbox(data$CTtable_sf)
+        extent <- round(extent, 3)
       # }
       spatial_coverage <- sprintf("Lon: %s to %s, Lat: %s to %s",
                                   extent[1], extent[3], extent[2], extent[4])
