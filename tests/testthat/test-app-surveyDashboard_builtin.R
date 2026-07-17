@@ -151,8 +151,6 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_covariate_extraction_
   app$set_inputs(elevationZoom = "9")
   app$set_inputs(terrainMeasures = c("slope", "TRI", "TPI"))
   app$click("run_covariate_extraction")
-  app$set_inputs(rasterBand = "slope")
-  app$set_inputs(rasterBand = "TRI")
   app$set_inputs(colorPalette = "Plasma")
   app$set_inputs(rasterBand = "TPI")
   app$set_inputs(predictionRasterBand = "TRI")
