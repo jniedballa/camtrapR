@@ -1411,6 +1411,7 @@ surveyDashboard <- function(CTtable = NULL,
             shinydashboard::box(
               title = "Filtered Records Preview", 
               solidHeader = TRUE, width = 12, status = "info",
+              collapsible = TRUE, collapsed = TRUE,
               DT::dataTableOutput("filteredRecordTable")
             )
           )
