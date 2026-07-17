@@ -2810,6 +2810,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # # store the original record table
     original_record_table <- reactiveVal(NULL)
+    # NOTE: What's the point of this if we have original_data$recordTable? Can likely be removed / use original_data instead.
     # 
     # # Initialize filtered data reactive value
     filtered_data <- reactiveVal(NULL)
@@ -4262,7 +4263,9 @@ surveyDashboard <- function(CTtable = NULL,
     }, label = "remove excluded species")
     # NOTE: species removed by exclude are shown in species filter in UI, but cannot be brought back from there. Might be a bit confusing
     # NOTE:: Bug: Trying to bring the species back from the filter UI removes all records.
-    # Maybe just remove the exclude argument and do all filtering in the app
+    # Maybe just remove the exclude argument to the function and do all filtering in the app
+    # also there is data$exclude. It should probably combine "exclude" from surveyDashboard() and data$exclude (from UI)
+    # otherwise this here only filters based on UI input.
     
     
     # Tab: Data summary ----
