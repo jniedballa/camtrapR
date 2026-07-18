@@ -357,9 +357,6 @@ surveyDashboard <- function(CTtable = NULL,
   
 
   
-  # Create flag indicating if data was provided via parameters
-  has_params <- !is.null(CTtable) && !is.null(recordTable)
-  
   # Helper function for standard tooltips in the dashboard
   add_tooltip <- function(id, 
                           title, 
@@ -5087,7 +5084,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       orig_species <- length(unique(original_record_table()[[data$speciesCol]]))
       current_species <- length(unique(data$recordTable[[data$speciesCol]]))
-      removed_species <- orig_species - current_species
+      # removed_species <- orig_species - current_species
       
       # Get actual list of filtered species by comparing original and current sets
       original_species_set <- unique(original_record_table()[[data$speciesCol]])
@@ -5943,14 +5940,14 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Create species summary table for filtering
     species_summary_for_filter <- reactive({
-      # Add explicit dependencies on key data changes
-      data_key <- list(
-        record_table_rows = if (!is.null(data$recordTable)) nrow(data$recordTable) else 0,
-        species_col = data$speciesCol,
-        station_col = data$stationCol #,
-        # original_table_id = if (!is.null(original_record_table())) digest::digest(head(original_record_table(), 5)) else NULL
-      )
-      
+      # # Add explicit dependencies on key data changes
+      # data_key <- list(
+      #   record_table_rows = if (!is.null(data$recordTable)) nrow(data$recordTable) else 0,
+      #   species_col = data$speciesCol,
+      #   station_col = data$stationCol #,
+      #   # original_table_id = if (!is.null(original_record_table())) digest::digest(head(original_record_table(), 5)) else NULL
+      # )
+      # 
       # Validate inputs more strictly
       shiny::validate(
         shiny::need(!is.null(data$recordTable) && nrow(data$recordTable) > 0, "No record data available"),
@@ -6408,7 +6405,7 @@ surveyDashboard <- function(CTtable = NULL,
 
       # Find which raster object and band correspond to the selection
       selected_raster <- NULL
-      raster_display_name <- selected_input # Default display name
+      # raster_display_name <- selected_input # Default display name
 
       for (raster_name in names(data$original_rasters)) {
          raster_obj <- data$original_rasters[[raster_name]]
@@ -6563,97 +6560,97 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Tab: Elevation & terrain data ----
     
-    ask_to_debug <- function() {
-      response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
-      if (tolower(response) == "y" || tolower(response) == "yes") {
-        message("Entering browser mode...")
-        browser()
-      } else {
-        message("Continuing execution...")
-      }
-    }
+    # ask_to_debug <- function() {
+    #   response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
+    #   if (tolower(response) == "y" || tolower(response) == "yes") {
+    #     message("Entering browser mode...")
+    #     browser()
+    #   } else {
+    #     message("Continuing execution...")
+    #   }
+    # }
     
     # Helper function to clip/mask prediction rasters
-    clip_prediction_rasters <- function(rasters, prediction_extent) {
-      if (is.null(prediction_extent) || !inherits(prediction_extent, "sf")) return(rasters)
-      if (!inherits(rasters, "SpatRaster")) return(rasters)
-      
-      response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
-      if (tolower(response) == "y" || tolower(response) == "yes") {
-        message("Entering browser mode...")
-        browser()
-      }
-      
-      tryCatch({
-        # Ensure prediction_extent is valid
-        prediction_extent <- sf::st_make_valid(prediction_extent)
-        if (!sf::st_is_valid(prediction_extent)) {
-          warning("Prediction extent geometry is invalid after st_make_valid.")
-          return(rasters) # Return original if extent is invalid
-        }
-        
-        # Get CRS information
-        raster_crs_str <- terra::crs(rasters, proj = TRUE)
-        extent_crs <- sf::st_crs(prediction_extent)
-        
-        # Transform prediction_extent to match raster CRS *if* they are different
-        extent_transformed_sf <- if (raster_crs_str != extent_crs$proj4string) {
-          sf::st_transform(prediction_extent, raster_crs_str)
-        } else {
-          prediction_extent
-        }
-        
-        # Check validity again after potential transformation
-        if (!sf::st_is_valid(extent_transformed_sf)) {
-          warning("Prediction extent geometry became invalid after transformation.")
-          extent_transformed_sf <- sf::st_make_valid(extent_transformed_sf)
-          if (!sf::st_is_valid(extent_transformed_sf)){
-            warning("Could not repair transformed prediction extent geometry.")
-            return(rasters)
-          }
-        }
-        
-        # Convert sf object to terra SpatVector
-        extent_vect <- terra::vect(extent_transformed_sf)
-        
-        # Check if extents overlap *after* transformation
-        # Create extents for comparison
-        raster_extent_obj <- terra::ext(rasters)
-        extent_vect_obj <- terra::ext(extent_vect)
-        
-        if (!terra::relate(raster_extent_obj, extent_vect_obj, "intersects")) {
-          warning("[clip_prediction_rasters] Extents do not overlap after transformation.")
-          return(rasters) # Return original if they don't overlap
-        }
-        
-        # First crop to the bounding box of the transformed extent for efficiency
-        rasters_cropped <- tryCatch(
-          terra::crop(rasters, extent_vect),
-          error = function(e) {
-            warning(paste("[clip_prediction_rasters] Cropping failed:", e$message))
-            return(NULL) # Indicate failure
-          }
-        )
-        
-        if (is.null(rasters_cropped)) return(rasters) # Return original if crop failed
-        
-        # Then mask using the actual polygon geometry
-        rasters_masked <- tryCatch(
-          terra::mask(rasters_cropped, extent_vect),
-          error = function(e) {
-            warning(paste("[clip_prediction_rasters] Masking failed:", e$message))
-            return(rasters_cropped) # Return cropped if mask failed
-          }
-        )
-        
-        
-        return(rasters_masked)
-        
-      }, error = function(e) {
-        warning(paste("Error during clip/mask operation:", e$message))
-        return(rasters) # Fallback to original rasters on any error
-      })
-    }
+    # clip_prediction_rasters <- function(rasters, prediction_extent) {
+    #   if (is.null(prediction_extent) || !inherits(prediction_extent, "sf")) return(rasters)
+    #   if (!inherits(rasters, "SpatRaster")) return(rasters)
+    #   
+    #   response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
+    #   if (tolower(response) == "y" || tolower(response) == "yes") {
+    #     message("Entering browser mode...")
+    #     browser()
+    #   }
+    #   
+    #   tryCatch({
+    #     # Ensure prediction_extent is valid
+    #     prediction_extent <- sf::st_make_valid(prediction_extent)
+    #     if (!sf::st_is_valid(prediction_extent)) {
+    #       warning("Prediction extent geometry is invalid after st_make_valid.")
+    #       return(rasters) # Return original if extent is invalid
+    #     }
+    #     
+    #     # Get CRS information
+    #     raster_crs_str <- terra::crs(rasters, proj = TRUE)
+    #     extent_crs <- sf::st_crs(prediction_extent)
+    #     
+    #     # Transform prediction_extent to match raster CRS *if* they are different
+    #     extent_transformed_sf <- if (raster_crs_str != extent_crs$proj4string) {
+    #       sf::st_transform(prediction_extent, raster_crs_str)
+    #     } else {
+    #       prediction_extent
+    #     }
+    #     
+    #     # Check validity again after potential transformation
+    #     if (!sf::st_is_valid(extent_transformed_sf)) {
+    #       warning("Prediction extent geometry became invalid after transformation.")
+    #       extent_transformed_sf <- sf::st_make_valid(extent_transformed_sf)
+    #       if (!sf::st_is_valid(extent_transformed_sf)){
+    #         warning("Could not repair transformed prediction extent geometry.")
+    #         return(rasters)
+    #       }
+    #     }
+    #     
+    #     # Convert sf object to terra SpatVector
+    #     extent_vect <- terra::vect(extent_transformed_sf)
+    #     
+    #     # Check if extents overlap *after* transformation
+    #     # Create extents for comparison
+    #     raster_extent_obj <- terra::ext(rasters)
+    #     extent_vect_obj <- terra::ext(extent_vect)
+    #     
+    #     if (!terra::relate(raster_extent_obj, extent_vect_obj, "intersects")) {
+    #       warning("[clip_prediction_rasters] Extents do not overlap after transformation.")
+    #       return(rasters) # Return original if they don't overlap
+    #     }
+    #     
+    #     # First crop to the bounding box of the transformed extent for efficiency
+    #     rasters_cropped <- tryCatch(
+    #       terra::crop(rasters, extent_vect),
+    #       error = function(e) {
+    #         warning(paste("[clip_prediction_rasters] Cropping failed:", e$message))
+    #         return(NULL) # Indicate failure
+    #       }
+    #     )
+    #     
+    #     if (is.null(rasters_cropped)) return(rasters) # Return original if crop failed
+    #     
+    #     # Then mask using the actual polygon geometry
+    #     rasters_masked <- tryCatch(
+    #       terra::mask(rasters_cropped, extent_vect),
+    #       error = function(e) {
+    #         warning(paste("[clip_prediction_rasters] Masking failed:", e$message))
+    #         return(rasters_cropped) # Return cropped if mask failed
+    #       }
+    #     )
+    #     
+    #     
+    #     return(rasters_masked)
+    #     
+    #   }, error = function(e) {
+    #     warning(paste("Error during clip/mask operation:", e$message))
+    #     return(rasters) # Fallback to original rasters on any error
+    #   })
+    # }
     
     
     
@@ -7167,8 +7164,8 @@ surveyDashboard <- function(CTtable = NULL,
            las = 2)
       
       # Add correlation values
-      for(i in 1:nrow(cor_matrix)) {
-        for(j in 1:ncol(cor_matrix)) {
+      for(i in seq_len(nrow(cor_matrix))) {
+        for(j in seq_len(ncol(cor_matrix))) {
           if(i != j) {  # Skip diagonal
             text(x = (j-1)/(ncol(cor_matrix)-1),
                  y = (nrow(cor_matrix)-i)/(nrow(cor_matrix)-1),
@@ -10022,18 +10019,20 @@ surveyDashboard <- function(CTtable = NULL,
     ### Plot responses
     
     
-    # Reactive values for plot settings
-    plot_settings <- reactiveValues(
-      submodel = "state",
-      response = "occupancy",
-      speciesSubset = NULL,
-      draws = 1000,
-      level = c(outer = 0.95, inner = 0.75),
-      ordered = TRUE,
-      combine = FALSE,
-      scales = "free_y",
-      community_lines = FALSE
-    )        # Create plot data with effect type handling
+    # # Reactive values for plot settings
+    # plot_settings <- reactiveValues(
+    #   submodel = "state",
+    #   response = "occupancy",
+    #   speciesSubset = NULL,
+    #   draws = 1000,
+    #   level = c(outer = 0.95, inner = 0.75),
+    #   ordered = TRUE,
+    #   combine = FALSE,
+    #   scales = "free_y",
+    #   community_lines = FALSE
+    # )       
+    
+    # Create plot data with effect type handling
         # plot_data <- createAdvancedEffectPlot(
         #   model = model,
         #   effect = effect,        # Create plot data with effect type handling
@@ -10792,18 +10791,18 @@ surveyDashboard <- function(CTtable = NULL,
         )
     })
     
-    # Helper function to get fill color based on p-value
-    get_fit_color <- function(bp) {
-      if(bp < 0.1 || bp > 0.9) {
-        "#ff6666"  # Red for lack of fit
-      } else if(bp >= 0.45 && bp <= 0.55) {
-        "#cceb99"  # Medium-light green for excellent fit
-      } else if(bp >= 0.35 && bp <= 0.65) {
-        "#d9f0b3"  # Light green for good fit
-      } else {
-        "#e6f5c9"  # Very light green for moderate fit
-      }
-    }
+    # # Helper function to get fill color based on p-value
+    # get_fit_color <- function(bp) {
+    #   if(bp < 0.1 || bp > 0.9) {
+    #     "#ff6666"  # Red for lack of fit
+    #   } else if(bp >= 0.45 && bp <= 0.55) {
+    #     "#cceb99"  # Medium-light green for excellent fit
+    #   } else if(bp >= 0.35 && bp <= 0.65) {
+    #     "#d9f0b3"  # Light green for good fit
+    #   } else {
+    #     "#e6f5c9"  # Very light green for moderate fit
+    #   }
+    # }
     
     # # Render residual plot
     output$gof_residual_plot <- renderPlot({
@@ -10896,14 +10895,14 @@ surveyDashboard <- function(CTtable = NULL,
       return(TRUE)
     }
     
-    # Get covariate raster based on user selection
-    get_covariate_raster <- function() {
-      if (input$prediction_raster_source == "extracted") {
-        return(data$prediction_raster)
-      } else {
-        return(terra::rast(input$covariate_raster$datapath))
-      }
-    }
+    # # Get covariate raster based on user selection
+    # get_covariate_raster <- function() {
+    #   if (input$prediction_raster_source == "extracted") {
+    #     return(data$prediction_raster)
+    #   } else {
+    #     return(terra::rast(input$covariate_raster$datapath))
+    #   }
+    # }
     
     # Observer for species occupancy predictions
     observeEvent(input$runOccupancyPrediction, {
@@ -11673,7 +11672,7 @@ surveyDashboard <- function(CTtable = NULL,
               orig_dir <- file.path(rasters_dir, "original")
               dir.create(orig_dir, recursive = TRUE)
               
-              for (i in 1:length(data$original_rasters)) {
+              for (i in seq_along(data$original_rasters)) {
                 layer_name <- names(data$original_rasters)[i]
                 file_path <- file.path(orig_dir, paste0(layer_name, ".tif"))
                 terra::writeRaster(data$original_rasters[[i]], file_path, overwrite = TRUE)
