@@ -170,6 +170,15 @@ local({
     augmentation = c(full = 8) 
   )
   
+  mod.jags_fixed_no_modelFile <- communityModel(
+    data_list,
+    occuCovs = list(fixed = c("some_factor", "utm_y", "elevation")),
+    detCovsObservation = list(fixed = c("effort")),
+    intercepts = list(det = "fixed", occu = "fixed")
+    # modelFile = tempfile(fileext = "txt")
+  )
+  
+  
   
   # --- TESTS:  ---
   
@@ -560,6 +569,12 @@ local({
     fixed = "speciesSiteRandomEffect$occu must be FALSE"
     )
     
+  })
+  
+  test_that("Model fitting works when modelFile is not defined", {
+    
+    fit.mod.jags.fixed_no_modelFile <- quiet(fit(mod.jags_fixed_no_modelFile, n.iter = 100, n.burnin = 50, chains = 3))
+    expect_s3_class(fit.mod.jags.fixed_no_modelFile, "mcmc.list")
   })
   
 })
