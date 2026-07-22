@@ -245,10 +245,6 @@ mod.nimble <- communityModel(data_list,
 # currently necessary to do explicitly, to avoid additional package dependencies
 require(nimbleEcology)
 
-# fit uncompiled model in Nimble
-fit.nimble.uncomp <- fit(mod.nimble, 
-                         n.iter = 10, 
-                         chains = 1)
 
 # fit compiled model in Nimble
 fit.nimble.comp <- fit(mod.nimble, 

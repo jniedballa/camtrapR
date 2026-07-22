@@ -1884,11 +1884,15 @@ communityModel <- function(data_list,
     cat(out$model, fill = FALSE, sep = "")
     # sink()
   }
+  if(is.null(modelFile)) {
+    message(paste("modelFile was undefined. Didn't write model to text file."))
+  } else {
     if(file.exists(modelFile)) {
       message(paste("Wrote model to", modelFile))
     } else {
       message(paste("Model could not be written to", modelFile))
     }
+  }
   
   
   # create output commOccu object
@@ -1975,20 +1979,40 @@ fit.commOccu <- function(object,
   if(thin == 0) stop("thin can't be 0")
   if(n.adapt != 0 && isTRUE(object@nimble)) message(paste("nimble models don't use n.adapt. It will be ignored."))
   
+  
+  
+  
   if(isFALSE(object@nimble)){
     
-    if(!file.exists(object@modelFile)) stop(paste("modelFile not found under", object@modelFile))
     
     if(isTRUE(WAIC)) warning("WAIC is only returned in Nimble models", immediate. = TRUE)
     
-    
-    
+    if(file.exists(object@modelFile)) {
       mod <- rjags::jags.model(file = object@modelFile, 
                                data = object@data, 
                                inits = object@inits_fun(),
                                n.chain=chains, 
                                n.adapt=n.adapt,
                                quiet = quiet)
+    } else {
+      run_jags_from_text <- function(modelText, data, inits, chains, n.adapt, quiet) {
+        con <- textConnection(object@modelText)
+        on.exit(close(con))
+        rjags::jags.model(file = con,
+                          data = data,
+                          inits = inits,
+                          n.chain = chains,
+                          n.adapt = n.adapt,
+                          quiet = quiet)
+      }
+      
+      mod <- run_jags_from_text(object@modelText,
+                                object@data,
+                                object@inits_fun(),
+                                chains,
+                                n.adapt,
+                                quiet)
+    }
       
       out <- rjags::coda.samples(model = mod,
                                 variable.names = object@params, 
@@ -2013,6 +2037,7 @@ fit.commOccu <- function(object,
   
   if(isTRUE(object@nimble)) {
     
+    if(!file.exists(object@modelFile)) stop(paste("modelFile not found under", object@modelFile))
     
     mod <- nimble::readBUGSmodel(object@modelFile,
                                  data = object@data,
