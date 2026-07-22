@@ -6,6 +6,9 @@
 \usage{
 createCovariates(
   CTtable,
+  xcol = NULL,
+  ycol = NULL,
+  crs = NULL,
   directory,
   filenames,
   rasters,
@@ -25,7 +28,13 @@ createCovariates(
 )
 }
 \arguments{
-\item{CTtable}{sf object as defined by the \code{sf} package. Essentially a camera trap data frame with spatial information.}
+\item{CTtable}{data.frame or sf object (as defined by the \code{sf} package). A camera trap data frame with spatial information, either as a proper sf object or via coordinate columns (\code{xcol} / \code{ycol}) and a coordinate system (\code{crs}).}
+
+\item{xcol}{character. Column name defining longitude / easting in  \code{CTtable}}
+
+\item{ycol}{character. Column name defining latitude / northing in  \code{CTtable}}
+
+\item{crs}{character or numeric. Coordinate system of columns \code{xcol} and \code{ycol}. E.g. "EPSG:4326" or 4326.}
 
 \item{directory}{character. The directory containing the covariate rasters.}
 
@@ -80,16 +89,20 @@ This function extracts covariate values from spatial raster data
  (e.g. for use in modelling) and prepares these covariates for use in 
  spatial predictions. 
  
- It accepts a camera trap table containing spatial information, 
- along with either a directory containing covariate raster files, a character 
- vector specifying the file paths of these covariate rasters, or direct
- SpatRaster objects from the terra package.
+ Input  is a camera trap table containing spatial information, either as an
+ sf object or a regular data frame with coordinate columns.
  
- Additionally, users can provide parameters to control how covariates are
- extracted, and how they are aggregated to prediction rasters.
+ Covariate information can be extracted from local or online raster sources.
+ For local raster sources, users can either provide a directory containing 
+ covariate raster files, a character vector specifying the file paths of 
+ these covariate rasters, or direct SpatRaster objects from the terra package.
+ 
  
  The function can also download elevation data and calculate terrain metrics
  if requested.
+ 
+ Additionally, users can provide parameters to control how covariates are
+ extracted, and how they are aggregated to prediction rasters.
  
  The function generates prediction rasters based on a provided template or 
  creates one automatically if no template is provided.
@@ -100,11 +113,14 @@ This function extracts covariate values from spatial raster data
 }
 \details{
 The input camera trap table must be an \code{\link[sf]{sf}} object (a data 
-frame with a geometry column specifying the spatial information). For details 
-on how to convert an exising camera trap table to sf, see the examples below.
-The input rasters can be in different coordinate systems. During covariate 
+frame with a geometry column specifying the spatial information) or a regular 
+data frame with x and y columns, for which the users specifies a coordinate system.
+In that case the data frame will be converted to an sf object internally. 
+For details on how to convert an exising camera trap table to sf, see the examples below.
+
+The input rasters can be in different coordinate systems. For covariate 
 extraction the CTtable is projected to each raster's coordinate system 
-individually. For the prediction raster all input rasters are either 
+individually. For the prediction raster, all input rasters are either 
 resampled or reprojected to a consistent coordinate system.
 
 When \code{recursive = TRUE} and a directory is provided, the function will search
