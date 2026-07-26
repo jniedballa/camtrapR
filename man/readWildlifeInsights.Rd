@@ -22,10 +22,10 @@ readWildlifeInsights(
 }
 \value{
 A list containing three elements:
-\describe{
-  \item{CTtable}{The full camera trap table, based on deployments.csv}
-  \item{CTtable_aggregated}{An aggregated version of the camera trap table, with one row per station}
-  \item{recordTable}{The record table, based on images.csv with additional columns from deployments.csv}
+\itemize{
+  \item \strong{CTtable}: The full camera trap table, based on deployments.csv
+  \item \strong{CTtable_aggregated}: An aggregated version of the camera trap table, with one row per station
+  \item \strong{recordTable}: The record table, based on images.csv with additional columns from deployments.csv
 }
 }
 \description{
@@ -35,7 +35,7 @@ It can read data from a directory containing CSV files, from a ZIP file, or from
 \examples{
 \dontrun{
 # Reading from a directory
-wi_data <- readWildlifeInsights(directory = "path/to/csv/files")
+wi_data <- readWildlifeInsights(directory = "path/to/csv_files")
 
 # Reading from a ZIP file
 wi_data <- readWildlifeInsights(zipfile = "path/to/wildlife_insights_export.zip")
