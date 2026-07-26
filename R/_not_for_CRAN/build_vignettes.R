@@ -41,11 +41,7 @@ render(input = file.path(wd, "camtrapr4.Rmd"),
 
 render(input = file.path(wd, "camtrapr5.Rmd"),
        #output = file.path(wd, "camtrapR5.html")
-       output_format = "html_document",
-       output_options = list(#self_contained = T,
-         toc = T,
-         toc_depth = 2,
-         toc_float = T))
+       output_format = "html_vignette")
 
 render(input = file.path(wd, "camtrapr6.Rmd"),
        output_format = "html_vignette",
