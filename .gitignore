@@ -9,3 +9,4 @@ to_do.txt
 .stignore
 .positai
 tests/testthat/Rplots.pdf
+.posit/assistant

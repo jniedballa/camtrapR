@@ -29,3 +29,4 @@
 ^Image-ExifTool-11.94\.tar\.gz$
 ^Image-ExifTool-11.94$
 ^tests/testthat/_snaps$
+^\.posit/assistant$
