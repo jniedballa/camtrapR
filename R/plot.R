@@ -747,7 +747,9 @@ plot_coef_commOccu <- function(object,
                    scales = scales,
                    space = "free_y"
         ) +
-        xlab ("Effect size") +  ylab(element_blank()) +
+        labs (x = "Effect size",
+              y = NULL,
+              title = paste("Effect sizes:", current_cov)) +
         theme_bw() +
         theme(panel.grid.minor = element_blank(),
               panel.grid.major.y = element_blank(),
@@ -755,8 +757,7 @@ plot_coef_commOccu <- function(object,
               strip.text.y = element_blank()) + 
         scale_color_manual(breaks = c("outer", "inner", "no"),
                            values=c("firebrick", "black", "grey50"),
-                           guide = "none") +
-        ggtitle(paste("Effect sizes:", current_cov))
+                           guide = "none") 
       
       
       if(!covariate_is_factor) {
@@ -805,7 +806,8 @@ plot_coef_commOccu <- function(object,
                  cols = vars(covariate),
                  scales = scales, 
                  space = "free_y") +
-      xlab ("Effect size") +  ylab(element_blank()) +
+      labs (x = "Effect size",
+            y = NULL) +
       theme_bw() +
       theme(panel.grid.minor = element_blank(),
             panel.grid.major.y = element_blank(),
