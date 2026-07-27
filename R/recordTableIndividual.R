@@ -634,10 +634,12 @@ recordTableIndividual <- function(inDir,
   }
   
   # declare specific class and store attributes
-  class(record.table3) <- unique(c("records", class(record.table3)))
-  attr(record.table3, "stationCol") <- stationCol
-  attr(record.table3, "individualCol") <- individualCol
-  attr(record.table3, "speciesCol") <- speciesCol
+  record.table3 <- as_records(record.table3, 
+                              stationCol = stationCol,
+                              speciesCol = speciesCol)
+  
+  attr(record.table3, "individualCol") <- individualCol  # NOTE: Not ideal individual record table shares same class with species-level record table.
+  
   
   return(record.table3)
 }
