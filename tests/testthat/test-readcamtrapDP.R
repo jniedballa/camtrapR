@@ -1,4 +1,4 @@
-context("readcamtrapDP")
+context("readCamtrapDP")
 
 # Load necessary libraries for testing
 library(testthat)
@@ -23,7 +23,7 @@ testthat::describe("Core Functionality: Reading Data", {
   skip_if_not(dir.exists(fixture_path), "Sample fixture data not found.")
   
   test_that("it reads a valid datapackage correctly", {
-    result <- readcamtrapDP(file = dp_file)
+    result <- readCamtrapDP(file = dp_file)
     
     # 1. Check output structure
     expect_type(result, "list")
@@ -45,7 +45,7 @@ testthat::describe("Core Functionality: Reading Data", {
   test_that("it handles legacy CSV arguments by issuing a warning but parsing successfully", {
     # Simulate someone providing the old individual file paths
     expect_warning(
-      result <- readcamtrapDP(
+      result <- readCamtrapDP(
         file = dp_file,
         deployments_file = file.path(fixture_path, "deployments.csv"),
         media_file = file.path(fixture_path, "media.csv")
@@ -78,7 +78,7 @@ testthat::describe("Conditional Logic & Optional Column Fallbacks", {
       deps$locationID <- NA
       write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
       
-      res <- readcamtrapDP("datapackage.json")
+      res <- readCamtrapDP("datapackage.json")
       
       # Station should now equal locationName
       expect_setequal(res$CTtable$Station, unique(deps$locationName))
@@ -94,7 +94,7 @@ testthat::describe("Conditional Logic & Optional Column Fallbacks", {
       deps$locationName <- NA
       write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
       
-      res <- readcamtrapDP("datapackage.json")
+      res <- readCamtrapDP("datapackage.json")
       
       # Station should now equal deploymentID
       expect_setequal(res$CTtable$Station, unique(deps$deploymentID))
@@ -109,7 +109,7 @@ testthat::describe("Conditional Logic & Optional Column Fallbacks", {
       deps$cameraID <- NA
       write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
       
-      res <- readcamtrapDP("datapackage.json")
+      res <- readCamtrapDP("datapackage.json")
       
       expect_true(all(res$CTtable$cameraID == "unknown_camera"))
       expect_true(all(res$recordTable$cameraID == "unknown_camera"))
@@ -130,7 +130,7 @@ testthat::describe("Conditional Logic & Optional Column Fallbacks", {
       obs <- rbind(obs, fake_obs)
       write.csv(obs, "observations.csv", row.names = FALSE, na = "")
       
-      res <- readcamtrapDP("datapackage.json")
+      res <- readCamtrapDP("datapackage.json")
       
       # Isolate the fake row we just created
       test_row <- res$recordTable[res$recordTable$observationID == "fake_blank_1", ]
@@ -172,7 +172,7 @@ testthat::describe("Gap Analysis and Data Processing", {
       deps$deploymentEnd[2]   <- "2020-01-20T12:00:00Z"
       write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
       
-      res <- readcamtrapDP("datapackage.json", min_gap_hours = 24)
+      res <- readCamtrapDP("datapackage.json", min_gap_hours = 24)
       
       gap_station <- res$CTtable[res$CTtable$Station == "GapStation", ]
       
@@ -195,7 +195,7 @@ testthat::describe("Argument Flags Handling", {
   
   test_that("filter_observations subsets recordTable correctly", {
     # Test Boolean TRUE (Keep only animals)
-    res_animal <- readcamtrapDP(file = dp_file, filter_observations = TRUE)
+    res_animal <- readCamtrapDP(file = dp_file, filter_observations = TRUE)
     expect_true(all(res_animal$recordTable$observationType == "animal"))
     
     # Test specific string vector targeting
@@ -207,18 +207,18 @@ testthat::describe("Argument Flags Handling", {
       obs$observationType[1:2] <- c("human", "blank")
       write.csv(obs, "observations.csv", row.names = FALSE, na = "")
       
-      res_custom <- readcamtrapDP("datapackage.json", filter_observations = c("human", "blank"))
+      res_custom <- readCamtrapDP("datapackage.json", filter_observations = c("human", "blank"))
       expect_true(all(res_custom$recordTable$observationType %in% c("human", "blank")))
     })
   })
   
   test_that("add_file_path joins file paths from media table", {
     # Default is FALSE
-    res_default <- readcamtrapDP(file = dp_file, add_file_path = FALSE)
+    res_default <- readCamtrapDP(file = dp_file, add_file_path = FALSE)
     expect_false("filePath" %in% colnames(res_default$recordTable))
     
     # Turn ON
-    res_added <- readcamtrapDP(file = dp_file, add_file_path = TRUE)
+    res_added <- readCamtrapDP(file = dp_file, add_file_path = TRUE)
     # Ensure it joined securely
     if ("mediaID" %in% colnames(res_added$recordTable)) {
       expect_true("filePath" %in% colnames(res_added$recordTable))
@@ -227,11 +227,11 @@ testthat::describe("Argument Flags Handling", {
   
   test_that("remove_bbox strips bounding box coordinates", {
     # Default is TRUE
-    res_default <- readcamtrapDP(file = dp_file, remove_bbox = TRUE)
+    res_default <- readCamtrapDP(file = dp_file, remove_bbox = TRUE)
     expect_false(any(grepl("bbox", colnames(res_default$recordTable))))
     
     # Turn OFF
-    res_kept <- readcamtrapDP(file = dp_file, remove_bbox = FALSE)
+    res_kept <- readCamtrapDP(file = dp_file, remove_bbox = FALSE)
     raw_obs <- read.csv(file.path(fixture_path, "observations.csv"), stringsAsFactors = FALSE)
     if ("bboxX" %in% colnames(raw_obs)) {
       expect_true("bboxX" %in% colnames(res_kept$recordTable))

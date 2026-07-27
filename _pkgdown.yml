@@ -8,7 +8,7 @@ reference:
   - title: Data import
     desc: Functions for importing data sets from external sources
     contents:
-      - '`readcamtrapDP`'
+      - '`readCamtrapDP`'
       - '`readWildlifeInsights`'
   - title: Image organisation and management
     desc: Functions for image organisation and preprocessing
