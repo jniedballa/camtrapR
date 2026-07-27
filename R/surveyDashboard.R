@@ -3760,8 +3760,8 @@ surveyDashboard <- function(CTtable = NULL,
       withProgress(message = 'Importing camtrapDP data...', value = 0, {
         tryCatch({
           
-          # Call readcamtrapDP function
-          imported_data <- readcamtrapDP(
+          # Call readCamtrapDP function
+          imported_data <- readCamtrapDP(
             file = datapackage_file,
             min_gap_hours = input$camtrapdp_min_gap_hours,
             removeNA = input$camtrapdp_remove_na,
