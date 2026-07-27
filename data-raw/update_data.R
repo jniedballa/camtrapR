@@ -8,8 +8,7 @@ devtools::load_all()
 ## camtraps.rda ----
 load("./data/camtraps.rda")
 camtraps
-class(camtraps) <- unique(c("cams", class(camtraps)))
-attr(camtraps, "stationCol") <- "Station"
+camtraps <- as_cams(camtraps, stationCol = "Station")
 camtraps
 save(camtraps, file = "./data/camtraps.rda")
 rm(list = ls())
