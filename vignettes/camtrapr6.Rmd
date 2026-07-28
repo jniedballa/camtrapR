@@ -98,7 +98,7 @@ The package includes the standard camtrap DP sample dataset (without image files
 ```{r  load-camtrap-dp}
 path_camtrapdp <- system.file("sample_data/tdwg_camtrap-dp_1.0.2_example", 
                                     package = "camtrapR")
-camtrapdp <- readcamtrapDP(file = file.path(path_camtrapdp, "datapackage.json")) 
+camtrapdp <- readCamtrapDP(file = file.path(path_camtrapdp, "datapackage.json")) 
 
 ```
 
@@ -137,7 +137,7 @@ Load the data:
 
 ``` {r eval = F}
 dir_snapshot_japan <- "/path/to/unzipped/datapackage"
-camtrapdp_japan <- readcamtrapDP(file.path(wd_snapshot_japan, "datapackage.json"))
+camtrapdp_japan <- readCamtrapDP(file.path(wd_snapshot_japan, "datapackage.json"))
 ```
 
 Open the dashboard with the data:
@@ -167,7 +167,7 @@ We highly recommend using the **Data Export** button in the dashboard sidebar to
 
 The Camtrap DP standard is designed to be highly flexible, meaning several columns that are traditionally required by `camtrapR` (such as specific station names or common species names) are technically optional.
 
-To ensure your data always loads smoothly into `camtrapR` formats, the `readcamtrapDP()` function employs a robust fallback hierarchy.
+To ensure your data always loads smoothly into `camtrapR` formats, the `readCamtrapDP()` function employs a robust fallback hierarchy.
 
 #### Location / Station Fallbacks
 
