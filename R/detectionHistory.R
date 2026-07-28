@@ -2,7 +2,7 @@
 #' 
 #' This function generates species detection histories that can be used in
 #' single-species occupancy analyses with packages \link[unmarked:unmarked-package]{unmarked} 
-#' and \pkg{ubms}, as well as multi-species/community occupancy models via 
+#' and \pkg{ubms}, as well as community occupancy models via 
 #' \code{\link{communityModel}}. It generates detection histories in different formats, 
 #' with adjustable occasion length and occasion start time.
 #'  
@@ -197,8 +197,10 @@
 #'                              timeZone             = "Asia/Kuala_Lumpur"
 #' )
 #' 
-#' DetHist2$detection_history  # detection history  (alternatively, use: DetHist2[[1]])
-#' DetHist2$effort             # effort (alternatively, use: DetHist2[[2]])
+#' DetHist2
+#' DetHist2["detection_history"] # detection history as list, and thus keeping nice printing
+#' DetHist2$detection_history    # raw detection history  (alternatively, use: DetHist2[[1]])
+#' DetHist2$effort               # effort (alternatively, use: DetHist2[[2]])
 #' 
 #' # with effort / using lubridate package to define recordDateTimeFormat
 #' DetHist2_lub <- detectionHistory(recordTable          = recordTableSample,
@@ -216,6 +218,7 @@
 #'                                  timeZone             = "Asia/Kuala_Lumpur"
 #' )    
 #' 
+#' DetHist2_lub
 #' DetHist2_lub$detection_history  # detection history  (alternatively, use: DetHist2_lub[[1]])
 #' DetHist2_lub$effort             # effort (alternatively, use: DetHist2_lub[[2]])
 #' 
@@ -252,6 +255,7 @@
 #' )
 #' 
 #' DetHist_multi_season
+#' print(DetHist_multi_season, nRows = 1, nCols = Inf)
 #' 
 #' 
 #' # Multi-species example for community occupancy analysis with communityModel()
@@ -313,6 +317,7 @@ detectionHistory <- function(recordTable,
   # Check if species is vector
   is_multispecies <- length(species) > 1
   
+
   
   # single-species case ----
   if(!is_multispecies) { 
@@ -799,19 +804,27 @@ detectionHistory <- function(recordTable,
   
   if(includeEffort){
     if(scaleEffort){
-      return(list(detection_history = record.hist,
-                  effort = effort,
-                  effort_scaling_parameters = scale.eff.tmp.attr))
+      return(as_dethist(list(detection_history = record.hist,
+                           effort = effort,
+                           effort_scaling_parameters = scale.eff.tmp.attr),
+                        stationCol = stationCol,
+                        speciesCol= speciesCol,
+                        recordDateTimeCol= recordDateTimeCol))
     } else {
-      return(list(detection_history = record.hist,
-                  effort = effort))
+      return(as_dethist(list(detection_history = record.hist,
+                           effort = effort),
+                        stationCol = stationCol,
+                        speciesCol= speciesCol,
+                        recordDateTimeCol= recordDateTimeCol))
     }
   } else {
-    return(list(detection_history = record.hist))
+    return(as_dethist(list(detection_history = record.hist),
+                      stationCol = stationCol,
+                      speciesCol= speciesCol,
+                      recordDateTimeCol= recordDateTimeCol))
   }
   
   }  # end is_multispecies
-  
   
   
   # Multi-species case ----
@@ -858,18 +871,30 @@ detectionHistory <- function(recordTable,
   # Return modified structure
   if(includeEffort) {
     if(scaleEffort) {
-      return(list(
+      return(as_dethist(list(
         detection_history = results,
         effort = full_result$effort,
         effort_scaling_parameters = full_result$effort_scaling_parameters
-      ))
+      ),
+      stationCol = stationCol,
+      speciesCol= speciesCol,
+      recordDateTimeCol= recordDateTimeCol))
     } else {
-      return(list(
+      return(as_dethist(list(
         detection_history = results,
         effort = full_result$effort
-      ))
+      ),
+      stationCol = stationCol,
+      speciesCol= speciesCol,
+      recordDateTimeCol= recordDateTimeCol))
     }
   } else {
-    return(list(detection_history = results))
+    return(as_dethist(list(detection_history = results),
+                      stationCol = stationCol,
+                      speciesCol= speciesCol,
+                      recordDateTimeCol= recordDateTimeCol))
   }
 }
+
+
+

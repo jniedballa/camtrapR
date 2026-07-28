@@ -1,5 +1,5 @@
 
-#' Create a community (multi-species) occupancy model for JAGS or Nimble
+#' Create a community occupancy model for JAGS or Nimble
 #' 
 #' @description 
 #' Flexibly creates complete code and input data for community occupancy models for JAGS amd Nimble (both standard occupancy models and Royle-Nichols occupancy models), and automatically sets initial values and parameters to monitor. 
@@ -34,7 +34,7 @@
 #'
 #'
 #' @details
-#' For examples of implementation, see Vignette 5: Multi-species occupancy models.
+#' For examples of implementation, see Vignette 5: Community occupancy models.
 #' 
 #' Fixed effects of covariates are constant across species, whereas random effect covariates differ between species. Independent effect differ between species and are independent (there is no underlying hyperdistribution).
 #' Fixed, independent and random effects are allowed for station-level detection and occupancy covariates (a.k.a. site covariates). Fixed and random effects are also allowed for station-occasion level covariates (a.k.a. observation covariates). 
@@ -226,10 +226,6 @@
 #' # currently necessary to do explicitly, to avoid additional package dependencies
 #' require(nimbleEcology)
 #' 
-#' # fit uncompiled model in Nimble
-#' fit.nimble.uncomp <- fit(mod.nimble, 
-#'                          n.iter = 10, 
-#'                          chains = 1)
 #' 
 #' # fit compiled model in Nimble
 #' fit.nimble.comp <- fit(mod.nimble, 
@@ -342,6 +338,7 @@ communityModel <- function(data_list,
   
   # 1. Check site covariates exist in data_list$siteCovs
   if(exists("siteCovs", where = data_list)) {
+    # NOTE: Here and below, maybe replace exists() with "x" %in% names(data_list)
     
     if(inherits(data_list$siteCovs, "sf")) {
       # message("site covariates are sf object. Dropping geometry.")
@@ -414,6 +411,11 @@ communityModel <- function(data_list,
   # define prior distributions to be used throughout (maybe make it an argument later)
   prior_list <- list(dnorm = "dnorm(0, 0.05)",
                      dgamma = "dgamma(0.1, 0.1)")
+  # TODO: change to uniform(0,1) or beta(1,1) priors directly on probabilities, which are then converted to the logit scale to serve as means for the community distributions. 
+  # As an example code snippet:
+  # p.mean~dbeta(1,1)
+  # alpha0.mu<-ilogit(p.mean)
+  # alpha0[i]~dnorm(alpha0.mu, sd.alpha)
   
   # define inits
   inits_list <- list(
@@ -477,6 +479,8 @@ communityModel <- function(data_list,
   
   # parse covariates ####
   
+  # TODO: This whole parse covariates logic could be condensed into a single helper function
+  
   ## observation level covariates  ####
   if(!effortCov %in% names(data_list$obsCovs)) stop(paste0("effortCov '", effortCov, "' is not in the list of observation covariates (data_list$obsCovs)."))
   
@@ -495,7 +499,7 @@ communityModel <- function(data_list,
   obs_covariates_numeric <- names(obs_covariates)[sapply(obs_covariates, is.numeric)]
   obs_covariates_categ   <- names(obs_covariates)[sapply(obs_covariates, is.character)]
   
-  if(!all(names(detCovsObservation) %in% c("fixed", "ranef"))) stop("detCovsObservation can currentlly only be 'fixed' or 'ranef'")
+  if(!all(names(detCovsObservation) %in% c("fixed", "ranef"))) stop("detCovsObservation can currently only be 'fixed' or 'ranef'")
   
   if(!is.null(detCovsObservation$fixed)) {
     for(i in detCovsObservation$fixed) {
@@ -615,10 +619,8 @@ communityModel <- function(data_list,
   # throw error for character covariates
   
   if(length(covariates_char) >= 1) {
-    # browser()
     stop(paste("Covariate", covariates_char, "is character. Please convert to factor."), call. = FALSE)
-    
-    # attempt to convert to factor?
+    # NOTE: attempt to convert to factor?
   }
     
   # paste cov1|cov2 (to check for random effects other than species, and nested random effects)
@@ -666,10 +668,6 @@ communityModel <- function(data_list,
       
       # prohibit independent effects of categorical covariates
       if(any(occuCovs$independent %in% covariates_categ)) stop("independent effects of categorical site covariates are currently not supported")
-      
-      # occuCovs_categ$independent <- occuCovs$independent[occuCovs$independent %in% covariates_categ]
-      # occuCovs$independent       <- occuCovs$independent[occuCovs$independent %in% covariates_numeric]
-      # if(length(occuCovs$independent) == 0) occuCovs <- modifyList(occuCovs, list(independent = NULL))
     }
   }
   
@@ -717,9 +715,6 @@ communityModel <- function(data_list,
       # prohibit independent effects of categorical covariates
       if(any(detCovs$independent %in% covariates_categ)) stop("independent effects of categorical site covariates are currently not supported")
       
-      # detCovs_categ$independent <- detCovs$independent[detCovs$independent %in% covariates_categ]
-      # detCovs$independent       <- detCovs$independent[detCovs$independent %in% covariates_numeric]
-      # if(length(detCovs$independent) == 0) detCovs <- modifyList(detCovs, list(independent = NULL))
     }
   }
   
@@ -772,9 +767,7 @@ communityModel <- function(data_list,
       if (!all(dim(data_list$ylist[[1]]) == dim(data_list$obsCovs[[obs_cov_tmp_i_name]]))) {
         stop(paste("detection history and", obs_cov_tmp_i_name, "matrix must have the same dimensions"))
       }
-      
-      # all_matching <- all(!is.na(data_list$ylist[[1]]) == !is.na(data_list$obsCovs[[obs_cov_tmp_i_name]]))
-      # browser()
+
       NAs_in_obs_cov_not_in_dethist <- !which(is.na(data_list$obsCovs[[obs_cov_tmp_i_name]])) %in% which(is.na(data_list$ylist[[1]]))
       if(any(NAs_in_obs_cov_not_in_dethist)) stop(paste("NAs in detection history and", obs_cov_tmp_i_name, "matrix differ"))
     })
@@ -819,7 +812,10 @@ communityModel <- function(data_list,
     nspec <- length(data_list$ylist) # number of seen species
     
     nz <- augmentation - length(data_list$ylist)   # number of unseen species added
-    data_list$ylist <- c(data_list$ylist, replicate(augmentation - length(data_list$ylist), data_list$ylist[[1]] * 0, simplify = FALSE))
+    data_list$ylist <- c(data_list$ylist, 
+                         replicate(augmentation - length(data_list$ylist), 
+                                   data_list$ylist[[1]] * 0, 
+                                   simplify = FALSE))
     
   } else {
     augment = "none"
@@ -893,7 +889,7 @@ communityModel <- function(data_list,
   if(!is.null(detCovsObservation$fixed)) {
     priors_obscovs_det_fixed <- list()
     
-    for(obsCovs_det_index in 1:length(detCovsObservation$fixed)){
+    for(obsCovs_det_index in seq_along(detCovsObservation$fixed)){
       current_cov <- detCovsObservation$fixed[obsCovs_det_index]
       
       priors_obscovs_det_fixed[[obsCovs_det_index]] <- paste(
@@ -906,7 +902,7 @@ communityModel <- function(data_list,
       inits_tmp <- vector(mode = "list", length = length(detCovsObservation$fixed))
       names(inits_tmp) <- c(paste0("alpha.obs.fixed.cont.", detCovsObservation$fixed))
       
-      for(i in 1:length(inits_tmp)){
+      for(i in seq_along(inits_tmp)){
         inits_tmp[[i]] <- inits_list$inits_runif_mean_0      #list("runif", list(1))
       }
       attr(priors_obscovs_det_fixed, "inits") <- inits_tmp
@@ -924,7 +920,7 @@ communityModel <- function(data_list,
     priors_obscovs_det_ranef <- list()
     alpha_draws_ranef_obs_cont <- list()
     
-    for(obsCovs_det_index in 1:length(detCovsObservation$ranef)){
+    for(obsCovs_det_index in seq_along(detCovsObservation$ranef)){
       current_cov <- detCovsObservation$ranef[obsCovs_det_index]
       priors_obscovs_det_ranef[[obsCovs_det_index]] <- paste(
         paste("# Observation Covariate:", current_cov),
@@ -948,7 +944,7 @@ communityModel <- function(data_list,
     names(inits_tmp) <- c(paste0("alpha.obs.ranef.cont.", detCovsObservation$ranef, ".mean"),
                           paste0("alpha.obs.ranef.cont.", detCovsObservation$ranef, ".tau"))
     
-    for(i in 1:length(inits_tmp)){
+    for(i in seq_along(inits_tmp)){
       if(endsWith(names(inits_tmp)[i], "mean")) inits_tmp[[i]] <- inits_list$inits_runif_mean_0
       if(endsWith(names(inits_tmp)[i], "tau"))  inits_tmp[[i]] <- inits_list$inits_runif_tau
     }
@@ -974,7 +970,7 @@ communityModel <- function(data_list,
     
     attr(priors_obscovs_det_categ_fixed, "n_levels") <- rep(NA, times = length(detCovsObservation_categ$fixed))
     
-    for(obsCovs_det_categ_index in 1:length(detCovsObservation_categ$fixed)){
+    for(obsCovs_det_categ_index in seq_along(detCovsObservation_categ$fixed)){
       
       obsCovCat_tmp_fact <- factor(data_list$obsCovs[[detCovsObservation_categ$fixed[obsCovs_det_categ_index]]])
       
@@ -997,7 +993,7 @@ communityModel <- function(data_list,
     
     inits_tmp <- vector(mode = "list", length = length(detCovsObservation_categ$fixed))
     names(inits_tmp) <- paste0("alpha.obs.fixed.categ.", detCovsObservation_categ$fixed)
-    for(n in 1:length(detCovsObservation_categ$fixed)) {
+    for(n in seq_along(detCovsObservation_categ$fixed)) {
       inits_tmp[[n]][1] <- NA
       inits_tmp[[n]][2:attr(priors_obscovs_det_categ_fixed, "n_levels")[n]] <- rnorm(attr(priors_obscovs_det_categ_fixed, "n_levels")[n] - 1)
     }
@@ -1019,7 +1015,7 @@ communityModel <- function(data_list,
     
     attr(priors_obscovs_det_categ_ranef, "n_levels") <- rep(NA, times = length(detCovsObservation_categ$ranef))
     
-    for(obsCovs_det_categ_index in 1:length(detCovsObservation_categ$ranef)){
+    for(obsCovs_det_categ_index in seq_along(detCovsObservation_categ$ranef)){
       
       obsCovCat_tmp_fact <- factor(data_list$obsCovs[[detCovsObservation_categ$ranef[obsCovs_det_categ_index]]])
       
@@ -1062,7 +1058,7 @@ communityModel <- function(data_list,
     names(inits_tmp) <- c(paste0("alpha.obs.ranef.categ.", detCovsObservation_categ$ranef, ".mean"),
                           paste0("alpha.obs.ranef.categ.", detCovsObservation_categ$ranef, ".tau"))
     
-    for(n in 1:length(detCovsObservation_categ$ranef)) {
+    for(n in seq_along(detCovsObservation_categ$ranef)) {
       inits_tmp[[n]][1] <- NA
       inits_tmp[[n]][2:attr(priors_obscovs_det_categ_ranef, "n_levels")[n]] <- rnorm(attr(priors_obscovs_det_categ_ranef, "n_levels")[n] - 1)
       
@@ -1306,7 +1302,7 @@ communityModel <- function(data_list,
                  if (!nimble) {
                    paste0("psi[", speciesIndex, ",", stationIndex, "] <- exp(logit.psi[", speciesIndex, ",", stationIndex, "]) / (exp(logit.psi[", speciesIndex, ",", stationIndex, "]) + 1)")
                  },
-                 
+                 # TODO: refactor block below to replace nested ifelse() with if() ... else ... (since nimble is scalar, not vector)
                  ifelse(!nimble, 
                         paste0("z[", speciesIndex, ",", stationIndex, "] ~ dbern(psi[", speciesIndex, ", ", stationIndex, "]", 
                                ifelse(augment == "full", paste0(" * w[", speciesIndex, "])"), ")")), 
@@ -1419,8 +1415,6 @@ communityModel <- function(data_list,
   
   
   if(speciesSiteRandomEffect$det) {
-    priors_species_station_det_ranef <- paste("ran", "[", speciesIndex, ", ", stationIndex, "] ~ dnorm(0, alpha.speciesstation.ranef.tau)", collapse = "", sep = "")
-    
     alpha_species_station_ranef <- paste("ran", "[", speciesIndex, ", ", stationIndex, "]", collapse = "", sep = "")
   } else {
     alpha_species_station_ranef <- ""
@@ -1462,10 +1456,6 @@ communityModel <- function(data_list,
                    
                    
                    paste0("y[", speciesIndex, ",", stationIndex, ",", occasionIndex,"] ~ dbern(p.eff[", speciesIndex, ",", stationIndex, ",", occasionIndex,"])"),
-
-                   ## remove GOF calculation temporarily until it is corrected
-                   # "\n### generate new data from model under consideration",
-                   # paste0("new.y[", speciesIndex, ",", stationIndex, ",", occasionIndex,"] ~ dbern(p.eff[", speciesIndex, ",", stationIndex, ",", occasionIndex,"])"),
                    "}   # close occasion loop", 
                    "\n", sep = "\n")
     attr(loop3, "params") <- NULL
@@ -1497,11 +1487,7 @@ communityModel <- function(data_list,
                    
                    # "\n### calculate probability of observed data ",
                    paste0("y[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "] ~ dOcc_v(probOcc = psi[", speciesIndex, ",", stationIndex, "], probDetect = p.eff[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "], len = ", occasionMax, ")"),
-                   
-                   ## remove GOF calculation temporarily until it is corrected
-                   # "\n### generate new data from model under consideration",
-                   # paste0("new.y[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "]  <- rOcc_v(n = 1, probOcc = psi[", speciesIndex, ",", stationIndex, "], probDetect = p.eff[", speciesIndex, ",", stationIndex, ",", "1:", occasionMax, "], len = ", occasionMax, ")"), 
-                   
+
                    "\n", sep = "\n")
     attr(loop3, "params") <- NULL
     
@@ -1513,25 +1499,14 @@ communityModel <- function(data_list,
   ## derived quantities #### 
   
   if(!nimble) {    
-    # remove GOF calculation  temporarily until it is corrected
-    close_loop2 <-  paste(# "### calculate Freeman-Tukey residuals for real and new data",
-                          # paste0("res[", speciesIndex, ",", stationIndex, "] <- (sqrt(sum(y[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])) - sqrt(sum(p.eff[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])))^2"),
-                          # paste0("new.res[", speciesIndex, ",", stationIndex, "] <- (sqrt(sum(new.y[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])) - sqrt(sum(p.eff[", speciesIndex, ",", stationIndex, ", 1:", occasionMax, "])))^2"),
-                           "}   # close station loop",
+    close_loop2 <-  paste("}   # close station loop",
                            "\n", sep = "\n")
     attr(close_loop2, "params") <- NULL
     
     
     
-    close_loop1a1 <- paste(#"### sum residuals over stations",
-                           #paste0("R2[", speciesIndex, "] <- sum(res[", speciesIndex, ", 1:", stationMax, "])"),
-                           #paste0("new.R2[", speciesIndex, "] <- sum(new.res[", speciesIndex, ", 1:", stationMax, "])"),
-                           
-                           #"\n### species-level Bayesian p-value",
-                           #paste0("Bpvalue_species[", speciesIndex, "] <- R2[", speciesIndex, "] > new.R2[", speciesIndex, "]"),
-                           "# Goodness-of-fit test is now implemented in PPC.community function.",
+    close_loop1a1 <- paste("# Goodness-of-fit test is now implemented in PPC.community function.",
                            "\n", sep = "\n")
-    # attr(close_loop1a1, "params") <- c("R2", "new.R2", "Bpvalue_species")
   } else {
     close_loop2 <- "}   # close station loop\n"
     close_loop1a1 <- "# Goodness-of-fit test is now implemented in PPC.community function.\n"
@@ -1560,9 +1535,9 @@ communityModel <- function(data_list,
     
     # get number of stations in each richness category
     stations_richness_categories <- table(covariates[,occuIntercept_categ$fixed])
-    names(stations_richness_categories) <- paste0("J", 1:length(stations_richness_categories))
+    names(stations_richness_categories) <- paste0("J", seq_along(stations_richness_categories))
     
-    for(s_occu in 1:length(unique(covariates[,occuIntercept_categ$fixed]))){
+    for(s_occu in seq_along(unique(covariates[,occuIntercept_categ$fixed]))){
       
       current_s1 <- names(stations_richness_categories)[s_occu]
       current_s2a <- paste0(stationMax, 1:(s_occu - 1), collapse = " + ")
@@ -1574,7 +1549,7 @@ communityModel <- function(data_list,
                                                    paste0("fractionStationsOccupied[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", 1:", current_s1, "])/", current_s1), 
                                                    sep = "\n")
       
-      if(s_occu > 1 & s_occu != length(unique(covariates[,occuIntercept_categ$fixed]))) fractionStationsOccupied[[s_occu]] <- paste0("fractionStationsOccupied[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", (", current_s2a, " + 1):(", current_s2b ,")]) / ", current_s3)
+      if(s_occu > 1 && s_occu != length(unique(covariates[,occuIntercept_categ$fixed]))) fractionStationsOccupied[[s_occu]] <- paste0("fractionStationsOccupied[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", (", current_s2a, " + 1):(", current_s2b ,")]) / ", current_s3)
       
       if(s_occu == length(unique(covariates[,occuIntercept_categ$fixed]))) fractionStationsOccupied[[s_occu]] <- paste0("fractionStationsOccupied[", speciesIndex , ", ", s_occu, "] <- sum(z[", speciesIndex ,", (", current_s2a, " + 1):", stationMax, "]) / (", stationMax, " - (", current_s2a, "))")      
     }
@@ -1593,7 +1568,7 @@ communityModel <- function(data_list,
   
   
   if(!is.null(occuIntercept_categ$fixed)) {
-    occ <- paste0("occ[", speciesIndex, ", ", 1:length(unique(covariates[,occuIntercept_categ$fixed])), "]<- 1 - equals(fractionStationsOccupied[i,", 1:length(unique(covariates[,occuIntercept_categ$fixed])), "], 0)")
+    occ <- paste0("occ[", speciesIndex, ", ", seq_along(unique(covariates[,occuIntercept_categ$fixed])), "]<- 1 - equals(fractionStationsOccupied[", speciesIndex, ", ", 1:length(unique(covariates[,occuIntercept_categ$fixed])), "], 0)")
   } else {
     occ <- paste0("occ[", speciesIndex ,"] <- 1 - equals(fractionStationsOccupied[", speciesIndex ,"], 0)")
   }
@@ -1608,18 +1583,8 @@ communityModel <- function(data_list,
     close_loop1c <- paste("}    # close species loop\n\n")
   }
   
-  
-  # if(!nimble){    # remove GOF calculation temporarily until it it corrected
-  #   finish_residuals <- paste("###sum residuals over observed species", 
-  #                             paste0("R3 <- sum(R2[1:", speciesMax, "])"),
-  #                             paste0("new.R3 <- sum(new.R2[1:", speciesMax, "])"),
-  #                             paste0("Bpvalue <- R3 > new.R3"),
-  #                             "\n", sep = "\n")
-  #   attr(finish_residuals, "params") <- c("R3", "new.R3", "Bpvalue")
-  # } else {
     finish_residuals <- ""
-  # }
-  
+
   
   if(augment == "full") {
     finish_nspecies <- paste("### total number of species", 
@@ -1649,7 +1614,7 @@ communityModel <- function(data_list,
   } 
   
   
-  if(!is.null(occuIntercept_categ$fixed) & !nimble) {
+  if(!is.null(occuIntercept_categ$fixed) && !nimble) {
     finish_nspecies_categ <- paste(paste0("### number of species (in each level of '", richnessCategories, "')"),
                                    paste0("for(s_occu in 1:", length(unique(covariates[,occuIntercept_categ$fixed])), "){"), 
                                    paste0("Nspecies_", richnessCategories, "[s_occu] <- sum(occ[1:", speciesMax , ", s_occu])"),
@@ -1762,6 +1727,12 @@ communityModel <- function(data_list,
   
   
   ## combine parameters to monitor  ####
+  
+  # NOTE: the repetitive attr() calls could be collected in a loop, e.g. 
+  # prior_objects <- list(priors_sitecovs_det_fixed, priors_sitecovs_det_indep, ...)
+  # out$params <- c(unlist(sapply(model_text, attr, "params")),
+  #                 unlist(lapply(prior_objects, attr, "params")))
+  
   out$params <- c(unlist(sapply(model_text, attr, "params")), 
                   attr(priors_sitecovs_det_fixed, "params"),
                   attr(priors_sitecovs_det_indep, "params"),
@@ -1830,7 +1801,7 @@ communityModel <- function(data_list,
   if(!is.null(augmentation)) {
     if(any(dimnames(y)[[1]] == "")) {
       which_no_name <- which(dimnames(y)[[1]] == "")
-      dimnames(y)[[1]][which_no_name] <- paste("species_DA", 1:length(which_no_name), sep = "_")
+      dimnames(y)[[1]][which_no_name] <- paste("species_DA", seq_along(which_no_name), sep = "_")
     }
   }
   
@@ -1878,7 +1849,7 @@ communityModel <- function(data_list,
   
   if(!is.null(occuIntercept_categ$fixed)) {
     tmp <- table(covariates[,occuIntercept_categ$fixed])
-    names(tmp) <- paste0("J", 1:length(tmp))
+    names(tmp) <- paste0("J", seq_along(tmp))
     data.list <- c(data.list, tmp)
   }
   
@@ -1909,14 +1880,20 @@ communityModel <- function(data_list,
   # save model text file
   if(!is.null(modelFile)) {
     sink(modelFile)
+    on.exit(sink(), add = TRUE)
     cat(out$model, fill = FALSE, sep = "")
-    sink()
+    # sink()
+  }
+  if(is.null(modelFile)) {
+    message(paste("modelFile was undefined. Didn't write model to text file."))
+  } else {
     if(file.exists(modelFile)) {
       message(paste("Wrote model to", modelFile))
     } else {
       message(paste("Model could not be written to", modelFile))
     }
   }
+  
   
   # create output commOccu object
   out2 <- new("commOccu",   
@@ -1926,7 +1903,7 @@ communityModel <- function(data_list,
               data      = out$model_data,
               input     = data_list,
               nimble    = nimble,
-              modelFile = ifelse(!is.null(modelFile), modelFile, "undefined"),
+              modelFile = if(!is.null(modelFile)) modelFile else "undefined",
               covariate_info = covariate_info,
               model     = model
               )
@@ -1995,27 +1972,47 @@ fit.commOccu <- function(object,
                          chains = 3,
                          inits = NULL,
                          compile = TRUE,
-                         WAIC	= FALSE,
+                         WAIC = FALSE,
                          quiet = FALSE,
                          ...) {
   
   if(thin == 0) stop("thin can't be 0")
-  if(n.adapt != 0 & isTRUE(object@nimble)) message(paste("nimble models don't use n.adapt. It will be ignored."))
+  if(n.adapt != 0 && isTRUE(object@nimble)) message(paste("nimble models don't use n.adapt. It will be ignored."))
+  
+  
+  
   
   if(isFALSE(object@nimble)){
     
-    if(!file.exists(object@modelFile)) stop(paste("modelFile not found under", object@modelFile))
     
     if(isTRUE(WAIC)) warning("WAIC is only returned in Nimble models", immediate. = TRUE)
     
-    
-    
+    if(file.exists(object@modelFile)) {
       mod <- rjags::jags.model(file = object@modelFile, 
                                data = object@data, 
                                inits = object@inits_fun(),
                                n.chain=chains, 
                                n.adapt=n.adapt,
                                quiet = quiet)
+    } else {
+      run_jags_from_text <- function(modelText, data, inits, chains, n.adapt, quiet) {
+        con <- textConnection(object@modelText)
+        on.exit(close(con))
+        rjags::jags.model(file = con,
+                          data = data,
+                          inits = inits,
+                          n.chain = chains,
+                          n.adapt = n.adapt,
+                          quiet = quiet)
+      }
+      
+      mod <- run_jags_from_text(object@modelText,
+                                object@data,
+                                object@inits_fun(),
+                                chains,
+                                n.adapt,
+                                quiet)
+    }
       
       out <- rjags::coda.samples(model = mod,
                                 variable.names = object@params, 
@@ -2040,6 +2037,8 @@ fit.commOccu <- function(object,
   
   if(isTRUE(object@nimble)) {
     
+    if(!file.exists(object@modelFile)) stop(paste("modelFile not found under", object@modelFile))
+    
     mod <- nimble::readBUGSmodel(object@modelFile,
                                  data = object@data,
                                  inits = object@inits_fun())
@@ -2053,7 +2052,9 @@ fit.commOccu <- function(object,
     
     if(compile) {
       
-      mod_comp <- nimble::compileNimble(mod)
+      mod_comp <- nimble::compileNimble(mod)   
+      # NOTE: This line seems necessary even though mod_comp is not used. Look into why that is. 
+      # If it is not run,  compMCMC <- nimble::compileNimble(myMCMC, project = mod) returns error
       
       compMCMC <- nimble::compileNimble(myMCMC, project = mod)
       
@@ -2089,7 +2090,7 @@ fit.commOccu <- function(object,
 setGeneric("fit", function(object, ...){})
 
 
-#' Fit a community (multi-species) occupancy model
+#' Fit a community occupancy model
 #'
 #' Convenience function for fitting community occupancy models (defined in a commOccu object) in JAGS or Nimble.
 #'
@@ -2138,7 +2139,8 @@ summary.commOccu <- function(object, ...) {
     has_unnamed <- is.null(species_names) || any(species_names == "")
     
     # Count augmented species (those without names)
-    augmented_count <- sum(species_names == "") + sum(is.null(species_names))
+    augmented_count <- sum(species_names == "") # + sum(is.null(species_names))
+    
     
     if(has_unnamed || augmented_count > 0) {
       total_species <- length(object@input$ylist)
@@ -2190,7 +2192,7 @@ summary.commOccu <- function(object, ...) {
       levels <- character(nrow(section_data))
       effect_types <- character(nrow(section_data))
       
-      for (i in 1:nrow(section_data)) {
+      for (i in seq_len(nrow(section_data))) {
         # Check for independent effects first, then random effects
         if (section_data$independent[i]) {
           effect_types[i] <- "Independent"
@@ -2232,7 +2234,7 @@ summary.commOccu <- function(object, ...) {
       cat(paste0("    ", separator, "\n"))
       
       # Print data rows
-      for (i in 1:length(covariate_names)) {
+      for (i in seq_along(covariate_names)) {
         cat(sprintf(header_fmt, covariate_names[i], levels[i], effect_types[i]))
       }
       cat("\n")
@@ -2280,6 +2282,7 @@ setMethod("summary", signature(object = "commOccu"),
 # other helper functions
 
 # make table with information about covariates
+# TODO: avoid referencing variables from calling environment via lexical scoping
 get_cov_info <- function(cov,
                          keyword_nested = keyword_nested,
                          keyword_quadratic = keyword_quadratic,
@@ -2469,7 +2472,7 @@ fixedEffectPriors <- function(effect_names,
   if(!is.null(effect_names)){
     priors_list <- list()
     
-    for(effect_names_index in 1:length(effect_names)){
+    for(effect_names_index in seq_along(effect_names)){
       priors_list[[effect_names_index]] <- paste(
         paste("# Covariate:", effect_names[effect_names_index]),
         paste0(param, ".fixed.cont.", effect_names[effect_names_index], " ~ ", prior_list$dnorm), 
@@ -2507,7 +2510,7 @@ independentEffectPriors <- function(effect_names,
   if(!is.null(effect_names)){
     priors_list <- list()
     
-    for(effect_names_index in 1:length(effect_names)){
+    for(effect_names_index in seq_along(effect_names)){
       priors_list[[effect_names_index]] <- paste(
         paste("# Covariate:", effect_names[effect_names_index]),
         paste0("for(", speciesIndex, " in 1:", speciesMax, ") {"),
@@ -2526,7 +2529,7 @@ independentEffectPriors <- function(effect_names,
     names(inits_tmp) <- c(paste0(param, ".indep.cont.", effect_names))
     
     
-    for(i in 1:length(inits_tmp)){
+    for(i in seq_along(inits_tmp)){
       inits_tmp[[i]] <- modifyInits(inits_list$inits_runif_mean_0, 
                                     speciesMax_value)
     }
@@ -2568,7 +2571,7 @@ randomEffectPriors <- function(effect_names,
     current_cov2 <- vector(mode = "character")
     ranef_double_all <- vector()
     
-    for(effect_names_index in 1:length(effect_names)){
+    for(effect_names_index in seq_along(effect_names)){
       current_cov <- effect_names[effect_names_index]
       if(grepl("|", current_cov, fixed = TRUE)) {
         
@@ -2577,7 +2580,7 @@ randomEffectPriors <- function(effect_names,
         tmp <- unlist(strsplit(current_cov, split = "|", fixed = TRUE))
         current_cov <- gsub("|", "_", current_cov, fixed = TRUE)
         current_cov2[effect_names_index] <- tmp[1]
-        if(length(tmp) == 2 & endsWith(tmp[2], keyword_nested)) {
+        if(length(tmp) == 2 && endsWith(tmp[2], keyword_nested)) {
           ranef_index[effect_names_index] <- paste0(speciesIndex, ", ", gsub(keyword_nested, "", tmp[2], fixed = TRUE), "[", stationIndex, "]")  
           ranef_double <- TRUE
           ranef_double_all[effect_names_index] <- TRUE
@@ -2650,7 +2653,7 @@ randomEffectPriors <- function(effect_names,
     
 
     
-    for(i in 1:length(inits_tmp)){
+    for(i in seq_along(inits_tmp)){
       if(endsWith(names(inits_tmp)[i], "mean")) if(ranef_double_all[i]){
         inits_tmp[[i]] <- lapply(attr(ranef_double_all, "nlevels"), modifyInits, inits = inits_list$inits_runif_mean_0)[[i]]
       } else {
@@ -2695,49 +2698,36 @@ randomSpeciesStationEffectPriors <- function(doit,
                                              stationIndex) {
   
   if(doit) {
-  param <- "alpha"
+    tau.tmp   <- "alpha.speciesstation.ranef.tau"
+    sigma.tmp <- "alpha.speciesstation.ranef.sigma"
     
-  # mean.tmp  <- 0
-  tau.tmp   <- "alpha.speciesstation.ranef.tau" #paste0(param, ".ranef.cont.", current_cov, ".tau", ifelse(ranef_double, paste0("[", speciesIndex, "]"), ""))
-  sigma.tmp <- "alpha.speciesstation.ranef.sigma" #paste0(param, ".ranef.cont.", current_cov, ".sigma", ifelse(ranef_double, paste0("[", speciesIndex, "]"), ""))
-  
-  param_name_site_species <- "alpha.speciesstation.ranef"
-  
-  priors_list <- list()
-  
-  priors_list[[1]] <- paste(
-    #paste("# Random Species-station effect"),
-    # if(ranef_double) paste0("for(", speciesIndex, " in 1:", speciesMax, "){"),
+    param_name_site_species <- "alpha.speciesstation.ranef"
     
+    priors_list <- list()
+    
+    priors_list[[1]] <- paste(
+      paste0(tau.tmp, " ~ ", prior_list$dgamma),
+      paste0(sigma.tmp, " <- sqrt(1 / ", tau.tmp, ")"),
+      "\n", 
+      sep = "\n")
     
     
-    # paste0(mean.tmp, " <- ", 0#prior_list$dnorm),
-    paste0(tau.tmp, " ~ ", prior_list$dgamma),
-    paste0(sigma.tmp, " <- sqrt(1 / ", tau.tmp, ")"),
-    # if(ranef_double) "}",
-    "\n", 
-    sep = "\n")
-  
-
-  attr(priors_list, "params") <- c(sigma.tmp, param_name_site_species)
-  
-  
-  inits_tmp <- vector(mode = "list", length = 1)
-  names(inits_tmp) <- "alpha.speciesstation.ranef.tau"
-  inits_tmp[[1]] <- inits_list$inits_runif_tau
+    attr(priors_list, "params") <- c(sigma.tmp, param_name_site_species)
     
-  attr(priors_list, "inits") <- inits_tmp
-  
-  attr(priors_list, "formula") <- #paste(" + ",  "[", ranef_index, "] * ", current_cov2, "[", stationIndex, "]", collapse = "", sep = "")
-    paste(" + ",  param_name_site_species, "[", speciesIndex, ", ", stationIndex, "]", collapse = "", sep = "")
-  
-  
-  species_draws <- paste("# Random effect of species and station on detection probability:" ,
-                         paste(param_name_site_species, "[", speciesIndex, ", ", stationIndex, "] ~ dnorm(0, alpha.speciesstation.ranef.tau)", collapse = "", sep = ""),
-                         "\n", 
-                         sep = "\n")
-# beta.ranef.cont.habitat[i] ~ dnorm(beta.ranef.cont.habitat.mean, beta.ranef.cont.habitat.tau)")
-  
+    
+    inits_tmp <- vector(mode = "list", length = 1)
+    names(inits_tmp) <- "alpha.speciesstation.ranef.tau"
+    inits_tmp[[1]] <- inits_list$inits_runif_tau
+    
+    attr(priors_list, "inits") <- inits_tmp
+    
+    attr(priors_list, "formula") <-  paste(" + ",  param_name_site_species, "[", speciesIndex, ", ", stationIndex, "]", collapse = "", sep = "")
+    
+    
+    species_draws <- paste("# Random effect of species and station on detection probability:" ,
+                           paste(param_name_site_species, "[", speciesIndex, ", ", stationIndex, "] ~ dnorm(0, alpha.speciesstation.ranef.tau)", collapse = "", sep = ""),
+                           "\n", 
+                           sep = "\n")
   } 
   
   
@@ -2775,7 +2765,7 @@ fixedEffectPriorsCateg <- function(effect_names,
     priors_list <- list()
     attr(priors_list, "n_levels") <- rep(NA, times = length(effect_names))
     
-    for(effect_names_index in 1:length(effect_names)){
+    for(effect_names_index in seq_along(effect_names)){
       
       current_cov <- effect_names[effect_names_index]
       current_cov_values <- covariates[, current_cov]
@@ -2800,7 +2790,7 @@ fixedEffectPriorsCateg <- function(effect_names,
     inits_tmp <- vector(mode = "list", length = length(effect_names))
     names(inits_tmp) <- paste0(param, ".fixed.categ.", effect_names)
     
-    for(n in 1:length(effect_names)) {
+    for(n in seq_along(effect_names)) {
       inits_tmp[[n]][1] <- NA
       inits_tmp[[n]][2:attr(priors_list, "n_levels")[n]] <- rnorm(attr(priors_list, "n_levels")[n] - 1)
     }
@@ -2841,7 +2831,7 @@ randomEffectPriorsCateg <- function(effect_names,
     
     attr(priors_list, "n_levels") <- rep(NA, times = length(effect_names))
     
-    for(effect_names_index in 1:length(effect_names)){
+    for(effect_names_index in seq_along(effect_names)){
       
       current_cov <- effect_names[effect_names_index]
       current_cov_values <- covariates[, current_cov]
@@ -2883,7 +2873,7 @@ randomEffectPriorsCateg <- function(effect_names,
     names(inits_tmp) <- c(paste0(param, ".ranef.categ.", effect_names, ".mean"),
                           paste0(param, ".ranef.categ.", effect_names, ".tau"))
     
-    for(n in 1:length(effect_names)) {
+    for(n in seq_along(effect_names)) {
       inits_tmp[[n]][1] <- NA
       inits_tmp[[n]][2:attr(priors_list, "n_levels")[n]] <- rnorm(attr(priors_list, "n_levels")[n] - 1)
       

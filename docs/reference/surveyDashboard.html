@@ -27,7 +27,7 @@ Spatial prediction capabilities
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
@@ -54,7 +54,10 @@ Spatial prediction capabilities
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
     <li>
-      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
+      <a href="../articles/camtrapr5.html">5. Community occupancy models</a>
+    </li>
+    <li>
+      <a href="../articles/camtrapr6.html">6. Sample camera trap datasets and the `surveyDashboard`</a>
     </li>
   </ul></li>
 <li>
@@ -212,6 +215,7 @@ interactive visualization, data exploration, and analysis tools including:</p>
 </ul><p><strong>Occupancy Modeling:</strong></p><ul><li><p>Basic workflow for simple model specification (linear effects)</p></li>
 <li><p>Support for both unmarked and ubms packages</p></li>
 <li><p>Automated detection history creation</p></li>
+<li><p>Automatic scaling of covariates (including prediction rasters)</p></li>
 <li><p>Model comparison and selection</p></li>
 <li><p>Response curves and spatial predictions</p></li>
 </ul><p><strong>Community Occupancy Modeling:</strong></p><ul><li><p>Flexible species selection with filtering</p></li>
@@ -220,18 +224,14 @@ interactive visualization, data exploration, and analysis tools including:</p>
 <li><p>Effort handling on detection</p></li>
 <li><p>MCMC diagnostics and convergence assessment</p></li>
 <li><p>Species occupancy, richness and PAO predictions</p></li>
-</ul></div>
+</ul><p>The app state can be saved and restored</p>
+    </div>
     <div id="note">
     <h2>Note</h2>
-
-<ul><li><p>Interactive maps with multiple basemap options</p></li>
-<li><p>Covariate scaling is performed automatically if requested (includes
-   automatic scaling of prediction rasters)</p></li>
-<li><p>The app state can be saved and restored</p></li>
-</ul><p>Current limitations include:</p>
-<p>- supports only single-season data
-- no support for spatial capture-recapture models (or anything related to individual IDs)</p>
-    </div>
+    <p>Current limitations include:</p>
+<ul><li><p>supports only single-season data</p></li>
+<li><p>no support for spatial capture-recapture models (or anything related to individual IDs)</p></li>
+</ul></div>
     <div id="author">
     <h2>Author</h2>
     <p>Juergen Niedballa</p>
@@ -266,6 +266,7 @@ interactive visualization, data exploration, and analysis tools including:</p>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -280,7 +281,7 @@ interactive visualization, data exploration, and analysis tools including:</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

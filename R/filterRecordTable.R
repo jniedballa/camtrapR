@@ -40,8 +40,9 @@
 #' (optional)
 #' @param quiet logical. If TRUE, suppress printing of progress.
 #'
-#' @return A data frame containing species records and additional information
-#' about stations, date, time, filtered for temporal independence.
+#' @return An object of class `records` containing a data frame with species
+#' records and additional information about stations, date, time, filtered for
+#' temporal independence.
 #' 
 #' @export
 #' @importFrom lubridate ymd_hms is.POSIXt tz parse_date_time
@@ -114,6 +115,7 @@ filterRecordTable <- function(#inDir,
   # wd0 <- getwd()
   # on.exit(setwd(wd0))
   
+  ## FIXME: use attribute "stationCol" provided by recordTable() instead
   if(!hasArg(stationCol)) stationCol <- "Station"
   if(!is.character(stationCol)) stop("stationCol must be of class 'character'")
   if(!stationCol %in% colnames(recordTable)) stop("stationCol is not a column name in recordTable")
@@ -514,5 +516,9 @@ filterRecordTable <- function(#inDir,
     # }
     write.csv(record.table3, file = outtable_filename)
   }
+  
+  # declare specific class and store attributes
+  record.table3 <- as_records(record.table3, stationCol = stationCol, speciesCol = speciesCol)
+  
   return(record.table3)
 }

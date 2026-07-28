@@ -19,7 +19,7 @@ when multiple cameras were deployed at a single station or a single camera had m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
@@ -46,7 +46,10 @@ when multiple cameras were deployed at a single station or a single camera had m
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
     <li>
-      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
+      <a href="../articles/camtrapr5.html">5. Community occupancy models</a>
+    </li>
+    <li>
+      <a href="../articles/camtrapr6.html">6. Sample camera trap datasets and the `surveyDashboard`</a>
     </li>
   </ul></li>
 <li>
@@ -85,7 +88,8 @@ when multiple cameras were deployed at a single station or a single camera had m
 <span>  cameraCol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  setupCol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  retrievalCol <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  dateFormat <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  dateFormat <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -124,6 +128,10 @@ retrieval dates in <code>CTtable</code></p></dd>
 be interpretable by either <code>as.Date</code> or the "orders" argument
 <code><a href="https://lubridate.tidyverse.org/reference/parse_date_time.html" class="external-link">parse_date_time</a></code> in <span class="pkg">lubridate</span>. Can be a date
 or a date-time.</p></dd>
+
+
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p>logical. If TRUE, print message if no aggregation is needed.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -170,7 +178,7 @@ with mixed data types or specific aggregation requirements not covered by the de
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

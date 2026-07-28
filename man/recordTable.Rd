@@ -98,8 +98,9 @@ a metadata tag) by to summarise non-independent records (those within
 (optional). See details.}
 }
 \value{
-A data frame containing species records and additional information
-about stations, date, time and (optionally) further metadata.
+An object of class `records` containing a data frame with species
+records and additional information about stations, date, time and
+(optionally) further metadata.
 }
 \description{
 Generates a record table from camera trap images or videos. Images/videos
@@ -245,6 +246,9 @@ rec_table1 <- recordTable(inDir               = wd_images_ID_species,
                        additionalMetadataTags = c("EXIF:Model", "EXIF:Make")
 )
 # note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames
+
+rec_table1
+summary(rec_table1)
 
 rec_table2 <- recordTable(inDir               = wd_images_ID_species,
                        IDfrom                 = "directory",

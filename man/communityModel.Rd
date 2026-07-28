@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{communityModel}
 \alias{communityModel}
-\title{Create a community (multi-species) occupancy model for JAGS or Nimble}
+\title{Create a community occupancy model for JAGS or Nimble}
 \usage{
 communityModel(
   data_list,
@@ -64,7 +64,7 @@ Such a model will run slower than proper single-species model JAGS code due to t
 The function returns several derived quantities, e.g. species richness, Bayesian p-values (overall and by species), Freeman-Tukey residuals for actual and simulated data (by station and total). If doing data augmentation, metacommunity size and number of unseen species are returned also.
 }
 \details{
-For examples of implementation, see Vignette 5: Multi-species occupancy models.
+For examples of implementation, see Vignette 5: Community occupancy models.
 
 Fixed effects of covariates are constant across species, whereas random effect covariates differ between species. Independent effect differ between species and are independent (there is no underlying hyperdistribution).
 Fixed, independent and random effects are allowed for station-level detection and occupancy covariates (a.k.a. site covariates). Fixed and random effects are also allowed for station-occasion level covariates (a.k.a. observation covariates). 
@@ -245,10 +245,6 @@ mod.nimble <- communityModel(data_list,
 # currently necessary to do explicitly, to avoid additional package dependencies
 require(nimbleEcology)
 
-# fit uncompiled model in Nimble
-fit.nimble.uncomp <- fit(mod.nimble, 
-                         n.iter = 10, 
-                         chains = 1)
 
 # fit compiled model in Nimble
 fit.nimble.comp <- fit(mod.nimble, 

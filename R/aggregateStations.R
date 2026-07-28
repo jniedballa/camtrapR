@@ -71,6 +71,27 @@ aggregateStations <- function(CTtable,
                               quiet = FALSE) {
   
   
+    # --- Input Validation ---
+  required_cols <- c(stationCol)
+  if (!is.null(cameraCol)) required_cols <- c(required_cols, cameraCol)
+  if (!is.null(setupCol)) required_cols <- c(required_cols, setupCol)
+  if (!is.null(retrievalCol)) required_cols <- c(required_cols, retrievalCol)
+  
+  missing_cols <- required_cols[!required_cols %in% names(CTtable)]
+  if (length(missing_cols) > 0) {
+    stop(paste("Error in aggregateStations: The following required columns were not found in 'CTtable':\n",
+               paste(paste0("- ", missing_cols), collapse = "\n"), "\n\n",
+               "Available columns are:", "\n", paste(sort(paste0("- ", names(CTtable))), collapse = "\n")), call. = F)
+  }
+  
+  # Validate dateFormat if date columns are provided and are characters
+  if ((!is.null(setupCol) && is.character(CTtable[, setupCol])) ||
+      (!is.null(retrievalCol) && is.character(CTtable[, retrievalCol]))) {
+    if (is.null(dateFormat)) {
+      stop("Error in aggregateStations: 'dateFormat' must be provided if 'setupCol' or 'retrievalCol' are character strings.")
+    }
+  }
+  
   # --- Handle sf objects ---
   is_sf_input <- inherits(CTtable, "sf")
   
@@ -81,30 +102,6 @@ aggregateStations <- function(CTtable,
   } else {
     df <- as.data.frame(CTtable)  
   }
-  
-  
-  
-  # --- Input Validation ---
-  required_cols <- c(stationCol)
-  if (!is.null(cameraCol)) required_cols <- c(required_cols, cameraCol)
-  if (!is.null(setupCol)) required_cols <- c(required_cols, setupCol)
-  if (!is.null(retrievalCol)) required_cols <- c(required_cols, retrievalCol)
-  
-  missing_cols <- required_cols[!required_cols %in% names(df)]
-  if (length(missing_cols) > 0) {
-    stop(paste("Error in aggregateStations: The following required columns were not found in 'CTtable':",
-               paste(missing_cols, collapse = ", "),
-               ". Available columns are:", paste(names(df), collapse = ", ")))
-  }
-  
-  # Validate dateFormat if date columns are provided and are characters
-  if ((!is.null(setupCol) && is.character(df[[setupCol]])) ||
-      (!is.null(retrievalCol) && is.character(df[[retrievalCol]]))) {
-    if (is.null(dateFormat)) {
-      stop("Error in aggregateStations: 'dateFormat' must be provided if 'setupCol' or 'retrievalCol' are character strings.")
-    }
-  }
-  
   
   # --- Early exit if no aggregation needed ---
   if (all(table(df[[stationCol]]) == 1)) {

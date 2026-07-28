@@ -5,16 +5,20 @@
 #'  (e.g. for use in modelling) and prepares these covariates for use in 
 #'  spatial predictions. 
 #'  
-#'  It accepts a camera trap table containing spatial information, 
-#'  along with either a directory containing covariate raster files, a character 
-#'  vector specifying the file paths of these covariate rasters, or direct
-#'  SpatRaster objects from the terra package.
+#'  Input  is a camera trap table containing spatial information, either as an
+#'  sf object or a regular data frame with coordinate columns.
 #'  
-#'  Additionally, users can provide parameters to control how covariates are
-#'  extracted, and how they are aggregated to prediction rasters.
+#'  Covariate information can be extracted from local or online raster sources.
+#'  For local raster sources, users can either provide a directory containing 
+#'  covariate raster files, a character vector specifying the file paths of 
+#'  these covariate rasters, or direct SpatRaster objects from the terra package.
+#'  
 #'  
 #'  The function can also download elevation data and calculate terrain metrics
 #'  if requested.
+#'  
+#'  Additionally, users can provide parameters to control how covariates are
+#'  extracted, and how they are aggregated to prediction rasters.
 #'  
 #'  The function generates prediction rasters based on a provided template or 
 #'  creates one automatically if no template is provided.
@@ -23,7 +27,10 @@
 #'  extracted covariate values (e.g for use in occupancy modelling), and 
 #'  prediction rasters ready for spatial modeling.
 #'  
-#' @param CTtable sf object as defined by the \code{sf} package. Essentially a camera trap data frame with spatial information.
+#' @param CTtable data.frame or sf object (as defined by the \code{sf} package). A camera trap data frame with spatial information, either as a proper sf object or via coordinate columns (\code{xcol} / \code{ycol}) and a coordinate system (\code{crs}).
+#' @param xcol character. Column name defining longitude / easting in  \code{CTtable}
+#' @param ycol character. Column name defining latitude / northing in  \code{CTtable}
+#' @param crs character or numeric. Coordinate system of columns \code{xcol} and \code{ycol}. E.g. "EPSG:4326" or 4326.
 #' @param directory character. The directory containing the covariate rasters.
 #' @param filenames character (optionally named). A vector of file paths of covariate rasters. If it is named the covariates will be named according to the names. If unnamed the file names will be used as covariate names.
 #' @param rasters SpatRaster object or list of SpatRaster objects. Direct input of rasters from the terra package instead of reading from disk.
@@ -44,11 +51,14 @@
 #' @details
 #' 
 #' The input camera trap table must be an \code{\link[sf]{sf}} object (a data 
-#' frame with a geometry column specifying the spatial information). For details 
-#' on how to convert an exising camera trap table to sf, see the examples below.
-#' The input rasters can be in different coordinate systems. During covariate 
+#' frame with a geometry column specifying the spatial information) or a regular 
+#' data frame with x and y columns, for which the users specifies a coordinate system.
+#' In that case the data frame will be converted to an sf object internally. 
+#' For details on how to convert an exising camera trap table to sf, see the examples below.
+#' 
+#' The input rasters can be in different coordinate systems. For covariate 
 #' extraction the CTtable is projected to each raster's coordinate system 
-#' individually. For the prediction raster all input rasters are either 
+#' individually. For the prediction raster, all input rasters are either 
 #' resampled or reprojected to a consistent coordinate system.
 #' 
 #' When \code{recursive = TRUE} and a directory is provided, the function will search
@@ -108,6 +118,7 @@
 #'   \item{scaling_params}{A list containing center and scale information of numeric covariates}
 #' }
 #' @export
+#' @importFrom checkmate assert assert_character assert_data_frame checkClass
 #'
 #' @examples
 #' 
@@ -190,6 +201,9 @@
 #' 
 
 createCovariates <- function(CTtable,
+                             xcol = NULL,
+                             ycol = NULL,
+                             crs = NULL,
                              directory,
                              filenames,
                              rasters,
@@ -207,8 +221,27 @@ createCovariates <- function(CTtable,
                              standardize_na = FALSE,
                              scale_covariates = FALSE)
 {
+  
+  checkmate::assert_data_frame(CTtable)
+  
   if(!inherits(CTtable, "sf")){ 
-    stop("CTtable is not an sf object.")
+    message("CTtable is not an sf object. Converting.")
+    
+    assert_character(xcol, any.missing = FALSE, null.ok = FALSE, len = 1)
+    assert_character(ycol, any.missing = FALSE, null.ok = FALSE, len = 1)
+    checkmate::assert(
+      checkmate::checkClass(crs, "numeric"),
+      checkmate::checkClass(crs, "character"),
+      .var.name = "crs"
+    )
+    if(length(crs) > 1) stop("crs must be a vector of length 1.")
+    if(is.na(crs)) stop("crs may not be NA.")
+    
+    CTtable <- sf::st_as_sf(CTtable, 
+                            coords = c(xcol, ycol),
+                            crs = crs,
+                            remove = FALSE)
+    
   }
   if(is.na(sf::st_crs(CTtable))) stop("Coordinate reference system of CTtable is not defined. See: sf::st_crs(CTtable).")
   

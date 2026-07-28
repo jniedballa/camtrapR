@@ -1,6 +1,73 @@
+# camtrapR 3.1.0
+
+## New function
+
+* simulateCamtrapData(): simulate camera trap data with custom properties (e.g. for testing, examples and teaching)
+
+## New features
+
+### surveyDashboard
+
+* new welcome screen (modal dialog) on startup
+* new data-quality and convergence warning system, flagging potential problems with input data and model fit (modal dialog and sidebar)
+* new date range filter for records
+* new instructions for CSV uploads, with links to relevant functions
+* stricter validation of CSV uploads: a CRS must now be provided (numeric EPSG codes accepted); uploads abort with an informative modal dialog if the loaded table has only one column (wrong delimiter) or if the camera trap table contains duplicate station/camera combinations
+* maximum csv file upload size increased to 500 MB (was 10Mb)
+* single-species occupancy: new warning UI, improved printing of model summaries and species names, fitted models can now be exported, unmarkedFrame summary shown in a separate tab
+* community occupancy: model file name is now printed in the UI
+* added GitHub and Google Group links to the header; 
+* record preview in the filter section is collapsed by default; various label, tooltip and progress-indicator improvements
+
+### Occupancy models
+
+* community occupancy models (commOccu) can now be fitted from JAGS model code stored in the new modelText slot, without an external model file
+* createCovariates() now accept plain data frames with coordinates (new arguments xcol, ycol, crs; converted to sf internally)
+* consistent terminology: "community models" instead of "multi-species models"
+
+### Data import
+
+* the Camtrap DP interface was rewritten throughout and now uses the camtrapdp package for reading data packages
+* readcamtrapDP renamed to readCamtrapDP (capitalisation in line with official name)
+* more tolerant Camtrap DP import: missing vernacularNames are generated from scientific names and observation type; missing placename falls back to the deployment ID (with a warning); informative error if all timestamps fail to parse
+* activity estimation with Camtrap DP data now uses only observations of type "event"
+
+### Improved displays and summary functions
+
+* recordTable, recordTableIndividual & filterRecordTable now return an object of class "records" with dedicated print, [, summary, and dplyr_reconstruct methods
+* cameraOperation now returns an object of class "camOp" with dedicated print, [, summary, and plot methods
+* detectionHistory now returns an object of class "detHist" with dedicated print and [ methods
+* readCamtrapDP now returns an object of class "cams_dp" with a dedicated print method
+* camera tables contained in readCamtrapDP and simulateCamtrapData outputs are now of class "cams" with a dedicated print method
+* internal function stripClass to remove added (S3) class and attributes
+
+## Other changes
+
+* new vignette 6 introducing the surveyDashboard (with sample data)
+* surveyDashboard: documentation expanded (new section on Bayesian priors, more details on model fitting challenges)
+* new package dependencies: camtrapdp, checkmate, crayon, tibble (the latter two now direct rather than indirect dependencies)
+
+## Bugfixes
+
+* surveyDashboard:
+    * fixed several reactivity issues (records not resetting when loading new Camtrap DP data with active filters; number of removed images not updating; broken model selection table)
+    * fixed error in export of covariate rasters
+    * assert validity of parameter inputs (prevents opening app when e.g. column names specified wrongly)
+    * fixed model selection table for ubms 1.2.9
+    * ubms models now uses 1 core by default (faster than 3 cores for short runs)
+* plot_coef(): fixed colors of plot lines by significance level in community model plots
+* fixed wrong color ramp being applied to the original rasters in spatial prediction plots
+* more robust aggregation of the camera trap table (all columns checked first, clearer error messages)
+* fixed ggplot2 warning by replacing ylab() with labs()
+
+# camtrapR 3.0.4
+
+maintenance release to avoid potential problems in CRAN checks (unit tests)
+
+
 # camtrapR 3.0.3
 
-## bugfixes
+## Bugfixes
 * surveyDashboard: in covariate extraction, fix "Error in date$retrievalCol: object of type 'closure' is not subsettable"
 
 ## Other changes
@@ -9,12 +76,12 @@
 
 # camtrapR 3.0.2
 
-## bugfixes
+## Bugfixes
 * fixed plot_effects with continuous covariates
 
 # camtrapR 3.0.1
 
-## bugfixes
+## Bugfixes
 * fixed plot_effects with categorical covariates
 
 ## Other changes

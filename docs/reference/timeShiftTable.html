@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
@@ -44,7 +44,10 @@
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
     <li>
-      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
+      <a href="../articles/camtrapr5.html">5. Community occupancy models</a>
+    </li>
+    <li>
+      <a href="../articles/camtrapr6.html">6. Sample camera trap datasets and the `surveyDashboard`</a>
     </li>
   </ul></li>
 <li>
@@ -66,7 +69,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Sample camera trap time shift table</h1>
-
+    <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/HEAD/R/data.R" class="external-link"><code>R/data.R</code></a></small>
     <div class="hidden name"><code>timeShiftTable.Rd</code></div>
     </div>
 
@@ -74,9 +77,6 @@
     <p>Sample camera trap time shift table</p>
     </div>
 
-    <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">timeShiftTable</span><span class="op">)</span></span></code></pre></div>
-    </div>
 
     <div id="format">
     <h2>Format</h2>
@@ -84,7 +84,11 @@
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>If image Exif metadata timestamps are wrong systematically (e.g. because camera system time was not set after changing batteries), it can be corrected using a <code>data.frame</code> in the following format using function <code><a href="timeShiftImages.html">timeShiftImages</a></code>. For details on data format, please see <code><a href="timeShiftImages.html">timeShiftImages</a></code>.</p>
+    <p>If image Exif metadata timestamps are wrong systematically (e.g. because
+camera system time was not set after changing batteries), it can be
+corrected using a <code>data.frame</code> in the following format using function
+<code><a href="timeShiftImages.html">timeShiftImages</a></code>. For details on data format, please see
+<code><a href="timeShiftImages.html">timeShiftImages</a></code>.</p>
 <p>The variables are as follows:</p>
 <table class="table table"><tr><td><code>Station</code></td><td>Camera trap station ID</td></tr><tr><td><code>camera</code></td><td>Camera trap ID (optional)</td></tr><tr><td><code>timeshift</code></td><td>time shift amount to be applied</td></tr><tr><td><code>sign</code></td><td>direction of time shift</td></tr></table></div>
 
@@ -100,7 +104,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

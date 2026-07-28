@@ -2,7 +2,7 @@
 % Please edit documentation in R/communityModel.R
 \name{fit,commOccu-method}
 \alias{fit,commOccu-method}
-\title{Fit a community (multi-species) occupancy model}
+\title{Fit a community occupancy model}
 \usage{
 \S4method{fit}{commOccu}(
   object,

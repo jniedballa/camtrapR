@@ -81,8 +81,9 @@ a metadata tag) by to summarise non-independent records (those within
 \item{quiet}{logical. If TRUE, suppress printing of progress.}
 }
 \value{
-A data frame containing species records and additional information
-about stations, date, time, filtered for temporal independence.
+An object of class `records` containing a data frame with species
+records and additional information about stations, date, time, filtered for
+temporal independence.
 }
 \description{
 Filter species record table for temporal independence

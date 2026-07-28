@@ -49,7 +49,7 @@
 A list of ggplot objects (one list item per covariate).
 }
 \description{
-Plot effect sizes for all species in a community (multi-species) occupancy model. Currently only supports continuous covariates, not categorical covariates.
+Plot effect sizes for all species in a community occupancy model. Currently only supports continuous covariates, not categorical covariates.
 }
 \details{
 Users who wish to create their own visualizations can use the data stored in the ggplot output. It is accessed via e.g. \code{output$covariate_name$data}

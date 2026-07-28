@@ -14,15 +14,33 @@ coverage](https://codecov.io/gh/jniedballa/camtrapR/graph/badge.svg)](https://ap
 
 camtrapR is a package for camera trap data management in R.
 
+## Features
+
+- **Data management** — Build record tables from raw camera trap
+  images/videos using EXIF metadata
+- **Data import** — Import data from external platforms (Wildlife
+  Insights, Camtrap DP, csv files)
+- **Survey dashboard** — `surveyDashboard()` provides a code-free
+  graphical user interface for data exploration and occupancy modelling
+- **Activity patterns** — Kernel density estimation and comparison of
+  temporal activity
+- **Occupancy models** — Prepare and run single-species and Bayesian
+  community occupancy models (via `unmarked`, `ubms`, JAGS or NIMBLE)
+- **Spatial capture-recapture** — Generate input for SCR analyses (with
+  the `secr` package)
+- **Spatial covariates** — Extract environmental covariates and predict
+  species occupancy across space
+- **Visualisation** — Maps, activity plots, and survey summary figures
+
 ## Installation
 
-You can install the release version of camtrapR from CRAN:
+Install the release version from CRAN:
 
 ``` r
 install.packages("camtrapR")
 ```
 
-the GitHub master version via:
+Install the GitHub master version:
 
 ``` r
 # install.packages("remotes")
@@ -30,71 +48,85 @@ the GitHub master version via:
 remotes::install_github("jniedballa/camtrapR", build_vignettes = TRUE)
 ```
 
-and the GitHub development version\* (containing the most recent changes
-and new features) via:
+Install the GitHub development version (most recent changes and new
+features):
 
 ``` r
 remotes::install_github("jniedballa/camtrapR", ref = "dev", build_vignettes = TRUE)
 ```
 
-\[\* a development version may not always be available on GitHub\]
+> **Note:** For installation from GitHub, package `R.rsp` is required.
+> `build_vignettes = TRUE` is necessary due to the use of static
+> vignettes.
 
-For installation from GitHub make sure package `R.rsp` is available.
-`build_vignettes = TRUE` is necessary since v 2.1.1. due to the new
-static vignettes.
-
-You can also install a previous version (e.g. if a recent update broke
-the code you need to run urgently) via:
+You can also install a specific previous version (e.g., if a recent
+update broke code you need):
 
 ``` r
-remotes::install_version(package = "camtrapR", version = "2.3.1")
+remotes::install_version(package = "camtrapR", version = "3.0.1")
 ```
 
 ## Exiftool
 
-Numerous important camtrapR functions read EXIF metadata from JPG images
-(and videos). This is done via Exiftool, a free and open-source sofware
-tool developed by Phil Harvey and available for Windows, MacOS and
-Linux.
+Many camtrapR functions read EXIF metadata from JPG images and videos
+via [**Exiftool**](https://exiftool.sourceforge.net/), a free and
+open-source tool by Phil Harvey (available for Windows, macOS, and
+Linux).
 
-To make full use of camtrapR, you will need Exiftool on your system. You
-can download it from the [Exiftool homepage](https://exiftool.org/).
-Please follow the installation instruction in vignette 1 and the
-Exiftool website.
+To make full use of camtrapR, you will need Exiftool on your system. See
+the installation instructions in [vignette
+1](https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr1.pdf)
+and the [Exiftool website](https://exiftool.sourceforge.net/).
 
-You may not need Exiftool if you do not work with image files, but only
-use camtrapR to create input for occupancy or spatial capture-recapture
-models from existing record tables.
+> If you only use camtrapR to create model input from existing record
+> tables (without working with raw image files), Exiftool is not
+> required.
+
+## Vignettes
+
+camtrapR includes six vignettes covering the entire workflow:
+
+1.  **Camera trap data management**
+2.  **Species and individual identification**
+3.  **Record tables and model input**
+4.  **Maps, species activity and reports**
+5.  **Community Occupancy models**
+6.  **Sample data sets and the surveyDashboard()**
+
+Browse them online at <https://cran.r-project.org/package=camtrapR> or
+locally after installation with `browseVignettes("camtrapR")`.
 
 ## Help and Support
 
-### Google Group
-
-There is a [Google
-Group](https://groups.google.com/forum/#!forum/camtrapr) for all
-questions and problems regarding camtrapR. Please feel free to join the
-discussion there.
-
-### GitHub issues
-
-Alternatively, you can report bugs and problems as issues on GitHub
-[(here)](https://github.com/jniedballa/camtrapR/issues).
+- **Google Group**:
+  [camtrapR](https://groups.google.com/forum/#!forum/camtrapr) — for all
+  questions and problems around the use of `camtrapR`
+- **GitHub Issues**: [Report bugs or request
+  features](https://github.com/jniedballa/camtrapR/issues)
 
 ## Further reading
 
-See the [Article in Methods in Ecology and
-Evolution](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600)
-for an overview of the package. The five vignettes provide examples for
-the entire workflow.
+Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016). camtrapR:
+an R package for efficient camera trap data management. *Methods in
+Ecology and Evolution*, 7(12), 1457–1462.
+<https://doi.org/10.1111/2041-210X.12600>
+
+Niedballa, J., Sollmann, R., Wilting, A. (2025) The camtrapR R package:
+From data management to interactive ecological analysis of camera trap
+data. *bioRxiv* 2025.09.26.678697; doi:
+<https://doi.org/10.1101/2025.09.26.678697>
 
 ## Citation
 
-To cite camtrapR, please use:
+To cite camtrapR in publications, please use:
 
-Jürgen Niedballa, Rahel Sollmann, Alexandre Courtiol, Andreas Wilting
-(2016). camtrapR: an R package for efficient camera trap data
-management. Methods in Ecology and Evolution 7(12), 1457-1462,
-<https://doi.org/10.1111/2041-210X.12600>, URL:
-<https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600>
+> Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016).
+> camtrapR: an R package for efficient camera trap data management.
+> *Methods in Ecology and Evolution* 7(12), 1457–1462.
+> <https://doi.org/10.1111/2041-210X.12600>
 
-or see `citation("camtrapR")`
+or run `citation("camtrapR")` in R.
+
+## License
+
+camtrapR is released under the GPL-2 license.

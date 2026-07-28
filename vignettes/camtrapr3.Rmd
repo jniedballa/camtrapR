@@ -61,7 +61,7 @@ Now we can run `recordTable`. Here is a minimal example:
 rec.db.species0 <- recordTable(inDir  = wd_images_ID,
                                IDfrom = "directory")
 
-head(rec.db.species0)
+rec.db.species0
 ```
 
 Argument `IDfrom` tells the function to look for species directories within the station directories and to take species IDs from these. `IDfrom` must be set to "metadata" if metadata tagging was used for species identification.
@@ -187,7 +187,7 @@ rec.db.species.metadata1 <- recordTable(inDir                  = wd_images_ID,
                                         timeZone               = "Asia/Kuala_Lumpur",
                                         additionalMetadataTags = c("EXIF:Model", "EXIF:Make"))
 
-head(rec.db.species.metadata1)
+rec.db.species.metadata1
 ```
 
 There are 2 additional columns containing the information from the metadata we requested.
@@ -224,7 +224,7 @@ In addition to the metadata that were saved when the image was taken (see above)
 
 
 ```{r eval = exiftool_present}
-head(rec.db.pbe)
+rec.db.pbe
 ```
 
 
@@ -412,7 +412,7 @@ Now let's see how the daily effort was combined for the different combinations o
    camOp_station_aggregation [camOp_station_aggregation$hasProblems == FALSE, -3]
 ```
 
-sS you can see, allCamsOn has no effect if all cameras were active (due to hasProblems = FALSE). The differences on the setup/retrieval day are due to camerasIndependent.
+As you can see, allCamsOn has no effect if all cameras were active (due to hasProblems = FALSE). The differences on the setup/retrieval day are due to camerasIndependent.
 
 Now with hasProblems = TRUE:
 
@@ -438,15 +438,15 @@ Here's how the daily aggregates are calculate for the different combinations of 
 
 ## Plotting camera operation matrices
 
-There is a little function for plotting the camera operation matrix included in the package, but not exported in the Namespace. It is accessible with camtrapR:::camopPlot(). Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.
+There is a little function for plotting the camera operation matrix included in the package, accessible directly via plot(). Imagine there is a typo in one of your date fields and the setup or retrieval year is wrong. You will easily be able to spot it this way.
 
 
 Here is the camera operation matrix calculated above  (in two different color palettes, the default being the viridis palette - requires R 3.6.0 or higher).
 
 ```{r}
 par(mfrow = c(1,2))
-camtrapR:::camopPlot(camOp = camop_problem)
-camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat")
+plot(camop_problem)
+plot(camop_problem, palette = "Heat")
 ```
 
 <!--  ```{r include = FALSE} -->
@@ -455,8 +455,8 @@ camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat")
 
 One can also plot with the levelplot function from the lattice package:
 ```{r}
-camtrapR:::camopPlot(camOp = camop_problem, lattice = TRUE)
-camtrapR:::camopPlot(camOp = camop_problem, palette = "Heat", lattice = TRUE)
+plot(camop_problem, lattice = TRUE)
+plot(camop_problem, palette = "Heat", lattice = TRUE)
 ```
 
 
@@ -475,7 +475,7 @@ camop_typo <- cameraOperation(CTtable      = camtraps_typo,
                                  hasProblems  = TRUE,
                                  dateFormat   = dateFormat
 )
-camtrapR:::camopPlot(camop_typo)
+plot(camop_typo)
 ```
 
 
@@ -695,7 +695,7 @@ camop_season <- cameraOperation(CTtable         = camtrapsMultiSeason,
 
 # plot camera operation matrix
 par(oma = c(0,7,0,0))
-camtrapR:::camopPlot(camop_season)
+plot(camop_season)
 
 
 # make multi-season detection history

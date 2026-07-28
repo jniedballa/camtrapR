@@ -30,7 +30,12 @@ names(r2) <- "cov_wgs"
 testthat::describe("Input Validation and Error Handling", {
   
   test_that("it stops for invalid CTtable inputs", {
-    expect_error(createCovariates(camtraps), "CTtable is not an sf object.")
+    expect_error(createCovariates(camtraps), 
+                 "Assertion on 'xcol' failed: Must be of type 'character', not 'NULL'.")
+    expect_error(createCovariates(camtraps, xcol = "utm_x", ycol = "utm_y"), 
+                 "Assertion on 'crs' failed:")
+    expect_error(createCovariates(camtraps, xcol = "utm_x", ycol = "utm_y", crs = 32650), 
+                 "Please provide one of 'directory', 'filenames', 'rasters', or set 'download_elevation = TRUE'.")
     
     
     expect_error({

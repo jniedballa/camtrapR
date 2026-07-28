@@ -1,10 +1,10 @@
 Type: Package
 Package: camtrapR
 Title: Camera Trap Data Management and Analysis Framework
-Version: 3.0.3
-Date: 2026-02-08
+Version: 3.1.0
+Date: 2026-07-25
 Authors@R: c(
-    person("Juergen", "Niedballa", , "camtrapr@gmail.com", role = c("aut", "cre"),
+    person("Juergen", "Niedballa", email = "camtrapr@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9187-2116")),
     person("Alexandre", "Courtiol", role = "aut",
            comment = c(ORCID = "0000-0003-0637-2959")),
@@ -45,25 +45,31 @@ BugReports: https://groups.google.com/forum/#!forum/camtrapr
 Depends: 
     R (>= 4.1.0)
 Imports: 
+    checkmate,
+    crayon,
     data.table,
     dplyr,
     DT,
     generics,
     ggplot2,
+    htmltools,
     leaflet,
     lubridate,
     methods,
+    reshape2,
     secr,
     sf,
     shiny,
     shinyBS,
     shinydashboard,
     shinyjs,
-    terra
+    terra,
+    tibble
 Suggests: 
     abind,
     bayesplot,
     callr,
+    camtrapdp,
     coda,
     corrplot,
     elevatr,
@@ -85,7 +91,6 @@ Suggests:
     psych,
     R.rsp,
     raster,
-    reshape2,
     ritis,
     rjags,
     rlang,
@@ -93,12 +98,12 @@ Suggests:
     RSQLite,
     rstudioapi,
     scales,
+    shinytest2,
     shinyWidgets,
     stringr,
     taxize,
     tesseract,
     testthat,
-    tibble,
     ubms,
     units,
     unmarked,
@@ -108,5 +113,5 @@ Suggests:
 VignetteBuilder: 
     R.rsp
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 SystemRequirements: ExifTool (https://exiftool.org/)
+Config/roxygen2/version: 8.0.0

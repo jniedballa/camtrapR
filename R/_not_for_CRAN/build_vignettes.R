@@ -2,7 +2,7 @@
 library(rmarkdown)
 
 # building html vignette with code below ensures that toc works correctly
-wd <- "C:/Users/Juergen/Documents/GitHub/camtrapR/vignettes"
+wd <- here::here("vignettes")
 
 render(input = file.path(wd, "camtrapr1.Rmd"),
        #output = file.path(wd, "camtrapR5.html")
@@ -37,13 +37,17 @@ render(input = file.path(wd, "camtrapr4.Rmd"),
          toc_float = T))
 
 
-
 # vignette 5 is html, not pdf
 
 render(input = file.path(wd, "camtrapr5.Rmd"),
        #output = file.path(wd, "camtrapR5.html")
-       output_format = "html_document",
+       output_format = "html_vignette")
+
+render(input = file.path(wd, "camtrapr6.Rmd"),
+       output_format = "html_vignette",
        output_options = list(#self_contained = T,
          toc = T,
-         toc_depth = 2,
-         toc_float = T))
+         toc_depth = 2
+         # toc_float = T
+         ))
+

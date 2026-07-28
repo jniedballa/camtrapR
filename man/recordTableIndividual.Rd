@@ -103,9 +103,9 @@ a metadata tag) by to summarise non-independent records (those within
 (optional). See details.}
 }
 \value{
-A data frame containing species records with individual IDs and
-additional information about stations, date, time and (optionally) further
-metadata.
+An object of class `records` containing a data frame containing
+species records with individual IDs and additional information about 
+stations, date, time and (optionally) further metadata.
 }
 \description{
 The function generates a single-species record table containing individual

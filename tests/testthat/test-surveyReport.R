@@ -26,21 +26,22 @@ camop_problem <- cameraOperation(
   dateFormat   = "dmy"
 )
 
-# camtrapR:::camopPlot(camop_problem)
+# plot(camop_problem)
 
 # --- Test Suite ---
 
 testthat::describe("Core Functionality and Return Value", {
   
   test_that("it returns a list of 5 data frames with correct structure", {
-    report <- surveyReport(
+    
+    report <- quiet(surveyReport(
       recordTable  = recordTableSample,
       CTtable      = camtraps,
       camOp        = camop_no_problem,
       setupCol     = "Setup_date",
       retrievalCol = "Retrieval_date",
       CTDateFormat = "dmy"
-    )
+    ))
     
     # 1. Check the main output structure
     expect_true(class(report) == "list")
@@ -58,14 +59,14 @@ testthat::describe("Core Functionality and Return Value", {
   })
   
   test_that("calculations are correct for a survey without problems", {
-    report <- surveyReport(
+    report <- quiet(surveyReport(
       recordTable  = recordTableSample,
       CTtable      = camtraps,
       setupCol     = "Setup_date",
       retrievalCol = "Retrieval_date",
       camOp        = camop_no_problem,
       CTDateFormat = "dmy"
-    )
+    ))
     
     # Check key calculations in the survey_dates table
     survey_dates <- report$survey_dates
@@ -87,14 +88,15 @@ testthat::describe("Core Functionality and Return Value", {
   })
   
   test_that("calculations are correct for a survey WITH problems", {
-    report_problem <- surveyReport(
+    
+    report_problem <- quiet(surveyReport(
       recordTable  = recordTableSample,
       CTtable      = camtraps,
       setupCol     = "Setup_date",
       retrievalCol = "Retrieval_date",
       camOp        = camop_problem,
       CTDateFormat = "dmy"
-    )
+    ))
     
     survey_dates_prob <- report_problem$survey_dates
     stationC_dates_prob <- survey_dates_prob[survey_dates_prob$Station == "StationC", ]
@@ -117,7 +119,8 @@ testthat::describe("File Writing and Side Effects", {
   tmpdir <- tempdir()
   
     test_that("sinkpath argument creates a text report", {
-      report <- surveyReport(
+      
+      report <- quiet(surveyReport(
         recordTable  = recordTableSample,
         CTtable      = camtraps,
         setupCol     = "Setup_date",
@@ -125,7 +128,7 @@ testthat::describe("File Writing and Side Effects", {
         camOp        = camop_no_problem,
         CTDateFormat = "dmy",
         sinkpath     = tmpdir #"." # Write to the temp directory
-      )
+      ))
       
       # Check for the report file
       report_files <- list.files(tmpdir, pattern = paste0("survey_report_", Sys.Date(), ".txt"), full.names = T)
@@ -144,7 +147,7 @@ testthat::describe("File Writing and Side Effects", {
 
       testthat::skip_if_not_installed("overlap")
 
-      report <- surveyReport(
+      report <- quiet(surveyReport(
         recordTable  = recordTableSample,
         CTtable      = camtraps,
         setupCol     = "Setup_date",
@@ -153,9 +156,9 @@ testthat::describe("File Writing and Side Effects", {
         CTDateFormat = "dmy",
         Xcol         = "utm_x",
         Ycol         = "utm_y",
-        sinkpath     = tmpdir, #".",
+        sinkpath     = tmpdir, 
         makezip      = TRUE
-      )
+      ))
 
 
     # 1. Check if the zip file was created
@@ -186,6 +189,7 @@ testthat::describe("Date/time column checks", {
   camtraps_retrieval_blank$Retrieval_date[1] <- ""
   
   recordTableSample_datetime_blank <- recordTableSample
+  recordTableSample_datetime_blank$DateTimeOriginal <- as.character(recordTableSample_datetime_blank$DateTimeOriginal)
   recordTableSample_datetime_blank$DateTimeOriginal[1] <- ""
   
   camtraps_setup_NA <- camtraps_setup_blank
@@ -217,6 +221,7 @@ testthat::describe("Date/time column checks", {
   )
   
   test_that("errors about blank values in Date/Time are correct", {
+    
     expect_error(surveyReport (recordTable          = recordTableSample,
                                CTtable              = camtraps_setup_blank,
                                camOp                = camop_no_problem,
@@ -308,3 +313,4 @@ actual:    2009-04-21 00:40:00", fixed = TRUE)
     
   })
 })
+

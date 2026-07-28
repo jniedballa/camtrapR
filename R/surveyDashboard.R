@@ -73,6 +73,7 @@
 # #'   random effects)
 #'   \item Support for both unmarked and ubms packages
 #'   \item Automated detection history creation
+#'   \item Automatic scaling of covariates (including prediction rasters)
 #'   \item Model comparison and selection
 #'   \item Response curves and spatial predictions
 #' }
@@ -87,13 +88,13 @@
 #'   \item Species occupancy, richness and PAO predictions
 #' }
 #'
-#'
-#' @note 
+#' The app state can be saved and restored
+#' 
+#' @note Current limitations include:
+#' 
 #' \itemize{
-#'   \item Interactive maps with multiple basemap options
-#'   \item Covariate scaling is performed automatically if requested (includes
-#'    automatic scaling of prediction rasters)
-#'   \item The app state can be saved and restored
+#' \item  supports only single-season data
+#' \item  no support for spatial capture-recapture models (or anything related to individual IDs)
 #' }
 #' 
 #' @examples
@@ -124,27 +125,25 @@
 #'   
 #'   
 #'
-#' @note Current limitations include:
-#' 
-#' - supports only single-season data
-#' - no support for spatial capture-recapture models (or anything related to individual IDs)
-#' 
 #' 
 #' @author Juergen Niedballa
 #'  
+#' @importFrom checkmate assert assert_data_frame assert_logical assert_character assert_choice checkClass makeAssertCollection reportAssertions
 #' @importFrom grDevices hcl.colors colorRampPalette
-#' @importFrom graphics layout pairs plot.new title
-#' @importFrom lubridate is.Date parse_date_time
-#' @importFrom utils read.csv str unzip sessionInfo
-#' @importFrom shiny renderUI renderText outputOptions req observe observeEvent reactiveVal reactiveValues renderTable renderPrint renderPlot updateSelectInput updateSelectizeInput updateTextInput updateNumericInput updateSliderInput updateCheckboxInput updateCheckboxGroupInput updateActionButton removeNotification showNotification showModal removeModal modalDialog modalButton HTML tags tabsetPanel tabPanel actionButton checkboxInput checkboxGroupInput fileInput numericInput radioButtons selectInput sliderInput textInput uiOutput verbatimTextOutput plotOutput textOutput wellPanel withProgress fluidRow column div hr h4 conditionalPanel helpText tagList tableOutput reactive reactiveTimer varSelectizeInput icon h1 h2 h3 isolate need validate span
-#' @importFrom shinydashboard dropdownMenu dropdownMenuOutput renderMenu
-#' @importFrom DT renderDT DTOutput datatable
 #' @importFrom dplyr %>% group_by summarize n n_distinct pull sym
-#' @importFrom sf st_buffer st_convex_hull st_drop_geometry st_intersection st_transform st_union st_make_valid
-#' @importFrom terra rast vect project resample nlyr values<- mask
-#' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
+#' @importFrom DT renderDT DTOutput datatable
 #' @importFrom ggplot2 element_text element_rect geom_violin geom_boxplot geom_point geom_abline median_hilow scale_x_continuous stat_summary theme_void
+#' @importFrom graphics layout pairs plot.new title
+#' @importFrom leaflet leaflet leafletOutput renderLeaflet addTiles addCircleMarkers addLayersControl layersControlOptions addPolygons leafletProxy clearGroup
+#' @importFrom lubridate is.Date parse_date_time
+#' @importFrom reshape2 melt
+#' @importFrom sf st_buffer st_convex_hull st_drop_geometry st_intersection st_transform st_union st_make_valid st_bbox
+#' @importFrom shiny renderUI renderText outputOptions req observe observeEvent reactiveVal reactiveValues renderTable renderPrint renderPlot updateSelectInput updateSelectizeInput updateTextInput updateNumericInput updateSliderInput updateCheckboxInput updateCheckboxGroupInput updateActionButton removeNotification showNotification showModal removeModal modalDialog modalButton HTML tags tabsetPanel tabPanel actionButton checkboxInput checkboxGroupInput fileInput numericInput radioButtons selectInput sliderInput textInput uiOutput verbatimTextOutput plotOutput textOutput wellPanel withProgress fluidRow column div hr h4 h5 conditionalPanel helpText tagList tableOutput reactive reactiveTimer varSelectizeInput icon h1 h2 h3 isolate need validate span htmlOutput dateRangeInput updateDateRangeInput incProgress
 #' @importFrom shinyBS bsTooltip
+#' @importFrom shinydashboard dropdownMenu dropdownMenuOutput renderMenu
+#' @importFrom terra rast vect project resample nlyr values<- mask
+#' @importFrom utils read.csv str unzip sessionInfo
+
 #' @export
 
 
@@ -165,60 +164,78 @@ surveyDashboard <- function(CTtable = NULL,
                             recordDateTimeCol = "DateTimeOriginal",
                             recordDateTimeFormat = "ymd HMS",
                             timeZone = "UTC",
-                            exclude = NULL) {
+                            exclude = NULL) {   # TODO: deprecate "exclude"
   
   
-  # pkg_required <- c(
-  #   # UI packages
-  #   "shiny",
-  #   "shinyWidgets", 
-  #   "shinydashboard",
-  #   "DT",
-  #   
-  #   # Data manipulation
-  #   "dplyr",
-  #   "lubridate",
-  #   "sf",
-  #   "terra",
-  #   
-  #   # Visualization
-  #   "ggplot2",
-  #   "plotly",
-  #   "patchwork",
-  #   "mapview",
-  #   "leaflet",
-  #   "viridisLite",
-  #   "scales",
-  #   
-  #   # Modeling
-  #   "unmarked",
-  #   "ubms",
-  #   "bayesplot",
-  #   "coda"
-  # )
-  # 
-  # pkg_optional <- c(
-  #   "corrplot",
-  #   "psych",
-  #   "rstudioapi",
-  #   "callr"
-  # )
-  # 
-  # # Check required packages
-  # missing_required <- pkg_required[!sapply(pkg_required, requireNamespace, quietly = TRUE)]
-  # if (length(missing_required) > 0) {
-  #   stop("Please install the following required packages: ", 
-  #        paste(missing_required, collapse = ", "))
-  # }
-  # 
-  # # Check optional packages and warn if missing
-  # missing_optional <- pkg_optional[!sapply(pkg_optional, requireNamespace, quietly = TRUE)]
-  # if (length(missing_optional) > 0) {
-  #   warning("The following optional packages are not installed. Some features may be limited: ",
-  #           paste(missing_optional, collapse = ", "))
-  # }
-  # 
+  # check inputs ----
+  checkmate::assert_data_frame(CTtable, null.ok = TRUE)
+  checkmate::assert_data_frame(recordTable, null.ok = TRUE)
   
+  if(!is.null(CTtable) && is.null(recordTable)) stop("If CTtable is defined, recordTable must be defined too.")
+  if(is.null(CTtable) && !is.null(recordTable)) stop("If recordTable is defined, CTtable must be defined too.")
+  
+  if(!is.null(CTtable) && !is.null(recordTable)){
+    
+    # initialize assertion collection
+    coll <- checkmate::makeAssertCollection()
+    
+    # check column name parameters
+    checkmate::assert_character(stationCol, len = 1, add = coll)
+    checkmate::assert_character(xcol, len = 1, add = coll)
+    checkmate::assert_character(ycol, len = 1, add = coll)
+    checkmate::assert_character(setupCol, len = 1, add = coll)
+    checkmate::assert_character(retrievalCol, len = 1, add = coll)
+    checkmate::assert_character(speciesCol, len = 1, add = coll)
+    checkmate::assert_character(recordDateTimeCol, len = 1, add = coll)
+    checkmate::assert_character(cameraCol, null.ok = TRUE, len = 1, add = coll)
+    
+    # check format parameters
+    checkmate::assert_character(CTdateFormat, len = 1, add = coll)
+    checkmate::assert_character(recordDateTimeFormat, len = 1, add = coll)
+    
+    # other
+    if(!is.null(cameraCol)) {
+      checkmate::assert_logical(camerasIndependent, len = 1)  
+    }
+    checkmate::assert_character(exclude, len = 1, null.ok = TRUE)
+    checkmate::assert(
+      checkmate::checkClass(crs, "numeric"),
+      checkmate::checkClass(crs, "character"),
+      .var.name = "crs",
+      add = coll
+    )
+    
+    # ensure column names are in tables
+    # camera trap table
+    checkmate::assert_choice(stationCol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(xcol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(ycol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(setupCol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(retrievalCol, choices = names(CTtable), add = coll)
+    checkmate::assert_choice(cameraCol, choices = names(CTtable), null.ok = T)
+    
+    # record table
+    checkmate::assert_choice(stationCol, choices = names(recordTable), add = coll)
+    checkmate::assert_choice(speciesCol, choices = names(recordTable), add = coll)
+    checkmate::assert_choice(recordDateTimeCol, choices = names(recordTable), add = coll)
+    
+    
+    # If any assertion failed, stop and print combined list of errors
+    checkmate::reportAssertions(coll)
+    
+    
+    if(any(is.na(recordTable[, speciesCol]))) {
+      stop(paste("Error in data input:\n", 
+                 sum(is.na(recordTable[, speciesCol])),
+           "out of", 
+           nrow(recordTable), 
+           "records have no species tag. Please remove these first"),
+           call. = F)
+    }
+  }
+  
+  
+  # check required packages are available ----
   # For now do aggressive package check until I load functions cleanly with pkg::function()
   
   # Load all required packages
@@ -244,7 +261,8 @@ surveyDashboard <- function(CTtable = NULL,
     "scales",
     "corrplot",
     "unmarked",
-    "ubms"
+    "reshape2"#,
+    # "ubms"
   )
   
   # Check which packages are missing
@@ -263,78 +281,6 @@ surveyDashboard <- function(CTtable = NULL,
   }
   
   
-  #Version check
-  
-  # Function to get version info from the local DESCRIPTION file
-  get_local_version <- function(package = "camtrapR") {
-    tryCatch({
-      utils::packageVersion(package)
-    }, error = function(e) {
-      warning("Could not determine local version: ", e$message)
-      return(NULL)
-    })
-  }
-  
-  # Function to get version info from GitHub
-  get_github_version <- function(repo = "jniedballa/camtrapR") {
-    tryCatch({
-      # Get DESCRIPTION content from GitHub
-      desc_url <- paste0("https://raw.githubusercontent.com/", repo, "/dev/DESCRIPTION")
-      
-      # Try to download DESCRIPTION file
-      desc_content <- readLines(desc_url, warn = FALSE)
-      
-      # Find Version line
-      version_line <- grep("^Version:", desc_content, value = TRUE)
-      if (length(version_line) == 0) {
-        warning("No version information found in GitHub DESCRIPTION")
-        return(NULL)
-      }
-      
-      # Extract version number
-      version <- gsub("^Version:\\s*", "", version_line)
-      package_version(version)
-      
-    }, error = function(e) {
-      warning("Could not fetch GitHub version: ", e$message)
-      return(NULL)
-    })
-  }
-  
-  # Function to compare versions and return notification text if needed
-  check_version <- function() {
-    local_ver <- get_local_version()
-    github_ver <- get_github_version()
-    
-    if (is.null(local_ver) || is.null(github_ver)) {
-      return(NULL)  # Return NULL if we couldn't get either version
-    }
-    
-    if (github_ver > local_ver) {
-      return(list(
-        text = HTML(paste0("A newer version (", github_ver, ") is available on GitHub. ",
-                           "You are currently using version ", local_ver, ". ",
-                           "Please update to access the latest features and bug fixes:<br>",
-                           "<code>remotes::install_github('jniedballa/camtrapR', ref = 'dev')</code>")),
-        type = "warning"
-      ))
-    }
-    return(NULL)  # Return NULL if current version is up to date
-  }
-  
-  # Function to create version notification
-  create_version_notification <- function() {
-    version_info <- check_version()
-    if (!is.null(version_info)) {
-      shiny::showNotification(
-        ui = version_info$text,
-        type = version_info$type,
-        duration = NULL,
-        closeButton = TRUE,
-        id = "version-check"
-      )
-    }
-  }
   
   
   # function to locate help files
@@ -411,9 +357,6 @@ surveyDashboard <- function(CTtable = NULL,
   
 
   
-  # Create flag indicating if data was provided via parameters
-  has_params <- !is.null(CTtable) && !is.null(recordTable)
-  
   # Helper function for standard tooltips in the dashboard
   add_tooltip <- function(id, 
                           title, 
@@ -427,17 +370,56 @@ surveyDashboard <- function(CTtable = NULL,
                        options = options)
   }
   
+  
+  # add debug button in UI (for developers, not user)
+  show_debug <- identical(Sys.getenv("CAMTRAPR_DEBUG"), "true")
+  
   # UI definition ####
   ui <- shinydashboard::dashboardPage(
     
     shinydashboard::dashboardHeader(
       title = "Survey dashboard",
+      
+      # Link collection
+      dropdownMenu(
+        type = "notifications",
+        icon = icon("link"),
+        badgeStatus = "success",
+        headerText = "Useful Links",
+        
+        # custom notificationItem function to prevent 403 access denied error from Google
+        # also ensures that websites open in new tab, not in the shiny app tab
+        # NOTE: minor caveat: When clicking links from RStudio built-in Viewer, it opens useless blank page (also the web site in browser though)
+        # solution 1: Just close the blank page and go to browser 
+        # solution 2: In app, click "Open in browser", then click links
+        # solution 3: before starting app, run options(shiny.launch.browser = TRUE) to automatically open app in browser
+        
+        notificationItem_blank(
+          text = "GitHub Repository",
+          icon = icon("github"),
+          status = "info",
+          href = "https://github.com/jniedballa/camtrapR"
+        ),
+        notificationItem_blank(
+          text = "Report an Issue",
+          icon = icon("bug"),
+          status = "danger",
+          href = "https://github.com/jniedballa/camtrapR/issues"
+        ),
+        notificationItem_blank(
+          text = "Google Group",
+          icon = icon("google"),
+          status = "warning",
+          href = "https://groups.google.com/g/camtrapr"
+        )
+      ),
       shinydashboard::dropdownMenuOutput("stateMenu")
     ),
     
     
     shinydashboard::dashboardSidebar(
       shinydashboard::sidebarMenu(
+        id = "tabs",  # enables input$tabs (active top-level tabName) for the warning system
         # Add shinyBS init here - this dummy tooltip helps ensure library loads if no other tooltips are immediately visible.
         add_tooltip(id = "sidebarMenu_init", title = ""), # Optional dummy tooltip
         
@@ -456,9 +438,10 @@ surveyDashboard <- function(CTtable = NULL,
         # Add new dedicated Filters section
         shinydashboard::menuItem("Data Filters", icon = shiny::icon("filter"),
                                  shinydashboard::menuSubItem("Filter Overview", tabName = "filter_overview"),
-                                 shinydashboard::menuSubItem("Station Filters", tabName = "filterCTData"),
-                                 shinydashboard::menuSubItem("Temporal Filters", tabName = "filterRecords"),
-                                 shinydashboard::menuSubItem("Species Filters", tabName = "filterSpecies")
+                                 shinydashboard::menuSubItem("Station Filter", tabName = "filterCTData"),
+                                 shinydashboard::menuSubItem("Date Range Filter", tabName = "filterCTData_by_date"),
+                                 shinydashboard::menuSubItem("Temporal Filter", tabName = "filterRecords"),
+                                 shinydashboard::menuSubItem("Species Filter", tabName = "filterSpecies")
         ),
         add_tooltip(id = "Data Filters", title = "Apply filters to refine the dataset used for analysis.", placement = "right"),
         
@@ -507,25 +490,72 @@ surveyDashboard <- function(CTtable = NULL,
         tags$div(
           class = "sidebar-button-container",
           actionButton("export_all_data", "Export Data",
-                       icon = icon("download")),
-          add_tooltip(id = "export_all_data", title = "Export processed data, models, and plots.") # Default placement=bottom is fine here
-        )
+                       icon = icon("download"),
+                       class = "btn-primary"),
+          add_tooltip(id = "export_all_data",
+                      title = "Export processed data, models, and plots.")
+        ),
+        
+        tags$div(
+          tags$hr(class = "sidebar-divider")
+        ),
+        
+        # Data warnings review button
+        tags$div(
+          class = "sidebar-button-container",
+          actionButton("show_data_warnings", "Data Warnings",
+                       icon = icon("exclamation-triangle"),
+                       class = "btn-warning"),
+          add_tooltip(id = "show_data_warnings",
+                      title = "Review all active data-quality warnings (station count, species count, low detections).")
+        ),
+        
+        # Model warnings review button
+        tags$div(
+          class = "sidebar-button-container",
+          actionButton("show_model_warnings", "Model Warnings",
+                       icon = icon("exclamation-circle"),
+                       class = "btn-warning"),
+          add_tooltip(id = "show_model_warnings",
+                      title = "Review all active model warnings (convergence, effective sample size, lack of fit).")
+        ),
+        
+        if (show_debug) {
+          tags$div(
+            class = "sidebar-button-container",
+            actionButton("debug_button", "Debug",
+                         icon = icon("bug"),
+                         class = "btn-default"),
+            add_tooltip(id = "debug_button",
+                        title = "Triggers browser() for debugging.")
+          )
+        }
       )
     ),
     shinydashboard::dashboardBody(
       # Add bsAlert anchor (needed for bsAlerts)
       shinyBS::bsAlert("alert"),
-      shiny::uiOutput("welcome_screen"),
       
       shinydashboard::tabItems(
         
         
         ## Tab: Import data ----
         
-        ###  csv ----
+        ###  CSV ----
         shinydashboard::tabItem(
           tabName = "import_csv",
           shiny::tabsetPanel(
+            selected = "Camera Trap Data",
+            shiny::tabPanel("Instructions",
+                            fluidRow(
+                              shinydashboard::box(
+                                title = "Data Format for CSV Import",
+                                width = 12,
+                                status = "info",
+                                shiny::HTML(paste(help_text("csv_upload_help.html"), collapse = "\n"))
+                              )
+                            )
+            ),
 
             shiny::tabPanel("Camera Trap Data",
                             shinydashboard::box(
@@ -539,6 +569,13 @@ surveyDashboard <- function(CTtable = NULL,
                                                                        "Upload the CSV file containing camera deployment information (locations, setup/retrieval dates)."),
                                                accept = c(".csv")),
                               add_tooltip(id = "ct_file", title = "Upload the CSV file containing camera deployment information (locations, setup/retrieval dates)."), # Keep bsTooltip for fileInput
+                              
+                              # # --- CSV delimiter ---
+                              # shiny::selectInput("csvDelimiter_CT",
+                              #                    label = label_with_info("CSV file delimiter", "Specify the field separator character used to separate columns within each line of the input file."),
+                              #                    selected = ",",
+                              #                    choices = c(",", ";")  
+                              # ),
                               
                               shiny::selectInput("stationCol", 
                                                  label = label_with_info("Station Column", "Select the column identifying unique camera trap stations."), 
@@ -566,7 +603,7 @@ surveyDashboard <- function(CTtable = NULL,
                               shiny::textInput("crs",
                                                label = label_with_info("Coordinate Reference System", "Specify the CRS using EPSG codes (e.g., EPSG:4326 for WGS84, EPSG:32650 for UTM Zone 50N). No quotes needed."),
                                                value = "",
-                                               placeholder = "e.g. EPSG:4326 or EPSG:32648"
+                                               placeholder = "e.g. 4326 or EPSG:4326"
                               ),
                               
                               # --- Date Columns ---
@@ -585,6 +622,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                label = label_with_info("Date Format", "Specify date format using lubridate codes (e.g., ymd, dmy HMS, %Y-%m-%d %H:%M:%S)."),
                                                value = "ymd"
                               ),
+                              
                               
                               # --- Problem Columns Checkbox ---
                               shiny::checkboxInput("hasProblems",
@@ -609,9 +647,17 @@ surveyDashboard <- function(CTtable = NULL,
                               solidHeader = TRUE,
                               width = 12,
                               shiny::fileInput("record_file",
-                                               label = label_with_info("Upload Record CSV", "Upload the CSV file containing species detection records."),
+                                               label = label_with_info("Upload Record CSV", 
+                                                                       "Upload the CSV file containing species detection records. If you see an error 'maximum upload size exceeded', please restart dashboard and adjust maximum allowed file size in sidebar, under 'File Size Control'."),
                                                accept = c(".csv")
                               ),
+                              
+                              # # --- CSV delimiter ---
+                              # shiny::selectInput("csvDelimiter_recs",
+                              #                    label = label_with_info("CSV file delimiter", "Specify the field separator character used to separate columns within each line of the input file."),
+                              #                    selected = ",",
+                              #                    choices = c(",", ";", "\t")
+                              # ),
                               
                               shiny::selectInput("speciesCol", 
                                                  label = label_with_info("Species Column", "Select the column containing the species names (common or scientific)."), 
@@ -719,6 +765,9 @@ surveyDashboard <- function(CTtable = NULL,
         ),
         
         ### camtrap DP ----
+        
+        # TODO: When loading camtrap DP data, applying species filter, then loading a new dataset, the filters don't reset.
+        
         shinydashboard::tabItem(
           tabName = "import_camtrapdp",
           fluidRow(
@@ -731,9 +780,10 @@ surveyDashboard <- function(CTtable = NULL,
               # Directory selection
               fluidRow(
                 column(8,
-                       textInput("camtrapdp_directory", "Path to camtrapDP Directory:",
-                                 placeholder = "C:/path/to/camtrapdp_directory"),
-                       add_tooltip(id = "camtrapdp_directory", title = "Enter the path to the root directory of the camtrapDP dataset (the folder containing 'datapackage.json').")
+                       textInput("camtrapdp_directory", 
+                                 label = label_with_info("Path to camtrapDP directory:", 
+                                                         "Enter the path to the root folder of the camtrapDP dataset. This folder must contain the 'datapackage.json' file."),
+                                 placeholder = "C:/path/to/camtrapdp_directory")
                 ),
                 column(4,
                        style = "margin-top: 25px;",
@@ -748,47 +798,37 @@ surveyDashboard <- function(CTtable = NULL,
                 column(6,
                        h4("Basic Import Options"),
                        numericInput("camtrapdp_min_gap_hours",
-                                    label = tagList(
-                                      "Min. gap for camera interruption (hours)",
-                                      span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
-                                           title = "Min duration (hours) without observations to mark a deployment interruption.")
-                                    ),
+                                    label = label_with_info("Min. gap for camera interruption (hours)", 
+                                                            "Minimum duration (in hours) between the end of one deployment and the start of the next at the same station. If the gap exceeds this value, it is logged as a 'Problem' period (camera inactive) in the resulting camera trap table. This calculation is based solely on deployment start and end dates, not on species observation records."),
                                     value = 24, min = 1),
-                       # add_tooltip(id = "camtrapdp_min_gap_hours", title = "Define the minimum duration (in hours) without observations to consider a camera deployment interrupted (used for 'Problem' columns)."),
+                       
                        radioButtons("camtrapdp_filter_observations",
-                                    label = tagList(
-                                      "Filter observations:",
-                                      span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
-                                           title = "Import all records or only those classified as 'animal'.")
-                                    ),
+                                    label = label_with_info("Filter observations:", 
+                                                            "Choose whether to import all observation records or only those explicitly classified as 'animal'."),
                                     choices = c("All observation types" = "none", "Animal observations only" = "animals"),
                                     selected = "none"),
-                       # add_tooltip(id = "camtrapdp_filter_observations", title = "Choose whether to import all observation records or only those classified as 'animal'."),
+                       
                        checkboxInput("camtrapdp_cameras_independent",
-                                     label = tagList(
-                                       "Cameras are independent",
-                                       span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
-                                            title = "If multiple cameras per location ('locationName'), treat as independent units?")
-                                     ),
+                                     label = label_with_info("Treat multiple cameras as independent", 
+                                                             "If the dataset includes multiple cameras deployed at the same location, check this box to treat each camera (identified by 'cameraID') as an independent sampling unit. Uncheck if cameras were paired."),
                                      value = FALSE),
-                       # add_tooltip(id = "camtrapdp_cameras_independent", title = "If the dataset includes a 'cameraID' and multiple cameras are deployed per 'locationName', check this to treat them as independent units."),
+                       
                        checkboxInput("camtrapdp_remove_na",
-                                     "Remove columns with only NA values", value = TRUE),
-                       add_tooltip(id = "camtrapdp_remove_na", title = "Automatically remove columns from the imported tables if they contain only missing (NA) values."),
+                                     label = label_with_info("Remove columns with only NA values", 
+                                                             "Automatically removes columns from the imported tables if they contain only missing (NA) values."),
+                                     value = TRUE),
+                       
                        checkboxInput("camtrapdp_remove_empty",
-                                     "Remove columns with only empty values", value = TRUE),
-                       add_tooltip(id = "camtrapdp_remove_empty", title = "Automatically remove columns from the imported tables if they contain only empty strings or blanks.")
+                                     label = label_with_info("Remove columns with only empty values", 
+                                                             "Automatically removes columns from the imported tables if they contain only empty strings or whitespace."),
+                                     value = TRUE)
                 ),
                 column(6,
                        h4("Advanced Options"),
                        textInput("camtrapdp_custom_filter",
-                                 label = tagList(
-                                   "Custom observation types to include (comma-separated):",
-                                   span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
-                                        title = "Enter comma-separated 'observationType' values to keep. Overrides basic filter.")
-                                 ),
+                                 label = label_with_info("Custom observation types to include (comma-separated):", 
+                                                         "Enter a comma-separated list of 'observationType' values to keep (e.g., animal, human, vehicle). If provided, this overrides the basic filter setting on the left."),
                                  placeholder = "e.g., animal,human,vehicle")
-                       # add_tooltip(id = "camtrapdp_custom_filter", title = "Enter a comma-separated list of observation types (from 'observationType' column) to keep. This overrides the basic filter setting.")
                 )
               ),
               
@@ -799,7 +839,8 @@ surveyDashboard <- function(CTtable = NULL,
                          style = "margin-top: 20px;",
                          actionButton("camtrapdp_import", "Import Data",
                                       class = "btn-primary btn-lg"),
-                         add_tooltip(id = "camtrapdp_import", title = "Start importing the camtrapDP data with the specified options.")
+                         add_tooltip(id = "camtrapdp_import", 
+                                     title = "Imports the camtrapDP dataset into the application using the specified options.")
                        )
                 )
               ),
@@ -858,14 +899,14 @@ surveyDashboard <- function(CTtable = NULL,
             status = "warning",
             solidHeader = TRUE,
             width = 12,
-            shiny::numericInput("max_file_size", "Maximum file size (MB)", value = 10, min = 5, max = 100),
+            shiny::numericInput("max_file_size", "Maximum file size (MB)", value = 500, min = 500, max = 2000, step = 500),
             add_tooltip(id = "max_file_size", title = "Set the maximum size (in Megabytes) for files uploaded to the application."),
             shiny::actionButton("update_max_size", "Update Maximum File Size"),
             add_tooltip(id = "update_max_size", title = "Apply the selected maximum file size limit.")
           )
         ),
         
-        ## Tab: Summary  ----
+        ## Tab: Data Summary  ----
         # (No input elements here)
         shinydashboard::tabItem(
           tabName = "Summary",
@@ -883,6 +924,8 @@ surveyDashboard <- function(CTtable = NULL,
                                              width = NULL
               )
             ),
+            # NOTE: a box with number of independent detections would be nice, but temporal filtering is usually done before importing data in dashboard (recordTable())
+            # could currently only be implemented if the temporal filter is applied (likely rare for most users)
             shinydashboard::box(
               width = 3,
               shinydashboard::valueBoxOutput("num_species",
@@ -966,8 +1009,10 @@ surveyDashboard <- function(CTtable = NULL,
                                 )
         ),
         
-        ## Tab: Camera table  ----
+        ## Tab: Tables ----
         # (No input elements here)
+        
+        ### Tab: Camera table  ----
         shinydashboard::tabItem(tabName = "camera_table",
                                 shiny::tabsetPanel(
                                   shiny::tabPanel(title = "Current Camera trap table",
@@ -979,8 +1024,7 @@ surveyDashboard <- function(CTtable = NULL,
                                 )
         ),
         
-        ## Tab: Record table  ----
-        # (No input elements here)
+        ### Tab: Record table  ----
         shinydashboard::tabItem(tabName = "record_table",
                                 DT::dataTableOutput("record_table")),
         
@@ -1020,8 +1064,9 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
+        ## Tab: Activity ----
         
-        ## Tab:  Activity (single)  ----
+        ### Tab:  Activity (single)  ----
         shinydashboard::tabItem(
           tabName = "ActivityDensity",
           shiny::fluidRow(
@@ -1042,8 +1087,8 @@ surveyDashboard <- function(CTtable = NULL,
                                             height = "600px"))
           )
         ),
-        
-        ## Tab: Activity ( species overlap)  ----
+     
+        ### Tab: Activity ( species overlap)  ----
         shinydashboard::tabItem(
           tabName = "TwoSpeciesOverlap",
           shiny::fluidRow(
@@ -1056,9 +1101,7 @@ surveyDashboard <- function(CTtable = NULL,
                                  title = "Select the first species for overlap analysis.")
                           ),
                           choices = NULL,   # Dynamically updated
-                          selected = NULL),
-              add_tooltip(id = "speciesA", title = "Select the first species for the activity overlap analysis.")
-            ),
+                          selected = NULL)),
             shiny::column(
               width = 6,
               selectInput("speciesB",
@@ -1068,9 +1111,7 @@ surveyDashboard <- function(CTtable = NULL,
                                  title = "Select the second species for overlap analysis.")
                           ),
                           choices = NULL,    # Dynamically updated
-                          selected = NULL),
-              add_tooltip(id = "speciesB", title = "Select the second species for the activity overlap analysis.")
-            )
+                          selected = NULL))
           ),
           shiny::fluidRow(
             shiny::column(width = 12, shiny::plotOutput("actOverlapPlot",
@@ -1078,9 +1119,10 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
+      
+        ## Tab: Filters ----  
         
-        
-        ## Tab: filter summary ----
+        ### Filter summary ----
         shinydashboard::tabItem(
           tabName = "filter_overview",
           fluidRow(
@@ -1088,7 +1130,7 @@ surveyDashboard <- function(CTtable = NULL,
                    shinydashboard::box(
                      title = "Active Filters Summary",
                      width = NULL,
-                     status = "warning",
+                     status = "primary",
                      solidHeader = TRUE,
                      
                      # Summary counts
@@ -1103,9 +1145,11 @@ surveyDashboard <- function(CTtable = NULL,
                               shinydashboard::valueBoxOutput("summary_species_filtered", width = NULL)
                        ),
                        column(3,
-                              shiny::actionButton("resetAllFiltersOverview", "Reset All Filters",
-                                                  icon = icon("sync"), class = "btn-danger btn-block"),
-                              add_tooltip("resetAllFiltersOverview", "Click to remove all station, temporal, and species filters.")
+                              shiny::actionButton("resetAllFiltersOverview", 
+                                                  "Reset All Filters",
+                                                  icon = icon("undo"), 
+                                                  class = "btn-warning"),
+                              add_tooltip("resetAllFiltersOverview", "Click to remove all station, temporal, and species filters (does not bring back species removed by 'exclude').")
                        )
                      )
                    )
@@ -1113,7 +1157,7 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
-        ## Tab: Filter Stations  ----
+        ### Filter Stations  ----
         shinydashboard::tabItem(
           tabName = "filterCTData",
           fluidRow(
@@ -1133,9 +1177,13 @@ surveyDashboard <- function(CTtable = NULL,
                                           title = "Select the camera trap table column to filter by.")
                                    ),
                                    choices = NULL),
-                       uiOutput("filterControls"), # Tooltips added dynamically via renderUI
-                       shiny::actionButton("applyFilter", "Apply Filter", class = "btn-primary"),
-                       add_tooltip(id = "applyFilter", title = "Apply the currently defined filter to the camera trap stations.")
+                       uiOutput("filterControlsCamtrap"), # Tooltips added dynamically via renderUI
+                       shiny::actionButton("applyFilter_camtrap_properties", 
+                                           "Apply Filter", 
+                                           icon = icon("filter"),
+                                           class = "btn-success",
+                                           style = "margin-top: 10px;"), # green
+                       add_tooltip(id = "applyFilter_camtrap_properties", title = "Apply the currently defined filter to the camera trap stations.")
                 ),
                 
                 # Active filters display
@@ -1145,15 +1193,23 @@ surveyDashboard <- function(CTtable = NULL,
                          width = NULL,
                          status = "info",
                          uiOutput("activeFilters"), # Dynamic buttons, tooltips added via server
-                         shiny::actionButton("clearAllFilters", "Clear All Camera Trap Filters", class = "btn-warning"),
+                         shiny::actionButton("clearAllFilters", 
+                                             "Clear All Camera Trap Filters", 
+                                             class = "btn-warning",
+                                             icon = icon("undo"),
+                                             style = "margin-left: 10px;"),
                          add_tooltip(id = "clearAllFilters", title = "Remove all active filters applied to the camera trap stations.")
                        )
                 )
               ),
               hr(),
               fluidRow(
-                column(12,
-                       uiOutput("filterSummary")
+                shinydashboard::box(
+                  title = "Filter Summary",
+                  width = 12,
+                  status = "info",
+                  solidHeader = TRUE,
+                  uiOutput("overallFilterSummary")
                 )
               ),
               fluidRow(
@@ -1184,7 +1240,74 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
-        ## Tab: Filter records temporally ----
+        
+        ### Filter Deployments by Date ----
+        shinydashboard::tabItem(
+          tabName = "filterCTData_by_date",
+          fluidRow(
+            shinydashboard::box(
+              title = "Filter Deployments & Records by Date",
+              width = 12,
+              status = "primary",
+              solidHeader = TRUE,
+              
+              # Informational text explaining the biological/ecological logic to the user
+              p("Select a study window. Deployments that do not overlap with this range 
+                will be excluded. Overlapping deployments will have their setup/retrieval 
+                dates temporarily clipped to match this window, and records outside this 
+                range will be filtered out."),
+              
+              # TODO: changing setup date when CTdateFormat is date (not date-time) causes cameraOperation to assume setup was at 12 noon, losing half a day of effort
+              
+              
+              # Date Range Selection Widget (Calendar)
+              fluidRow(
+                column(6,
+                       dateRangeInput(
+                         inputId = "date_range_filter",
+                         label = tagList(
+                           "Select Active Window (Start & End Date):",
+                           span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
+                                title = "Define the global date boundaries for deployments and records.")
+                         ),
+                         start = NULL, # Populated dynamically on data load via server-side update
+                         end = NULL,
+                         separator = " to ",
+                         format = "yyyy-mm-dd",
+                         weekstart = 1
+                       )
+                )
+              ),
+              
+              hr(),
+              
+              # Action and Clear buttons
+              fluidRow(
+                column(12,
+                       actionButton(
+                         inputId = "apply_date_filter",
+                         label = "Apply Date Constraints",
+                         icon = icon("filter"),
+                         class = "btn-success" # green
+                       ),
+                       add_tooltip(id = "apply_date_filter", title = "Recalculate deploy effort and slice records according to this date range."),
+                       
+                       actionButton(
+                         inputId = "clear_date_filter",
+                         label = "Clear Date Constraints",
+                         icon = icon("undo"),
+                         class = "btn-warning", # orange
+                         style = "margin-left: 10px;"
+                       ),
+                       add_tooltip(id = "clear_date_filter", title = "Reset start and end date boundary filtering to original values.")
+                )
+              )
+            )
+          )
+        ),
+        
+        
+        ### Filter records temporally ----
         shinydashboard::tabItem(
           tabName = "filterRecords",
           fluidRow(
@@ -1192,25 +1315,36 @@ surveyDashboard <- function(CTtable = NULL,
               title = "Temporal Filtering Settings", width = 12, status = "primary",
               solidHeader = TRUE,
               numericInput("minDeltaTime", 
-                           label = label_with_info("Minimum time difference (minutes)", "Specify the minimum time gap (in minutes) required between consecutive records of the same species at the same location to be considered independent."), 
+                           label = label_with_info("Minimum time difference (minutes)", 
+                                                   "Set the minimum time gap (in minutes) between consecutive records of the same species at the same station. Records closer in time than this threshold are considered non-independent and will be collapsed into a single independent record."), 
                            value = 0, min = 0
               ),
               
               selectInput("deltaTimeComparedTo", 
-                          label = label_with_info("Compare delta time to:", "Choose whether the time difference is calculated relative to the last record overall or only the last *independent* record."),
+                          label = label_with_info("Independence definition:", 
+                                                  "Determines how the time gap is measured. 'Last record' compares each record to the immediately preceding one. 'Last independent record' compares each record to the last record that already passed the independence threshold."),
                           choices = c("Last independent record" = "lastIndependentRecord", "Last record" = "lastRecord")
               ),
               
               uiOutput("camerasIndependentUI"), # Tooltip added dynamically via renderUI
               
               checkboxInput("removeDuplicateRecords", 
-                            label = label_with_info("Remove duplicate records", "Remove records that have the exact same timestamp, species, and station/camera ID."), 
+                            label = label_with_info("Remove exact duplicate records", 
+                                                    "If checked, records with the exact same timestamp, species, and station/camera ID are removed. This is useful for cleaning data where the camera may have logged identical entries multiple times."), 
                             value = TRUE
               ),
               # buttons keep tooltips separate to avoid clickable icons inside buttons
-              shiny::actionButton("runTemporalFilter", "Apply Temporal Filter"),
+              shiny::actionButton("runTemporalFilter", 
+                                  "Apply Temporal Filter",
+                                  icon = icon("filter"),
+                                  class = "btn-success" # green
+                                  ),
               add_tooltip(id = "runTemporalFilter", title = "Apply the temporal independence filter to the record table."),
-              shiny::actionButton("restoreOriginalRecordTable", "Restore Original Record Table", class = "btn-warning"),
+              shiny::actionButton("restoreOriginalRecordTable", 
+                                  "Clear temporal record filter", 
+                                  class = "btn-warning",
+                                  icon = icon("undo"),
+                                  style = "margin-left: 10px;"),
               add_tooltip(id = "restoreOriginalRecordTable", title = "Remove the temporal filter and revert to the record table prior to temporal filtering (other filters may still apply).")
             )
           ),
@@ -1230,7 +1364,7 @@ surveyDashboard <- function(CTtable = NULL,
           )
         ),
         
-        ## Tab: Species filter ----
+        ### Species filter ----
         shinydashboard::tabItem(
           tabName = "filterSpecies",
           fluidRow(
@@ -1251,7 +1385,8 @@ surveyDashboard <- function(CTtable = NULL,
                                                  class = "btn-success btn-block",
                                                  icon = icon("check")),
                              add_tooltip(id = "keepSelectedSpecies", title = "Keep only the species selected in the table, filtering out all others."),
-                             shiny::actionButton("removeSelectedSpecies", "Remove Selected Species",
+                             shiny::actionButton("removeSelectedSpecies", 
+                                                 "Remove Selected Species",
                                                  class = "btn-danger btn-block",
                                                  icon = icon("trash")),
                              add_tooltip(id = "removeSelectedSpecies", title = "Filter out the species selected in the table."),
@@ -1273,12 +1408,18 @@ surveyDashboard <- function(CTtable = NULL,
             shinydashboard::box(
               title = "Filtered Records Preview", 
               solidHeader = TRUE, width = 12, status = "info",
+              collapsible = TRUE, collapsed = TRUE,
               DT::dataTableOutput("filteredRecordTable")
             )
           )
         ),
         
-        ## Tab: Extract covariates  ----
+
+
+
+        ## Covariates ----
+        
+        ### Tab: Extract covariates  ----
         shinydashboard::tabItem(tabName = "extract",
                                 shiny::tabsetPanel(
                                   selected = "Extract Covariates",
@@ -1415,8 +1556,8 @@ surveyDashboard <- function(CTtable = NULL,
                                                                  
                                                                  radioButtons("elevationZoom", 
                                                                               label = label_with_info("Zoom Level (Resolution):", "Select the desired resolution (zoom level) for the downloaded elevation data. Higher zoom levels provide finer resolution but require more download time and processing."),
-                                                                              choices = c("12 (~20m)" = 12, "11 (~40m)" = 11, "10 (~80m)" = 10, "9 (~160m)" = 9),
-                                                                              selected = 11
+                                                                              choices = c("12 (~20m)" = 12, "11 (~40m)" = 11, "10 (~80m)" = 10, "9 (~160m)" = 9, "8 (~320m)" = 8),
+                                                                              selected = 10
                                                                  )
                                                                )
                                                         )
@@ -1467,7 +1608,7 @@ surveyDashboard <- function(CTtable = NULL,
         ),
         
         
-        ## Tab: Covariate correlation ----
+        ### Tab: Covariate correlation ----
         shinydashboard::tabItem(
           tabName = "covariateCorrelation",
           shiny::tabsetPanel(
@@ -1729,10 +1870,10 @@ surveyDashboard <- function(CTtable = NULL,
                                                         min = 1, max = 20, value = 10, step = 1, ticks = FALSE)),
                               shiny::column(3, 
                                             selectInput("day1_single_species",
-                                                        label = label_with_info("Day 1",
-                                                                                "'survey'=align all to survey start; 'station'=align to station setup date."),
+                                                        label = label_with_info("Occasion start date", 
+                                                                                "Defines when the first sampling occasion begins. 'survey' aligns all stations to the overall first day of the study, ensuring temporal consistency across sites. 'station' aligns each station's timeline to its individual camera setup date. Using 'station' results in more compact detection matrices (avoiding leading zero-occasions), which can speed up model fitting, particularly for Bayesian models ('ubms')."),
                                                         choices = c("survey", "station"), selected = "survey")
-                              )               
+                              )              
                             ),
                             shiny::fluidRow(
                               shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_n_records", width = NULL)),
@@ -1740,14 +1881,21 @@ surveyDashboard <- function(CTtable = NULL,
                               shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_n_stations", width = NULL)),
                               shinydashboard::box(width = 3, shinydashboard::valueBoxOutput("dethist_percent_1s", width = NULL))
                             ),
-                            shinydashboard::box(width = 12, title = "Detection History Plot", collapsible = TRUE, collapsed = FALSE, status = "primary", solidHeader = TRUE, plotly::plotlyOutput("detectionHistory")),
-                            shinydashboard::box(width = 12, title = "unmarkedFrame Summary", status = "info", solidHeader = TRUE, collapsible = TRUE, collapsed = TRUE, shiny::verbatimTextOutput("umf_summary")),
-                            shiny::actionButton("return_dethist", "Return detection history"), add_tooltip(id = "return_dethist", 
-                                                                                                           title = "Save the generated detection history list (detections and effort) to your R workspace.",
-                                                                                                           placement = "top"),
-                            shiny::actionButton("return_umf", "Return unmarkedFrame"), add_tooltip(id = "return_umf", 
-                                                                                                   title = "Save the generated unmarkedFrame object (formatted for modeling) to your R workspace.",
-                                                                                                   placement = "top")
+                            shinydashboard::box(width = 12, title = "Detection History Plot", collapsible = TRUE, collapsed = FALSE, status = "primary", solidHeader = TRUE, 
+                                                plotly::plotlyOutput("detectionHistory")),
+                            shiny::actionButton("return_dethist", "Return detection history"), 
+                            add_tooltip(id = "return_dethist", 
+                                        title = "Save the generated detection history list (detections and effort) to your R workspace.",
+                                        placement = "top")
+            ),
+            shiny::tabPanel("unmarkedFrame",
+                              shinydashboard::box(width = 12, title = "unmarkedFrame Summary", status = "info", solidHeader = TRUE, 
+                                                  footer = "This summary was created automatically based on the detection history (for observations and observation-level covariate 'effort') and the camera trap table (for site covariates). It is used as input for single-species occupancy models.",
+                                                  shiny::verbatimTextOutput("umf_summary")),
+                              shiny::actionButton("return_umf", "Return unmarkedFrame"), 
+                              add_tooltip(id = "return_umf", 
+                                          title = "Save the generated unmarkedFrame object (formatted for modeling) to your R workspace.",
+                                          placement = "top")
             )
           )
         ),
@@ -1786,36 +1934,43 @@ surveyDashboard <- function(CTtable = NULL,
                          column(width = 3,
                                 wellPanel(
                                   h4("Model Configuration", class = "text-primary"),
+                                  uiOutput("model_config_header"),
                                   selectInput("basic_model_package",
-                                              label = label_with_info("Package:", "Select R package: 'unmarked' (frequentist) or 'ubms' (Bayesian)."),
+                                              label = label_with_info("Modeling package:", 
+                                                                      "Select the R package for model fitting. 'unmarked' runs frequentist models (faster, uses Maximum Likelihood). 'ubms' runs Bayesian models (slower, uses MCMC via Stan)."),
                                               choices = c("unmarked", "ubms"), selected = "unmarked"
                                   ),
                                   
                                   selectInput("basic_model_type",
-                                              label = label_with_info("Model type:", "'Occupancy' (estimates presence/absence) or 'Royle-Nichols' (links detection to abundance)."),
+                                              label = label_with_info("Model type:", 
+                                                                      "'Occupancy' estimates the probability a site is occupied (presence/absence). 'Royle-Nichols' models detection heterogeneity as a function of site abundance, providing estimates of mean abundance per site."),
                                               choices = c("Occupancy", "Royle-Nichols"), selected = "Occupancy"
                                   ),
                                   hr(),
                                   h4("Covariates", class = "text-primary"),
                                   
                                   varSelectizeInput("basic_det_covs", 
-                                                    label = label_with_info("Detection covariates", "Select site-level covariates assumed to influence detection probability."), 
+                                                    label = label_with_info("Detection covariates", 
+                                                                            "Select site-level covariates that are assumed to influence detection probability (e.g., camera placement, habitat type). These explain why a species might be missed if it is actually present."), 
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)
                                   ), 
                                   
                                   checkboxInput("basic_effort_on_detection", 
-                                                label = label_with_info("Include effort on detection", "Check to include camera effort (active days/occasion) as an observation-level covariate influencing detection."), 
+                                                label = label_with_info("Include effort on detection", 
+                                                                        "If checked, camera effort (number of active days per occasion) is included as an observation-level covariate. This accounts for varying sampling effort across sites or occasions."), 
                                                 value = FALSE
                                   ), 
                                   
                                   varSelectizeInput("basic_occ_covs", 
-                                                    label = label_with_info("Occupancy covariates", "Select site-level covariates assumed to influence occupancy probability (or abundance)."), 
+                                                    label = label_with_info("Occupancy covariates", 
+                                                                            "Select site-level covariates assumed to influence occupancy probability (for 'Occupancy' models) or abundance (for 'Royle-Nichols' models). Examples include habitat features or management interventions."), 
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)
                                   ), 
                                   
                                   checkboxInput("basic_scale_covariates", 
-                                                label = label_with_info("Scale covariates", "Check to standardize numeric covariates (mean=0, sd=1). Recommended."), 
-                                                value = FALSE
+                                                label = label_with_info("Scale covariates", 
+                                                                        "If checked, numeric covariates are standardized (mean = 0, standard deviation = 1) before modeling. This is highly recommended to improve model convergence and interpretability of coefficient estimates."), 
+                                                value = TRUE
                                   ), 
                                   
                                   conditionalPanel(
@@ -1823,48 +1978,75 @@ surveyDashboard <- function(CTtable = NULL,
                                     hr(), h4("MCMC Settings", class = "text-primary"),
                                     
                                     numericInput("basic_ubms_chains", 
-                                                 label = label_with_info("Number of chains:", "Number of independent Markov chains (min 3 recommended)."), 
+                                                 label = label_with_info("Number of chains:", 
+                                                                         "Number of independent Markov chains to run in the Bayesian model. A minimum of 3 chains is recommended to properly assess model convergence."), 
                                                  value = 3, min = 1
                                     ), 
                                     
                                     numericInput("basic_ubms_iter", 
-                                                 label = label_with_info("Number of iterations:", "Total MCMC iterations per chain (including warmup)."), 
-                                                 value = 2000, min = 100
+                                                 label = label_with_info("Number of iterations:", 
+                                                                         "Total number of MCMC iterations per chain, including the warmup/burn-in phase. Higher values generally yield more precise estimates but increase computation time."), 
+                                                 value = 2000, min = 100, step = 100
                                     ), 
                                     
+                                    # TODO: Allow user to set burnin (as in community models). Parameter warmup in stan_occu (currently defaults to iteration / 2 - reasonable)
+                                    
                                     numericInput("basic_ubms_thin", 
-                                                 label = label_with_info("Thinning:", "Thinning interval for MCMC samples (keep every nth sample)."), 
+                                                 label = label_with_info("Thinning interval:", 
+                                                                         "Thinning interval for MCMC samples. If set to 1, all post-warmup samples are kept. Higher values keep only every 'nth' sample, reducing memory usage if chains are highly autocorrelated."), 
                                                  value = 1, min = 1
                                     ), 
                                     
                                     uiOutput("basic_ubms_cores_input"), # Tooltip added dynamically
+                                    add_tooltip(id = "basic_ubms_cores_input", 
+                                                title = "Number of CPU cores to use for running chains in parallel. For simple models, using 1 core may actually be faster due to the computational overhead of parallelization. The maximum is limited by your system's available cores.")
                                   ),
                                   hr(),
                                   div(style = "text-align: center; margin-top: 20px;",
                                       actionButton("basic_run_model", "Run Model", class = "btn-primary btn-lg btn-block"), 
-                                      add_tooltip(id = "basic_run_model", title = "Fit the occupancy model with the current specifications."),
+                                      add_tooltip(id = "basic_run_model", 
+                                                  title = "Runs the model fitting process using the currently selected package, model type, and covariates."),
                                       div(style = "margin-top: 10px;",
-                                          actionButton("basic_add_to_modsel", "Add to Model Selection", class = "btn-success btn-block"), add_tooltip(id = "basic_add_to_modsel", title = "Add the currently fitted model to the model selection table for comparison.")
-                                      )
+                                          actionButton("basic_add_to_modsel", "Add to Model Selection", class = "btn-success btn-block"), 
+                                          add_tooltip(id = "basic_add_to_modsel", 
+                                                      title = "Saves the currently fitted model to a list for model comparison (via AIC for unmarked models and LOOIC for ubms models).")
+                                      ),
+                                      div(style = "margin-top: 10px;",
+                                          actionButton("export_basic_model", "Export Model", class = "btn-info btn-block"), 
+                                          add_tooltip(id = "export_basic_model", 
+                                                      title = "Exports the fitted model object to your R workspace or local environment for further analysis.")
+                                      ),
                                   )
                                 )
                          ),
                          column(width = 9,
                                 fluidRow(
-                                  column(width = 7, shinydashboard::box(title = "Model Summary", status = "primary", width = NULL, solidHeader = TRUE, collapsible = TRUE, height = "500px", verbatimTextOutput("basic_model_summary"))),
+                                  column(width = 7, 
+                                         shinydashboard::box(title = "Model Summary", status = "primary", width = NULL, solidHeader = TRUE, collapsible = TRUE, height = "500px", 
+                                                             verbatimTextOutput("basic_model_summary"))),
                                   column(width = 5,
                                          shinydashboard::box(
                                            title = "Parameter Estimates", status = "primary", width = NULL, solidHeader = TRUE, collapsible = TRUE,
                                            fluidRow(
                                              column(width = 6, numericInput("basic_pval", "Interval width:", min = 0, max = 1, value = 0.95, step = 0.01), 
-                                                    add_tooltip(id = "basic_pval", title = "Set the confidence/credible interval width (e.g., 0.95 for 95%).")),
+                                                    add_tooltip(id = "basic_pval", 
+                                                                title = "Set the width of the confidence (for unmarked) or credible (for ubms) intervals. For example, enter 0.95 for 95% intervals.")),
                                              column(width = 6, numericInput("basic_digits", "Decimal places:", value = 2, min = 0, max = 5, step = 1), 
-                                                    add_tooltip(id = "basic_digits", title = "Number of decimal places for displaying estimates."))
+                                                    add_tooltip(id = "basic_digits", 
+                                                                title = "Number of decimal places to display in the parameter estimates table."))
                                            ),
                                            hr(),
                                            textOutput("basic_coef_det_header", inline = TRUE), verbatimTextOutput("basic_coef_det"),
                                            textOutput("basic_coef_state_header", inline = TRUE), verbatimTextOutput("basic_coef_state")
                                          )
+                                  )
+                                ),
+                                fluidRow(
+                                  shinydashboard::box(       
+                                    title = "Model Diagnostics", status = "warning", solidHeader = TRUE, collapsible = TRUE, width = 12, 
+                                    uiOutput("basic_occu_model_log_messages"),
+                                    uiOutput("basic_occu_model_log_warnings"),
+                                    uiOutput("basic_occu_model_log_errors")
                                   )
                                 )
                          )
@@ -1876,7 +2058,9 @@ surveyDashboard <- function(CTtable = NULL,
                            title = "Model Selection", status = "info", width = 12,
                            tableOutput("basic_model_selection"),
                            shiny::fluidRow(
-                             shiny::column(width = 12, shiny::actionButton("basic_clear_modsel", "Clear model selection", class = "btn-warning"), add_tooltip(id = "basic_clear_modsel", title = "Remove all models from the model selection table."))
+                             shiny::column(width = 12, shiny::actionButton("basic_clear_modsel", "Clear model selection", class = "btn-warning"), 
+                                           add_tooltip(id = "basic_clear_modsel", title = "Remove all models from the model selection table."))
+                             # TODO: Add button for exporting model list and/or model selection (as with unmarkedFrame)
                            )
                          )
                        )
@@ -1888,7 +2072,7 @@ surveyDashboard <- function(CTtable = NULL,
                                             label = label_with_info("Plot type:", "Choose whether to display response curves for detection or occupancy/abundance covariates."), 
                                             choices = c("Detection covariates", "Occupancy covariates")
                                 ), 
-                                
+                                # TODO: Would be better to calculate all response plots and present them in tabs rather than the drop down menu.
                                 numericInput("basic_ci_level", 
                                              label = label_with_info("Confidence level:", "Set the confidence level for the shaded uncertainty intervals on the response curves."), 
                                              value = 0.95, min = 0, max = 1, step = 0.01
@@ -1919,7 +2103,8 @@ surveyDashboard <- function(CTtable = NULL,
                                 
                                 # Tooltip kept separate for button
                                 actionButton("basic_run_prediction", "Generate Predictions", class = "btn-primary"), 
-                                add_tooltip(id = "basic_run_prediction", title = "Generate spatial predictions based on the fitted model and the selected covariate source."),
+                                add_tooltip(id = "basic_run_prediction", 
+                                            title = "Generate spatial predictions based on the fitted model and the selected covariate source."),
                                 
                                 uiOutput("basic_prediction_layer_choices"), # Tooltip added dynamically
                                 
@@ -1984,7 +2169,7 @@ surveyDashboard <- function(CTtable = NULL,
                                     add_tooltip(id = "adv_effort_on_detection", title = "Include camera effort as an observation covariate.")
                              ),
                              column(3,
-                                    checkboxInput("adv_scale_covariates", "Scale covariates", value = FALSE),
+                                    checkboxInput("adv_scale_covariates", "Scale covariates", value = TRUE),
                                     add_tooltip(id = "adv_scale_covariates", title = "Standardize numeric covariates before modeling.")
                              )
                            )
@@ -2056,7 +2241,7 @@ surveyDashboard <- function(CTtable = NULL,
                              title = "UBMS Settings", status = "primary", width = 12,
                              fluidRow(
                                column(3, numericInput("adv_ubms_chains", "Number of chains:", value = 3, min = 1), add_tooltip(id = "adv_ubms_chains", title = "Number of MCMC chains.")),
-                               column(3, numericInput("adv_ubms_iter", "Number of iterations:", value = 2000, min = 100), add_tooltip(id = "adv_ubms_iter", title = "Total MCMC iterations per chain.")),
+                               column(3, numericInput("adv_ubms_iter", "Number of iterations:", value = 2000, min = 100, step = 100), add_tooltip(id = "adv_ubms_iter", title = "Total MCMC iterations per chain.")),
                                column(3, numericInput("adv_ubms_thin", "Thinning:", value = 1, min = 1), add_tooltip(id = "adv_ubms_thin", title = "MCMC thinning interval.")),
                                column(3, uiOutput("adv_ubms_cores_input")) # Tooltip added dynamically
                              )
@@ -2102,6 +2287,7 @@ surveyDashboard <- function(CTtable = NULL,
         shinydashboard::tabItem(
           tabName = "CommunityOccupancy",
           tabsetPanel(
+            id = "commOccu_tabs",  # enables input$commOccu_tabs (active sub-tab title) for the warning system
             selected = "Species Selection",
             tabPanel("Instructions", 
                      fluidRow(shinydashboard::box(title = "Community Occupancy Model Workflow", width = 12, status = "info", 
@@ -2153,27 +2339,28 @@ surveyDashboard <- function(CTtable = NULL,
                          fluidRow(
                            column(3, 
                                   selectInput("communityModelType",
-                                              label = label_with_info("Model Type:", "'Occupancy' (estimates presence/absence) or 'Royle-Nichols' (links detection to abundance)."),
+                                              label = label_with_info("Model Type:", "'Occupancy' estimates presence/absence. 'Royle-Nichols' links detection probability to abundance."),
                                               choices = c("Occupancy" = "Occupancy", "Royle-Nichols" = "RN"), 
                                               selected = "Occupancy"
                                   )
                            ),
                            column(3, 
                                   sliderInput("occasionLength_community", 
-                                              label = label_with_info("Occasion Length (days)", "Define the length of sampling occasions (in days) for creating detection histories."),
+                                              label = label_with_info("Occasion Length (days)", "Defines the number of days grouped into a single sampling occasion for the detection history. Shorter lengths increase temporal resolution but may lower per-occasion detection."),
                                               min = 1, max = 20, value = 10, step = 1, ticks = FALSE
                                   )
                            ),
                            column(3, 
                                   selectInput("day1_community",
-                                              label = label_with_info("Day 1", "'survey'=align all to survey start; 'station'=align to station setup date."),
+                                              label = label_with_info("Occasion start date", 
+                                                                      "Defines when the first sampling occasion begins. 'survey' aligns all stations to the overall first day of the study, ensuring temporal consistency across sites. 'station' aligns each station's timeline to its individual camera setup date. Using 'station' results in more compact detection matrices (avoiding leading zero-occasions), which can speed up model fitting considerably."),
                                               choices = c("survey", "station"), 
                                               selected = "survey"
                                   )
                            ),
                            column(3, 
                                   checkboxInput("useNimble", 
-                                                label = label_with_info("Use Nimble", "Use the NIMBLE package for MCMC fitting instead of JAGS (experimental)."), 
+                                                label = label_with_info("Use NIMBLE", "If checked, uses the NIMBLE package for MCMC fitting instead of JAGS (experimental, requires NIMBLE to be installed)."), 
                                                 value = FALSE
                                   )
                            )
@@ -2186,7 +2373,8 @@ surveyDashboard <- function(CTtable = NULL,
                          fluidRow(
                            column(4, 
                                   selectInput("augmentationType",
-                                              label = label_with_info("Data Augmentation Type:", "Augmentation for estimating richness ('maxknown' or 'full')."),
+                                              label = label_with_info("Data Augmentation Type:", 
+                                                                      "Method to augment data for estimating community richness. 'Max Known' augments up to the maximum number of observed species, while 'Full' allows specifying a larger number to account for unobserved species."),
                                               choices = c("None" = "none", "Max Known" = "maxknown", "Full" = "full"), 
                                               selected = "none"
                                   )
@@ -2194,14 +2382,16 @@ surveyDashboard <- function(CTtable = NULL,
                            column(4, 
                                   conditionalPanel(condition = "input.augmentationType != 'none'", 
                                                    numericInput("augmentationValue", 
-                                                                label = label_with_info("Number of Potential Species:", "If using augmentation, specify the total number of potential species (observed + unobserved) in the community."), 
+                                                                label = label_with_info("Number of Potential Species:", 
+                                                                                        "If using augmentation, specify the total number of potential species (observed + unobserved) in the community."), 
                                                                 value = NULL, min = 1
                                                    )
                                   )
                            ),
                            column(4, 
                                   textInput("richnessCategories", 
-                                            label = label_with_info("Richness Categories (optional)", "Optional: Provide the name of a column in the site covariates table that defines categories for stratified richness estimation."), 
+                                            label = label_with_info("Richness Categories (optional)", 
+                                                                    "Optional: Provide the exact name of a column in the site covariates table that defines categories for stratified richness estimation (e.g., habitat types)."), 
                                             placeholder = "Enter column name"
                                   )
                            )
@@ -2209,13 +2399,15 @@ surveyDashboard <- function(CTtable = NULL,
                          fluidRow(
                            column(6, 
                                   textInput("keyword_quadratic",
-                                            label = label_with_info("Keyword for Quadratic Effects", "Suffix to identify quadratic terms (e.g., 'elevation_squared')."),
+                                            label = label_with_info("Keyword for Quadratic Effects", 
+                                                                    "Suffix to identify quadratic terms in the covariate names (e.g., 'elevation_squared')."),
                                             value = "_squared"
                                   )
                            ),
                            column(6, 
                                   textInput("modelFile", 
-                                            label = label_with_info("Model File Name (optional)", "Optional: Specify a file path to save the generated JAGS or NIMBLE model code."), 
+                                            label = label_with_info("Model File Name (optional)", 
+                                                                    "Optional: Specify a file path to save the generated JAGS or NIMBLE model code for inspection."), 
                                             placeholder = "Leave blank for temporary file"
                                   )
                            )
@@ -2230,71 +2422,64 @@ surveyDashboard <- function(CTtable = NULL,
                                   h4("Detection Covariates"),
                                   selectInput("detIntercept",
                                               label = label_with_info("Detection Intercept:",
-                                                                      "Model detection intercept: 'fixed', 'ranef', or 'independent'."),
+                                                                      "Defines how baseline detection probability is shared across species: 'fixed' (identical for all), 'ranef' (species-specific, drawn from a common distribution), or 'independent' (completely separate for each species)."),
                                               choices = c("fixed", "ranef", "independent"), selected = "ranef"),
                                   varSelectizeInput("detCovFixed", 
                                                     label_with_info("Fixed Effects", 
-                                                                    "Select covariates with a single effect across all species on detection."),
+                                                                    "Select site-level covariates that have a single, constant effect across all species on detection."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "detCovFixed", title = "Select covariates with a single effect across all species on detection."),
                                   varSelectizeInput("detCovRanef", label_with_info("Species Random Effects", 
-                                                                                   "Select covariates with species-specific but related effects on detection (drawn from a common distribution)."), 
+                                                                                   "Select covariates with species-specific but related effects on detection (effects are drawn from a shared community-level distribution)."), 
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "detCovRanef", title = "Select covariates with species-specific but related effects on detection (drawn from a common distribution)."),
                                   varSelectizeInput("detCovIndep", label_with_info("Independent Effects", 
-                                                                                   "Select covariates with completely independent effects for each species on detection."),
+                                                                                   "Select covariates with completely independent, unrelated effects for each species on detection."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "detCovIndep", title = "Select covariates with completely independent effects for each species on detection."),
                                   checkboxInput("speciesSiteRandomEffectDet", 
-                                                label_with_info("Species-Site Random Effect on Detection", 
-                                                                "Include a random effect term for each species at each specific site to account for unexplained variation in detection."), value = FALSE), 
-                                  # add_tooltip(id = "speciesSiteRandomEffectDet", title = "Include a random effect term for each species at each specific site to account for unexplained variation in detection."),
+                                                label = label_with_info("Species-Site Random Effect on Detection", 
+                                                                "Include a random effect term for each species at each specific site to account for unexplained, localized variation in detection."), value = FALSE), 
                                   h4("Effort as Detection Covariate"),
                                   checkboxInput("useEffortAsDetCov", 
-                                                label_with_info("Use Effort as Detection Covariate", 
+                                                label = label_with_info("Use Effort as Detection Covariate", 
                                                                 "Include camera trap effort (scaled trap days per occasion) as an observation-level covariate influencing detection."),
                                                 value = FALSE), 
-                                  # add_tooltip(id = "useEffortAsDetCov", title = "Include camera trap effort (scaled trap days per occasion) as an observation-level covariate influencing detection."),
                                   conditionalPanel(condition = "input.useEffortAsDetCov == true", 
                                                    radioButtons("effortDetCovType", 
                                                                 label_with_info("Effort Effect Type:", 
-                                                                                "Choose how the effort effect is modeled: 'Fixed' (same effect for all species) or 'Species random effect' (species-specific related effects)."),
-                                                                choices = c("Fixed (contant across species)" = "fixed", "Species random effect" = "ranef"), selected = "fixed")) #,
-                                                   # add_tooltip(id = "effortDetCovType", title = "Choose how the effort effect is modeled: 'Fixed' (same effect for all species) or 'Species random effect' (species-specific related effects)."))
+                                                                                "Choose how the effort effect is modeled across species: 'Fixed' (same effect for all species) or 'Species random effect' (species-specific related effects)."),
+                                                                choices = c("Fixed (constant across species)" = "fixed", "Species random effect" = "ranef"), selected = "fixed")) 
                            ),
                            column(6,
                                   h4("Occupancy Covariates"),
                                   selectInput("occuIntercept",
-                                              label = label_with_info(
-                                                "Occupancy Intercept:",
-                                                "Model occupancy/abundance intercept: 'fixed', 'ranef', or 'independent'."),
+                                              label = label_with_info("Occupancy Intercept:",
+                                                                      "Defines how baseline occupancy/abundance is shared across species: 'fixed' (identical for all), 'ranef' (species-specific, drawn from a common distribution), or 'independent' (completely separate for each species)."),
                                               choices = c("fixed", "ranef", "independent"), selected = "ranef"),
                                   varSelectizeInput("occuCovFixed", 
                                                     label_with_info("Fixed Effects", 
-                                                                    "Select covariates with a single effect across all species on occupancy/abundance."),
+                                                                    "Select site-level covariates that have a single, constant effect across all species on occupancy/abundance."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "occuCovFixed", title = "Select covariates with a single effect across all species on occupancy/abundance."),
                                   varSelectizeInput("occuCovRanef", 
                                                     label_with_info("Species Random Effects", 
-                                                                    "Select covariates with species-specific but related effects on occupancy/abundance."),
+                                                                    "Select covariates with species-specific but related effects on occupancy/abundance (effects drawn from a shared community-level distribution)."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE)), 
-                                  # add_tooltip(id = "occuCovRanef", title = "Select covariates with species-specific but related effects on occupancy/abundance."),
                                   varSelectizeInput("occuCovIndep", 
                                                     label_with_info("Independent Effects", 
-                                                                    "Select covariates with completely independent effects for each species on occupancy/abundance."),
+                                                                    "Select covariates with completely independent, unrelated effects for each species on occupancy/abundance."),
                                                     data = NULL, multiple = TRUE, options = list(selectize = TRUE))
-                                  # add_tooltip(id = "occuCovIndep", title = "Select covariates with completely independent effects for each species on occupancy/abundance.")
-                           )
+                                  )
                          )
                        )
                      ),
                      fluidRow(column(12, align = "left", 
                                      shiny::actionButton("createCommunityModel", "Create Model", class = "btn-primary btn-lg"), 
-                                     add_tooltip(id = "createCommunityModel", title = "Generate the community model structure based on the specified configuration. Does not fit the model yet."))
+                                     add_tooltip(id = "createCommunityModel", title = "Generate the community model structure based on the specified configuration. This prepares the model but does not start fitting it yet."))
                               ),
                      fluidRow(shinydashboard::box(title = "Model Summary", width = 12, status = "success", collapsible = TRUE,
                                                   verbatimTextOutput("communityModelSummary"))
-                              )
+                              ),
+                     fluidRow(shinydashboard::box(title = "Model File", width = 12, status = "info", collapsible = TRUE, collapsed = FALSE,
+                                                  htmlOutput("communityModelTextfile"))
+                     )
             ),
             tabPanel("Model Fitting",
                      fluidRow(
@@ -2305,25 +2490,25 @@ surveyDashboard <- function(CTtable = NULL,
                                   numericInput("niter", 
                                                label_with_info("Number of Iterations", 
                                                                "Total number of MCMC iterations per chain (including burn-in)."),
-                                               value = 1000, min = 100)), 
+                                               value = 1000, min = 100, step = 100)), 
                            column(3, 
                                   numericInput("nburn", 
                                                label_with_info("Burn-in", 
-                                                               "Number of initial iterations to discard as burn-in."), 
-                                               value = 500, min = 0)), 
+                                                               "Number of initial iterations to discard as burn-in to allow the chain to reach the target distribution."), 
+                                               value = 500, min = 0, step = 100)), 
                            column(3, 
                                   numericInput("nthin", 
                                                label_with_info("Thinning", 
-                                                               "Thinning interval (keep every nth sample) to reduce autocorrelation."), 
+                                                               "Thinning interval (keep every nth sample) to reduce autocorrelation and save memory."), 
                                                value = 1, min = 1)), 
                            column(3, 
                                   numericInput("nchains", 
                                                label_with_info("Number of Chains", 
-                                                               "Number of independent MCMC chains to run (minimum 3 recommended)."), 
+                                                               "Number of independent MCMC chains to run (minimum 3 recommended to assess convergence)."), 
                                                value = 3, min = 1))
                          ),
                          shiny::actionButton("fitCommunityModel", "Fit Model", class = "btn-primary"), 
-                         add_tooltip(id = "fitCommunityModel", title = "Start fitting the community model using the specified MCMC settings. This may take a significant amount of time.")
+                         add_tooltip(id = "fitCommunityModel", title = "Start fitting the community model using the specified MCMC settings. This may take a significant amount of time depending on model complexity.")
                        )
                      )
             ),
@@ -2340,7 +2525,7 @@ surveyDashboard <- function(CTtable = NULL,
                                 fluidRow(shinydashboard::box(title = "Trace Plots", width = 12, status = "warning", 
                                                              selectInput("trace_parameter", 
                                                                          label_with_info("Select Parameter:", 
-                                                                                         "Select a model parameter to view its MCMC trace plot across all chains."),
+                                                                                         "Select a model parameter to view its MCMC trace plot across all chains. Good mixing looks 'grassy' or like a 'hairy caterpillar'."),
                                                                          choices = NULL), 
                                                              # add_tooltip(id = "trace_parameter", title = "Select a model parameter to view its MCMC trace plot across all chains."), 
                                                              plotOutput("trace_plot", height = "400px")))
@@ -2379,16 +2564,14 @@ surveyDashboard <- function(CTtable = NULL,
                                                                numericInput("gof_plot_scale", "Plot size scale:", value = 1.5, min = 0.5, max = 3, step = 0.1), 
                                                                add_tooltip(id = "gof_plot_scale", title = "Adjust the overall size of text and elements in the residual plots.")),
                                                         column(3, 
-                                                               # checkboxInput("gof_plot_free_scales", "Use free scales", value = FALSE), 
                                                                checkboxInput("gof_plot_free_scales",
                                                                              label = tagList(
                                                                                "Use free scales",
                                                                                span(icon("question-circle"), style="margin-left: 5px; color: #6c757d; cursor: help;",
                                                                                     title = "Allow axes scales to vary between species residual plots?")
                                                                              ),
-                                                                             value = FALSE),
-                                                               # add_tooltip(id = "gof_plot_free_scales", title = "Allow the x and y axes scales to vary between species plots ('free') or keep them the same ('fixed').")
-                                                        )
+                                                                             value = FALSE)
+                                                               )
                                                       ),
                                                       plotOutput("gof_residual_plot", height = "auto")
                                                     )
@@ -2419,7 +2602,7 @@ surveyDashboard <- function(CTtable = NULL,
                                     class = "settings-group", style = "margin-top: 20px;", h4("Plot Settings"),
                                     selectInput("selectedPlot", "Select Effect:", choices = NULL), 
                                       add_tooltip(id = "selectedPlot", title = "Select the specific covariate effect to visualize in the plots.", placement = "top"),
-                                    numericInput("plotDraws", "Number of Draws", value = 1000, min = 100), 
+                                    numericInput("plotDraws", "Number of Draws", value = 1000, min = 100, step = 100), 
                                       add_tooltip(id = "plotDraws", title = "Number of posterior draws used to calculate uncertainty intervals for the effect plots."),
                                     numericInput("plotLevelOuter", "Confidence Level", value = 0.95, min = 0, max = 1, step = 0.01), 
                                       add_tooltip(id = "plotLevelOuter", title = "Set the confidence level for the outer uncertainty interval (e.g., 0.95 for 95% CI)."),
@@ -2454,9 +2637,9 @@ surveyDashboard <- function(CTtable = NULL,
                               wellPanel(
                                 h4("Input Settings", class = "text-primary"),
                                 selectInput("prediction_raster_source", "Prediction Surface:", choices = c("Use extracted covariates" = "extracted", "Upload custom raster" = "custom")), 
-                                add_tooltip(id = "prediction_raster_source", title = "Choose the source for the covariate rasters needed for prediction.", placement = "top"),
+                                add_tooltip(id = "prediction_raster_source", title = "Choose the source for the covariate rasters needed for prediction. 'Extracted' uses rasters already loaded in the app, while 'Custom' lets you upload your own.", placement = "top"),
                                 conditionalPanel(condition = "input.prediction_raster_source == 'custom'", fileInput("covariate_raster", "Upload Raster:", accept = c(".tif")), 
-                                                 add_tooltip(id = "covariate_raster", title = "Upload a multi-layer raster file (.tif) containing all necessary covariates. Layer names must match model covariates.")),
+                                                 add_tooltip(id = "covariate_raster", title = "Upload a multi-layer raster file (.tif) containing all necessary covariates. Layer names must exactly match the model covariate names.")),
                                 hr(),
                                 h4("MCMC Settings", class = "text-primary"),
                                 numericInput("predictionDraws", "Posterior Draws:", value = 1000, min = 100), 
@@ -2485,7 +2668,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                           div(
                                                             style = "display: flex; gap: 10px; align-items: center;",
                                                             shiny::actionButton("runOccupancyPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), 
-                                                              add_tooltip(id = "runOccupancyPrediction", title = "Generate spatial predictions for species occupancy probabilities."),
+                                                              add_tooltip(id = "runOccupancyPrediction", title = "Generate spatial predictions for species occupancy probabilities across the prediction surface."),
                                                             selectInput("occupancySpecies", "Select Species:", choices = NULL, width = "300px"), 
                                                               add_tooltip(id = "occupancySpecies", title = "Select the species for which to display the occupancy map.", placement = "top"),
                                                             selectInput("occupancyMapType", "Display:", choices = c("Mean Occupancy" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), 
@@ -2509,7 +2692,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                           div(
                                                             style = "display: flex; gap: 10px; align-items: center;",
                                                             shiny::actionButton("runRichnessPrediction", "Generate Predictions", class = "btn-primary", icon = icon("calculator")), 
-                                                              add_tooltip(id = "runRichnessPrediction", title = "Generate spatial predictions for species richness."),
+                                                              add_tooltip(id = "runRichnessPrediction", title = "Generate spatial predictions for species richness across the prediction surface."),
                                                             selectInput("richnessType", "Display:", choices = c("Mean Richness" = "mean", "Standard Deviation" = "sd", "Lower CI" = "lower", "Upper CI" = "upper"), selected = "mean", width = "200px"), 
                                                               add_tooltip(id = "richnessType", title = "Choose which richness layer to display: Mean, Standard Deviation, or Confidence Interval bounds.", placement = "top"),
                                                             selectInput("richnessColorPalette", "Color Palette:", choices = c("Viridis", "Plasma", "Inferno", "Rocket"), selected = "Viridis", width = "200px"), 
@@ -2546,81 +2729,63 @@ surveyDashboard <- function(CTtable = NULL,
   
   
   
-  
+  # Server function definition ####
   server <- function(input, output, session) { 
 
-    #  version check
+
+    # Welcome screen modal (if dashboards started without data)
+    rv_welcome <- reactiveValues(welcome_shown = FALSE) # to track if it's been shown already
+    
     observe({
-      version_info <- check_version()
-      if (!is.null(version_info)) {
-        showNotification(
-          version_info$text,
-          type = version_info$type,
-          duration = NULL,
-          closeButton = TRUE,
-          id = "version-check"
-        )
+      # Check if data is NOT loaded based on your original conditions
+      data_not_loaded <- is.null(CTtable) && is.null(recordTable) && 
+        is.null(data$CTtable) && is.null(data$recordTable)
+      
+      # Show modal only if data is missing and we haven't shown it yet
+      if (data_not_loaded && !rv_welcome$welcome_shown) {
+        
+        rv_welcome$welcome_shown <- TRUE # Mark as shown so it doesn't pop up again
+        
+        showModal(modalDialog(
+          title = "Welcome to the Camera Trap Survey Dashboard",
+          size = "l", # Large modal to fit the text nicely
+          
+          tags$div(
+            style = "padding: 10px;",
+            tags$h4("Getting Started"),
+            tags$p("To begin analyzing your camera trap data, you'll need to import:"),
+            tags$ul(
+              tags$li(tags$strong("Camera Trap Table:"), " Contains deployment information for each station"),
+              tags$li(tags$strong("Record Table:"), " Contains species detection records")
+            ),
+            
+            tags$h4("Import Options"),
+            tags$ul(
+              tags$li(tags$strong("CSV Import:"), " Upload data directly from CSV files"),
+              tags$li(tags$strong("Wildlife Insights:"), " Import from Wildlife Insights export"),
+              tags$li(tags$strong("camtrapDP:"), " Import camera trap data package")
+            ),
+            
+            tags$hr(),
+            
+            tags$p("Use the 'Import Data' menu on the left to get started."),
+            tags$p("Once your data is imported, you'll have access to:",
+                   tags$ul(
+                     tags$li("Data summaries and visualizations"),
+                     tags$li("Interactive maps"),
+                     tags$li("Species activity patterns"),
+                     tags$li("Occupancy modeling"),
+                     tags$li("And more...")
+                   )
+            )
+          ),
+          
+          easyClose = TRUE, # Disappears if user clicks outside the modal
+          footer = modalButton("Get Started") # Disappears when user clicks the button
+        ))
       }
     })
     
-    # Welcome screen (if dashboards started without data)
-    output$welcome_screen <- renderUI({
-      if (!is.null(CTtable) && !is.null(recordTable)) {
-        return(NULL)
-      }
-      
-      if (!is.null(data$CTtable) && !is.null(data$recordTable)) {
-        return(NULL)
-      }
-      
-      version_info <- check_version()
-      version_alert <- if (!is.null(version_info)) {
-        tags$div(
-          class = "alert alert-warning",
-          icon("info-circle"), 
-          version_info$text
-        )
-      }
-      
-      shinydashboard::box(
-        width = 12,
-        status = "info",
-        solidHeader = TRUE,
-        title = "Welcome to the Camera Trap Survey Dashboard",
-        
-        if (!is.null(version_info)) version_alert,
-        
-        tags$div(
-          style = "padding: 20px;",
-          tags$h4("Getting Started"),
-          tags$p("To begin analyzing your camera trap data, you'll need to import:"),
-          tags$ul(
-            tags$li(tags$strong("Camera Trap Table:"), " Contains deployment information for each station"),
-            tags$li(tags$strong("Record Table:"), " Contains species detection records")
-          ),
-          
-          tags$h4("Import Options"),
-          tags$ul(
-            tags$li(tags$strong("CSV Import:"), " Upload data directly from CSV files"),
-            tags$li(tags$strong("Wildlife Insights:"), " Import from Wildlife Insights export"),
-            tags$li(tags$strong("camtrapDP:"), " Import camera trap data package")
-          ),
-          
-          tags$hr(),
-          
-          tags$p("Use the Import Data menu on the left to get started."),
-          tags$p("Once your data is imported, you'll have access to:",
-                 tags$ul(
-                   tags$li("Data summaries and visualizations"),
-                   tags$li("Interactive maps"),
-                   tags$li("Species activity patterns"),
-                   tags$li("Occupancy modeling"),
-                   tags$li("And more...")
-                 )
-          )
-        )
-      )
-    })
     
     
     # Initialize reactive values ----
@@ -2637,11 +2802,12 @@ surveyDashboard <- function(CTtable = NULL,
       CTtable_sf = NULL,
       recordTable = NULL,
       aggregated_CTtable = NULL
-    ))
+    ), label = "initialize original_data")
     
     
     # # store the original record table
     original_record_table <- reactiveVal(NULL)
+    # NOTE: What's the point of this if we have original_data$recordTable? Can likely be removed / use original_data instead.
     # 
     # # Initialize filtered data reactive value
     filtered_data <- reactiveVal(NULL)
@@ -2675,6 +2841,7 @@ surveyDashboard <- function(CTtable = NULL,
     # single species occupancy
     #  reactive values to track models for each workflow
     basic_model <- reactiveVal(NULL)
+    print_basic_model <- reactiveVal(NULL)
     advanced_model <- reactiveVal(NULL)
     modelEffects <- reactiveVal(list(detection = list(), occupancy = list()))
     
@@ -2687,6 +2854,13 @@ surveyDashboard <- function(CTtable = NULL,
     coef_plot <- reactiveVal(NULL)
     gof_results <- reactiveVal(NULL)
     
+    # Warning system: track which warning IDs the user has already
+    # acknowledged (so popups only show once per dataset). Cleared on
+    # new dataset import via resetAppState().
+    acknowledged_warnings <- reactiveVal(NULL)
+    # Temporarily stores the IDs of warnings shown in the current modal
+    # so the dismiss handler can acknowledge them.
+    pending_acknowledgment <- reactiveVal(NULL)
     
     
     data <- shiny::reactiveValues(
@@ -2734,11 +2908,10 @@ surveyDashboard <- function(CTtable = NULL,
       if (is.null(original_record_table())) {
         original_record_table(data$recordTable)
       }
-    })
+    }, label = "initialize original_record_table")
     
     # check column specification of input tables
     observe({
-      # Only run this when we have both tables
       req(data$CTtable, data$recordTable)
       
       # Skip during restoration
@@ -2746,52 +2919,124 @@ surveyDashboard <- function(CTtable = NULL,
         return()
       }
       
-      # Check column names in camera trap table
-      ct_cols <- names(data$CTtable)
-      ct_cols_lower <- tolower(ct_cols)
+      # ---- 1. Check that the fixed required column settings are not blank ----
+      setting_errors <- character()
       
-      # Required column lists
-      required_ct_cols <- c(data$stationCol, data$xcol, data$ycol, data$setupCol, data$retrievalCol)
-      if (!is.null(data$cameraCol) && data$cameraCol != "") {
+      for (nm in c("stationCol", "xcol", "ycol", "setupCol", "retrievalCol")) {
+        val <- data[[nm]]
+        if (is.null(val) || identical(val, "")) {
+          setting_errors <- c(
+            setting_errors,
+            paste("Required setting", nm, "has not been selected")
+          )
+        }
+      }
+      
+      if (length(setting_errors) > 0L) {
+          showModal(modalDialog(
+          title = "Input Error: required column not selected",
+          tagList(
+            p("Please choose a column for the following settings before continuing:"),
+            tags$ul(lapply(setting_errors, tags$li))
+          ),
+          footer    = modalButton("Dismiss"),
+          easyClose = FALSE
+        ))
+        req(FALSE)
+      }
+      
+      # ---- 2. Build the required-column lists ----
+      # cameraCol is optional; only add if provided
+      use_camera <- !is.null(data$cameraCol) && data$cameraCol != ""
+      
+      required_ct_cols <- c(
+        data$stationCol, data$xcol, data$ycol, data$setupCol, data$retrievalCol
+      )
+      if (use_camera) {
         required_ct_cols <- c(required_ct_cols, data$cameraCol)
       }
       
-      # Check for case mismatches in CT table
-      for (col in required_ct_cols) {
-        if (!col %in% ct_cols && tolower(col) %in% ct_cols_lower) {
-          actual_case <- ct_cols[which(ct_cols_lower == tolower(col))]
-          showNotification(paste("Column case mismatch in camera trap table:", col, 
-                                 "specified but found as", actual_case), 
-                           type = "warning", duration = 10)
-        } else if (!col %in% ct_cols) {
-          showNotification(paste("Required column missing in camera trap table:", col), 
-                           type = "error", duration = NULL)
-        }
-      }
-      
-      # Check column names in record table
-      record_cols <- names(data$recordTable)
-      record_cols_lower <- tolower(record_cols)
-      
-      # Required columns for record table
-      required_record_cols <- c(data$stationCol, data$speciesCol, data$recordDateTimeCol)
-      if (!is.null(data$cameraCol) && data$cameraCol != "") {
+      required_record_cols <- c(
+        data$stationCol, data$speciesCol, data$recordDateTimeCol
+      )
+      if (use_camera) {
         required_record_cols <- c(required_record_cols, data$cameraCol)
       }
+
+      # ---- 3. Check existence / case of required columns in the tables ----
+      check_columns <- function(df, required, df_label) {
+        cols       <- names(df)
+        cols_lower <- tolower(cols)
+        missing    <- character()
+        case       <- character()
+        
+        for (col in required) {
+          if (col %in% cols) next
+          
+          pos <- match(tolower(col), cols_lower)
+          if (!is.na(pos)) {
+            actual <- cols[pos]
+            case <- c(case, paste0(
+              df_label, " case mismatch: '", col,
+              "' specified but found as '", actual, "'"
+            ))
+          } else {
+            missing <- c(missing, paste0(
+              df_label, " is missing required column '", col, "'"
+            ))
+          }
+        }
+        
+        list(missing = missing, case = case)
+      }
       
-      # Check for case mismatches in record table
-      for (col in required_record_cols) {
-        if (!col %in% record_cols && tolower(col) %in% record_cols_lower) {
-          actual_case <- record_cols[which(record_cols_lower == tolower(col))]
-          showNotification(paste("Column case mismatch in record table:", col, 
-                                 "specified but found as", actual_case), 
-                           type = "warning", duration = 10)
-        } else if (!col %in% record_cols) {
-          showNotification(paste("Required column missing in record table:", col), 
-                           type = "error", duration = NULL)
+      ct_check     <- check_columns(data$CTtable,    required_ct_cols,    "Camera-trap table")
+      record_check <- check_columns(data$recordTable, required_record_cols, "Record table")
+      
+      col_errors <- c(
+        ct_check$missing, record_check$missing,
+        ct_check$case,    record_check$case
+      )
+      
+      if (length(col_errors) > 0L) {
+        showModal(modalDialog(
+          title = "Input Error: column problems",
+          tagList(
+            p("Please fix these issues before continuing:"),
+            tags$ul(lapply(col_errors, tags$li))
+          ),
+          footer    = modalButton("Dismiss"),
+          easyClose = FALSE
+        ))
+        req(FALSE)
+      }
+      
+      # ---- 4. Uniqueness checks (safe now that columns exist) ----
+      if (use_camera) {
+        if (anyDuplicated(data$CTtable[, c(data$stationCol, data$cameraCol)])) {
+          showModal(modalDialog(
+            title = "Input Error",
+            "Duplicate stationCol + cameraCol combinations. Multi-season datasets are not yet supported.",
+            footer    = modalButton("Dismiss"),
+            easyClose = FALSE
+          ))
+          req(FALSE)
+        }
+      } else {
+        if (anyDuplicated(data$CTtable[[data$stationCol]])) {
+          showModal(modalDialog(
+            title = "Input Error",
+            "Duplicate values in stationCol. If this is a single-season dataset, do you need to specify a cameraCol? Please be aware that the dashboard currently does not support multi-season datasets. Subset to a single season if relevant.",
+            footer    = modalButton("Dismiss"),
+            easyClose = FALSE
+          ))
+          req(FALSE)
         }
       }
-    })
+    }, label = "validate column inputs")
+    
+    
+    # TODO: filter record table if there are NAs in species column
     
     # Tab: Import data ----
     
@@ -2811,12 +3056,33 @@ surveyDashboard <- function(CTtable = NULL,
       if (is.null(data)) return(NULL)
       preview <- head(data, max_rows)
       DT::datatable(preview, options = list(scrollX = TRUE, dom = 't'))
+      # NOTE: Would be nice to show the selected columns color-coded, but low priority
     }
     
     # Observer for CT file upload
     shiny::observeEvent(input$ct_file, {
       req(input$ct_file)
-      data$CTtable_temp <- read.csv(input$ct_file$datapath, stringsAsFactors = FALSE)
+      data$CTtable_temp <- read.csv(input$ct_file$datapath, 
+                                    stringsAsFactors = FALSE)
+      
+      # If table has only one column, the delimiter is wrong -> stop with modal
+      if (ncol(data$CTtable_temp) == 1) {
+        data$CTtable_temp <- NULL
+        showModal(modalDialog(
+          title = "Wrong CSV separator",
+          p(sprintf(
+            "The file '%s' was read with separator \",\" and resulted in a single column.",
+            input$ct_file$name #, 
+            #input$csvDelimiter_CT
+          )),
+          p("Please re-save your CSV file using a comma (\",\") as the field separator and upload it again."),
+          easyClose = FALSE,
+          footer = modalButton("OK")
+        ))
+        return()
+      }
+      # TODO: guess delimiter from data, or let user decide in UI. Or at least unify reading of csvs in validate_csv_upload(path, sep), outputting either data.frame or error.
+      
       updateSelectInput(session, "stationCol", choices = names(data$CTtable_temp))
       updateSelectInput(session, "cameraCol", choices = c("", names(data$CTtable_temp)))
       updateSelectInput(session, "xcol", choices = names(data$CTtable_temp))
@@ -2828,12 +3094,31 @@ surveyDashboard <- function(CTtable = NULL,
       output$ct_preview <- DT::renderDT({
         generate_preview(data$CTtable_temp)
       })
-    })
+    }, label = "CSV: camtrap file upload")
     
     # Observer for record file upload
     shiny::observeEvent(input$record_file, {
       req(input$record_file)
-      data$recordTable_temp <- read.csv(input$record_file$datapath, stringsAsFactors = FALSE)
+      data$recordTable_temp <- read.csv(input$record_file$datapath, 
+                                        stringsAsFactors = FALSE                                        )
+      
+      if (ncol(data$recordTable_temp) == 1) {
+        data$recordTable_temp <- NULL
+        showModal(modalDialog(
+          title = "Wrong CSV separator",
+          p(sprintf(
+            "The file '%s' was read with separator \",\" and resulted in a single column.",
+            input$record_file$name #,
+            # input$csvDelimiter_recs
+          )),
+          p("Please re-save your CSV file using a comma (\",\") as the field separator and upload it again."),
+          easyClose = FALSE,
+          footer = modalButton("OK")
+        ))
+        return()
+      }
+      
+      
       updateSelectInput(session, "speciesCol", choices = names(data$recordTable_temp))
       updateSelectInput(session, "recordDateTimeCol", choices = names(data$recordTable_temp))
       
@@ -2841,43 +3126,9 @@ surveyDashboard <- function(CTtable = NULL,
       output$record_preview <- DT::renderDT({
         generate_preview(data$recordTable_temp)
       })
-    })
-    
-    
-    # output$camerasIndependentImportUI <- renderUI({ 
-    #   req(data$CTtable_temp, input$stationCol, input$cameraCol)
-    #   
-    #   # Only show camerasIndependent if camera column is selected and multiple cameras exist
-    #   if (input$cameraCol != "") {
-    #     n_cameras_per_station <- table(data$CTtable_temp[[input$stationCol]])
-    #     has_multiple_cameras <- any(n_cameras_per_station > 1)
-    #     
-    #     if (has_multiple_cameras) {
-    #       checkboxInput("camerasIndependentImport", 
-    #                     "Cameras are independent", 
-    #                     value = FALSE)
-    #     }
-    #   }
-    # })
-    
-    # output$camerasIndependentUI <- renderUI({
-    #   if (!is.null(data$cameraCol) && data$cameraCol != "") {
-    #     # Show a warning if camerasIndependent is not defined in data
-    #     if (is.null(data$camerasIndependent)) {
-    #       tagList(
-    #         checkboxInput("camerasIndependent", "Cameras are independent", value = FALSE),
-    #         div(
-    #           class = "alert alert-warning",
-    #           style = "padding: 5px 10px; margin-top: 5px;",
-    #           icon("exclamation-triangle"), 
-    #           "This setting is required when using camera ID column."
-    #         )
-    #       )
-    #     } else {
-    #       checkboxInput("camerasIndependent", "Cameras are independent", value = data$camerasIndependent)
-    #     }
-    #   }
-    # })
+    }, label = "CSV: record table file upload")    
+
+
     
     # renderUI for camerasIndependentUI (Temporal Filter)
     output$camerasIndependentUI <- renderUI({
@@ -2897,35 +3148,88 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
+    
+    # Debounce the CRS input: only update after short period  of no typing to avoid excessive warnings
+    crs_done <- shiny::debounce(
+      reactive(input$crs),
+      millis = 1000 # milliseconds
+    )
+    
     # validate input coordinate system
+    #  Observe the debounced value, not input$crs directly
     observe({
-      req(input$crs)
+      req(crs_done())
       
-      # Clean up CRS input
-      clean_crs <- gsub("['\"]", "", input$crs)  # Remove quotes if present
+      # Clean: remove quotes and whitespace
+      clean_crs <- gsub('["\']', "", crs_done())
+      clean_crs <- trimws(clean_crs)
       
-      # Validate CRS format
-      if (!grepl("^EPSG:\\d+$", clean_crs, ignore.case = TRUE)) {
-        showNotification("CRS should be in format 'EPSG:number' (e.g. EPSG:4326)", 
-                         type = "warning",
-                         duration = 10)
+      if (nchar(clean_crs) == 0) return()
+      
+      # Accept "EPSG:4326" or just "4326"
+      if (!grepl("^(EPSG:)?\\d+$", clean_crs, ignore.case = TRUE)) {
+        showNotification(
+          "CRS should be an EPSG number, with or without 'EPSG:' (e.g. 4326 or EPSG:4326)",
+          id = "crs_warning",
+          type = "warning",
+          duration = 10
+        )
         return()
       }
       
-      # Try to create CRS object to validate
+      # Silently add EPSG: prefix if missing
+      if (!grepl("^EPSG:", clean_crs, ignore.case = TRUE)) {
+        clean_crs <- paste0("EPSG:", clean_crs)
+      }
+      
+      # Validate against sf
       tryCatch({
         sf::st_crs(clean_crs)
-        # Store clean CRS in data if valid
-        data$crs <- clean_crs
+        data$crs <- clean_crs          # always stored as "EPSG:number"
+        removeNotification(id = "crs_warning")
       }, error = function(e) {
-        showNotification("Invalid CRS specified. Please check the EPSG code.", 
-                         type = "error")
+        showNotification(
+          "Invalid CRS specified. Please check the EPSG code.",
+          id = "crs_error",
+          type = "error"
+        )
       })
-    })
+    }, label = "check CRS")
     
     # Observer for CT "Done" button
     shiny::observeEvent(input$ct_done, {
+      
       req(data$CTtable_temp)
+      
+      # check if stationCol is unique(if cameraCol is not defined)
+      if((is.null(input$cameraCol) || input$cameraCol == "")) {
+        if(anyDuplicated(data$CTtable_temp[, input$stationCol])) {
+          showModal(modalDialog(
+            title = "Input Error",
+            "Duplicate values in stationCol. Do you need to specify cameraCol?",
+            easyClose = TRUE
+          ))
+        }
+      } else { # check if stationCol + cameraCol is unique (e.g. because of season / session column)
+        if(anyDuplicated(data$CTtable_temp[, c(input$stationCol, input$cameraCol)])) {
+          showModal(modalDialog(
+            title = "Input Error",
+            "Duplicate values in stationCol and cameraCol. Multi-season datasets are not yet supported.",
+            easyClose = TRUE
+          ))
+        }
+      }
+      
+      # ensure user actually defined crs
+      if(is.null(data$crs)) {
+        showModal(modalDialog(
+          title = "Input Error",
+          "CRS undefined. Please define the coordinate system X and Y coordinate columns use.",
+          easyClose = TRUE
+        ))
+      }
+      
+
       data$CTtable <- data$CTtable_temp
       data$stationCol <- input$stationCol
       data$cameraCol <- if(input$cameraCol != "") input$cameraCol else NULL
@@ -2938,15 +3242,15 @@ surveyDashboard <- function(CTtable = NULL,
       data$hasProblems <- input$hasProblems
       data$camerasIndependent <- if(!is.null(input$camerasIndependentImport)) input$camerasIndependentImport else FALSE
       
-      # Reset original_data() when new data is loaded
-      observe({
-        req(data$CTtable_sf)     # Need to make sure CTtable_sf is updated first
-        original_data(list(
-          CTtable_sf = data$CTtable_sf,
-          recordTable = data$recordTable,
-          aggregated_CTtable = data$aggregated_CTtable
-        ))
-      })
+      # # Reset original_data() when new data is loaded
+      # observe({
+      #   req(data$CTtable_sf)     # Need to make sure CTtable_sf is updated first
+      #   original_data(list(
+      #     CTtable_sf = data$CTtable_sf,
+      #     recordTable = data$recordTable,
+      #     aggregated_CTtable = data$aggregated_CTtable
+      #   ))
+      # })
       
       # Clear active filters
       active_filters(list())
@@ -2967,6 +3271,7 @@ surveyDashboard <- function(CTtable = NULL,
         # x_label = x_label,
         species_accumulation_objects = species_accumulation_objects,
         basic_model = basic_model,
+        print_basic_model = print_basic_model,
         advanced_model = advanced_model,
         modelEffects = modelEffects,
         commOccu_model = commOccu_model,
@@ -2978,11 +3283,12 @@ surveyDashboard <- function(CTtable = NULL,
         gof_results = gof_results,
         output = output,
         single_species_occu_objects = single_species_occu_objects,
-        spatial_predictions_community = spatial_predictions_community
+        spatial_predictions_community = spatial_predictions_community,
+        acknowledged_warnings = acknowledged_warnings
       )
       
       shiny::showNotification("Camera Trap data updated", type = "message")
-    })
+    }, label = "CSV: Camtrap Table Done click")
     
     # Observer for Record "Done" button
     shiny::observeEvent(input$record_done, {
@@ -3024,6 +3330,7 @@ surveyDashboard <- function(CTtable = NULL,
         # x_label = x_label,
         species_accumulation_objects = species_accumulation_objects,
         basic_model = basic_model,
+        print_basic_model = print_basic_model,
         advanced_model = advanced_model,
         modelEffects = modelEffects,
         commOccu_model = commOccu_model,
@@ -3035,11 +3342,12 @@ surveyDashboard <- function(CTtable = NULL,
         gof_results = gof_results,
         output = output,
         single_species_occu_objects = single_species_occu_objects,
-        spatial_predictions_community = spatial_predictions_community
+        spatial_predictions_community = spatial_predictions_community,
+        acknowledged_warnings = acknowledged_warnings
       )
       
       shiny::showNotification("Record data updated", type = "message")
-    })
+    }, label = "CSV: Record Table Done click")
     
     
     
@@ -3184,6 +3492,7 @@ surveyDashboard <- function(CTtable = NULL,
             # x_label = x_label,
             species_accumulation_objects = species_accumulation_objects,
             basic_model = basic_model,
+            print_basic_model = print_basic_model,
             advanced_model = advanced_model,
             modelEffects = modelEffects,
             commOccu_model = commOccu_model,
@@ -3195,7 +3504,8 @@ surveyDashboard <- function(CTtable = NULL,
             gof_results = gof_results,
             output = output,
             single_species_occu_objects = single_species_occu_objects,
-            spatial_predictions_community = spatial_predictions_community
+            spatial_predictions_community = spatial_predictions_community,
+            acknowledged_warnings = acknowledged_warnings
           )
           
           # Show success message
@@ -3247,7 +3557,6 @@ surveyDashboard <- function(CTtable = NULL,
     observe({
       req(data$recordTable)
       species_list <- update_species_inputs()
-      # cat("Updated species list:", paste(species_list, collapse=", "), "\n")
       current_species_list(species_list)
     })
     
@@ -3271,116 +3580,81 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Create a project info summary from metadata
     create_project_info <- function(metadata) {
-      # Handle case when metadata is missing
       if (is.null(metadata)) {
         return(HTML("<div class='alert alert-warning'>No metadata available in datapackage.json</div>"))
       }
       
-      # Extract key metadata fields with fallbacks
       title <- metadata$title %||% "Untitled Project"
       description <- metadata$description %||% "No description available"
       version <- metadata$version %||% "Unknown"
       
+      # Safe License Extraction
       license <- "Unknown license"
       if (!is.null(metadata$licenses)) {
-        # Check if it's a data frame
-        if (is.data.frame(metadata$licenses)) {
-          # Use data frame syntax for licenses
-          if ("name" %in% names(metadata$licenses)) {
-            license_names <- metadata$licenses$name
-            license <- paste(license_names, collapse = ", ")
-          }
+        if (is.data.frame(metadata$licenses) && "name" %in% names(metadata$licenses)) {
+          license <- paste(metadata$licenses$name, collapse = ", ")
         } else if (is.list(metadata$licenses)) {
-          # Original code for list type (kept for compatibility)
           license <- paste(sapply(metadata$licenses, function(l) l$name %||% "Unknown license"), collapse = ", ")
         }
       }
       
-      
       # Extract temporal coverage
-      temporal_start <- "Unknown"
-      temporal_end <- "Unknown"
-      if (!is.null(metadata$temporal) && !is.null(metadata$temporal$start) && !is.null(metadata$temporal$end)) {
-        temporal_start <- metadata$temporal$start
-        temporal_end <- metadata$temporal$end
-      }
+      temporal_start <- metadata$temporal$start %||% "Unknown"
+      temporal_end   <- metadata$temporal$end %||% "Unknown"
       
       # Extract spatial coverage
       spatial_coverage <- "Unknown"
-      if (!is.null(metadata$spatial)) {
-        # if (!is.null(metadata$spatial$description)) {
-        # spatial_coverage <- metadata$spatial$description
-        # } else 
-        if (!is.null(metadata$spatial$bbox)) {
-          extent <- metadata$spatial$bbox
-          spatial_coverage <- sprintf("Lon: %s to %s, Lat: %s to %s",
-                                      extent[1], extent[3], extent[2], extent[4])
-        }
-      }
+      # if (!is.null(metadata$spatial$bbox)) {
+        # extent <- metadata$spatial$bbox
+      # } else {
+        extent <- sf::st_bbox(data$CTtable_sf)
+        extent <- round(extent, 3)
+      # }
+      spatial_coverage <- sprintf("Lon: %s to %s, Lat: %s to %s",
+                                  extent[1], extent[3], extent[2], extent[4])
       
-      # Extract authors/contributors
+      
+      # Safe Contributor Extraction
       authors <- "Unknown"
       if (!is.null(metadata$contributors)) {
-        # Check if it's a data frame
         if (is.data.frame(metadata$contributors)) {
-          # Use data frame syntax for contributors
           author_names <- apply(metadata$contributors, 1, function(row) {
-            # Based on structure in mica_small, use 'title' instead of 'name'
             name <- if ("title" %in% names(metadata$contributors)) row["title"] else ""
+            org  <- if ("organization" %in% names(metadata$contributors)) row["organization"] else ""
             
-            # alternative approach, seems more reasonable, but doesn't include rightsHolder, publisher
-            # name <- if ("lastName" %in% names(metadata$contributors)) paste(row["firstName"], row["lastName"]) else ""
-            
-            org <- if ("organization" %in% names(metadata$contributors)) row["organization"] else ""
-            
-            if (name != "" && !is.na(name) && org != "" && !is.na(org)) {
-              paste0(name, " (", org, ")")
-            } else if (name != "" && !is.na(name)) {
-              name
-            } else if (org != "" && !is.na(org)) {
-              org
-            } else {
-              "Unknown contributor"
-            }
+            if (!is.na(name) && name != "" && !is.na(org) && org != "") paste0(name, " (", org, ")")
+            else if (!is.na(name) && name != "") name
+            else if (!is.na(org) && org != "") org
+            else "Unknown contributor"
           })
           authors <- paste(author_names, collapse = ", ")
         } else if (is.list(metadata$contributors)) {
-          # Original code for list type (kept for compatibility)
           author_names <- sapply(metadata$contributors, function(c) {
-            name <- c$name %||% ""
+            name <- c$title %||% c$name %||% ""
             org <- c$organization %||% ""
-            if (name != "" && org != "") {
-              paste0(name, " (", org, ")")
-            } else if (name != "") {
-              name
-            } else if (org != "") {
-              org
-            } else {
-              "Unknown contributor"
-            }
+            if (name != "" && org != "") paste0(name, " (", org, ")")
+            else if (name != "") name
+            else if (org != "") org
+            else "Unknown contributor"
           })
           authors <- paste(author_names, collapse = ", ")
         }
       }
       
-      
-      # Extract taxonomic coverage
+      # Extract taxonomic coverage (camtrapdp handles this as a dataframe)
       taxonomic_info <- "No taxonomic information available"
       if (!is.null(metadata$taxonomic)) {
         tax_data <- metadata$taxonomic
-        if (is.data.frame(tax_data) || is.list(tax_data)) {
-          n_species <- length(tax_data$scientificName %||% tax_data$species %||% character(0))
-          taxonomic_info <- sprintf("%d animal species in dataset", n_species)
+        tax_df <- do.call("rbind", lapply(tax_data, as.data.frame))
+        # NOTE:  might be better to separate this by taxonRank (XY species, Z genera, 1 family, ...)
+        n_species <- length(unique(tax_df$scientificName))
+          taxonomic_info <- sprintf("%d taxa in dataset", n_species)
         }
-      }
       
-      # Keywords
-      keywords <- "None"
-      if (!is.null(metadata$keywords) && length(metadata$keywords) > 0) {
-        keywords <- paste(metadata$keywords, collapse = ", ")
-      }
+      keywords <- if (!is.null(metadata$keywords) && length(metadata$keywords) > 0) paste(metadata$keywords, collapse = ", ") else "None"
       
       # Create HTML output
+      # TODO: Better present this in native dashboard boxes (similar to filter summary)
       html_output <- tags$div(
         class = "project-info",
         style = "padding: 15px;",
@@ -3390,7 +3664,6 @@ surveyDashboard <- function(CTtable = NULL,
         tags$div(
           class = "row",
           
-          # Left column - Basic info
           tags$div(
             class = "col-md-6",
             tags$div(
@@ -3415,7 +3688,6 @@ surveyDashboard <- function(CTtable = NULL,
             )
           ),
           
-          # Right column - Coverage info
           tags$div(
             class = "col-md-6",
             tags$div(
@@ -3455,6 +3727,11 @@ surveyDashboard <- function(CTtable = NULL,
       output$camtrapdp_preview_deployments <- DT::renderDT(NULL)
       output$camtrapdp_preview_observations <- DT::renderDT(NULL)
       output$camtrapdp_project_info <- renderUI(NULL)
+      active_filters(list())
+      filter_state (list(camera_trap = NULL, 
+                         temporal = NULL, 
+                         species = NULL))
+      
       
       # Validate directory exists
       if (!dir.exists(input$camtrapdp_directory)) {
@@ -3462,13 +3739,10 @@ surveyDashboard <- function(CTtable = NULL,
         return()
       }
       
-      # Check required files
-      required_files <- c("deployments.csv", "observations.csv", "media.csv", "datapackage.json")
-      missing_files <- required_files[!file.exists(file.path(input$camtrapdp_directory, required_files))]
-      
-      if (length(missing_files) > 0) {
-        output$camtrapdp_status <- renderText(paste("Error: Missing required files:", 
-                                                    paste(missing_files, collapse = ", ")))
+      # Validate ONLY datapackage.json (CamtrapDP standard dictates this is the only required named file)
+      datapackage_file <- file.path(input$camtrapdp_directory, "datapackage.json")
+      if (!file.exists(datapackage_file)) {
+        output$camtrapdp_status <- renderText("Error: Missing required file: datapackage.json")
         return()
       }
       
@@ -3478,62 +3752,68 @@ surveyDashboard <- function(CTtable = NULL,
                                     "animals" = TRUE)
       
       # If custom filter is provided, use it instead
-      if (!is.null(input$camtrapdp_custom_filter) && 
-          nchar(trimws(input$camtrapdp_custom_filter)) > 0) {
+      if (!is.null(input$camtrapdp_custom_filter) && nchar(trimws(input$camtrapdp_custom_filter)) > 0) {
         filter_observations <- unlist(strsplit(trimws(input$camtrapdp_custom_filter), "\\s*,\\s*"))
       }
       
       # Import with progress indicator
       withProgress(message = 'Importing camtrapDP data...', value = 0, {
         tryCatch({
-          # Set file paths
-          deployments_file <- file.path(input$camtrapdp_directory, "deployments.csv")
-          observations_file <- file.path(input$camtrapdp_directory, "observations.csv")
-          # media_file <- file.path(input$camtrapdp_directory, "media.csv")
-          datapackage_file <- file.path(input$camtrapdp_directory, "datapackage.json")
           
-          # Call readcamtrapDP function
-          imported_data <- readcamtrapDP(
-            deployments_file = deployments_file,
-            observations_file = observations_file,
-            # media_file = media_file,
-            datapackage_file = datapackage_file,
+          # Call readCamtrapDP function
+          imported_data <- readCamtrapDP(
+            file = datapackage_file,
             min_gap_hours = input$camtrapdp_min_gap_hours,
             removeNA = input$camtrapdp_remove_na,
             removeEmpty = input$camtrapdp_remove_empty,
-            remove_bbox = TRUE, #input$camtrapdp_remove_bbox,
-            add_file_path = FALSE,   #input$camtrapdp_add_file_path,
+            remove_bbox = TRUE,
+            add_file_path = FALSE,
             filter_observations = filter_observations
           )
           
-          # Add deployment and observation counts to metadata if not already present
+          # Add counts to metadata
           metadata <- imported_data$metadata
           if (!is.null(metadata)) {
             metadata$deployment_count <- nrow(imported_data$CTtable)
             metadata$observation_count <- nrow(imported_data$recordTable)
-            metadata$media_count <- length(unique(imported_data$recordTable$mediaID))
+            metadata$media_count <- sum(!is.na(unique(imported_data$recordTable$mediaID)))
           }
           
           # Store imported data
           data$CTtable <- imported_data$CTtable
           data$recordTable <- imported_data$recordTable
           
-          # Provide default column names and specifications for camtrap DP
-          # Set column specifications based on imported data
-          data$stationCol <- "locationName" #  "Station"
+          # Set core identifiers 
+          data$stationCol <- "Station" 
           
-          # camera ID column is optional in camtrapDP
-          if ("cameraID" %in% colnames(data$CTtable)) {
+          
+          # Handle Camera ID safely
+          has_real_cameras <- "cameraID" %in% colnames(data$CTtable) && !all(data$CTtable$cameraID == "unknown_camera")
+          
+          if (has_real_cameras) {
             data$cameraCol <- "cameraID"
+            cameras_per_station <- table(data$CTtable$Station)
+            
+            if (any(cameras_per_station > 1)) {
+              data$camerasIndependent <- input$camtrapdp_cameras_independent
+              showNotification("Multiple cameras per station detected. Camera independence setting applied.", type = "message")
+            } else {
+              data$camerasIndependent <- FALSE
+              if (input$camtrapdp_cameras_independent) {
+                showNotification("Camera independence setting not applied - no station has multiple cameras.", type = "warning")
+              }
+            }
           } else {
             data$cameraCol <- NULL
+            data$camerasIndependent <- FALSE
+            if (input$camtrapdp_cameras_independent) {
+              showNotification("Camera independence setting ignored - no specific camera IDs found in data.", type = "warning")
+            }
           }
           
           # Location coordinates
           data$xcol <- "longitude"
           data$ycol <- "latitude"
-          
-          # Set coordinate system (default to WGS84 if not specified)
           data$crs <- "EPSG:4326"  # WGS84
           
           # Date columns
@@ -3541,7 +3821,7 @@ surveyDashboard <- function(CTtable = NULL,
           data$retrievalCol <- "Retrieval_date"
           data$CTdateFormat <- "ymd HMS"
           
-          # Record table columns
+          # Find the best Species Column
           data$speciesCol <- if ("vernacularName_en" %in% colnames(data$recordTable)) {
             "vernacularName_en"
           } else if (any(grepl("^vernacularName_", colnames(data$recordTable)))) {
@@ -3553,55 +3833,16 @@ surveyDashboard <- function(CTtable = NULL,
           data$recordDateTimeCol <- "DateTimeOriginal"
           data$recordDateTimeFormat <- "ymd HMS"
           data$timeZone <- "UTC"
-          
-          # Clear exclude filter unless it's specifically set
           data$exclude <- NULL
-          
-          # Set problem columns
           data$hasProblems <- any(grepl("^Problem[0-9]+_(from|to)$", colnames(data$CTtable)))
           
-          # Update camera independence setting
-          if ("cameraID" %in% colnames(data$CTtable)) {
-            # Check if there are actually multiple cameras per station
-            cameras_per_station <- table(data$CTtable$Station)
-            has_multiple_cameras <- any(cameras_per_station > 1)
-            
-            if (has_multiple_cameras) {
-              # Apply user setting
-              data$camerasIndependent <- input$camtrapdp_cameras_independent
-              
-              # Notify user
-              showNotification(
-                "Multiple cameras per station detected. Camera independence setting applied.", 
-                type = "message"
-              )
-            } else {
-              # Set to FALSE since no station has multiple cameras
-              data$camerasIndependent <- FALSE
-              
-              if (input$camtrapdp_cameras_independent) {
-                # Notify user if they selected independence but it's not applicable
-                showNotification(
-                  "Camera independence setting not applied - no station has multiple cameras.", 
-                  type = "warning"
-                )
-              }
+          # Create sf object (Safely filtering out deployments missing coordinates)
+          valid_coords <- !is.na(data$CTtable[[data$xcol]]) & !is.na(data$CTtable[[data$ycol]])
+          if (!all(valid_coords)) {
+            showNotification(paste(sum(!valid_coords), "deployments missing coordinates were removed from the spatial map."), type = "warning")
             }
-          } else {
-            # No cameraID column exists
-            data$camerasIndependent <- FALSE
-            
-            if (input$camtrapdp_cameras_independent) {
-              # Notify user if they selected independence but it's not applicable
-              showNotification(
-                "Camera independence setting not applied - no camera ID column in data.", 
-                type = "warning"
-              )
-            }
-          }
           
-          # Create sf object from CTtable
-          data$CTtable_sf <- sf::st_as_sf(data$CTtable, 
+          data$CTtable_sf <- sf::st_as_sf(data$CTtable[valid_coords, ], 
                                           coords = c(data$xcol, data$ycol), 
                                           crs = data$crs, 
                                           remove = FALSE)
@@ -3614,7 +3855,7 @@ surveyDashboard <- function(CTtable = NULL,
                                                        retrievalCol = data$retrievalCol,
                                                        dateFormat = data$CTdateFormat)
           
-          # Update data previews
+          # Update Data Previews
           output$camtrapdp_preview_deployments <- DT::renderDT({
             DT::datatable(head(data$CTtable, 100), 
                           options = list(scrollX = TRUE, pageLength = 10),
@@ -3627,12 +3868,12 @@ surveyDashboard <- function(CTtable = NULL,
                           rownames = FALSE)
           })
           
-          # Create and render project info
+          
           output$camtrapdp_project_info <- renderUI({
             create_project_info(metadata)
           })
           
-          # Update status
+          
           output$camtrapdp_status <- renderText({
             paste0("Import successful!\n",
                    "- Stations: ", nrow(data$CTtable), "\n",
@@ -3641,26 +3882,20 @@ surveyDashboard <- function(CTtable = NULL,
                    "- Species count: ", length(unique(data$recordTable[[data$speciesCol]])))
           })
           
-          # Notify user of success
           showNotification("camtrapDP data imported successfully", type = "message")
           
-          # Reset original_data with the new data
+          # Update global application state
           original_data(list(
             CTtable_sf = data$CTtable_sf,
             recordTable = data$recordTable,
             aggregated_CTtable = data$aggregated_CTtable
           ))
           
-          # Clear active filters
-          # active_filters(list())
+          original_record_table(data$recordTable)
           
-          # Update species list
           update_species_inputs()
           
-          
-          # reset app state (explicit to pass reactive values to function even within observe environment)
           resetAppState(
-            # Pass all reactive values
             restoration_mode = restoration_mode,
             wi_data = wi_data,
             current_species_list = current_species_list,
@@ -3671,9 +3906,9 @@ surveyDashboard <- function(CTtable = NULL,
             active_filters = active_filters,
             filter_removal_observers = filter_removal_observers,
             original_record_table = original_record_table,
-            # x_label = x_label,
             species_accumulation_objects = species_accumulation_objects,
             basic_model = basic_model,
+            print_basic_model = print_basic_model,
             advanced_model = advanced_model,
             modelEffects = modelEffects,
             commOccu_model = commOccu_model,
@@ -3685,7 +3920,8 @@ surveyDashboard <- function(CTtable = NULL,
             gof_results = gof_results,
             output = output,
             single_species_occu_objects = single_species_occu_objects,
-            spatial_predictions_community = spatial_predictions_community
+            spatial_predictions_community = spatial_predictions_community,
+            acknowledged_warnings = acknowledged_warnings
           )
           
         }, error = function(e) {
@@ -3694,11 +3930,6 @@ surveyDashboard <- function(CTtable = NULL,
         })
       })
     })
-    
-    # Helper function for null coalescing
-    "%||%" <- function(x, y) {
-      if (is.null(x)) y else x
-    }
     
     ## import shapefile ----
     
@@ -3795,7 +4026,7 @@ surveyDashboard <- function(CTtable = NULL,
                    coords = c(data$xcol, data$ycol), 
                    crs = data$crs, 
                    remove = FALSE)
-    })
+    }, label = "convert camera trap table to sf")
     
     # Update CTtable_sf when CT table is updated
     observe({
@@ -3805,25 +4036,38 @@ surveyDashboard <- function(CTtable = NULL,
     # Create reactive expression for aggregated_CTtable
     aggregated_CTtable <- shiny::reactive({
       req(data$CTtable_sf, data$stationCol)
-      
-      aggregateStations(CTtable = data$CTtable_sf, 
+      tryCatch({
+        aggregateStations(
+          CTtable = data$CTtable_sf,
                         stationCol = data$stationCol,
                         cameraCol = data$cameraCol,
                         setupCol = data$setupCol,
                         retrievalCol = data$retrievalCol,
                         dateFormat = data$CTdateFormat,
-                        quiet = T)
+          quiet = TRUE
+        )
+      }, error = function(e) {
+        msg <- paste("Error aggregating camera trap table:", e$message)
+        
+        # Keep the notification
+        showNotification(msg, type = "error", duration = NULL)
+        
+        # Stop the reactive chain gracefully with the captured error message
+        shiny::validate(shiny::need(FALSE, msg))
+        # stop(e$message)
     })
+      
+    }, label = "aggregate camera trap table")
     
     # Update aggregated_CTtable when CTtable_sf changes
     observe({
       data$aggregated_CTtable <- aggregated_CTtable()
-    })
+    }, label = "Update aggregated_CTtable when CTtable_sf changes")
     
     ## Upload file size ----
     
     # Reactive value to store the current max file size
-    current_max_size <- shiny::reactiveVal(10)
+    current_max_size <- shiny::reactiveVal(500)
     
     # Observer to update max file size
     shiny::observeEvent(input$update_max_size, {
@@ -3837,7 +4081,7 @@ surveyDashboard <- function(CTtable = NULL,
     # camera operation matrix ----
     
     
-    # # Reactive value for camop
+    # Initialize Reactive value for camop
     camop <- shiny::reactiveVal(NULL)
     
     # Create a function to compute camera operation
@@ -3912,6 +4156,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Render the plotly output for the camera operation matrix
     output$camop <- plotly::renderPlotly({
+      # TODO: rename this output to output$camop_plotly
       req(camop(), data$stationCol)
       
       camop_df <- as.data.frame(camop())
@@ -3966,12 +4211,12 @@ surveyDashboard <- function(CTtable = NULL,
     
     # 4. Clear cached camera operation when CTtable or key parameters change
     observeEvent(c(data$CTtable, data$setupCol, data$retrievalCol, data$CTdateFormat, data$stationCol, data$cameraCol, data$camerasIndependent), {
-      camop(NULL)
+      camop(compute_camop())
     }, ignoreNULL = TRUE)
     
-    # 5. If input$applyFilter is clicked, we need to update camop
-    observeEvent(input$applyFilter, {
-      camop(NULL)  # Clear first
+    # 5. If input$applyFilter_camtrap_properties is clicked, we need to update camop
+    observeEvent(input$applyFilter_camtrap_properties, {
+      # camop(NULL)  # Clear first
       # Only recompute if we're currently viewing the CameraOperation tab
       # this would make sense but the commented if() below crashed the app with: 
       # Warning: Error in if: argument is of length zero don't know why
@@ -3982,25 +4227,45 @@ surveyDashboard <- function(CTtable = NULL,
       # }
     }, ignoreNULL = TRUE)
     
+    # 6 if user filters camera traps by date range, calculate camop
+    observeEvent(input$apply_date_filter, {
+      camop(compute_camop())
+    }, ignoreNULL = TRUE)
+    
     
 
-    df_covariates <- observe({
-      req(data$CTtable_aggregated, camop())
-      stopifnot(rownames(camop()) == data$CTtable_aggregated[, data$stationCol])
-      data$CTtable_aggregated
-    })
-    
-    
-    
+
     # remove excluded records (silently at the moment)
-    if (!is.null(exclude)) {
-      num_images_excluded <- sum(data$recordTable[, speciesCol] %in% exclude)
-      data$recordTable <- recordTable[!data$recordTable[, speciesCol] %in% exclude, ]
-    } else {
-      num_images_excluded <- 0
-    }
+
+    num_images_excluded <- shiny::reactiveVal(0)
+    
+    shiny::observe({
+      df <- data$recordTable
+      shiny::req(df) # Pauses here if no data has been loaded yet
+      if (!is.null(exclude)) {
+        # Check which rows actually match the exclusion criteria
+        to_exclude <- df[, speciesCol] %in% exclude
+        
+        # If there are no rows to exclude this block gets skipped safely.
+        if (any(to_exclude)) {
+          num_dropped <- sum(to_exclude)
+          
+          # Update the standalone reactive value 
+          num_images_excluded(num_dropped)
+          
+          # Overwrite the table with the filtered version
+          data$recordTable <- df[!to_exclude, ]
+        }
+      }
+    }, label = "remove excluded species")
+    # NOTE: species removed by exclude are shown in species filter in UI, but cannot be brought back from there. Might be a bit confusing
+    # NOTE:: Bug: Trying to bring the species back from the filter UI removes all records.
+    # Maybe just remove the exclude argument to the function and do all filtering in the app
+    # also there is data$exclude. It should probably combine "exclude" from surveyDashboard() and data$exclude (from UI)
+    # otherwise this here only filters based on UI input.
     
     
+    # Tab: Data summary ----
     # Calculate the number of unique stations and species
     # Reactive expressions for calculations
     num_stations <- shiny::reactive({
@@ -4174,6 +4439,7 @@ surveyDashboard <- function(CTtable = NULL,
       df
     })
     
+    
     output$plot_n_species <- plotly::renderPlotly({
       req(df_n_species())
       plotly::ggplotly(
@@ -4212,14 +4478,7 @@ surveyDashboard <- function(CTtable = NULL,
       )
     })
     
-    
-    # Update the max value of occasionLength slider based on camop
-    observe({
-      req(camop())
-      updateSliderInput(session, "occasionLength_single_species", max = ncol(camop()))
-      updateSliderInput(session, "occasionLength_community", max = ncol(camop()))
-    })
-    
+
     
     
     # Tab: camera traps table     ####
@@ -4289,6 +4548,7 @@ surveyDashboard <- function(CTtable = NULL,
     output$area_mcp <- shinydashboard::renderValueBox({
       req(area_mcp_km2())
       shinydashboard::valueBox(
+        # TODO: conditional rounding of MCP (depending on area)
         value = paste(round(as.numeric(area_mcp_km2()), 2), "km\U00B2"),
         subtitle = "Survey area (MCP)",
         icon = shiny::icon("vector-square")
@@ -4427,6 +4687,8 @@ surveyDashboard <- function(CTtable = NULL,
         }
         
         # add little black dots at stations with detections
+        # TODO: remove layer "Stations with detections" when input$scale_size is TRUE again
+        
         if (input$species_for_map != "n_species" & !input$scale_size) {
           map_view <- map_view + mapview::mapview(
             detmaps_sf_logi,
@@ -4457,7 +4719,7 @@ surveyDashboard <- function(CTtable = NULL,
         showNotification("Cannot apply filters: Original data is incomplete", type = "error")
         return()
       }
-      
+
       # Get original data
       original_CT <- isolate(original_data())$CTtable_sf
       original_records <- original_record_table()
@@ -4465,9 +4727,101 @@ surveyDashboard <- function(CTtable = NULL,
       # Get current filter state
       current_filters <- filter_state()
       
-      # 1. Apply camera trap filter to get filtered stations
+      # ----------------------------------------------------------------- # #
+      # 1. Apply Global Date Filter to DEPLOYMENTS (Setup & Retrieval)
+      # ----------------------------------------------------------------- # #
       filtered_CT <- original_CT
       
+      # Check if our new date range filter input is active/set
+      if (!is.null(current_filters$date_range)) {
+        tryCatch({
+          user_start <- current_filters$date_range$start  # class "Date"
+          user_end <- current_filters$date_range$end
+          
+          setup_col     <- data$setupCol
+          retrieval_col <- data$retrievalCol
+          
+          # 1. Drop cameras whose active period does not overlap with the user window at all
+          overlapping_CT <- filtered_CT[
+            as.Date(parse_date_time(filtered_CT[[setup_col]], orders = data$CTdateFormat)) <= user_end & 
+              as.Date(parse_date_time(filtered_CT[[retrieval_col]], orders = data$CTdateFormat)) >= user_start, 
+          ]
+          
+          
+          # Extra Safeguard Check before execution
+          if (nrow(overlapping_CT) >= 2) { 
+            
+            # We handle Date vs Class-POSIXt (Datetime) distinctions here.
+            clip_dates <- function(df, setup_col, retrieval_col, u_start, u_end) {
+              # Check if columns are Date-Times (POSIXct/POSIXlt)
+              # is_datetime <- inherits(df[[setup_col]], "POSIXt")
+              is_datetime <- grepl("H", data$CTdateFormat)
+              
+              col_setup_posix     <- "setup_posix"
+              col_retrieval_posix <- "retrieval_posix"
+
+              col_setup_posix     <- parse_date_time(df[[setup_col]], orders = data$CTdateFormat)
+              col_retrieval_posix <- parse_date_time(df[[retrieval_col]], orders = data$CTdateFormat)
+              
+              # create a "stamping" function based on the original format to reapply format later
+              date_formatter <- stamp(df[[setup_col]], orders = data$CTdateFormat, quiet = TRUE)
+
+
+              if (is_datetime) {
+                # Convert boundaries to midnight and just before midnight
+                u_start_dt <- as.POSIXct(paste(u_start, "00:00:00"))
+                u_end_dt   <- as.POSIXct(paste(u_end, "23:59:59"))
+                
+                col_setup_posix     <- safe_ifelse_posix(col_setup_posix < u_start_dt, u_start_dt, col_setup_posix)
+                col_retrieval_posix <- safe_ifelse_posix(col_retrieval_posix > u_end_dt, u_end_dt, col_retrieval_posix)
+              } else {
+                # Standard Date class
+                u_start_d <- as.Date(u_start)
+                u_end_d   <- as.Date(u_end)
+                
+                
+                col_setup_posix     <- as.Date(col_setup_posix)
+                col_retrieval_posix <- as.Date(col_retrieval_posix)
+
+                col_setup_posix     <- as.Date(ifelse(col_setup_posix < u_start_d, u_start_d, col_setup_posix), origin = "1970-01-01")
+                col_retrieval_posix <- as.Date(ifelse(col_retrieval_posix > u_end_d, u_end_d, col_retrieval_posix), origin = "1970-01-01")
+
+              }
+
+               # Format the new dates back to character
+                df[[setup_col]] <- date_formatter(col_setup_posix)
+                df[[retrieval_col]] <- date_formatter(col_retrieval_posix)
+                # TODO: Long term we really need to do everything in proper dates and date-time throughout the package, not these character strings. But for now, we will just reformat the dates back to the original format.
+              
+              return(df)
+            }
+            
+            # Helper function to prevent ifelse from stripping POSIXct attributes
+            safe_ifelse_posix <- function(cond, yes, no) {
+              class_posix <- class(no)
+              res <- ifelse(cond, yes, no)
+              class(res) <- class_posix
+              return(res)
+            }
+            
+            filtered_CT <- clip_dates(overlapping_CT, setup_col, retrieval_col, user_start, user_end)
+          } else {
+            # Notify user is no date filter applied
+            showNotification("Date range would leave fewer than 2 active stations. Bypassing date application.", type = "warning")
+          }
+          
+        }, error = function(e) {
+          showNotification(paste("Error applying deployment date constraints:", e$message), type = "error")
+
+          filtered_CT <- original_CT # Fallback on error
+          
+          # re-apply the date/time format 
+        })
+      }
+      
+      # ----------------------------------------------------------------- # #
+      # 2. Apply Custom Camera Trap Property Filter
+      # ----------------------------------------------------------------- # #
       if (!is.null(current_filters$camera_trap)) {
         filter_def <- current_filters$camera_trap
         
@@ -4492,7 +4846,7 @@ surveyDashboard <- function(CTtable = NULL,
           
           # Safety check
           if (nrow(filtered_CT) < 2) {
-            showNotification("Filter would remove too many stations! Reverting to original data.", type = "error")
+            showNotification("Properties filter would leave fewer than 2 stations! Reverting.", type = "error")
             filtered_CT <- original_CT
           }
         }, error = function(e) {
@@ -4504,10 +4858,35 @@ surveyDashboard <- function(CTtable = NULL,
       # Get filtered station list
       filtered_stations <- filtered_CT[[data$stationCol]]
       
-      # 2. First filter records by station (performance optimization)
+      # ----------------------------------------------------------------- #
+      # 3. First filter records by station mapping limit
+      # ----------------------------------------------------------------- #
       filtered_records <- original_records[original_records[[data$stationCol]] %in% filtered_stations, ]
       
-      # 3. Then apply temporal filter to station-filtered records
+      # ----------------------------------------------------------------- #
+      # 4. Filter RECORDS dynamically by selected Date Range
+      # ----------------------------------------------------------------- #
+      if (!is.null(current_filters$date_range)) {
+        tryCatch({
+          user_start <- current_filters$date_range$start
+          user_end <- current_filters$date_range$end
+                    
+              user_start_dt <- as.POSIXct(paste(user_start, "00:00:00"))
+              user_end_dt   <- as.POSIXct(paste(user_end, "23:59:59"))
+              
+              filtered_records <- filtered_records[
+                as.POSIXct(filtered_records[[data$recordDateTimeCol]]) >= user_start_dt & 
+                  as.POSIXct(filtered_records[[data$recordDateTimeCol]]) <= user_end_dt, 
+              ]
+
+        }, error = function(e) {
+          showNotification(paste("Error filtering records by date range:", e$message), type = "error")
+        })
+      }
+      
+      # ----------------------------------------------------------------- #
+      # 5. Then apply temporal filter to remaining records
+      # ----------------------------------------------------------------- #
       if (!is.null(current_filters$temporal)) {
         tryCatch({
           # Copy temporal filter parameters but use the station-filtered records
@@ -4521,7 +4900,9 @@ surveyDashboard <- function(CTtable = NULL,
         })
       }
       
-      # 4. Apply species filter if active
+      # ----------------------------------------------------------------- #
+      # 6. Apply species filters
+      # ----------------------------------------------------------------- #
       if (!is.null(current_filters$species)) {
         tryCatch({
           # Filter out excluded species
@@ -4531,7 +4912,9 @@ surveyDashboard <- function(CTtable = NULL,
         })
       }
       
-      # Update all data structures
+      # ----------------------------------------------------------------- #
+      # Write changes to data objects
+      # ----------------------------------------------------------------- #
       data$CTtable_sf <- filtered_CT
       data$CTtable <- sf::st_drop_geometry(filtered_CT)
       data$recordTable <- filtered_records
@@ -4563,7 +4946,7 @@ surveyDashboard <- function(CTtable = NULL,
       })
       
       # Re-trigger camop computation after filtering
-      camop(compute_camop())
+      # camop(compute_camop())
       
       # Update species inputs after filtering
       update_species_inputs()
@@ -4595,6 +4978,7 @@ surveyDashboard <- function(CTtable = NULL,
       showNotification("All filters have been reset", type = "message")
     })
     
+    # update the species select inputs throughout the dashboard when new data become available
     update_species_inputs <- function() {
       req(data$recordTable, data$speciesCol)
       species_list <- sort(unique(data$recordTable[[data$speciesCol]]))
@@ -4663,7 +5047,6 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     ## Tab: Filter summary
-    # Add these reactives and observers to the server function
     
     # Value boxes for filter summary
     output$summary_stations_filtered <- shinydashboard::renderValueBox({
@@ -4701,7 +5084,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       orig_species <- length(unique(original_record_table()[[data$speciesCol]]))
       current_species <- length(unique(data$recordTable[[data$speciesCol]]))
-      removed_species <- orig_species - current_species
+      # removed_species <- orig_species - current_species
       
       # Get actual list of filtered species by comparing original and current sets
       original_species_set <- unique(original_record_table()[[data$speciesCol]])
@@ -4778,7 +5161,7 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     # Dynamic filter controls based on column type
-    output$filterControls <- renderUI({
+    output$filterControlsCamtrap <- renderUI({
       req(input$filterColumn, data$CTtable_sf)
       column_data <- data$CTtable_sf[[input$filterColumn]]
       
@@ -4833,7 +5216,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Camera Trap Filtering
     
-    observeEvent(input$applyFilter, {
+    observeEvent(input$applyFilter_camtrap_properties, {
       req(input$filterColumn, data$CTtable_sf)
       
       # Create filter definition
@@ -5041,12 +5424,12 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     # Filter summary
-    output$filterSummary <- renderUI({
+    output$overallFilterSummary <- renderUI({
       req(data$CTtable_sf, data$recordTable, original_data())
       
       orig <- original_data()
-      curr_stations <- length(unique(data$CTtable_sf[[data$stationCol]])) #nrow(data$CTtable_sf)
-      orig_stations <- length(unique(orig$CTtable_sf[[data$stationCol]])) #nrow(orig$CTtable_sf)
+      curr_stations <- length(unique(data$CTtable_sf[[data$stationCol]])) 
+      orig_stations <- length(unique(orig$CTtable_sf[[data$stationCol]])) 
       curr_records <- nrow(data$recordTable)
       orig_records <- nrow(orig$recordTable)
       
@@ -5054,35 +5437,34 @@ surveyDashboard <- function(CTtable = NULL,
       filtered_stations <- orig_stations - curr_stations
       filtered_records <- orig_records - curr_records
       
-      # Safety check for valid percentages
-      station_percent <- if(orig_stations > 0) {
-        sprintf(" (%.1f%%)", curr_stations/orig_stations * 100)
-      } else {
-        " (N/A)"
-      }
+      # Calculate percentages without the parentheses for cleaner formatting
+      station_percent <- if(orig_stations > 0) sprintf("%.1f%%", curr_stations/orig_stations * 100) else "N/A"
+      record_percent <- if(orig_records > 0) sprintf("%.1f%%", curr_records/orig_records * 100) else "N/A"
       
-      record_percent <- if(orig_records > 0) {
-        sprintf(" (%.1f%%)", curr_records/orig_records * 100)
-      } else {
-        " (N/A)"
-      }
-      
-      div(
-        class = "well",
-        tags$p(
-          "Stations: ", 
-          tags$strong(curr_stations), " of ", tags$strong(orig_stations),
-          station_percent
+      fluidRow(
+        column(4, 
+               align = "center",
+               div(
+                 h4("Stations", class = "text-muted"),
+                 h3(tags$strong(paste0(curr_stations, " / ", orig_stations))),
+                 tags$span(class = "text-muted", paste0("(", station_percent, " retained)"))
+               )
         ),
-        tags$p(
-          "Records: ",
-          tags$strong(curr_records), " of ", tags$strong(orig_records),
-          record_percent
+        column(4, 
+               align = "center",
+               div(
+                 h4("Records", class = "text-muted"),
+                 h3(tags$strong(paste0(curr_records, " / ", orig_records))),
+                 tags$span(class = "text-muted", paste0("(", record_percent, " retained)"))
+               )
         ),
-        tags$p(
-          "Filtered out: ",
-          tags$strong(filtered_stations), " stations and ",
-          tags$strong(filtered_records), " records"
+        column(4, 
+               align = "center",
+               div(
+                 h4("Filtered Out", class = "text-muted"),
+                 h3(tags$strong(paste0(filtered_stations, " / ", filtered_records))),
+                 tags$span(class = "text-muted", "(Stations / Records)")
+               )
         )
       )
     })
@@ -5181,14 +5563,124 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
-    # Tab: Filter records temporally ####
+    # Tab: Filter by Date ----
     
-    output$camerasIndependentUI <- renderUI({
-      if (!is.null(data$cameraCol) && data$cameraCol != "") {
-        checkboxInput("camerasIndependent", "Cameras are independent", value = FALSE)
+    
+    # ----------------------------------------------------------------- # #
+    # Auto-initialize Date Filter Range to Study Duration on Data Load
+    # ----------------------------------------------------------------- # #
+    observe({
+      req(original_data()$CTtable_sf)
+      
+      original_CT <- original_data()$CTtable_sf
+      setup_col <- data$setupCol
+      retrieval_col <- data$retrievalCol
+      
+      
+      setup_dates <- as.Date(parse_date_time(original_CT[[setup_col]], orders = data$CTdateFormat))
+      retrieval_dates <- as.Date(parse_date_time(original_CT[[retrieval_col]], orders = data$CTdateFormat))
+      
+      # Calculate dynamic range boundary
+      min_date <- min(setup_dates, na.rm = TRUE)
+      max_date <- max(retrieval_dates, na.rm = TRUE)
+      
+      # Update the UI date widget bounds and selected default state
+      if (!is.na(min_date) && !is.na(max_date)) {
+        updateDateRangeInput(
+          session = session,
+          inputId = "date_range_filter",
+          start = min_date,
+          end = max_date,
+          min = min_date,
+          max = max_date
+        )
       }
+      
     })
     
+    # ----------------------------------------------------------------- #
+    # Apply global date filters with safeguards
+    # ----------------------------------------------------------------- #
+    observeEvent(input$apply_date_filter, {
+      req(input$date_range_filter)
+
+      
+      original_CT <- isolate(original_data())$CTtable_sf
+      setup_col <- data$setupCol
+      retrieval_col <- data$retrievalCol
+      
+      
+      # Safeguard Check 1: Check if date selection results in any active stations
+      user_start <- input$date_range_filter[1]
+      user_end <- input$date_range_filter[2]
+      
+      overlapping_stations <- original_CT[
+        as.Date(parse_date_time(original_CT[[setup_col]], orders = data$CTdateFormat)) <= user_end & 
+          as.Date(parse_date_time(original_CT[[retrieval_col]], orders = data$CTdateFormat)) >= user_start, 
+      ]
+      
+      
+      if (nrow(overlapping_stations) == 0) {
+        # Trigger blocking Modal Dialog
+        showModal(modalDialog(
+          title = "Date Input Error",
+          tags$div(
+            style = "text-align: center; color: #a94442;",
+            icon("exclamation-triangle", class = "fa-3x"),
+            tags$h4("No Active Deployments in Selected Range", style = "font-weight: bold; margin-top: 15px;")
+          ),
+          p("The selected date range does not overlap with any station deployment dates. Applying this filter would remove all stations from your session."),
+          p("Please choose a date range that falls within your study period."),
+          footer = modalButton("Dismiss & Adjust Dates"),
+          easyClose = TRUE,
+          size = "m"
+        ))
+        return() # Abort run
+      }
+      
+      # All checks passed, apply changes to state
+      curr_state <- filter_state()
+      curr_state$date_range <- list(
+        start = user_start,
+        end = user_end
+      )
+      filter_state(curr_state)
+      
+      withProgress(message = 'Recalculating deployment effort and filtering records...', {
+        applyAllFilters()
+      })
+      
+      showNotification("Date range constraints applied successfully.", type = "message")
+    })
+    
+    # ----------------------------------------------------------------- #
+    # Clear date filters
+    # ----------------------------------------------------------------- #
+    observeEvent(input$clear_date_filter, {
+      curr_state <- filter_state()
+      curr_state$date_range <- NULL
+      filter_state(curr_state)
+      
+      # Re-initialize widget back to absolute dataset limits
+      original_CT <- isolate(original_data())$CTtable_sf
+      if (!is.null(original_CT)) {
+        setup_vals     <- as.Date(original_CT[[data$setupCol]])
+        retrieval_vals <- as.Date(original_CT[[data$retrievalCol]])
+        
+        updateDateRangeInput(
+          session, 
+          "date_range_filter",
+          start = min(setup_vals, na.rm = TRUE),
+          end = max(retrieval_vals, na.rm = TRUE)
+        )
+      }
+      
+      withProgress(message = 'Reverting constraints...', {
+        applyAllFilters()
+      })
+      
+      showNotification("Date range filters cleared.", type = "message")
+    })
     
     # Initialize the original_record_table when the app starts
     observe({
@@ -5448,14 +5940,14 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Create species summary table for filtering
     species_summary_for_filter <- reactive({
-      # Add explicit dependencies on key data changes
-      data_key <- list(
-        record_table_rows = if (!is.null(data$recordTable)) nrow(data$recordTable) else 0,
-        species_col = data$speciesCol,
-        station_col = data$stationCol #,
-        # original_table_id = if (!is.null(original_record_table())) digest::digest(head(original_record_table(), 5)) else NULL
-      )
-      
+      # # Add explicit dependencies on key data changes
+      # data_key <- list(
+      #   record_table_rows = if (!is.null(data$recordTable)) nrow(data$recordTable) else 0,
+      #   species_col = data$speciesCol,
+      #   station_col = data$stationCol #,
+      #   # original_table_id = if (!is.null(original_record_table())) digest::digest(head(original_record_table(), 5)) else NULL
+      # )
+      # 
       # Validate inputs more strictly
       shiny::validate(
         shiny::need(!is.null(data$recordTable) && nrow(data$recordTable) > 0, "No record data available"),
@@ -5746,6 +6238,7 @@ surveyDashboard <- function(CTtable = NULL,
           point_size <- input$ctPointSizePrediction
           color_palette <- input$colorPalettePrediction
           invert_colors <- input$invertColorsPrediction
+          rasterband <- input$predictionRasterBand
           # full_resolution <- input$fullResolutionPrediction
         } else {
           req(raster, input$rasterBand, input$colorPalette)
@@ -5754,13 +6247,14 @@ surveyDashboard <- function(CTtable = NULL,
           point_size <- input$ctPointSize
           color_palette <- input$colorPalette
           invert_colors <- input$invertColors
+          rasterband <- input$rasterBand
         }
         
         ct_sf <- aggregated_CTtable_sf()
         
         # Get value range from raster and camera traps
         value_range_raster <- terra::minmax(raster)
-        value_range_station <- range(ct_sf[[input$predictionRasterBand]])
+        value_range_station <- range(ct_sf[[rasterband]])
         # get combined value range
         value_range <- c(min(value_range_raster, value_range_station),
                          max(value_range_raster, value_range_station))
@@ -5829,6 +6323,8 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Update choices for original raster band selection
     observe({
+      # TODO: mapview fails with error if stars package not available. Any way to avoid that and only require terra?
+      
       # Ensure original rasters is a list and not empty
       if (is.null(data$original_rasters) || !is.list(data$original_rasters) || length(data$original_rasters) == 0) {
         updateSelectInput(session, "rasterBand", choices = NULL, selected = NULL)
@@ -5902,11 +6398,6 @@ surveyDashboard <- function(CTtable = NULL,
     })
     
     # # Render original covariate raster map
-    # output$originalCovariatePlot <- leaflet::renderLeaflet({
-    #   req(data$original_rasters, input$rasterBand)
-    #   selected_raster <- data$original_rasters[[input$rasterBand]]
-    #   render_raster_map(selected_raster, input$rasterBand, is_prediction = FALSE)
-    # })
      output$originalCovariatePlot <- leaflet::renderLeaflet({
       req(data$original_rasters, input$rasterBand)
 
@@ -5914,7 +6405,7 @@ surveyDashboard <- function(CTtable = NULL,
 
       # Find which raster object and band correspond to the selection
       selected_raster <- NULL
-      raster_display_name <- selected_input # Default display name
+      # raster_display_name <- selected_input # Default display name
 
       for (raster_name in names(data$original_rasters)) {
          raster_obj <- data$original_rasters[[raster_name]]
@@ -5942,7 +6433,9 @@ surveyDashboard <- function(CTtable = NULL,
       req(selected_raster, inherits(selected_raster, "SpatRaster"))
 
       # Render the map using the selected single-band raster
-      render_raster_map(selected_raster, raster_display_name, is_prediction = FALSE)
+      render_raster_map(selected_raster, 
+                        raster_name = input$rasterBand, 
+                        is_prediction = FALSE)
     })
     
     # Render prediction raster map
@@ -6067,168 +6560,97 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Tab: Elevation & terrain data ----
     
-    ask_to_debug <- function() {
-      response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
-      if (tolower(response) == "y" || tolower(response) == "yes") {
-        message("Entering browser mode...")
-        browser()
-      } else {
-        message("Continuing execution...")
-      }
-    }
+    # ask_to_debug <- function() {
+    #   response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
+    #   if (tolower(response) == "y" || tolower(response) == "yes") {
+    #     message("Entering browser mode...")
+    #     browser()
+    #   } else {
+    #     message("Continuing execution...")
+    #   }
+    # }
     
     # Helper function to clip/mask prediction rasters
     # clip_prediction_rasters <- function(rasters, prediction_extent) {
-    #   if (is.null(prediction_extent)) return(rasters)
+    #   if (is.null(prediction_extent) || !inherits(prediction_extent, "sf")) return(rasters)
+    #   if (!inherits(rasters, "SpatRaster")) return(rasters)
     #   
-    #   # Safely handle transformations and clipping
+    #   response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
+    #   if (tolower(response) == "y" || tolower(response) == "yes") {
+    #     message("Entering browser mode...")
+    #     browser()
+    #   }
+    #   
     #   tryCatch({
+    #     # Ensure prediction_extent is valid
+    #     prediction_extent <- sf::st_make_valid(prediction_extent)
+    #     if (!sf::st_is_valid(prediction_extent)) {
+    #       warning("Prediction extent geometry is invalid after st_make_valid.")
+    #       return(rasters) # Return original if extent is invalid
+    #     }
+    #     
     #     # Get CRS information
-    #     raster_crs <- terra::crs(rasters)
+    #     raster_crs_str <- terra::crs(rasters, proj = TRUE)
     #     extent_crs <- sf::st_crs(prediction_extent)
     #     
-    #     # Check if we're transforming between geographic and projected systems
-    #     is_raster_geo <- grepl("\\+proj=longlat", raster_crs) || grepl("geographic", raster_crs, ignore.case = TRUE)
-    #     is_extent_geo <- grepl("\\+proj=longlat", extent_crs$proj4string) || grepl("geographic", extent_crs$input, ignore.case = TRUE)
-    #     
-    #     
-    #     # Special handling for transformation between geographic and projected systems
-    #     if (is_raster_geo != is_extent_geo) {
-    #       # Create a temporary buffer around the extent in its own CRS
-    #       # This helps ensure overlap after transformation
-    #       prediction_extent_buffered <- sf::st_buffer(prediction_extent, dist = if(is_extent_geo) 0.1 else 10000)
-    #       
-    #       # Get the bounding box of the prediction extent
-    #       bbox <- sf::st_bbox(prediction_extent_buffered)
-    #       bbox_poly <- sf::st_as_sfc(bbox, crs = extent_crs)
-    #       
-    #       # Safety check: ensure coordinates are reasonable
-    #       bbox_coords <- sf::st_coordinates(bbox_poly)[,1:2]
-    #       if (any(!is.finite(bbox_coords))) {
-    #         return(rasters)  # Return original rasters if coordinates invalid
-    #       }
-    #       
-    #       # Transform the bbox to raster CRS
-    #       bbox_transformed <- sf::st_transform(bbox_poly, raster_crs)
-    #       
-    #       # Check for valid transformation
-    #       transformed_coords <- sf::st_coordinates(bbox_transformed)[,1:2]
-    #       if (any(!is.finite(transformed_coords))) {
-    #         return(rasters)  # Return original rasters if transformation failed
-    #       }
-    #       
-    #       # Extract the bbox from the transformed geometry
-    #       t_bbox <- sf::st_bbox(bbox_transformed)
-    #       
-    #       # Create an extent object for cropping
-    #       crop_ext <- terra::ext(t_bbox["xmin"], t_bbox["xmax"], t_bbox["ymin"], t_bbox["ymax"])
-    # 
-    #       
-    #       # Crop using the bbox extent
-    #       return(terra::crop(rasters, crop_ext))
-    #       
+    #     # Transform prediction_extent to match raster CRS *if* they are different
+    #     extent_transformed_sf <- if (raster_crs_str != extent_crs$proj4string) {
+    #       sf::st_transform(prediction_extent, raster_crs_str)
     #     } else {
-    #       # Standard approach when both are in similar coordinate systems
-    #       # Transform the prediction extent to match the raster's CRS
-    #       extent_transformed <- sf::st_transform(prediction_extent, raster_crs)
-    #       
-    #       # Convert to a terra vector object for cropping and masking
-    #       extent_vect <- terra::vect(extent_transformed)
-    #       
-    #       
-    #       # First crop to bounding box for efficiency
-    #       rasters_cropped <- terra::crop(rasters, extent_vect)
-    #       
-    #       # Then mask to actual polygon shape
-    #       return(terra::mask(rasters_cropped, extent_vect))
+    #       prediction_extent
     #     }
+    #     
+    #     # Check validity again after potential transformation
+    #     if (!sf::st_is_valid(extent_transformed_sf)) {
+    #       warning("Prediction extent geometry became invalid after transformation.")
+    #       extent_transformed_sf <- sf::st_make_valid(extent_transformed_sf)
+    #       if (!sf::st_is_valid(extent_transformed_sf)){
+    #         warning("Could not repair transformed prediction extent geometry.")
+    #         return(rasters)
+    #       }
+    #     }
+    #     
+    #     # Convert sf object to terra SpatVector
+    #     extent_vect <- terra::vect(extent_transformed_sf)
+    #     
+    #     # Check if extents overlap *after* transformation
+    #     # Create extents for comparison
+    #     raster_extent_obj <- terra::ext(rasters)
+    #     extent_vect_obj <- terra::ext(extent_vect)
+    #     
+    #     if (!terra::relate(raster_extent_obj, extent_vect_obj, "intersects")) {
+    #       warning("[clip_prediction_rasters] Extents do not overlap after transformation.")
+    #       return(rasters) # Return original if they don't overlap
+    #     }
+    #     
+    #     # First crop to the bounding box of the transformed extent for efficiency
+    #     rasters_cropped <- tryCatch(
+    #       terra::crop(rasters, extent_vect),
+    #       error = function(e) {
+    #         warning(paste("[clip_prediction_rasters] Cropping failed:", e$message))
+    #         return(NULL) # Indicate failure
+    #       }
+    #     )
+    #     
+    #     if (is.null(rasters_cropped)) return(rasters) # Return original if crop failed
+    #     
+    #     # Then mask using the actual polygon geometry
+    #     rasters_masked <- tryCatch(
+    #       terra::mask(rasters_cropped, extent_vect),
+    #       error = function(e) {
+    #         warning(paste("[clip_prediction_rasters] Masking failed:", e$message))
+    #         return(rasters_cropped) # Return cropped if mask failed
+    #       }
+    #     )
+    #     
+    #     
+    #     return(rasters_masked)
+    #     
     #   }, error = function(e) {
-    #     # If clipping fails, return original rasters
-    #     warning(paste("Failed to clip rasters:", e$message))
-    #     return(rasters)
+    #     warning(paste("Error during clip/mask operation:", e$message))
+    #     return(rasters) # Fallback to original rasters on any error
     #   })
     # }
-    
-    clip_prediction_rasters <- function(rasters, prediction_extent) {
-      if (is.null(prediction_extent) || !inherits(prediction_extent, "sf")) return(rasters)
-      if (!inherits(rasters, "SpatRaster")) return(rasters)
-      
-      response <- readline(prompt = "Would you like to interrupt execution with browser()? (y/n): ")
-      if (tolower(response) == "y" || tolower(response) == "yes") {
-        message("Entering browser mode...")
-        browser()
-      }
-      
-      tryCatch({
-        # Ensure prediction_extent is valid
-        prediction_extent <- sf::st_make_valid(prediction_extent)
-        if (!sf::st_is_valid(prediction_extent)) {
-          warning("Prediction extent geometry is invalid after st_make_valid.")
-          return(rasters) # Return original if extent is invalid
-        }
-        
-        # Get CRS information
-        raster_crs_str <- terra::crs(rasters, proj = TRUE)
-        extent_crs <- sf::st_crs(prediction_extent)
-        
-        # Transform prediction_extent to match raster CRS *if* they are different
-        extent_transformed_sf <- if (raster_crs_str != extent_crs$proj4string) {
-          sf::st_transform(prediction_extent, raster_crs_str)
-        } else {
-          prediction_extent
-        }
-        
-        # Check validity again after potential transformation
-        if (!sf::st_is_valid(extent_transformed_sf)) {
-          warning("Prediction extent geometry became invalid after transformation.")
-          extent_transformed_sf <- sf::st_make_valid(extent_transformed_sf)
-          if (!sf::st_is_valid(extent_transformed_sf)){
-            warning("Could not repair transformed prediction extent geometry.")
-            return(rasters)
-          }
-        }
-        
-        # Convert sf object to terra SpatVector
-        extent_vect <- terra::vect(extent_transformed_sf)
-        
-        # Check if extents overlap *after* transformation
-        # Create extents for comparison
-        raster_extent_obj <- terra::ext(rasters)
-        extent_vect_obj <- terra::ext(extent_vect)
-        
-        if (!terra::relate(raster_extent_obj, extent_vect_obj, "intersects")) {
-          warning("[clip_prediction_rasters] Extents do not overlap after transformation.")
-          return(rasters) # Return original if they don't overlap
-        }
-        
-        # First crop to the bounding box of the transformed extent for efficiency
-        rasters_cropped <- tryCatch(
-          terra::crop(rasters, extent_vect),
-          error = function(e) {
-            warning(paste("[clip_prediction_rasters] Cropping failed:", e$message))
-            return(NULL) # Indicate failure
-          }
-        )
-        
-        if (is.null(rasters_cropped)) return(rasters) # Return original if crop failed
-        
-        # Then mask using the actual polygon geometry
-        rasters_masked <- tryCatch(
-          terra::mask(rasters_cropped, extent_vect),
-          error = function(e) {
-            warning(paste("[clip_prediction_rasters] Masking failed:", e$message))
-            return(rasters_cropped) # Return cropped if mask failed
-          }
-        )
-        
-        
-        return(rasters_masked)
-        
-      }, error = function(e) {
-        warning(paste("Error during clip/mask operation:", e$message))
-        return(rasters) # Fallback to original rasters on any error
-      })
-    }
     
     
     
@@ -6330,8 +6752,6 @@ surveyDashboard <- function(CTtable = NULL,
           }
           
           # --- Call the unified createCovariates function ---
-          # print("Arguments passed to createCovariates:") # Debugging
-          # print(str(args_list))                        # Debugging
           covariates_extract_list <- do.call(camtrapR::createCovariates, args_list)
 
           
@@ -6744,8 +7164,8 @@ surveyDashboard <- function(CTtable = NULL,
            las = 2)
       
       # Add correlation values
-      for(i in 1:nrow(cor_matrix)) {
-        for(j in 1:ncol(cor_matrix)) {
+      for(i in seq_len(nrow(cor_matrix))) {
+        for(j in seq_len(ncol(cor_matrix))) {
           if(i != j) {  # Skip diagonal
             text(x = (j-1)/(ncol(cor_matrix)-1),
                  y = (nrow(cor_matrix)-i)/(nrow(cor_matrix)-1),
@@ -7282,24 +7702,10 @@ surveyDashboard <- function(CTtable = NULL,
           
           # Display summary statistics
           output$acc_summary <- renderDT({
-            # print_AsyEst <- current_objects$results$AsyEst
-            # print_AsyEst[, -c(1,2)] <- round(print_AsyEst[, -c(1,2)], 2) 
-            # print(print_AsyEst)
             DT::datatable(print_AsyEst)
           })
           
-          
-          # # Save objects
-          # current_objects$acc_summary <- output$acc_summary
-          # current_objects$acc_rarefaction_plot <- output$acc_rarefaction_plot
-          # current_objects$acc_rarefaction_plot_combined <- output$acc_rarefaction_plot_combined
-          # current_objects$acc_coverage_plot <- output$acc_coverage_plot
-          # current_objects$acc_coverage_plot_combined <- output$acc_coverage_plot_combined
-          # current_objects$acc_richness_plot_combined <- output$acc_richness_plot_combined
-          # current_objects$acc_richness_plot_combined_combined <- output$acc_richness_plot_combined
-          
-          # print(str(current_objects))
-          
+                    
           species_accumulation_objects(current_objects)
           
           showNotification("Analysis completed successfully", type = "message")
@@ -7333,6 +7739,14 @@ surveyDashboard <- function(CTtable = NULL,
     
     # container for saving reactive objects
     single_species_occu_objects <- shiny::reactiveValues()
+    
+    
+    # Update the max value of occasionLength slider based on camop
+    observe({
+      req(camop())
+      updateSliderInput(session, "occasionLength_single_species", max = ncol(camop()))
+      updateSliderInput(session, "occasionLength_community", max = ncol(camop()))
+    })
     
     
     detection_hist <- reactive({
@@ -7466,6 +7880,7 @@ surveyDashboard <- function(CTtable = NULL,
         icon = shiny::icon("location-dot")
       )
     })
+    # TODO: Either add percentage in parentheses or a new box with percentage of stations with detections
     
     output$dethist_percent_1s <- shinydashboard::renderValueBox({
       req(dh1_df())
@@ -7500,6 +7915,11 @@ surveyDashboard <- function(CTtable = NULL,
     # Tab: Occupancy  ----
     
     ##  General ----
+    output$model_config_header <- renderUI({
+      if (!is.null(input$species_dethist) && input$species_dethist != "") {
+        h5(paste("Species:", input$species_dethist), class = "text-primary")
+      } 
+    })
     
     # Observer to update covariate choices for all occupancy workflows
     observe({
@@ -7540,11 +7960,11 @@ surveyDashboard <- function(CTtable = NULL,
     
     output$basic_ubms_cores_input <- renderUI({
       max_cores <- min(parallel::detectCores() - 1, 7)
-      safe_cores <- min(max_cores, input$basic_ubms_chains %||% 1) # Use %||% for safety
+      # safe_cores <- min(max_cores, input$basic_ubms_chains %||% 1) # Use %||% for safety
+      safe_cores <- 1  # single core is often faster than multiple for small models (due to parallel overhead of shiny)
       tagList(
         numericInput("basic_ubms_cores", "Number of cores:",
-                     value = safe_cores, min = 1, max = max_cores),
-        add_tooltip(id = "basic_ubms_cores", title = "Number of CPU cores to use for parallel chain execution (max limited by available cores).")
+                     value = safe_cores, min = 1, max = max_cores)
       )
     })
     
@@ -7567,6 +7987,8 @@ surveyDashboard <- function(CTtable = NULL,
       # detection_hist() returns a list with [[1]] = detection matrix, [[2]] = effort matrix
       tryCatch({
         sitecovs_umf <- st_drop_geometry(data$aggregated_CTtable)
+        #NOTE: unmarkedFrameOccu fails when passing "cams" object (even though it inherits from data.frame). Coerce for now.
+        if("cams" %in% class(sitecovs_umf)) {sitecovs_umf <- as.data.frame(sitecovs_umf)}
         
         unmarked::unmarkedFrameOccu(
           y = detection_hist()[[1]],          # Detection/non-detection matrix
@@ -7750,6 +8172,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Basic workflow state tracking and clearing
+    # clear all modelling objects if input changed
     observeEvent(c(
       input$basic_model_package,
       input$basic_model_type,
@@ -7764,12 +8187,15 @@ surveyDashboard <- function(CTtable = NULL,
         return(NULL)  # Use explicit return(NULL) to force early exit
       }
       
-      # Clear the model if it exists
+      # Clear the model if it exists (or if models were added to model selection)
       if (!is.null(basic_model()) || length(single_species_occu_objects$basic_modList) > 0) {
         basic_model(NULL)
+        print_basic_model(NULL)
         single_species_occu_objects$basic_modList <- list()
-        output$basic_model_selection <- renderTable({ NULL })
-        output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
+        # the following was stupid. Overwriting the original render function with function that can only output NULL
+        # because: "output$id <- " may only appear once in function!
+        # output$basic_model_selection <- renderTable({ NULL })    
+        # output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
         shiny::showNotification("Basic model cleared due to input changes", type = "warning")
       }
     }, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -7793,8 +8219,8 @@ surveyDashboard <- function(CTtable = NULL,
       if (!is.null(advanced_model()) || length(single_species_occu_objects$adv_modList) > 0) {
         advanced_model(NULL)
         single_species_occu_objects$adv_modList <- list()
-        output$adv_model_selection <- renderTable({ NULL })
-        output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
+        # output$adv_model_selection <- renderTable({ NULL })
+        # output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
         shiny::showNotification("Advanced model cleared due to input changes", type = "warning")
       }
     }, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -7811,17 +8237,18 @@ surveyDashboard <- function(CTtable = NULL,
       if (!is.null(basic_model()) || length(single_species_occu_objects$basic_modList) > 0) {
         something_to_clear <- TRUE
         basic_model(NULL)
+        basic_model_formula(NULL)
         
         single_species_occu_objects$basic_modList <- list()
-        output$basic_model_selection <- renderTable({ NULL })
-        output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
+        # output$basic_model_selection <- renderTable({ NULL })
+        # output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
       }
       if (!is.null(advanced_model()) || length(single_species_occu_objects$adv_modList) > 0) {
         something_to_clear <- TRUE
         advanced_model(NULL)
         single_species_occu_objects$adv_modList <- list()
-        output$adv_model_selection <- renderTable({ NULL })
-        output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
+        # output$adv_model_selection <- renderTable({ NULL })
+        # output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
       }
       if(something_to_clear) shiny::showNotification("Models and predictions cleared due to data changes", type = "warning")
     }, ignoreNULL = FALSE, ignoreInit = TRUE)
@@ -7830,6 +8257,25 @@ surveyDashboard <- function(CTtable = NULL,
     
     ## Basic workflow server logic   ----
     
+    # check if ubms is available if selected
+    observeEvent(input$basic_model_package, {
+      if (input$basic_model_package == "ubms") {
+        if (!requireNamespace("ubms", quietly = TRUE)) {
+          # Show a warning to the user
+          showNotification(
+            "The 'ubms' package is required for Bayesian models. Please install it with install.packages('ubms').", 
+            type = "error", 
+            duration = 10
+          )
+          
+          # Revert the dropdown back to unmarked
+          updateSelectInput(session, "basic_model_package", selected = "unmarked")
+        }
+      }
+    }, label = "Select model package (single)")
+    
+    basic_model_formula <- reactiveVal(NULL)
+
     observeEvent(input$basic_run_model, {
       req(umf())
       
@@ -7888,48 +8334,112 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Combine formulas
       formula_tmp <- stats::formula(paste0("~", det_formula, " ~", occ_formula))
+      # basic_model_formula(formula_tmp)
+      basic_model_formula(list(detection = det_formula,
+                               occupancy = occ_formula))
       
-      
+      ### Fit basic occupancy model   ----
+      ### Fit basic occupancy model   ----
       withProgress(message = 'Fitting basic model...', value = 0, {
         tryCatch({
-          model <- switch(
-            paste(input$basic_model_package, input$basic_model_type, sep = "_"),
-            "unmarked_Occupancy" = unmarked::occu(formula = formula_tmp, data = umf()),
-            "unmarked_Royle-Nichols" = unmarked::occuRN(formula = formula_tmp, data = umf()),
-            "ubms_Occupancy" = ubms::stan_occu(
-              formula = formula_tmp, 
-              data = umf(), 
-              chains = input$basic_ubms_chains, 
-              iter = input$basic_ubms_iter, 
-              warmup = floor(input$basic_ubms_iter/2), 
-              thin = input$basic_ubms_thin, 
-              cores = input$basic_ubms_cores,
-              refresh = 0
-            ),
-            "ubms_Royle-Nichols" = ubms::stan_occuRN(
-              formula = formula_tmp, 
-              data = umf(), 
-              chains = input$basic_ubms_chains, 
-              iter = input$basic_ubms_iter, 
-              warmup = floor(input$basic_ubms_iter/2), 
-              thin = input$basic_ubms_thin, 
-              cores = input$basic_ubms_cores,
-              refresh = 0
-            )
-          )
           
-          # Store the model in basic workflow reactive
-          basic_model(model)
-          shiny::showNotification("Basic model fitted successfully", type = "message")
+          if (input$basic_model_package == "unmarked") {
+            
+            # 1. Fit the model
+            if (input$basic_model_type == "Occupancy") {
+              model_unmarked <- eval(bquote(unmarked::occu(formula = .(formula_tmp), data = umf())))
+            } else if (input$basic_model_type == "Royle-Nichols") {
+              model_unmarked <- eval(bquote(unmarked::occuRN(formula = .(formula_tmp), data = umf())))
+            }
+            
+            # 2. Save model to reactive
+            basic_model(model_unmarked)
+            
+            # 3. Capture printed summary (unmarked outputs warnings/errors on print, not on fit)
+            print_basic_model(capture_conditions(print(model_unmarked)))
+            
+          } else if (input$basic_model_package == "ubms") {
+            
+            # 1. Fit the model (ubms outputs warnings/errors on fit, not on print)
+            if (input$basic_model_type == "Occupancy") {
+              model_ubms_capture <- capture_conditions(eval(bquote(ubms::stan_occu(
+                formula = .(formula_tmp),
+                data    = umf(), 
+                chains  = .(input$basic_ubms_chains), 
+                iter    = .(input$basic_ubms_iter), 
+                warmup  = .(floor(input$basic_ubms_iter/2)), 
+                thin    = .(input$basic_ubms_thin), 
+                cores   = .(input$basic_ubms_cores),
+                refresh = 0
+              ))))
+            } else if (input$basic_model_type == "Royle-Nichols") {
+              model_ubms_capture <- capture_conditions(eval(bquote(ubms::stan_occuRN(
+                formula = .(formula_tmp),
+                data    = umf(), 
+                chains  = .(input$basic_ubms_chains), 
+                iter    = .(input$basic_ubms_iter), 
+                warmup  = .(floor(input$basic_ubms_iter/2)), 
+                thin    = .(input$basic_ubms_thin), 
+                cores   = .(input$basic_ubms_cores),
+                refresh = 0
+              ))))
+            }
+            
+            # 2. Save model to reactive
+            basic_model(model_ubms_capture$result)
+            
+            # 3. Capture printed model summary
+            model_ubms_capture$printed_output <- capture_conditions(print(model_ubms_capture$result))$printed_output
+
+            # 4. Save outputs to print_basic_model reactive
+            print_basic_model(model_ubms_capture) 
+          }
+          
+          # Check for errors/warnings in the captured output
+          if (length(print_basic_model()$errors) >= 1) {
+            shiny::showNotification("Basic model fitted with error", type = "error")
+          } else if (length(print_basic_model()$warnings) >= 1) {
+            shiny::showNotification("Basic model fitted with warnings", type = "warning")
+          } else {
+            shiny::showNotification("Basic model fitted successfully", type = "message")
+          }
           
         }, error = function(e) {
           shiny::showNotification(paste("Error fitting basic model:", e$message), type = "error")
         })
       })
-    })
+    }, label = "Run model (single)")
     
+    # Add action button to return unmarkedFrame object
+    observeEvent(input$export_basic_model, {
+      req(basic_model())
+      object_name <- paste0("model", "_", 
+                            gsub(" ", "_", input$species_dethist), "_",
+                            input$occasionLength_single_species, "d", "_", 
+                            input$basic_model_package, "_",
+                            paste0("p_", basic_model_formula()$detection), "_",
+                            paste0("psi_", basic_model_formula()$occupancy)
+                            # basic_model_formula()
+                            )
+      
+      assign_to_global_umf <- function(pos=1) {
+        basic_model <- basic_model()
+        assign(object_name, basic_model, envir=as.environment(pos))
+      }
+      
+      assign_to_global_umf()
+      
+      showModal(modalDialog(
+        title = "Object Saved",
+        paste("The fitted model has been saved to the workspace as:", object_name)
+      ))
+    }, label = "Export model (single)")
+    
+    
+    
+
     ## Advanced workflow server logic  ----
-    
+    # TODO: reimplement advanced model properly and activate in UI
     # Generate formula for the model
     generateFormula <- function(effects, package = "unmarked") {
       
@@ -8333,7 +8843,73 @@ surveyDashboard <- function(CTtable = NULL,
       # Generate formula using existing formula generation function
       formula_tmp <- generateFormula(modelEffects(), input$adv_model_package)
       
-      withProgress(message = 'Fitting advanced model...', value = 0, {
+      # generateFormula <- function(effects, package = "unmarked") {
+    #   # Helper function to generate term
+    #   generate_term <- function(effect) {
+    #     if(effect$type == "random") {
+    #       if(package == "ubms") {
+    #         # For ubms, use proper random effect syntax
+    #         paste0("(1|", effect$covariates[2], ")")
+    #       } else {
+    #         # For unmarked, convert to interaction since it doesn't support random effects
+    #         warning("Random effects not supported in unmarked, converting to interaction")
+    #         paste(effect$covariates, collapse = " * ")
+    #       }
+    #     } else {
+    #       switch(effect$type,
+    #              "linear" = effect$covariates[1],
+    #              "quadratic" = paste0(effect$covariates[1], " + I(", effect$covariates[1], "^2)"),
+    #              "interaction" = paste(effect$covariates, collapse = " * ")
+    #       )
+    #     }
+    #   }
+    #   
+    #   # Process detection terms
+    #   det_terms <- if(length(effects$detection) > 0) {
+    #     vapply(effects$detection, generate_term, character(1))
+    #   } else {
+    #     character(0)
+    #   }
+    #   det_formula <- if(length(det_terms) > 0) paste(det_terms, collapse = " + ") else "1"
+    #   
+    #   # Process occupancy terms
+    #   occu_terms <- if(length(effects$occupancy) > 0) {
+    #     vapply(effects$occupancy, generate_term, character(1))
+    #   } else {
+    #     character(0)
+    #   }
+    #   occu_formula <- if(length(occu_terms) > 0) paste(occu_terms, collapse = " + ") else "1"
+    #   
+    #   # Return the full formula
+    #   formula(paste0("~", det_formula, " ~", occu_formula))
+    # }
+    
+    # Preview the formula with debugging
+    output$formulaPreview <- renderPrint({
+      req(modelEffects())
+      
+      current_effects <- modelEffects()
+      # cat("=== Formula Preview Debug ===\n")
+      # cat("Raw modelEffects structure:\n")
+      # str(current_effects)
+      # 
+      # cat("\nDetection effects:\n")
+      # print(length(current_effects$detection))
+      # str(current_effects$detection)
+      # 
+      # cat("\nOccupancy effects:\n")
+      # print(length(current_effects$occupancy))
+      # str(current_effects$occupancy)
+      
+      cat("\nGenerated Formula:\n")
+      formula <- generateFormula(current_effects, input$model_package)
+      print(formula)
+      # cat("===========================\n")
+    })
+    
+    
+    
+    withProgress(message = 'Fitting advanced model...', value = 0, {
         tryCatch({
           model <- switch(
             paste(input$adv_model_package, input$adv_model_type, sep = "_"),
@@ -8374,14 +8950,21 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     ## Model summaries ----
-    output$basic_model_summary <- renderPrint({
+    output$basic_model_summary <- renderText({
       req(basic_model())
       if (input$basic_model_package == "unmarked") {
-        # print(summary(basic_model()))
-        print(basic_model())
-      } else {
-        print(basic_model())
+        summary_text <- print_basic_model()$printed_output
+      } 
+      if (input$basic_model_package == "ubms"){
+        
+        # print_basic_model()$printed_output
+        # Catch the console text into a character vector
+        summary_text <- capture.output(print(print_basic_model()$result))
+        
+        # Combine it into one single block of text with linebreaks
+        summary_text <- paste(summary_text, collapse = "\n")
       }
+      return(summary_text)
     })
     
     output$adv_model_summary <- renderPrint({
@@ -8393,6 +8976,52 @@ surveyDashboard <- function(CTtable = NULL,
       }
     })
     
+    
+    ## Model summary warnings ----
+    
+    output$basic_occu_model_log_messages <- renderUI({
+      req(basic_model())
+      msgs <- print_basic_model()$messages
+      if (length(msgs) > 0) {
+        safe_msgs <- htmltools::htmlEscape(msgs)
+        
+        HTML(paste0(
+          '<div class="alert alert-info"><strong>Messages:</strong><br>', 
+          paste(safe_msgs, collapse = "<br><br>"), 
+          '</div>'
+        ))
+      }
+    })
+    
+    output$basic_occu_model_log_warnings <- renderUI({
+      req(basic_model())
+      warns <- print_basic_model()$warnings
+      if (length(warns) > 0) {
+        # 1. Escape HTML characters so code calls display correctly
+        safe_warns <- htmltools::htmlEscape(warns)
+        
+        # 2. Combine them with <br> tags
+        HTML(paste0(
+          '<div class="alert alert-warning"><strong>Warnings:</strong><br>', 
+          paste(safe_warns, collapse = "<br><br>"), 
+          '</div>'
+        ))
+      }
+    })
+
+    output$basic_occu_model_log_errors <- renderUI({
+      req(print_basic_model())
+      errs <- print_basic_model()$errors
+      if (length(errs) > 0) {
+        safe_errs <- htmltools::htmlEscape(errs)
+        
+        HTML(paste0(
+          '<div class="alert alert-danger"><strong>Errors:</strong><br>', 
+          paste(safe_errs, collapse = "<br><br>"), 
+          '</div>'
+        ))
+      }
+    })
     
     ## Parameter estimates   ----
     
@@ -8615,50 +9244,87 @@ surveyDashboard <- function(CTtable = NULL,
     
     # Spatial predictions - Basic workflow
     observeEvent(input$basic_run_prediction, {
-      req(basic_model())
       
-      
-      # Get prediction raster
-      # should probably be replaced with get_prediction_raster()
-      pred_raster <- if (input$basic_pred_source == "extracted") {
-        req(data$prediction_raster, 
-            message = "No extracted covariates available. Please extract covariates first.")
-        data$prediction_raster
-      } else {
-        req(input$basic_custom_raster,
-            message = "Please upload a custom raster.")
-        terra::rast(input$basic_custom_raster$datapcath)
+      # 1. Check Model Availability
+      current_model <- basic_model()
+      if (is.null(current_model)) {
+        showNotification("Please fit a model first before creating predictions.", 
+                         type = "warning", duration = 5)
+        return()
       }
       
-      # ensure that all cells have NA at the same locations
-      na_mask <- !is.na(prod(pred_raster))
-      pred_raster <- mask(pred_raster, na_mask, maskvalues = FALSE)
+      # 2. Get prediction raster
+      pred_raster <- NULL
+      if (input$basic_pred_source == "extracted") {
+        if (is.null(data$prediction_raster)) {
+          showNotification("No extracted covariates available. Please extract covariates first.", 
+                           type = "warning", duration = 5)
+          return()
+        }
+        pred_raster <- data$prediction_raster
+      } else {
+        if (is.null(input$basic_custom_raster)) {
+          showNotification("Please upload a custom raster first.", 
+                           type = "warning", duration = 5)
+          return()
+        }
+        # tryCatch to handle corrupted/unreadable raster files safely
+        pred_raster <- try(terra::rast(input$basic_custom_raster$datapath), silent = TRUE)
+        if (inherits(pred_raster, "try-error") || is.null(pred_raster)) {
+          showNotification("Failed to load the uploaded custom raster. Please check the file.", 
+                           type = "error", duration = 5)
+          return()
+        }
+      }
       
+      # 3. Ensure that all cells have NA at the same locations
+      tryCatch({
+        # all returns TRUE if all layer have values, NA otherwise
+        na_mask <- all(pred_raster) 
+        pred_raster <- terra::mask(pred_raster, na_mask, maskvalues = NA)
+      }, error = function(e) {
+        showNotification(paste("Error aligning raster NA values:", e$message), 
+                         type = "error", duration = 5)
+        return()
+      })
       
+      # 4. Generate Predictions
       withProgress(message = 'Generating predictions...', value = 0, {
+        incProgress(0.2, detail = "Running predictions...")
+        
         tryCatch({
           # Generate predictions based on model type
           if (input$basic_model_package == "unmarked") {
-            predictions <- predict(basic_model(), 
+            predictions <- predict(current_model, 
                                    type = input$basic_pred_type,
                                    newdata = pred_raster)
           } else {
-            pred_raster <- raster::stack(pred_raster)
+
             
-            predictions <- ubms::predict(object = basic_model(),
+            predictions <- ubms::predict(object = current_model,
                                          submodel = input$basic_pred_type,
                                          newdata = pred_raster)
-            predictions <- rast(predictions)
+            
+
           }
+          
+          incProgress(0.6, detail = "Updating map...")
           
           # Update map
           updatePredictionMap("basic_prediction_map", predictions, "basic")
           
+          incProgress(1, detail = "Done!")
+          
+          # Success Notification
+          showNotification("Predictions generated successfully!", 
+                           type = "message", duration = 3)
+          
         }, error = function(e) {
-          showNotification(paste("Error generating predictions:", e$message), type = "error")
+          showNotification(paste("Error generating predictions:", e$message), 
+                           type = "error", duration = 10)
         })
       })
-    })
+    })   
     
     # # Spatial predictions - Advanced workflow
     # observeEvent(input$adv_run_prediction, {
@@ -8701,15 +9367,29 @@ surveyDashboard <- function(CTtable = NULL,
     observeEvent(input$basic_add_to_modsel, {
       req(basic_model())
       single_species_occu_objects$basic_modList <- c(single_species_occu_objects$basic_modList, list(basic_model()))
-    })
+      showNotification(paste("Model added to model selection (Total:", length(single_species_occu_objects$basic_modList), ")."), type = "default")
+
+    }, label = "Add to model selection (basic)")
     
     observeEvent(input$basic_clear_modsel, {
       single_species_occu_objects$basic_modList <- list()
-    })
+    }, label = "Clear model selection (basic)")
     
     output$basic_model_selection <- renderTable({
-      req(length(single_species_occu_objects$basic_modList) > 0)
-      createModelSelectionTable(single_species_occu_objects$basic_modList, input$basic_model_package)
+      
+      mod_list <- single_species_occu_objects$basic_modList
+      pkg <- input$basic_model_package
+      
+      # Instead of req(), explicitly return NULL to CLEAR the UI
+      if (pkg == "unmarked" && length(mod_list) == 0) {
+        return(NULL) 
+      }
+      if (pkg == "ubms" && length(mod_list) <= 1) {
+        return(NULL)
+      }
+      
+      # If we make it past the checks, render the table
+      createModelSelectionTable(mod_list, pkg)
     })
     
     # advanced
@@ -8738,11 +9418,25 @@ surveyDashboard <- function(CTtable = NULL,
         ms <- unmarked::modSel(fl)
         df_ms <- round(ms@Full[, c("nPars", "AIC", "delta", "AICwt", "cumltvWt", "Rsq")], 2)
         df_ms <- cbind(formula = ms@Full$formula, df_ms)
-      } else {
+      } 
+      if (package == "ubms") {
+        # old implementation (before breaking changes in loo 2.9.0 / ubms 1.2.9 - modSel returns matrix)
+        # fl <- ubms::fitList(fits = model_list)
+        # ms <- ubms::modSel(fl)
+        # df_ms <- round(ms@Full[, c("nPars", "WAIC", "delta", "weight")], 2)
+        # df_ms <- cbind(formula = ms@Full$formula, df_ms)
+        
+        # ubms >= 1.2.9 (modSel returns data frame)
+        # construct model names from formula
+        names(model_list) <- sapply(model_list, FUN = \(x) {
+          paste(paste(as.character(x@submodels@submodels$det@formula), collapse = ""), 
+                paste(as.character(x@submodels@submodels$state@formula), collapse = ""))
+        })
+        
         fl <- ubms::fitList(fits = model_list)
-        ms <- ubms::modSel(fl)
-        df_ms <- round(ms@Full[, c("nPars", "WAIC", "delta", "weight")], 2)
-        df_ms <- cbind(formula = ms@Full$formula, df_ms)
+        ms <- ubms::modSel(fl) # requires > 1 model fitList, otherwise Error in : 'loo_compare' requires at least two models.
+        df_ms <- round(ms, 2)
+        df_ms <- cbind(model = rownames(df_ms), df_ms)
       }
       return(df_ms)
     }
@@ -8750,7 +9444,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
-    # Tab: Multi-species occupancy   ----
+    # Tab: Community occupancy   ----
     
     
     ### Functions to prepare covariates and prediction raster ----
@@ -8790,7 +9484,7 @@ surveyDashboard <- function(CTtable = NULL,
       df_scaled <- df
       
       # Scale each numeric column and store parameters
-      for (col in names(df)[numeric_cols][-1]) {
+      for (col in names(df)[numeric_cols]) {   # had subsetting with [-1]. Unclear why, caused covariates to go unscaled.
         # Calculate mean and sd
         col_mean <- mean(df[[col]], na.rm = TRUE)
         col_sd <- sd(df[[col]], na.rm = TRUE)
@@ -9073,6 +9767,35 @@ surveyDashboard <- function(CTtable = NULL,
       summary(commOccu_model())
     })
     
+    # Render model summary
+    output$communityModelTextfile <- renderUI({
+      req(commOccu_model())
+      
+      if (input$modelFile == "") {
+        label <- "The model file was saved to a temporary location:"
+      } else {
+        label <- "The model file was saved to disk:"
+      }
+      
+      path <- commOccu_model()@modelFile
+      
+      tags$div(
+        tags$p(
+          tags$strong(label)
+        ),
+        tags$div(
+          style = paste(
+            "background-color: #f5f5f5;",
+            "padding: 10px;",
+            "border: 1px solid #ddd;",
+            "border-radius: 4px;",
+            "font-family: monospace;",
+            "word-break: break-all;"
+          ),
+          path
+        )
+      )
+    })
     
     
     
@@ -9117,7 +9840,7 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     
-    # 
+    # TODO: background processing for model fitting (commented out for now)
     # observeEvent(input$fitCommunityModel_background, {
     #   req(commOccu_model())
     #   
@@ -9195,16 +9918,27 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Function to process Gelman diagnostics into a data frame
-    process_gelman_diag <- function(gd) {
+    process_gelman_diag <- function(gd, mcmc_list = NULL) {
       # Extract point estimates and upper CI
       estimates <- gd$psrf[, 1]
       upper_ci <- gd$psrf[, 2]
+      
+      # Compute effective sample size (ESS) if an mcmc.list is provided
+      if (!is.null(mcmc_list)) {
+        ess <- tryCatch(
+          as.numeric(coda::effectiveSize(mcmc_list)),
+          error = function(e) rep(NA_real_, length(estimates))
+        )
+      } else {
+        ess <- rep(NA_real_, length(estimates))
+      }
       
       # Create data frame
       data.frame(
         Parameter = rownames(gd$psrf),
         Point_Est = round(estimates, 3),
         Upper_CI = round(upper_ci, 3),
+        ESS = round(ess, 1),
         Converged = ifelse(upper_ci < 1.1, "Yes", "No"),
         stringsAsFactors = FALSE
       )
@@ -9219,7 +9953,8 @@ surveyDashboard <- function(CTtable = NULL,
       gelman_diag <- coda::gelman.diag(fitted_comm_model(), multivariate = FALSE)
       
       # Convert to data frame for display
-      diag_df <- process_gelman_diag(gelman_diag)
+      diag_df <- process_gelman_diag(gelman_diag, fitted_comm_model())
+      
       
       # Initialize DT output
       output$gelman_diagnostics_table <- DT::renderDT({
@@ -9246,10 +9981,15 @@ surveyDashboard <- function(CTtable = NULL,
       cat("Total parameters:", nrow(diag_df), "\n")
       cat("Converged parameters:", sum(diag_df$Converged == "Yes", na.rm = T), "\n")
       cat("Non-converged parameters:", sum(diag_df$Converged == "No", na.rm = T), "\n")
+      cat("Parameters with Rhat (point estimate) >= 1.1:", sum(diag_df$Point_Est >= 1.1, na.rm = T), "\n")
+      cat("Parameters with effective sample size < 100:", sum(diag_df$ESS < 100, na.rm = T), "\n")
       cat("\nPotential scale reduction factors:\n")
       print(summary(gelman_diag$psrf[,1]))
+      cat("\nEffective sample sizes:\n")
+      print(summary(diag_df$ESS))
       cat("\nNote: Values close to 1 indicate convergence.\n")
       cat("Values > 1.1 suggest lack of convergence.\n")
+      cat("Effective sample sizes should be > 100 for reliable inference.\n")
     })
     
     
@@ -9279,18 +10019,40 @@ surveyDashboard <- function(CTtable = NULL,
     ### Plot responses
     
     
-    # Reactive values for plot settings
-    plot_settings <- reactiveValues(
-      submodel = "state",
-      response = "occupancy",
-      speciesSubset = NULL,
-      draws = 1000,
-      level = c(outer = 0.95, inner = 0.75),
-      ordered = TRUE,
-      combine = FALSE,
-      scales = "free_y",
-      community_lines = FALSE
-    )
+    # # Reactive values for plot settings
+    # plot_settings <- reactiveValues(
+    #   submodel = "state",
+    #   response = "occupancy",
+    #   speciesSubset = NULL,
+    #   draws = 1000,
+    #   level = c(outer = 0.95, inner = 0.75),
+    #   ordered = TRUE,
+    #   combine = FALSE,
+    #   scales = "free_y",
+    #   community_lines = FALSE
+    # )       
+    
+    # Create plot data with effect type handling
+        # plot_data <- createAdvancedEffectPlot(
+        #   model = model,
+        #   effect = effect,        # Create plot data with effect type handling
+        # plot_data <- createAdvancedEffectPlot(
+        #   model = model,
+        #   effect = effect,
+        #   submodel = tolower(input$adv_plot_submodel),
+        #   ci_level = input$adv_ci_level,
+        #   show_data = input$adv_show_data
+        # )
+        
+        # print(plot_data)
+        
+        #   submodel = tolower(input$adv_plot_submodel),
+        #   ci_level = input$adv_ci_level,
+        #   show_data = input$adv_show_data
+        # )
+        
+        # print(plot_data)
+        
     
     
     # Update species choices when model is available
@@ -9600,12 +10362,348 @@ surveyDashboard <- function(CTtable = NULL,
           gof_results(results)
           
           showNotification("Goodness of fit test completed", type = "message")
+          
+          # Warning #5: lack of fit (pops up when GOF is run and trigger occurs)
+          w5 <- compute_lack_of_fit_warning(results)
+          if (!is.null(w5) && !(w5$id %in% acknowledged_warnings())) {
+            showWarningModal(list(w5))
+          }
         }, error = function(e) {
           showNotification(paste("Error in GOF test:", e$message), type = "error")
         })
       })
     })
     
+    ## ============================================================
+    ## Warning system (data-quality & model-convergence warnings)
+    ## ------------------------------------------------------------
+    ## A warning is a list with fields:
+    ##   id       : unique warning identifier (character)
+    ##   title    : short heading shown in the modal (character)
+    ##   message  : explanatory text shown in the modal (character)
+    ##   severity : "warning" (default) or "danger"
+    ## The warning reactives below each return a warning list if their
+    ## trigger condition is TRUE, or NULL otherwise. They deliberately
+    ## avoid req() so they can be safely called from inside observers
+    ## without raising silent validation errors.
+    ## ============================================================
+    
+    ## Helper: render a single warning as a block of tags ----
+    renderWarningBlock <- function(w) {
+      sev        <- if (is.null(w$severity)) "warning" else w$severity
+      icon_name  <- if (sev == "danger") "exclamation-triangle" else "exclamation-circle"
+      icon_color <- if (sev == "danger") "#d9534f" else "#f0ad4e"
+      div(
+        style = "margin-bottom: 15px;",
+        h4(
+          icon(icon_name),
+          span(w$title, style = paste0("color:", icon_color, ";"))
+        ),
+        p(w$message, style = "margin-left: 10px;")
+      )
+    }
+    
+    ## Helper: show a modal dialog listing all collected warnings ----
+    ## acknowledge = TRUE  -> footer is "Acknowledge" button; shown IDs are
+    ##                        stored in pending_acknowledgment so the dismiss
+    ##                        handler can mark them as seen (suppresses future
+    ##                        auto-popups until a new dataset is loaded).
+    ## acknowledge = FALSE -> footer is "Close"; used by sidebar review buttons.
+    showWarningModal <- function(warnings, acknowledge = TRUE) {
+      # Strip out any NULL elements just in case
+      warnings <- warnings[!sapply(warnings, is.null)]
+      
+      if (length(warnings) == 0) return(invisible(NULL))
+      
+      if (acknowledge) {
+        pending_acknowledgment(vapply(warnings, function(w) w$id, character(1)))
+      }
+      
+      body_blocks <- lapply(warnings, renderWarningBlock)
+      body <- do.call(tagList, c(body_blocks, list(
+        hr(),
+        p(
+          HTML("<strong>Note:</strong> These warnings are advisory. You can proceed, but interpret the results with extra caution."),
+          style = "color: #6c757d; font-size: 0.9em;"
+        )
+      )))
+      
+      footer_btn <- if (acknowledge) {
+        actionButton("dismissWarnings", "Acknowledge", class = "btn-primary")
+      } else {
+        modalButton("Close")
+      }
+      
+      showModal(modalDialog(
+        title    = tagList(icon("exclamation-triangle"), "Data Quality Warnings"),
+        body,
+        footer   = tagList(footer_btn),
+        size      = "l",
+        easyClose = !acknowledge
+      ))
+    }
+    
+    ## Helper: collect non-NULL warnings from a variable argument list ----
+    collect_warnings <- function(...) {
+      ws <- list(...)
+      ws[!sapply(ws, is.null)]
+    }
+    
+    ## Warning #1: station sample size ----
+    warn_station_sample_size <- reactive({
+      if (is.null(data$aggregated_CTtable)) return(NULL)
+      n <- nrow(data$aggregated_CTtable)
+      if (!is.null(n) && !is.na(n) && n < 20) {
+        list(
+          id       = "station_sample_size",
+          title    = "Warning: station sample size",
+          message  = paste0(
+            "You are about to fit an occupancy model to a data set with fewer than 20 sampling locations (n = ",
+            n, "). This can lead to high uncertainty in estimates; some parameters in your model may not be ",
+            "estimable. Your power to detect covariate effects will be low and you should strictly limit the ",
+            "number of covariates in your model."
+          ),
+          severity = "warning"
+        )
+      } else NULL
+    })
+
+    ## Warning #3: number of species ----
+    warn_n_species <- reactive({
+      if (is.null(input$speciesTable_rows_selected)) return(NULL)
+      n <- length(input$speciesTable_rows_selected)
+      if (n <= 5) {
+        list(
+          id       = "n_species",
+          title    = "Warning: number of species",
+          message  = paste0(
+            "You are about to fit a community occupancy model with ", n, " species (<6). For reliable ",
+            "estimation of community level parameters, there should be at least 6 species in the data set. ",
+            "Consider running multiple single-species occupancy models instead."
+          ),
+          severity = "warning"
+        )
+      } else NULL
+    })
+
+    ## Warning #4a: low number of detections (community workflow) ----
+    warn_low_detections_community <- reactive({
+      if (is.null(input$speciesTable_rows_selected)) return(NULL)
+      if (is.null(species_summary())) return(NULL)
+      ss <- species_summary()
+      selected_rows    <- input$speciesTable_rows_selected
+      selected_species <- sort(ss[[data$speciesCol]][selected_rows])
+      ss_subset <- ss[ss[[data$speciesCol]] %in% selected_species, ]
+      if (nrow(ss_subset) > 0 && any(ss_subset$Stations <= 3, na.rm = TRUE)) {
+        list(
+          id       = "low_detections",
+          title    = "Warning: low number of detections (community model)",
+          message  = paste0(
+            "At least one of the species in your data set is detected very rarely; parameter estimates for ",
+            "these species will likely have high uncertainty or may not be estimable at all; in a community ",
+            "occupancy model, they will be strongly influenced by the average community level parameters."
+          ),
+          severity = "warning"
+        )
+      } else NULL
+    })
+
+    ## Warning #4b: low number of detections (single-species workflow) ----
+    warn_low_detections_single <- reactive({
+      if (is.null(input$species_dethist) || input$species_dethist == "") return(NULL)
+      if (is.null(species_summary())) return(NULL)
+      ss <- species_summary()
+      stations <- ss$Stations[ss[[data$speciesCol]] == input$species_dethist]
+      if (length(stations) > 0 && !is.na(stations[1]) && stations[1] <= 3) {
+        list(
+          id       = "low_detections",
+          title    = "Warning: low number of detections (single species model)",
+          message  = paste0(
+            "The selected species (", input$species_dethist, ") is detected very rarely (at ",
+            stations[1], " station(s)); parameter estimates for this species will likely have high ",
+            "uncertainty or may not be estimable at all."
+          ),
+          severity = "warning"
+        )
+      } else NULL
+    })
+
+    ## Warning #5: lack of fit (helper + reactive) ----
+    ## Helper: compute lack-of-fit warning from a GOF results object.
+    ## Used both inline in the run_gof handler (passing `results` directly)
+    ## and in the warn_lack_of_fit reactive (passing gof_results()).
+    compute_lack_of_fit_warning <- function(gof_res) {
+      if (is.null(gof_res) || is.null(gof_res$BP)) return(NULL)
+      bp_df        <- gof_res$BP
+      bp_lower     <- 0.1
+      bp_upper     <- 0.9
+      bp_community <- bp_df$BP[nrow(bp_df)]
+      bp_species   <- bp_df$BP[-nrow(bp_df)]
+      lof_community <- isTRUE(bp_community < bp_lower || bp_community > bp_upper)
+      lof_species   <- isTRUE(any(bp_species < bp_lower | bp_species > bp_upper))
+      if (lof_community || lof_species) {
+        list(
+          id       = "lack_of_fit",
+          title    = "Warning: lack of fit",
+          message  = paste0(
+            "Posterior predictive checks indicate that the model does not fit the data ",
+            "at the community and/or species level (for at least one species). In some ",
+            "cases, this can be remedied by including important predictor variables currently ",
+            "missing from the model. If poor fit only affects a small number of species, ",
+            "consider excluding them or interpreting their results with extra caution. ",
+            "Causes, consequences and remedies for lack of fit are a complex topic and you ",
+            "may need to consult with an experienced user of these models."
+          ),
+          severity = "danger"
+        )
+      } else NULL
+    }
+    
+    warn_lack_of_fit <- reactive({
+      compute_lack_of_fit_warning(gof_results())
+    })
+    
+    ## Warning #2: convergence / effective sample size ----
+    warn_convergence <- reactive({
+      if (is.null(fitted_comm_model())) return(NULL)
+      fm  <- fitted_comm_model()
+      gd  <- tryCatch(coda::gelman.diag(fm, multivariate = FALSE), error = function(e) NULL)
+      ess <- tryCatch(as.numeric(coda::effectiveSize(fm)), error = function(e) NULL)
+      if (is.null(gd)) return(NULL)
+      point_est <- gd$psrf[, 1]
+      rhat_bad  <- any(point_est >= 1.1, na.rm = TRUE)
+      ess_bad   <- FALSE
+      if (!is.null(ess)) ess_bad <- any(ess < 100, na.rm = TRUE)
+      if (rhat_bad || ess_bad) {
+        problems <- character(0)
+        if (rhat_bad) problems <- c(problems, "at least one parameter has Rhat (point estimate) >= 1.1")
+        if (ess_bad)  problems <- c(problems, "at least one parameter has effective sample size < 100")
+        list(
+          id       = "convergence",
+          title    = "Warning: convergence, effective sample size",
+          message  = paste0(
+            "Some parameters in your community occupancy model have not converged and/or have extremely ",
+            "low effective sample size (", paste(problems, collapse = "; "), "). Estimates, and any ",
+            "products based on these estimates (distribution maps, response curves, etc) may not be ",
+            "reliable. Consider re-fitting the model with a larger number of iterations."
+          ),
+          severity = "danger"
+        )
+      } else NULL
+    })
+
+    ## Helper: filter out already-acknowledged warnings ----
+    filter_unacknowledged <- function(warnings) {
+      ack <- acknowledged_warnings()
+      if (is.null(ack) || length(ack) == 0) return(warnings)
+      Filter(function(w) !(w$id %in% ack), warnings)
+    }
+
+    ## Dismiss the warning modal (acknowledge shown warnings) ----
+    observeEvent(input$dismissWarnings, {
+      ids <- pending_acknowledgment()
+      if (!is.null(ids) && length(ids) > 0) {
+        acknowledged_warnings(unique(c(acknowledged_warnings(), ids)))
+      }
+      pending_acknowledgment(NULL)
+      removeModal()
+    })
+
+    ## Top-level tab navigation -> warnings #1, #4b ----
+    ## #1  pops up on "Detection History" and "Community Occupancy Models"
+    ## #4b pops up on "Occupancy models" (single-species)
+    ## Only shows warnings the user has NOT yet acknowledged.
+    observeEvent(input$tabs, {
+      active_tab <- input$tabs
+
+      if (active_tab == "DetectionHistory") {
+        ws <- filter_unacknowledged(collect_warnings(warn_station_sample_size()))
+        if (length(ws) > 0) showWarningModal(ws)
+
+      } else if (active_tab == "CommunityOccupancy") {
+        ws <- filter_unacknowledged(collect_warnings(warn_station_sample_size()))
+        if (length(ws) > 0) showWarningModal(ws)
+
+      } else if (active_tab == "Occupancy") {
+        ws <- filter_unacknowledged(collect_warnings(warn_low_detections_single()))
+        if (length(ws) > 0) showWarningModal(ws)
+      }
+    }, ignoreInit = TRUE)
+
+    ## Community occupancy sub-tab navigation -> warnings #2, #3, #4a ----
+    ## #3 and #4a pop up on "Model Configuration"
+    ## #2  pops up on Results / Diagnostics / Effect Plots / Spatial Predictions (after model fit)
+    observeEvent(input$commOccu_tabs, {
+      active_subtab <- input$commOccu_tabs
+
+      if (active_subtab == "Model Configuration") {
+        ws <- filter_unacknowledged(collect_warnings(
+          warn_n_species(),
+          warn_low_detections_community()
+        ))
+        if (length(ws) > 0) showWarningModal(ws)
+
+      } else if (active_subtab %in% c("Results", "Diagnostics", "Effect Plots", "Spatial Predictions")) {
+        # only relevant after a community model has been fitted
+        if (is.null(fitted_comm_model())) return()
+        ws <- filter_unacknowledged(list(warn_convergence()))
+        if (length(ws) > 0) showWarningModal(ws)
+      }
+    }, ignoreInit = TRUE)
+
+    ## Sidebar: review all active DATA warnings ----
+    ## Shows ALL currently-active data warnings regardless of acknowledgment.
+    observeEvent(input$show_data_warnings, {
+      ws <- collect_warnings(
+        warn_station_sample_size(),
+        warn_n_species(),
+        warn_low_detections_community(),
+        warn_low_detections_single()
+      )
+      if (length(ws) > 0) {
+        showWarningModal(ws, acknowledge = FALSE)
+      } else {
+        showNotification("No active data warnings.", type = "message", duration = 5)
+      }
+    })
+
+    ## Sidebar: review all active MODEL warnings ----
+    ## Shows ALL currently-active model warnings regardless of acknowledgment.
+    observeEvent(input$show_model_warnings, {
+      ws <- collect_warnings(
+        warn_convergence(),
+        warn_lack_of_fit()
+      )
+      if (length(ws) > 0) {
+        showWarningModal(ws, acknowledge = FALSE)
+      } else {
+        showNotification("No active model warnings.", type = "message", duration = 5)
+      }
+    })
+
+    ## Update sidebar button labels with active warning counts ----
+    observe({
+      data_ws <- collect_warnings(
+        warn_station_sample_size(),
+        warn_n_species(),
+        warn_low_detections_community(),
+        warn_low_detections_single()
+      )
+      n_data <- length(data_ws)
+      label  <- if (n_data > 0) paste0("Data Warnings (", n_data, ")") else "Data Warnings"
+      updateActionButton(session, "show_data_warnings", label = label)
+    })
+
+    observe({
+      model_ws <- collect_warnings(
+        warn_convergence(),
+        warn_lack_of_fit()
+      )
+      n_model <- length(model_ws)
+      label   <- if (n_model > 0) paste0("Model Warnings (", n_model, ")") else "Model Warnings"
+      updateActionButton(session, "show_model_warnings", label = label)
+    })
+
     # Reset gof_results when input changes
     observeEvent(c(input$gof_draws, input$gof_z_cond, input$gof_residual_type,
                    # Also reset if the underlying fitted model changes
@@ -9693,18 +10791,18 @@ surveyDashboard <- function(CTtable = NULL,
         )
     })
     
-    # Helper function to get fill color based on p-value
-    get_fit_color <- function(bp) {
-      if(bp < 0.1 || bp > 0.9) {
-        "#ff6666"  # Red for lack of fit
-      } else if(bp >= 0.45 && bp <= 0.55) {
-        "#cceb99"  # Medium-light green for excellent fit
-      } else if(bp >= 0.35 && bp <= 0.65) {
-        "#d9f0b3"  # Light green for good fit
-      } else {
-        "#e6f5c9"  # Very light green for moderate fit
-      }
-    }
+    # # Helper function to get fill color based on p-value
+    # get_fit_color <- function(bp) {
+    #   if(bp < 0.1 || bp > 0.9) {
+    #     "#ff6666"  # Red for lack of fit
+    #   } else if(bp >= 0.45 && bp <= 0.55) {
+    #     "#cceb99"  # Medium-light green for excellent fit
+    #   } else if(bp >= 0.35 && bp <= 0.65) {
+    #     "#d9f0b3"  # Light green for good fit
+    #   } else {
+    #     "#e6f5c9"  # Very light green for moderate fit
+    #   }
+    # }
     
     # # Render residual plot
     output$gof_residual_plot <- renderPlot({
@@ -9797,14 +10895,14 @@ surveyDashboard <- function(CTtable = NULL,
       return(TRUE)
     }
     
-    # Get covariate raster based on user selection
-    get_covariate_raster <- function() {
-      if (input$prediction_raster_source == "extracted") {
-        return(data$prediction_raster)
-      } else {
-        return(terra::rast(input$covariate_raster$datapath))
-      }
-    }
+    # # Get covariate raster based on user selection
+    # get_covariate_raster <- function() {
+    #   if (input$prediction_raster_source == "extracted") {
+    #     return(data$prediction_raster)
+    #   } else {
+    #     return(terra::rast(input$covariate_raster$datapath))
+    #   }
+    # }
     
     # Observer for species occupancy predictions
     observeEvent(input$runOccupancyPrediction, {
@@ -10131,9 +11229,34 @@ surveyDashboard <- function(CTtable = NULL,
     output$activity_density_plot <- shiny::renderPlot({
       req(data$recordTable, input$ad_species, data$speciesCol, data$recordDateTimeCol, data$recordDateTimeFormat)
       
+      # if data are from camtrap DP, keep event-based observations only
+      if("observationLevel" %in% colnames(data$recordTable)) {
+        recs <- data$recordTable
+        if(all(levels(data$recordTable$observationLevel) %in% c("event", "media"))) {
+          
+          if(sum(data$recordTable$observationLevel == "event") == 0) {
+            # use all records (media only)
+            recs <- data$recordTable
+          } else {
+            # use events only
+            recs <- data$recordTable[data$recordTable$observationLevel == "event", ]
+            showNotification("Using only event-based observations for activity analysis.", 
+                             type = "message", duration = 3)
+          }
+          
+        } else {
+          recs <- data$recordTable
+          showNotification("Column observationLevel in recordTable contains more values than 'event' and 'media'. Ignoring.",
+                           type = "warning")
+        }
+      } else {
+        recs <- data$recordTable
+      }
+      
+      
       tryCatch({
         activityDensity(
-          recordTable = data$recordTable,
+          recordTable = recs,
           species = input$ad_species,
           speciesCol = data$speciesCol,
           recordDateTimeCol = data$recordDateTimeCol,
@@ -10156,9 +11279,33 @@ surveyDashboard <- function(CTtable = NULL,
     output$actOverlapPlot <- shiny::renderPlot({
       req(data$recordTable, input$speciesA, input$speciesB, data$speciesCol, data$recordDateTimeCol, data$recordDateTimeFormat)
       
+      # if data are from camtrap DP, keep event-based observations only
+      if("observationLevel" %in% colnames(data$recordTable)) {
+        recs <- data$recordTable
+        if(all(levels(data$recordTable$observationLevel) %in% c("event", "media"))) {
+          
+          if(sum(data$recordTable$observationLevel == "event") == 0) {
+            # use all records (media only)
+            recs <- data$recordTable
+          } else {
+            # use events only
+            recs <- data$recordTable[data$recordTable$observationLevel == "event", ]
+            showNotification("Using only event-based observations for activity analysis.", 
+                             type = "message", duration = 3)
+          }
+          
+        } else {
+          recs <- data$recordTable
+          showNotification("Column observationLevel in recordTable contains more values than 'event' and 'media'. Ignoring.",
+                           type = "warning")
+        }
+      } else {
+        recs <- data$recordTable
+      }
+      
       tryCatch({
         activityOverlap(
-          recordTable = data$recordTable,
+          recordTable = recs,
           speciesA = input$speciesA,
           speciesB = input$speciesB,
           speciesCol = data$speciesCol,
@@ -10518,14 +11665,14 @@ surveyDashboard <- function(CTtable = NULL,
         if (any(c("original_rasters", "prediction_raster") %in% input$export_rasters)) {
           rasters_dir <- file.path(export_dir, "rasters")
           dir.create(rasters_dir, recursive = TRUE)
-          
+
           tryCatch({
             # Export original rasters
             if ("original_rasters" %in% input$export_rasters && !is.null(data$original_rasters)) {
               orig_dir <- file.path(rasters_dir, "original")
               dir.create(orig_dir, recursive = TRUE)
               
-              for (i in 1:terra::nlyr(data$original_rasters)) {
+              for (i in seq_along(data$original_rasters)) {
                 layer_name <- names(data$original_rasters)[i]
                 file_path <- file.path(orig_dir, paste0(layer_name, ".tif"))
                 terra::writeRaster(data$original_rasters[[i]], file_path, overwrite = TRUE)
@@ -10538,6 +11685,7 @@ surveyDashboard <- function(CTtable = NULL,
               pred_dir <- file.path(rasters_dir, "prediction")
               dir.create(pred_dir, recursive = TRUE)
               
+              # NOTE:: Why save as individual layers instead of multi-band raster?
               for (i in 1:terra::nlyr(data$prediction_raster)) {
                 layer_name <- names(data$prediction_raster)[i]
                 file_path <- file.path(pred_dir, paste0(layer_name, ".tif"))
@@ -10664,6 +11812,13 @@ surveyDashboard <- function(CTtable = NULL,
         )
       ))
     })
+    
+    # Stop execution and drops into the R debugger environment when clicking debug button
+    if (identical(Sys.getenv("CAMTRAPR_DEBUG"), "true")) {
+      observeEvent(input$debug_button, {
+        browser()
+      }, ignoreInit = TRUE)
+    }
     
     # Save / Restore app state ----
     
@@ -11295,6 +12450,7 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Single species occupancy
       basic_model = NULL,
+      print_basic_model = NULL,
       advanced_model = NULL,
       modelEffects = NULL,
       
@@ -11315,6 +12471,9 @@ surveyDashboard <- function(CTtable = NULL,
       
       # Spatial predictions 
       spatial_predictions_community = NULL,
+      
+      # Warning system
+      acknowledged_warnings = NULL,
       
       # UI control
       notification = TRUE
@@ -11401,13 +12560,18 @@ surveyDashboard <- function(CTtable = NULL,
           spatial_predictions_community$pao <- NULL
         }
         
+        # Reset warning acknowledgment (so warnings show again for new data)
+        if (!is.null(acknowledged_warnings)) {
+          acknowledged_warnings(NULL)
+        }
+        
         # Reset output elements if output reference provided
         if (!is.null(output)) {
           # Clear model summaries and plots
-          output$basic_model_selection <- renderTable({ NULL })
-          output$adv_model_selection <- renderTable({ NULL })
-          output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
-          output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
+          # output$basic_model_selection <- renderTable({ NULL })
+          # output$adv_model_selection <- renderTable({ NULL })
+          # output$basic_prediction_map <- leaflet::renderLeaflet({ NULL })
+          # output$adv_prediction_map <- leaflet::renderLeaflet({ NULL })
           
           # Clear species accumulation plots
           output$acc_rarefaction_plot <- NULL
@@ -11457,6 +12621,7 @@ surveyDashboard <- function(CTtable = NULL,
     
   }
   
-  shiny::shinyApp(ui, server)    #### 
+  # Start ShinyApp ----
+  shiny::shinyApp(ui, server)
   
 }

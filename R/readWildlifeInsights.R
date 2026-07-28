@@ -10,17 +10,20 @@
 #' @param image_file character. Path to the images CSV file.
 #'
 #' @return A list containing three elements:
-#' \describe{
-#'   \item{CTtable}{The full camera trap table, based on deployments.csv}
-#'   \item{CTtable_aggregated}{An aggregated version of the camera trap table, with one row per station}
-#'   \item{recordTable}{The record table, based on images.csv with additional columns from deployments.csv}
+#' \itemize{
+#'   \item \strong{CTtable}: The full camera trap table, based on deployments.csv
+#'   \item \strong{CTtable_aggregated}: An aggregated version of the camera trap table, with one row per station
+#'   \item \strong{recordTable}: The record table, based on images.csv with additional columns from deployments.csv
 #' }
+#' 
+#' 
+#' 
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' # Reading from a directory
-#' wi_data <- readWildlifeInsights(directory = "path/to/csv/files")
+#' wi_data <- readWildlifeInsights(directory = "path/to/csv_files")
 #'
 #' # Reading from a ZIP file
 #' wi_data <- readWildlifeInsights(zipfile = "path/to/wildlife_insights_export.zip")
@@ -41,7 +44,9 @@ readWildlifeInsights <- function(directory = NULL,
   }
   
   # Define required columns for validation
-  required_deployment_cols <- c("deployment_id", "placename", "camera_id", "start_date", "end_date")
+  required_deployment_cols <- c("deployment_id", 
+                                # "placename",   # expected by metadata standard, but not included in many downloads. Handle separately.
+                                "camera_id", "start_date", "end_date")
   required_image_cols <- c("deployment_id", "timestamp")
   
   # Load data from ZIP file
@@ -165,6 +170,7 @@ readWildlifeInsights <- function(directory = NULL,
   
   # Check for required columns in deployments
   missing_deployment_cols <- required_deployment_cols[!required_deployment_cols %in% colnames(deployments)]
+  
   if (length(missing_deployment_cols) > 0) {
     stop(paste("Missing required columns in deployments data:", 
                paste(missing_deployment_cols, collapse = ", "),
@@ -188,6 +194,13 @@ readWildlifeInsights <- function(directory = NULL,
                     "mdy HMS",  
                     "dmy HMS"            
   )
+  
+  # TODO: This was necessitated by a bug in previous WI exports. Fixed in 7/2026. Should not be necessary anymore. Remove once WI exports confirmed to match metadata standards.
+  if(!stationCol %in% colnames(deployments)) {
+    warning("deployments.csv does not contain a 'placename' column. Using 'deployment_id' as a fallback.", call. = F)
+    if(any(duplicated(deployments[, c(deploymentCol, cameraCol)]))) stop("Cannot use deployment_id as fallback due to duplicated deployment_id / camera_id.")
+    stationCol <- deploymentCol
+  }
   
   # Check for duplicate deployment IDs
   if(any(duplicated(deployments[, deploymentCol]))) {
@@ -380,6 +393,12 @@ readWildlifeInsights <- function(directory = NULL,
   # Ensure record date/time column is formatted correctly
   record_datetime_format <- c("ymd HMS",    # standard format
                               "mdy HM")     # if user modified content of zip in Excel
+  # NOTE: Some WI downloads have unexpected timestamp formats, e.g. "Fri Jul 18 2025 05:17:21 GMT+0000 (Coordinated Universal Time)", 
+  # should by "yyyy-mm-dd hh:mm:ss"
+  # Reported as bug. 
+  # Don't parse directly here. Error out.
+  
+  
   
   # Validate timestamp column
   if (!is.character(images_merged$timestamp)) {
@@ -399,6 +418,7 @@ readWildlifeInsights <- function(directory = NULL,
       "Supported formats are: ", paste(record_datetime_format, collapse = ", "), ".\n",
       "These records will have NA timestamps in the output."
     ))
+    if(all(is.na(timestamps_parsed))) stop("All timestamps failed to parse.", call. = FALSE)
   }
   
   images_merged$timestamp <- as.character(timestamps_parsed)

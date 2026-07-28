@@ -143,8 +143,9 @@
 #' @param video list. Contains information on how to handle video data
 #' (optional). See details.
 #' 
-#' @return A data frame containing species records and additional information
-#' about stations, date, time and (optionally) further metadata.
+#' @return An object of class `records` containing a data frame with species
+#' records and additional information about stations, date, time and
+#' (optionally) further metadata.
 #' 
 #' @note The results of a number of other function will depend on the output of
 #' this function (namely on the arguments \code{exclude} for excluding species
@@ -197,6 +198,9 @@
 #'                        additionalMetadataTags = c("EXIF:Model", "EXIF:Make")
 #' )
 #' # note argument additionalMetadataTags: it contains tag names as returned by function exifTagNames
+#' 
+#' rec_table1
+#' summary(rec_table1)
 #' 
 #' rec_table2 <- recordTable(inDir               = wd_images_ID_species,
 #'                        IDfrom                 = "directory",
@@ -670,5 +674,12 @@ recordTable <- function(inDir,
     }
   write.csv(record.table3, file = outtable_filename)
   }
+  
+  # declare specific class and store attributes
+  record.table3 <- as_records(record.table3, 
+                              stationCol = stationCol,
+                              speciesCol = speciesCol)
+  
   return(record.table3)
 }
+

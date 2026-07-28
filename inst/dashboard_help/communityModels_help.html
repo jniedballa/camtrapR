@@ -6,7 +6,8 @@
               <li>Review the species table showing detections and number of sites for each species</li>
               <li>Use the filtering options to select species based on minimum number of detections or sites</li>
               <li>You can manually select/deselect individual species by clicking the rows</li>
-              <li>Consider removing rare species with too few detections for reliable parameter estimation</li>
+              <li>Consider removing rare species with too few detections for reliable parameter estimation; for rarely detection species, parameters will be driven by the overall community</li>
+              <li>Do not fit community models to fewer than 6 species, as community level parameters are challenging to estimate for very small communities</li>
             </ul>
           </li>
 
@@ -70,12 +71,14 @@
           </li>
         </ol>
 
+        
         <h4>Important Notes:</h4>
         <ul>
           <li>More species and covariates increase computation time</li>
           <li>Check convergence diagnostics before interpreting results</li>
           <li>Covariates are scaled to mean = 0 and standard deviation = 1 automatically.</li>
-          <li>Prediction rasters shuold be provided in original scale. They are scaled automatically to match model covariatesy</li>
+          <li>Lack of model fit requires close examination of the data and model; in simple cases, adding important covariates may remedy lack of fit, but you may need to consult with an experienced user of these models</li>
+          <li>Prediction rasters should be provided in original scale. They are scaled automatically to match model covariates.</li>
           <li>Species with very few detections may have unreliable estimates</li>
           <li>Save your model objects to avoid rerunning long computations</li>
         </ul>
@@ -84,7 +87,36 @@
         <ul>
           <li>Start with simpler models and gradually add complexity</li>
           <li>Covariates are standardized automatically</li>
-          <li>Increase iterations if chains haven't converged</li>
+          <li>Increase iterations if chains haven't converged or if effective sample size is very low</li>
           <li>Check for highly correlated covariates</li>
           <li>Consider removing rare species or combining similar species</li>
         </ul>
+        
+        
+        <h4>Bayesian Priors</h4>
+        <p>All models in this tool utilize hard-coded, weakly informative (vague) priors. 
+        The goal is to allow the observed data to drive parameter estimation while providing enough structural constraints to ensure computational stability. 
+        Because all continuous covariates are automatically standardized to a mean of 0 and standard deviation of 1, these priors span a very wide range of plausible effect sizes.</p>
+        <ul>
+          <li><em>Community Means (Intercepts & Covariate Effects):</em> 
+            <ul>
+              <li><code>dnorm(0, 0.05)</code></li>
+              <li>Used for all community-level means (shared across species), such as the detection and occupancy intercepts and mean covariate effects. This normal distribution is centered at 0 with a precision of 0.05, which translates to a standard deviation of roughly 4.47. On the logit scale (used for occupancy and detection probabilities), a standard deviation of 4.47 is extremely wide, making it a vague prior.</li>
+            </ul>
+          </li>
+          <li><em>Variance of Random Effects (Precision, <code>tau</code>):</em> 
+            <ul>
+              <li><code>dgamma(0.1, 0.1)</code></li>
+              <li>Used for the precision parameter <code>tau</code>, which controls the degree of variation among species-specific random effects (both intercepts and covariates). This Gamma prior (shape = 0.1, rate = 0.1) is a classic vague prior in Bayesian hierarchical models. It is highly diffuse, allowing the data to completely dictate the true level of variation across species. The corresponding standard deviation for the random effects is calculated as <code>sigma &lt;- sqrt(1 / tau)</code>.</li>
+            </ul>
+          </li>
+        </ul>
+        
+  <h4>Relevant functions</h4>
+<ul>
+  <li><a href="https://jniedballa.github.io/camtrapR/reference/communityModel.html"><code> communityModel</code></a> Create community occupancy models </li>
+  <li><a href="https://jniedballa.github.io/camtrapR/reference/fit-commOccu-method.html"><code> fit(commOccu)</code></a> fit() method for community Models</li>
+  <li><a href="https://jniedballa.github.io/camtrapR/reference/predict-commOccu-method.html"><code> predict(commOccu)</code></a> predict() method for community Models</li>
+  <li><a href="https://jniedballa.github.io/camtrapR/reference/plot_coef-commOccu-method.html"><code> ploe_coef</code></a> Plot model coefficients </li>
+  <li><a href="https://jniedballa.github.io/camtrapR/reference/plot_effects-commOccu-method.html"><code> plot_effecs </code></a> Plot model effects </li>
+</ul>

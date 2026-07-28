@@ -1,5 +1,5 @@
 ---
-title: "5. Multi-species occupancy models"
+title: "5. Community occupancy models"
 author: Juergen Niedballa (<camtrapr@gmail.com>)
 date: "`r Sys.Date()`"
 output:
@@ -10,7 +10,7 @@ output:
       df_print: kable
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{5. Multi-species occupancy models}
+  %\VignetteIndexEntry{5. Community occupancy models}
   %\VignetteDepends{terra, sf}
   \usepackage[utf8]{inputenc}
 ---
@@ -26,7 +26,7 @@ library(sf)
 
 # Overview
 
-Multi-species occupancy models are a powerful tool for combining information from multiple species to estimate both individual and community-level responses to environmental variables. These models are typically fit using Bayesian frameworks such as BUGS, JAGS, or Nimble. However, preparing the necessary input from camera trapping data, writing the model code, setting parameters to monitor, and providing initial values can be a daunting and time-consuming task, even for experienced users.
+Community occupancy models are a powerful tool for combining information from multiple species to estimate both individual and community-level responses to environmental variables. These models are typically fit using Bayesian frameworks such as BUGS, JAGS, or Nimble. However, preparing the necessary input from camera trapping data, writing the model code, setting parameters to monitor, and providing initial values can be a daunting and time-consuming task, even for experienced users.
 
 To simplify this process, a new extension of camtrapR automatically generates custom community occupancy models for analysis in JAGS or Nimble. This flexible workflow supports:
 
@@ -60,12 +60,12 @@ The output is a `commOccu` object. The workflow provides methods for:
 
 The output of fit() is an mcmc.list from the coda package and can be uses as such, so the summary(), plot(), etc. methods are available as well as the functions from bayesplot.
 
-Unlike packages such as unmarked or ubms, the `communityModel` function does not currently support R formula syntax. Instead, covariates and their effect types are specified through dedicated function arguments. While this non-standard approach may change in the future to support formula syntax, it may be less confusing than the lme4 syntax for random effects.
+Unlike packages such as unmarked or ubms, the `communityModel` function does not currently support R formula syntax. Instead, covariates and their effect types are specified through dedicated function arguments. While this non-standard approach may change in the future to support formula syntax, it may be more accessible than the lme4 syntax for random effects.
 
 
 # Warning
 
-A word of caution, please always check the model code and make sure you understand the code and agree with it. While the workflow is designed for convenience and does not require you to examine the model code, it is highly recommended that you do so. The model code contains many comments to facilitate understanding. This workflow still requires a proper understanding of Bayesian modelling frameworks and the concepts behind multi-species occupancy models.
+A word of caution, please always check the model code and make sure you understand the code and agree with it. While the workflow is designed for convenience and does not require you to examine the model code, it is highly recommended that you do so. The model code contains many comments to facilitate understanding. This workflow still requires a proper understanding of Bayesian modelling frameworks and the concepts behind community occupancy models.
 
 # Limitations
 
@@ -636,7 +636,7 @@ plot_eff_nimble_det
 ## Missing values in detection histories
 
 
-The examples so far did not have any missing data in the detection histories. Real-world data commonly have missing data though, e.g. due to camera malfunction or specific study designs. In single-species occupancy models (e.g. in unmarked or ubms) this is handled automatically, but requires a little more attention in these multi-species models (at least when fitting with Nimble). Let's modify the above data set and introduce some NAs in the detection history and the effort matrix:
+The examples so far did not have any missing data in the detection histories. Real-world data commonly have missing data though, e.g. due to camera malfunction or specific study designs. In single-species occupancy models (e.g. in unmarked or ubms) this is handled automatically, but requires a little more attention in these community models (at least when fitting with Nimble). Let's modify the above data set and introduce some NAs in the detection history and the effort matrix:
 
 ```{r}
 # introduce a few missing values in detection history of all species
@@ -707,9 +707,9 @@ model1_nimble_na <- communityModel(
   nimble = T)
 ```
 
-When fitting the model there will be numerous warnings about values of data nodes y[,,] and determinisitc nodes res[,], R2[] and R3 being NA (not shown here).
+When fitting the model there will be numerous warnings about values of data nodes y[,,] and determinisitc nodes res[,], R2[] and R3 being NA (not shown here). In recent versions of Nimble it causes an error because of partly observed nodes.
 
-```{r results="hide"}
+```{r results="hide", eval = F}
 out_ahm_nimble_na <- fit(model1_nimble_na, 
                     n.iter = 5000, 
                     n.burnin = 2500,

@@ -8,7 +8,7 @@ reference:
   - title: Data import
     desc: Functions for importing data sets from external sources
     contents:
-      - '`readcamtrapDP`'
+      - '`readCamtrapDP`'
       - '`readWildlifeInsights`'
   - title: Image organisation and management
     desc: Functions for image organisation and preprocessing
@@ -56,7 +56,7 @@ reference:
       - '`communityModel`'
       - '`surveyDashboard`'
   - title: Community occupancy models
-    desc: Functions to create, fit and analyse community (multi-species) occupancy models
+    desc: Functions to create, fit and analyse community occupancy models
     contents: 
       - '`communityModel`'
       - '`commOccu-class`'
@@ -74,6 +74,7 @@ reference:
   - title: Sample data
     desc: Sample data sets included in camtrapR
     contents:
+      - '`simulateCamtrapData`'
       - '`camtraps`'
       - '`recordTableSample`'
       - '`recordTableIndividualSample`'

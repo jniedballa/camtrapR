@@ -4,7 +4,7 @@
 #' \code{\link{detectionHistory}} and \code{\link{spatialDetectionHistory}},
 #' where it is needed for calculating trapping effort per occasion. It is also
 #' used in \code{\link{surveyReport}} to calculate the number of trap nights
-#' durig a survey. If several cameras were deployed per station, the matrix can
+#' during a survey. If several cameras were deployed per station, the matrix can
 #' contain camera- or station-specific trap operation information, or
 #' information about sessions during repeated surveys.
 #' 
@@ -27,7 +27,7 @@
 #' worked again. This information is used to calculate the daily trapping
 #' effort more precisely on days with incomplete effort.
 #' 
-#' Previously, setup and retrival day were counted as 1, indicating a whole day
+#' Previously, setup and retrieval day were counted as 1, indicating a whole day
 #' of effort on those days. Since version 2.1, setup and retrieval are assumed
 #' to have happened at 12 noon (resulting in daily effort of 0.5 instead of 1).
 #' Users can also specify the exact time cameras were set up (by providing a
@@ -125,7 +125,7 @@
 #' .csv?
 #' @param outDir character. Directory into which csv is saved
 #' 
-#' @return A matrix. Row names always indicate Station IDs. If
+#' @return A matrix of class "camOp". Row names always indicate Station IDs. If
 #' \code{sessionCol} and/or \code{cameraCol} are defined, they are contained in
 #' the row names also (camera ID only if \code{byCamera = TRUE}). Column names
 #' are dates. \cr Legend: NA: camera(s) not set up, 0: camera(s) not
@@ -154,6 +154,10 @@
 #'                                     hasProblems  = FALSE,
 #'                                     dateFormat   = "dmy"
 #' )
+#' camop_no_problem
+#' summary(camop_no_problem)
+#' 
+#' plot(camop_no_problem)
 #' 
 #' # with problems/malfunction
 #' camop_problem <- cameraOperation(CTtable      = camtraps,
@@ -164,6 +168,8 @@
 #'                                  hasProblems  = TRUE,
 #'                                  dateFormat   = "dmy"
 #' )
+#' camop_problem
+#' summary(camop_problem)
 #' 
 #' # The examples above specified dateFormat using lubdridate package, which is more intuitive. 
 #' # Alternatively one can used in base-R date conversions (strptime) as below:
@@ -178,12 +184,11 @@
 #'                                            dateFormat   = "%d/%m/%Y"
 #' )
 #' 
-#' camop_no_problem
-#' camop_problem
 #' camop_problem_oldformat
+#' summary(camop_problem_oldformat)
 #' 
 #' @importFrom data.table rbindlist setDF setDT setkey foverlaps ":="
-#' @importFrom lubridate as_date as_datetime ddays dhours dseconds interval int_start int_end int_overlaps time_length "%within%" 
+#' @importFrom lubridate as_date as_datetime ddays dhours dseconds interval int_start int_end int_overlaps is.Date time_length "%within%" 
 #' @importFrom methods hasArg is new
 #' @importFrom stats aggregate na.omit start end rnorm window quantile
 #' @importFrom utils capture.output modifyList write.csv zip head menu read.table
@@ -345,6 +350,8 @@ cameraOperation <- function(CTtable,
                                     )
     # dateFormat <- "%Y-%m-%d %H:%M:%S"
     dateFormat <- "%Y-%m-%d"
+    # TODO: If camera trap table contains date columns other than setupCol and retrievalCol, this changes the expected dateFormat. Should check if setupCol and retrievalCol are in date_columns and only change dateFormat if they are?
+
   }
   
   # Convert POSIX columns to character
@@ -355,6 +362,7 @@ cameraOperation <- function(CTtable,
                                      FUN = function(col) format(col, format = "%Y-%m-%d %H:%M:%S")
                                      )
     dateFormat <- "%Y-%m-%d %H:%M:%S"
+     # TODO: If camera trap table contains date-time columns other than setupCol and retrievalCol, this changes the expected dateFormat. Should check if setupCol and retrievalCol are in date_columns and only change dateFormat if they are?
   }
   
   # if(exists("dateFormat_new")) dateFormat <- dateFormat_new
@@ -574,6 +582,12 @@ cameraOperation <- function(CTtable,
     }
     
     rm(problemFromColumn, problemToColumn, cols.prob.from.index, cols.prob.to.index)
+  } else {   # if there are no problems, but hasProblems = FALSE, check that there are indeed no Problem columns (since if there are, they will be ignored, which may not be intended)
+    # find problem columns
+    has.cols.prob.from <- any(grepl(colnames(CTtable), pattern = "Problem[0-9]+\\Sfrom"))
+    has.cols.prob.to   <- any(grepl(colnames(CTtable), pattern = "Problem[0-9]+\\Sto"))
+   
+    if(has.cols.prob.from || has.cols.prob.to ) message("CTtable contains Problem columns, but `hasProblem` is FALSE. Ensure this is intended.")
   }
   
   # create empty matrix with desired dimensions (depending on presence of camera / session columns)
@@ -669,7 +683,7 @@ cameraOperation <- function(CTtable,
         interval.tmp.prob <- sapply(camop_daily_intervals[run_these], intersect.Interval.fast, problem_intervals_by_row[[i]])   # intersection of day and total trapping period
         # total Problem value per day
         if(inherits(interval.tmp.prob, "array")) {
-          fraction_to_remove <- time_length(colSums(interval.tmp.prob, na.rm = TRUE), unit = "days")   # if mutliple problem periods are defined, they show up as rows here and are combined with colSums
+          fraction_to_remove <- time_length(colSums(interval.tmp.prob, na.rm = TRUE), unit = "days")   # if multiple problem periods are defined, they show up as rows here and are combined with colSums
         } else {
           fraction_to_remove <- time_length(interval.tmp.prob, unit = "days")
         }
@@ -826,5 +840,19 @@ cameraOperation <- function(CTtable,
     }
     if(missing(outDir)) message(paste("writecsv was TRUE, but outDir was not defined. Saved camera operation matrix in:", getwd(), sep = "   "))
   }
-  return(as.matrix(dat2))
+  
+  dat3 <- as.matrix(dat2)
+  
+  # declare specific class and store attributes
+  class(dat3) <- unique(c("camOp", class(dat3)))
+  attr(dat3, "stationCol")   <- stationCol
+  attr(dat3, "cameraCol")    <- cameraCol
+  attr(dat3, "sessionCol")   <- sessionCol
+  attr(dat3, "setupCol")     <- setupCol
+  attr(dat3, "retrievalCol") <- retrievalCol
+  attr(dat3, "from") <- as.Date(min(date0))
+  attr(dat3, "to") <- as.Date(max(date1))
+  return(dat3)
 }
+
+
