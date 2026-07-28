@@ -197,6 +197,7 @@ readCamtrapDP <- function(
   # Ensure there are absolutely no NAs/blanks in the chosen station ID column for individual rows
   na_stations <- is.na(deployments[[station_id_col]]) | deployments[[station_id_col]] == ""
   if (any(na_stations)) {
+    warning(paste(sum(na_stations), "deployments have no station ID."))
     deployments[[station_id_col]][na_stations] <- deployments$deploymentID[na_stations]
   }
   
@@ -256,7 +257,7 @@ readCamtrapDP <- function(
     
     # Initialize the base row with the absolute start and end times across all deployments
     row <- data.frame(
-      Station = as.character(station),
+      Station = as.character(station),   # <- this is the persistent station identifier (based on locationID / locationName / deploymentID)
       Setup_date = as.character(format(min(station_deployments$deploymentStart), "%Y-%m-%d %H:%M:%S")),
       Retrieval_date = as.character(format(max(station_deployments$deploymentEnd), "%Y-%m-%d %H:%M:%S")),
       stringsAsFactors = FALSE
@@ -337,6 +338,7 @@ readCamtrapDP <- function(
   recordTable <- dplyr::left_join(recordTable, deployments[, selected_deployment_cols], by = "deploymentID")
   
   # Ensure the recordTable gets the exact same 'Station' column as the CTtable
+  # name is always "Station", based on locationID, locationName, or deploymentID
   recordTable$Station <- recordTable[[station_id_col]]
   
   # Append media file paths if requested (requires 'mediaID' to map observations back to specific images/video)
@@ -379,11 +381,15 @@ readCamtrapDP <- function(
     warning("No vernacular names found in metadata. Using 'scientificName' as the primary species column and filling non-animal records (e.g., blanks) with 'observationType'.")
     
     if ("scientificName" %in% colnames(recordTable)) {
+      speciesCol <- "scientificName"
+      
       empty_names <- is.na(recordTable$scientificName) | recordTable$scientificName == ""
       has_obs_type <- !is.na(recordTable$observationType) & recordTable$observationType != ""
       
       # Fill NAs in scientificName with observationType (e.g. 'blank') to satisfy camtrapR formats
       recordTable$scientificName[empty_names & has_obs_type] <- as.character(recordTable$observationType[empty_names & has_obs_type])
+    } else {
+      stop("No species column found in observations table (no 'scientificName' or 'vernacularName' columns).")
     }
   } else {
     # If vernacular names DO exist, apply the observationType fallback to them instead
@@ -392,6 +398,12 @@ readCamtrapDP <- function(
       has_obs_type <- !is.na(recordTable$observationType) & recordTable$observationType != ""
       
       recordTable[[vc]][empty_names & has_obs_type] <- as.character(recordTable$observationType[empty_names & has_obs_type])
+    }
+    # guess species column (prefer english, otherwise take first one)
+    if("vernacularName_eng" %in% vern_cols) {
+      speciesCol <- "vernacularName_eng"
+    } else {
+      speciesCol <- vern_cols[1]
     }
   }
   
@@ -423,11 +435,11 @@ readCamtrapDP <- function(
   
   # declare specific classes and store attributes
   out$CTtable <- as_cams(out$CTtable, 
-                         stationCol = "Station")  #FIXME: is the name stable?
+                         stationCol = "Station")
 
   out$recordTable <- as_records(out$recordTable, 
-                                stationCol = "Station",        #FIXME: is the name stable?
-                                speciesCol = "scientificName") #FIXME: is the name stable?
+                                stationCol = "Station",
+                                speciesCol = speciesCol) # depends on presence of vernacularName* columns
   
   out <- as_cams_dp(out)
   
