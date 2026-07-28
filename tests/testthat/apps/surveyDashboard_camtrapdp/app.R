@@ -3,7 +3,7 @@ library(camtrapR)
 
 path_camtrapdp <- system.file("sample_data/tdwg_camtrap-dp_1.0.2_example", 
                                     package = "camtrapR")
-camtrapdp <- readcamtrapDP(file = file.path(path_camtrapdp, "datapackage.json")) 
+camtrapdp <- readCamtrapDP(file = file.path(path_camtrapdp, "datapackage.json")) 
 
 
 # Call shiny app function
