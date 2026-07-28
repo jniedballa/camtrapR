@@ -4,6 +4,8 @@ library(shinytest2)
 
 test_that("dashboard_camtrapdp_launch", {
   skip_on_cran() 
+  skip_on_covr()
+  skip_on_ci()
   
   local_app_support(test_path("apps/surveyDashboard_camtrapdp"))
   app <- AppDriver$new(test_path("apps/surveyDashboard_camtrapdp"), name = "app_camtrapdp_start", 
@@ -19,6 +21,8 @@ test_that("dashboard_camtrapdp_launch", {
 
 test_that("{shinytest2} recording: surveyDashboard_camtrapdp_maps", {
   skip_on_cran() 
+  skip_on_covr()
+  skip_on_ci()
   
   local_app_support(test_path("apps/surveyDashboard_camtrapdp"))
   app <- AppDriver$new(test_path("apps/surveyDashboard_camtrapdp"), name = "surveyDashboard_camtrapdp_maps", 
@@ -35,3 +39,4 @@ test_that("{shinytest2} recording: surveyDashboard_camtrapdp_maps", {
   app$set_inputs(scale_size = TRUE)
   app$expect_values()
 })
+  

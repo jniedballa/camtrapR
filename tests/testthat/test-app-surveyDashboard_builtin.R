@@ -6,7 +6,9 @@ load_timeout <- 30 * 1000  # 20 seconds
 
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_launch", {
-  skip_on_cran() 
+  skip_on_cran()
+  skip_on_covr()
+  skip_on_ci()
   
   local_app_support(test_path("apps/surveyDashboard_builtin"))
   app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_launch",
@@ -24,6 +26,8 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_launch", {
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_filters", {
   skip_on_cran() 
+  skip_on_covr()
+  skip_on_ci()
   
   local_app_support(test_path("apps/surveyDashboard_builtin"))
   app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_filters",
@@ -44,6 +48,8 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_filters", {
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_correlations", {
   skip_on_cran() 
+  skip_on_covr()
+  skip_on_ci()
   
   local_app_support(test_path("apps/surveyDashboard_builtin"))
   app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_correlat",
@@ -73,6 +79,8 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_correlations", {
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_detectionHistory", {
   skip_on_cran() 
+  skip_on_covr()
+  skip_on_ci()
   
   local_app_support(test_path("apps/surveyDashboard_builtin"))
   app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_detHist",
@@ -91,6 +99,8 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_detectionHistory", {
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_occupancy", {
   skip_on_cran() 
+  skip_on_covr()
+  skip_on_ci()
   
   local_app_support(test_path("apps/surveyDashboard_builtin"))
   app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_occu",
@@ -119,6 +129,8 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_occupancy", {
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_communiy_UI", {
   skip_on_cran() 
+  skip_on_covr()
+  skip_on_ci()
   
   local_app_support(test_path("apps/surveyDashboard_builtin"))
   app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_commun_UI",
@@ -139,6 +151,8 @@ test_that("{shinytest2} recording: surveyDashboard_builtin_communiy_UI", {
 
 test_that("{shinytest2} recording: surveyDashboard_builtin_covariate_extraction_dem", {
   skip_on_cran() 
+  skip_on_covr()
+  skip_on_ci()
   
   local_app_support(test_path("apps/surveyDashboard_builtin"))
   app <- AppDriver$new(test_path("apps/surveyDashboard_builtin"), name = "app_builtin_covs_DEM", 
