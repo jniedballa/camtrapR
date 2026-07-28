@@ -198,19 +198,14 @@ In the Snapshot Japan 2023 dataset above, `vernacularNames` are absent from the 
 
 Wildlife Insights data can be downloaded from the [Wildlife Insights website](https://app.wildlifeinsights.org/explore).
 
-Assuming we have downloaded a zipped data export, we can load it with `readWildlifeInsights`. Alternatively one can directly specify the paths to the required tables.
+Assuming we have downloaded a zipped data export, we can load it directly with `readWildlifeInsights`. The function will extract the data from the zip archive.
 
 ```{r}
 #| eval: false 
 wildlifeinsights <- readWildlifeInsights(zipfile = "path/to/your/downloaded_file.zip")
 ```
 
-**Warning**: many Wildlife Insights downloads currently don't match the declared [Wildlife Insights Minimum Metadata Standards](https://docs.google.com/spreadsheets/d/1Jg-WybmVeGlWGrbPpwuwJCgranOV1r3M_LrzELttfK0/edit?usp=sharing) and cause errors in the import function. Specifically,
-
-- the deployments table often lacks the "placename" column
-- in the images table, "timestamp" is often not formatted according to the standard
-
-The developers are working on a solution and this warning will be removed when the problems are solved.
+Alternatively, when working with unzipped files, one can directly specify the paths to the csv tables.
 
 
 # 4. Simulated datasets
