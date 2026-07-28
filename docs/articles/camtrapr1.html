@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@ camtrapR</h1>
                         <h4 data-toc-skip class="author">Juergen
 Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 data-toc-skip class="date">2026-07-15</h4>
+            <h4 data-toc-skip class="date">2026-07-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/HEAD/vignettes/camtrapr1.Rmd" class="external-link"><code>vignettes/camtrapr1.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr1.Rmd</code></div>
@@ -314,22 +314,22 @@ terms. It is standard camera trapping nomenclature.</p>
 </h3>
 <p>camtrapR relies on the free and open-source software
 <strong>ExifTool</strong> written by Phil Harvey to extract metadata
-from images. ExifTool is freely available <a href="https://exiftool.org/" class="external-link">here</a> and runs on Windows, Linux and
-MacOS. In order to use it, your system must be able to find the
-software. On MacOS, Linux and Unix it needs installation and should
+from images. ExifTool is freely available <a href="https://exiftool.sourceforge.net/" class="external-link">here</a> and runs on Windows,
+Linux and MacOS. In order to use it, your system must be able to find
+the software. On MacOS, Linux and Unix it needs installation and should
 afterwards be found by the system without problems. How to set up
 Exiftool for Windows is detailed below. General installation instruction
-can be found <a href="https://exiftool.org/install.html" class="external-link">here</a>.</p>
+can be found <a href="https://exiftool.sourceforge.net/install.html" class="external-link">here</a>.</p>
 <div class="section level4">
 <h4 id="exiftool-for-windows">ExifTool for Windows<a class="anchor" aria-label="anchor" href="#exiftool-for-windows"></a>
 </h4>
 <p>On Windows, ExifTool does not need installation. In order for Windows
-to be able to find ExifTool, follow the instructions found <a href="https://exiftool.org/install.html" class="external-link">here</a>. Be sure to download
-the stand-alone executable. The download file is a .zip which you need
-to unzip, rename the contained “exiftool(-k).exe” file to “exiftool.exe”
-and place it in, e.g., C:/Windows. Windows will be able to find ExifTool
-if exiftool.exe is placed in a directory that is contained in the
-Windows PATH variable (e.g. C:/Windows).</p>
+to be able to find ExifTool, follow the instructions found <a href="https://exiftool.sourceforge.net/install.html" class="external-link">here</a>. Be sure
+to download the stand-alone executable. The download file is a .zip
+which you need to unzip, rename the contained “exiftool(-k).exe” file to
+“exiftool.exe” and place it in, e.g., C:/Windows. Windows will be able
+to find ExifTool if exiftool.exe is placed in a directory that is
+contained in the Windows PATH variable (e.g. C:/Windows).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check which directories are in PATH (output not shown here)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"PATH"</span><span class="op">)</span></span></code></pre></div>
@@ -587,9 +587,9 @@ subdirectories are created.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">StationFolderCreate1</span></span></code></pre></div>
 <pre><code><span><span class="co">##    station                                         directory created exists</span></span>
-<span><span class="co">## 1 StationA /tmp/RtmpBV549E/createStationFoldersTest/StationA    TRUE   TRUE</span></span>
-<span><span class="co">## 2 StationB /tmp/RtmpBV549E/createStationFoldersTest/StationB    TRUE   TRUE</span></span>
-<span><span class="co">## 3 StationC /tmp/RtmpBV549E/createStationFoldersTest/StationC    TRUE   TRUE</span></span></code></pre>
+<span><span class="co">## 1 StationA /tmp/Rtmp4xAYia/createStationFoldersTest/StationA    TRUE   TRUE</span></span>
+<span><span class="co">## 2 StationB /tmp/Rtmp4xAYia/createStationFoldersTest/StationB    TRUE   TRUE</span></span>
+<span><span class="co">## 3 StationC /tmp/Rtmp4xAYia/createStationFoldersTest/StationC    TRUE   TRUE</span></span></code></pre>
 <p><strong>IMPORTANT:</strong> Please note that in this vignette station
 directories are set up in a temporary directory. That does not make any
 sense in real life and is done here solely to demonstrate how the
@@ -647,13 +647,13 @@ after saving the raw images on the hard disk.</p>
 <span>                                 timeShiftColumn      <span class="op">=</span> <span class="st">"timeshift"</span>,</span>
 <span>                                 timeShiftSignColumn  <span class="op">=</span> <span class="st">"sign"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## /tmp/RtmpBV549E/raw_images/StationA</span></span></code></pre>
-<pre><code><span><span class="co">## /tmp/RtmpBV549E/raw_images/StationB</span></span></code></pre>
+<pre><code><span><span class="co">## /tmp/Rtmp4xAYia/raw_images/StationA</span></span></code></pre>
+<pre><code><span><span class="co">## /tmp/Rtmp4xAYia/raw_images/StationB</span></span></code></pre>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">timeshift_run</span></span></code></pre></div>
 <pre><code><span><span class="co">##                             directory             n_directories</span></span>
-<span><span class="co">## 1 /tmp/RtmpBV549E/raw_images/StationA     1 directories scanned</span></span>
-<span><span class="co">## 2 /tmp/RtmpBV549E/raw_images/StationB     1 directories scanned</span></span>
+<span><span class="co">## 1 /tmp/Rtmp4xAYia/raw_images/StationA     1 directories scanned</span></span>
+<span><span class="co">## 2 /tmp/Rtmp4xAYia/raw_images/StationB     1 directories scanned</span></span>
 <span><span class="co">##                    n_images</span></span>
 <span><span class="co">## 1     3 image files updated</span></span>
 <span><span class="co">## 2     3 image files updated</span></span></code></pre>
@@ -677,8 +677,8 @@ consistency of file names.</p>
 <span></span>
 <span><span class="va">timeshift_undo</span></span></code></pre></div>
 <pre><code><span><span class="co">##                             directory n_images_undo</span></span>
-<span><span class="co">## 1 /tmp/RtmpBV549E/raw_images/StationA             3</span></span>
-<span><span class="co">## 2 /tmp/RtmpBV549E/raw_images/StationB             3</span></span></code></pre>
+<span><span class="co">## 1 /tmp/Rtmp4xAYia/raw_images/StationA             3</span></span>
+<span><span class="co">## 2 /tmp/Rtmp4xAYia/raw_images/StationB             3</span></span></code></pre>
 <!--  ## Date/Time problems with Reconyx Hyperfire and Maginon cameras -->
 </div>
 <div class="section level3">
@@ -758,7 +758,7 @@ simulated in out example. So, in real world data, set
 <pre><code><span><span class="co">## StationB:    3 images      |====================|  100%</span></span></code></pre>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># here is the information for a few images </span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">renaming.table2</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">renaming.table2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                                                               Directory</span></span>
 <span><span class="co">## 1 /home/juergen/R/x86_64-pc-linux-gnu-library/4.6/camtrapR/pictures/raw_images/StationA</span></span>
 <span><span class="co">## 2 /home/juergen/R/x86_64-pc-linux-gnu-library/4.6/camtrapR/pictures/raw_images/StationA</span></span>
@@ -774,12 +774,12 @@ simulated in out example. So, in real world data, set
 <span><span class="co">## 5 IMG0002.JPG StationB     NA 2009-04-05 23:13:00         TRUE</span></span>
 <span><span class="co">## 6 IMG0003.JPG StationB     NA 2009-04-07 00:23:00         TRUE</span></span>
 <span><span class="co">##                                        outDir</span></span>
-<span><span class="co">## 1 /tmp/RtmpBV549E/raw_images_renamed/StationA</span></span>
-<span><span class="co">## 2 /tmp/RtmpBV549E/raw_images_renamed/StationA</span></span>
-<span><span class="co">## 3 /tmp/RtmpBV549E/raw_images_renamed/StationA</span></span>
-<span><span class="co">## 4 /tmp/RtmpBV549E/raw_images_renamed/StationB</span></span>
-<span><span class="co">## 5 /tmp/RtmpBV549E/raw_images_renamed/StationB</span></span>
-<span><span class="co">## 6 /tmp/RtmpBV549E/raw_images_renamed/StationB</span></span>
+<span><span class="co">## 1 /tmp/Rtmp4xAYia/raw_images_renamed/StationA</span></span>
+<span><span class="co">## 2 /tmp/Rtmp4xAYia/raw_images_renamed/StationA</span></span>
+<span><span class="co">## 3 /tmp/Rtmp4xAYia/raw_images_renamed/StationA</span></span>
+<span><span class="co">## 4 /tmp/Rtmp4xAYia/raw_images_renamed/StationB</span></span>
+<span><span class="co">## 5 /tmp/Rtmp4xAYia/raw_images_renamed/StationB</span></span>
+<span><span class="co">## 6 /tmp/Rtmp4xAYia/raw_images_renamed/StationB</span></span>
 <span><span class="co">##                            filename_new fileExistsAlready CopyStatus</span></span>
 <span><span class="co">## 1 StationA__2009-04-10__05-07-00(1).JPG             FALSE      FALSE</span></span>
 <span><span class="co">## 2 StationA__2009-04-21__00-40-00(1).JPG             FALSE      FALSE</span></span>
@@ -886,7 +886,7 @@ data.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exiftagnames_extracted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exifTagNames.html">exifTagNames</a></span><span class="op">(</span><span class="va">wd_images_ID_copy</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Metadata of:</span></span>
-<span><span class="co">## /tmp/RtmpBV549E/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</span></span></code></pre>
+<span><span class="co">## /tmp/Rtmp4xAYia/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</span></span></code></pre>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">exiftagnames_extracted</span>, row.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -925,7 +925,7 @@ data.</p>
 <td align="left">4</td>
 <td align="left">File</td>
 <td align="left">Directory</td>
-<td align="left">/tmp/RtmpBV549E/sample_images_species_dir/StationA/PBE</td>
+<td align="left">/tmp/Rtmp4xAYia/sample_images_species_dir/StationA/PBE</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
@@ -937,19 +937,19 @@ data.</p>
 <td align="left">6</td>
 <td align="left">File</td>
 <td align="left">FileModifyDate</td>
-<td align="left">2026:07:15 15:57:09+08:00</td>
+<td align="left">2026:07:28 08:14:05+02:00</td>
 </tr>
 <tr class="odd">
 <td align="left">7</td>
 <td align="left">File</td>
 <td align="left">FileAccessDate</td>
-<td align="left">2026:07:15 15:57:09+08:00</td>
+<td align="left">2026:07:28 08:14:05+02:00</td>
 </tr>
 <tr class="even">
 <td align="left">8</td>
 <td align="left">File</td>
 <td align="left">FileInodeChangeDate</td>
-<td align="left">2026:07:15 15:57:09+08:00</td>
+<td align="left">2026:07:28 08:14:05+02:00</td>
 </tr>
 <tr class="odd">
 <td align="left">9</td>

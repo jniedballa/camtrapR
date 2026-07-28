@@ -6,20 +6,19 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>3. Data Extraction from Images and videos, creating occupancy &amp; secr input • camtrapR</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="3. Data Extraction from Images and videos, creating occupancy &amp; secr input">
-<meta property="og:description" content="camtrapR">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -33,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
@@ -45,7 +44,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -62,7 +61,10 @@
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
     <li>
-      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
+      <a href="../articles/camtrapr5.html">5. Community occupancy models</a>
+    </li>
+    <li>
+      <a href="../articles/camtrapr6.html">6. Sample camera trap datasets and the `surveyDashboard`</a>
     </li>
   </ul>
 </li>
@@ -74,7 +76,7 @@
 <li>
   <a href="https://github.com/jniedballa/camtrapR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -85,7 +87,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -95,7 +97,7 @@ creating occupancy &amp; secr input</h1>
                         <h4 data-toc-skip class="author">Juergen
 Niedballa (<a href="mailto:camtrapr@gmail.com" class="email">camtrapr@gmail.com</a>)</h4>
             
-            <h4 data-toc-skip class="date">2024-02-01</h4>
+            <h4 data-toc-skip class="date">2026-07-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jniedballa/camtrapR/blob/HEAD/vignettes/camtrapr3.Rmd" class="external-link"><code>vignettes/camtrapr3.Rmd</code></a></small>
       <div class="hidden name"><code>camtrapr3.Rmd</code></div>
@@ -153,35 +155,24 @@ example:</p>
 <pre><code><span><span class="co">## StationB:     23 images    6 duplicates removed      |=============       |   67%</span></span></code></pre>
 <pre><code><span><span class="co">## StationC:     37 images    6 duplicates removed      |====================|  100%</span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rec.db.species0</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##    Station Species    DateTimeOriginal       Date     Time delta.time.secs</span></span>
-<span><span class="co">## 1 StationA     PBE 2009-04-21 00:40:00 2009-04-21 00:40:00               0</span></span>
-<span><span class="co">## 2 StationA     PBE 2009-04-22 20:19:00 2009-04-22 20:19:00          157140</span></span>
-<span><span class="co">## 3 StationA     PBE 2009-04-22 20:21:00 2009-04-22 20:21:00             120</span></span>
-<span><span class="co">## 4 StationA     PBE 2009-04-23 00:07:00 2009-04-23 00:07:00           13560</span></span>
-<span><span class="co">## 5 StationA     PBE 2009-04-23 00:09:00 2009-04-23 00:09:00             120</span></span>
-<span><span class="co">## 6 StationA     PBE 2009-05-07 17:11:00 2009-05-07 17:11:00         1270920</span></span>
-<span><span class="co">##   delta.time.mins delta.time.hours delta.time.days</span></span>
-<span><span class="co">## 1               0              0.0             0.0</span></span>
-<span><span class="co">## 2            2619             43.6             1.8</span></span>
-<span><span class="co">## 3               2              0.0             0.0</span></span>
-<span><span class="co">## 4             226              3.8             0.2</span></span>
-<span><span class="co">## 5               2              0.0             0.0</span></span>
-<span><span class="co">## 6           21182            353.0            14.7</span></span>
-<span><span class="co">##                                                                                                              Directory</span></span>
-<span><span class="co">## 1 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 2 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 3 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 4 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 5 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 6 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">##                                FileName n_images</span></span>
-<span><span class="co">## 1 StationA__2009-04-21__00-40-00(1).JPG        1</span></span>
-<span><span class="co">## 2 StationA__2009-04-22__20-19-00(1).JPG        1</span></span>
-<span><span class="co">## 3 StationA__2009-04-22__20-21-00(1).JPG        1</span></span>
-<span><span class="co">## 4 StationA__2009-04-23__00-07-00(1).JPG        1</span></span>
-<span><span class="co">## 5 StationA__2009-04-23__00-09-00(1).JPG        1</span></span>
-<span><span class="co">## 6 StationA__2009-05-07__17-11-00(1).JPG        1</span></span></code></pre>
+<code class="sourceCode R"><span><span class="va">rec.db.species0</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Record table</span> based on <span style="color: #0000BB;">3</span> stations and <span style="color: #0000BB;">56</span> records of a total of <span style="color: #0000BB;">6</span> species:</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 56 × 12</span></span></span>
+<span><span class="co">##    Station  Species DateTimeOriginal    Date       Time     delta.time.secs</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> StationA PBE     2009-04-21 <span style="color: #949494;">00:40:00</span> 2009-04-21 00:40:00               0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> StationA PBE     2009-04-22 <span style="color: #949494;">20:19:00</span> 2009-04-22 20:19:00          <span style="text-decoration: underline;">157</span>140</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> StationA PBE     2009-04-22 <span style="color: #949494;">20:21:00</span> 2009-04-22 20:21:00             120</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> StationA PBE     2009-04-23 <span style="color: #949494;">00:07:00</span> 2009-04-23 00:07:00           <span style="text-decoration: underline;">13</span>560</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> StationA PBE     2009-04-23 <span style="color: #949494;">00:09:00</span> 2009-04-23 00:09:00             120</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> StationA PBE     2009-05-07 <span style="color: #949494;">17:11:00</span> 2009-05-07 17:11:00         1<span style="text-decoration: underline;">270</span>920</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> StationA VTA     2009-04-10 <span style="color: #949494;">05:07:00</span> 2009-04-10 05:07:00               0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> StationA VTA     2009-05-06 <span style="color: #949494;">19:06:00</span> 2009-05-06 19:06:00         2<span style="text-decoration: underline;">296</span>740</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> StationB MNE     2009-04-15 <span style="color: #949494;">07:21:00</span> 2009-04-15 07:21:00               0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> StationB MNE     2009-04-15 <span style="color: #949494;">07:23:00</span> 2009-04-15 07:23:00             120</span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 46 more rows</span></span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 6 more variables: delta.time.mins &lt;dbl&gt;, delta.time.hours &lt;dbl&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   delta.time.days &lt;dbl&gt;, Directory &lt;chr&gt;, FileName &lt;chr&gt;, n_images &lt;int&gt;</span></span></span></code></pre>
 <p>Argument <code>IDfrom</code> tells the function to look for species
 directories within the station directories and to take species IDs from
 these. <code>IDfrom</code> must be set to “metadata” if metadata tagging
@@ -193,7 +184,7 @@ the same time (measured with 1 minute precision by these cameras) and
 the function removes duplicate records.</p>
 <p>It may suffice to illustrate this with the Pig-tailed macaque images
 from stationB:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wd_images_ID</span>, <span class="st">"StationB"</span>, <span class="st">"MNE"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "StationB__2009-04-15__07-21-00(1).JPG"</span></span>
 <span><span class="co">##  [2] "StationB__2009-04-15__07-23-00(1).JPG"</span></span>
@@ -292,7 +283,7 @@ taken <code>minDeltaTime</code> minutes after the last
 <em>independent</em> record.</p>
 <p>Let’s now apply an 1-hour independence criterion and define a time
 zone.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rec.db.species60</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/recordTable.html">recordTable</a></span><span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_images_ID</span>,</span>
 <span>                                IDfrom              <span class="op">=</span> <span class="st">"directory"</span>,</span>
 <span>                                minDeltaTime        <span class="op">=</span> <span class="fl">60</span>,</span>
@@ -301,7 +292,7 @@ zone.</p>
 <pre><code><span><span class="co">## StationA:      8 images    0 duplicates removed      |=======             |   33%</span></span></code></pre>
 <pre><code><span><span class="co">## StationB:     23 images    6 duplicates removed      |=============       |   67%</span></span></code></pre>
 <pre><code><span><span class="co">## StationC:     37 images    6 duplicates removed      |====================|  100%</span></span></code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">rec.db.species60</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 40</span></span></code></pre>
 <p>Now 40 records were returned instead of 56. The missing records were
@@ -378,13 +369,13 @@ If missing, it will be assumed there was only 1 camera per station.</p>
 <p>Argument <code>exclude</code> can be used to ignore certain species.
 This is useful for omitting images in directories like “team” or
 “unidentified”. Here is an example:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># see what species  we recorded</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">rec.db.species60</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">##  EGY  MNE  PBE  TRA UNID  VTA </span></span>
 <span><span class="co">##    6    2   18    8    1    5</span></span></code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># remove "UNID" by setting argument exclude = "UNID"</span></span>
 <span><span class="va">rec.db.species60.exclude</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/recordTable.html">recordTable</a></span><span class="op">(</span>inDir               <span class="op">=</span> <span class="va">wd_images_ID</span>,</span>
 <span>                                        IDfrom              <span class="op">=</span> <span class="st">"directory"</span>,</span>
@@ -395,7 +386,7 @@ This is useful for omitting images in directories like “team” or
 <pre><code><span><span class="co">## StationA:      8 images    0 duplicates removed      |=======             |   33%</span></span></code></pre>
 <pre><code><span><span class="co">## StationB:     22 images    6 duplicates removed      |=============       |   67%</span></span></code></pre>
 <pre><code><span><span class="co">## StationC:     37 images    6 duplicates removed      |====================|  100%</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># note that "UNID" is gone now</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">rec.db.species60.exclude</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
@@ -415,11 +406,11 @@ tag names are known. Some tag names are standardised
 Therefore, function <code>exifTagNames</code> returns all Exif metadata
 it finds in a sample image. Users can then choose which to extract with
 <code>recordTable</code> and <code>recordTableIndividual</code>.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wd_images_ID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pictures/sample_images_species_dir"</span>, package <span class="op">=</span> <span class="st">"camtrapR"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/exifTagNames.html">exifTagNames</a></span><span class="op">(</span>inDir <span class="op">=</span> <span class="va">wd_images_ID</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Metadata of:</span></span>
-<span><span class="co">## C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</span></span></code></pre>
+<span><span class="co">## /home/juergen/R/x86_64-pc-linux-gnu-library/4.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE/StationA__2009-04-21__00-40-00(1).JPG</span></span></code></pre>
 <pre><code><span><span class="co">##    tag_group                tag_name</span></span>
 <span><span class="co">## 1   ExifTool         ExifToolVersion</span></span>
 <span><span class="co">## 2   ExifTool                 Warning</span></span>
@@ -428,7 +419,7 @@ it finds in a sample image. Users can then choose which to extract with
 <span><span class="co">## 5       File                FileSize</span></span>
 <span><span class="co">## 6       File          FileModifyDate</span></span>
 <span><span class="co">## 7       File          FileAccessDate</span></span>
-<span><span class="co">## 8       File          FileCreateDate</span></span>
+<span><span class="co">## 8       File     FileInodeChangeDate</span></span>
 <span><span class="co">## 9       File         FilePermissions</span></span>
 <span><span class="co">## 10      File                FileType</span></span>
 <span><span class="co">## 11      File       FileTypeExtension</span></span>
@@ -464,50 +455,50 @@ it finds in a sample image. Users can then choose which to extract with
 <span><span class="co">## 41 Composite               ImageSize</span></span>
 <span><span class="co">## 42 Composite              Megapixels</span></span>
 <span><span class="co">## 43 Composite            ShutterSpeed</span></span>
-<span><span class="co">##                                                                                                                   value</span></span>
-<span><span class="co">## 1                                                                                                                 12.49</span></span>
-<span><span class="co">## 2                                                                            Invalid EXIF text encoding for UserComment</span></span>
-<span><span class="co">## 3                                                                                 StationA__2009-04-21__00-40-00(1).JPG</span></span>
-<span><span class="co">## 4  C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 5                                                                                                                 28 kB</span></span>
-<span><span class="co">## 6                                                                                             2023:11:19 17:22:08+08:00</span></span>
-<span><span class="co">## 7                                                                                             2023:11:19 17:22:08+08:00</span></span>
-<span><span class="co">## 8                                                                                             2023:11:19 17:22:08+08:00</span></span>
-<span><span class="co">## 9                                                                                                            -rw-rw-rw-</span></span>
-<span><span class="co">## 10                                                                                                                 JPEG</span></span>
-<span><span class="co">## 11                                                                                                                  jpg</span></span>
-<span><span class="co">## 12                                                                                                           image/jpeg</span></span>
-<span><span class="co">## 13                                                                                            Little-endian (Intel, II)</span></span>
-<span><span class="co">## 14                                                                                                                  100</span></span>
-<span><span class="co">## 15                                                                                                                   75</span></span>
-<span><span class="co">## 16                                                                                         Baseline DCT, Huffman coding</span></span>
-<span><span class="co">## 17                                                                                                                    8</span></span>
-<span><span class="co">## 18                                                                                                                    3</span></span>
-<span><span class="co">## 19                                                                                                     YCbCr4:2:2 (2 1)</span></span>
-<span><span class="co">## 20                                                                                                                   G4</span></span>
-<span><span class="co">## 21                                                                                                            CUDDEBACK</span></span>
-<span><span class="co">## 22                                                                                                                   72</span></span>
-<span><span class="co">## 23                                                                                                                   72</span></span>
-<span><span class="co">## 24                                                                                                  2009:04:21 00:40:00</span></span>
-<span><span class="co">## 25                                                                                                               inches</span></span>
-<span><span class="co">## 26                                                                                                             Co-sited</span></span>
-<span><span class="co">## 27                                                                                                                 0200</span></span>
-<span><span class="co">## 28                                                                                                         Y, Cb, Cr, -</span></span>
-<span><span class="co">## 29                                                                                                                 0100</span></span>
-<span><span class="co">## 30                                                                                                                 sRGB</span></span>
-<span><span class="co">## 31                                                                                                                  100</span></span>
-<span><span class="co">## 32                                                                                                                   75</span></span>
-<span><span class="co">## 33                                                                                                  2009:04:21 00:40:00</span></span>
-<span><span class="co">## 34                                                                                                  2009:04:21 00:40:00</span></span>
-<span><span class="co">## 35                                                                                                        1 ATTEMPT G1H</span></span>
-<span><span class="co">## 36                                                                                                                    1</span></span>
-<span><span class="co">## 37                                                                                                     JPEG (old-style)</span></span>
-<span><span class="co">## 38                                                                                                                  408</span></span>
-<span><span class="co">## 39                                                                                                                25353</span></span>
-<span><span class="co">## 40                                                                  (Binary data 25353 bytes, use -b option to extract)</span></span>
-<span><span class="co">## 41                                                                                                               100x75</span></span>
-<span><span class="co">## 42                                                                                                                0.007</span></span>
-<span><span class="co">## 43                                                                                                                    1</span></span></code></pre>
+<span><span class="co">##                                                                                                       value</span></span>
+<span><span class="co">## 1                                                                                                     13.50</span></span>
+<span><span class="co">## 2                                                                Invalid EXIF text encoding for UserComment</span></span>
+<span><span class="co">## 3                                                                     StationA__2009-04-21__00-40-00(1).JPG</span></span>
+<span><span class="co">## 4  /home/juergen/R/x86_64-pc-linux-gnu-library/4.6/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
+<span><span class="co">## 5                                                                                                     28 kB</span></span>
+<span><span class="co">## 6                                                                                 2026:07:28 08:12:12+02:00</span></span>
+<span><span class="co">## 7                                                                                 2026:07:28 08:14:04+02:00</span></span>
+<span><span class="co">## 8                                                                                 2026:07:28 08:13:07+02:00</span></span>
+<span><span class="co">## 9                                                                                                -rw-r--r--</span></span>
+<span><span class="co">## 10                                                                                                     JPEG</span></span>
+<span><span class="co">## 11                                                                                                      jpg</span></span>
+<span><span class="co">## 12                                                                                               image/jpeg</span></span>
+<span><span class="co">## 13                                                                                Little-endian (Intel, II)</span></span>
+<span><span class="co">## 14                                                                                                      100</span></span>
+<span><span class="co">## 15                                                                                                       75</span></span>
+<span><span class="co">## 16                                                                             Baseline DCT, Huffman coding</span></span>
+<span><span class="co">## 17                                                                                                        8</span></span>
+<span><span class="co">## 18                                                                                                        3</span></span>
+<span><span class="co">## 19                                                                                         YCbCr4:2:2 (2 1)</span></span>
+<span><span class="co">## 20                                                                                                       G4</span></span>
+<span><span class="co">## 21                                                                                                CUDDEBACK</span></span>
+<span><span class="co">## 22                                                                                                       72</span></span>
+<span><span class="co">## 23                                                                                                       72</span></span>
+<span><span class="co">## 24                                                                                      2009:04:21 00:40:00</span></span>
+<span><span class="co">## 25                                                                                                   inches</span></span>
+<span><span class="co">## 26                                                                                                 Co-sited</span></span>
+<span><span class="co">## 27                                                                                                     0200</span></span>
+<span><span class="co">## 28                                                                                             Y, Cb, Cr, -</span></span>
+<span><span class="co">## 29                                                                                                     0100</span></span>
+<span><span class="co">## 30                                                                                                     sRGB</span></span>
+<span><span class="co">## 31                                                                                                      100</span></span>
+<span><span class="co">## 32                                                                                                       75</span></span>
+<span><span class="co">## 33                                                                                      2009:04:21 00:40:00</span></span>
+<span><span class="co">## 34                                                                                      2009:04:21 00:40:00</span></span>
+<span><span class="co">## 35                                                                                            1 ATTEMPT G1H</span></span>
+<span><span class="co">## 36                                                                                                        1</span></span>
+<span><span class="co">## 37                                                                                         JPEG (old-style)</span></span>
+<span><span class="co">## 38                                                                                                      408</span></span>
+<span><span class="co">## 39                                                                                                    25353</span></span>
+<span><span class="co">## 40                                                      (Binary data 25353 bytes, use -b option to extract)</span></span>
+<span><span class="co">## 41                                                                                                   100x75</span></span>
+<span><span class="co">## 42                                                                                                    0.007</span></span>
+<span><span class="co">## 43                                                                                                        1</span></span></code></pre>
 <p>The output table contains tag groups, tag descriptions, tag names and
 tag values. The values in <code>tag_group</code> help to unambiguously
 identify specific metadata tags.</p>
@@ -521,7 +512,7 @@ ecological interest in the example data. However, for demonstration
 purposes, let’s extract information about the camera model and make. To
 be as precise as possible, we provide tags in the format:
 tag_group:tag_name (e.g. EXIF:Model)</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rec.db.species.metadata1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/recordTable.html">recordTable</a></span><span class="op">(</span>inDir                  <span class="op">=</span> <span class="va">wd_images_ID</span>,</span>
 <span>                                        IDfrom                 <span class="op">=</span> <span class="st">"directory"</span>,</span>
 <span>                                        timeZone               <span class="op">=</span> <span class="st">"Asia/Kuala_Lumpur"</span>,</span>
@@ -529,36 +520,26 @@ tag_group:tag_name (e.g. EXIF:Model)</p>
 <pre><code><span><span class="co">## StationA:      8 images    0 duplicates removed      |=======             |   33%</span></span></code></pre>
 <pre><code><span><span class="co">## StationB:     23 images    6 duplicates removed      |=============       |   67%</span></span></code></pre>
 <pre><code><span><span class="co">## StationC:     37 images    6 duplicates removed      |====================|  100%</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rec.db.species.metadata1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##    Station Species    DateTimeOriginal       Date     Time delta.time.secs</span></span>
-<span><span class="co">## 1 StationA     PBE 2009-04-21 00:40:00 2009-04-21 00:40:00               0</span></span>
-<span><span class="co">## 2 StationA     PBE 2009-04-22 20:19:00 2009-04-22 20:19:00          157140</span></span>
-<span><span class="co">## 3 StationA     PBE 2009-04-22 20:21:00 2009-04-22 20:21:00             120</span></span>
-<span><span class="co">## 4 StationA     PBE 2009-04-23 00:07:00 2009-04-23 00:07:00           13560</span></span>
-<span><span class="co">## 5 StationA     PBE 2009-04-23 00:09:00 2009-04-23 00:09:00             120</span></span>
-<span><span class="co">## 6 StationA     PBE 2009-05-07 17:11:00 2009-05-07 17:11:00         1270920</span></span>
-<span><span class="co">##   delta.time.mins delta.time.hours delta.time.days</span></span>
-<span><span class="co">## 1               0              0.0             0.0</span></span>
-<span><span class="co">## 2            2619             43.6             1.8</span></span>
-<span><span class="co">## 3               2              0.0             0.0</span></span>
-<span><span class="co">## 4             226              3.8             0.2</span></span>
-<span><span class="co">## 5               2              0.0             0.0</span></span>
-<span><span class="co">## 6           21182            353.0            14.7</span></span>
-<span><span class="co">##                                                                                                              Directory</span></span>
-<span><span class="co">## 1 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 2 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 3 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 4 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 5 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">## 6 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_species_dir/StationA/PBE</span></span>
-<span><span class="co">##                                FileName EXIF.Model EXIF.Make n_images</span></span>
-<span><span class="co">## 1 StationA__2009-04-21__00-40-00(1).JPG  CUDDEBACK        G4        1</span></span>
-<span><span class="co">## 2 StationA__2009-04-22__20-19-00(1).JPG  CUDDEBACK        G4        1</span></span>
-<span><span class="co">## 3 StationA__2009-04-22__20-21-00(1).JPG  CUDDEBACK        G4        1</span></span>
-<span><span class="co">## 4 StationA__2009-04-23__00-07-00(1).JPG  CUDDEBACK        G4        1</span></span>
-<span><span class="co">## 5 StationA__2009-04-23__00-09-00(1).JPG  CUDDEBACK        G4        1</span></span>
-<span><span class="co">## 6 StationA__2009-05-07__17-11-00(1).JPG  CUDDEBACK        G4        1</span></span></code></pre>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rec.db.species.metadata1</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Record table</span> based on <span style="color: #0000BB;">3</span> stations and <span style="color: #0000BB;">56</span> records of a total of <span style="color: #0000BB;">6</span> species:</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 56 × 14</span></span></span>
+<span><span class="co">##    Station  Species DateTimeOriginal    Date       Time     delta.time.secs</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> StationA PBE     2009-04-21 <span style="color: #949494;">00:40:00</span> 2009-04-21 00:40:00               0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> StationA PBE     2009-04-22 <span style="color: #949494;">20:19:00</span> 2009-04-22 20:19:00          <span style="text-decoration: underline;">157</span>140</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> StationA PBE     2009-04-22 <span style="color: #949494;">20:21:00</span> 2009-04-22 20:21:00             120</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> StationA PBE     2009-04-23 <span style="color: #949494;">00:07:00</span> 2009-04-23 00:07:00           <span style="text-decoration: underline;">13</span>560</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> StationA PBE     2009-04-23 <span style="color: #949494;">00:09:00</span> 2009-04-23 00:09:00             120</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> StationA PBE     2009-05-07 <span style="color: #949494;">17:11:00</span> 2009-05-07 17:11:00         1<span style="text-decoration: underline;">270</span>920</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> StationA VTA     2009-04-10 <span style="color: #949494;">05:07:00</span> 2009-04-10 05:07:00               0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> StationA VTA     2009-05-06 <span style="color: #949494;">19:06:00</span> 2009-05-06 19:06:00         2<span style="text-decoration: underline;">296</span>740</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> StationB MNE     2009-04-15 <span style="color: #949494;">07:21:00</span> 2009-04-15 07:21:00               0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> StationB MNE     2009-04-15 <span style="color: #949494;">07:23:00</span> 2009-04-15 07:23:00             120</span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 46 more rows</span></span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 8 more variables: delta.time.mins &lt;dbl&gt;, delta.time.hours &lt;dbl&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   delta.time.days &lt;dbl&gt;, Directory &lt;chr&gt;, FileName &lt;chr&gt;, EXIF.Model &lt;chr&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   EXIF.Make &lt;chr&gt;, n_images &lt;int&gt;</span></span></span></code></pre>
 <p>There are 2 additional columns containing the information from the
 metadata we requested.</p>
 </div>
@@ -572,7 +553,7 @@ species<a class="anchor" aria-label="anchor" href="#recordtableindividual-tabula
 (spatial) capture-recapture models. <code>recordTableIndividual</code>
 and the subsequent <code>spatialDetectionHistory</code> function prepare
 data for these models.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># find the directory with tagged sample images contained in the package</span></span>
 <span><span class="va">wd_images_individual_ID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pictures/sample_images_indiv_tag/LeopardCat"</span>, package <span class="op">=</span> <span class="st">"camtrapR"</span><span class="op">)</span></span>
 <span> <span class="co"># missing space in species = "LeopardCat" is because of CRAN package policies</span></span>
@@ -595,43 +576,34 @@ can also be extracted. These may contain species ID tags if species were
 identified using metadata tags (instead of moving images into species
 directories), but also individual IDs, animal counts, sex of animals
 recorded, etc..</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rec.db.pbe</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##    Station    Species Individual    DateTimeOriginal       Date     Time</span></span>
-<span><span class="co">## 1 StationA LeopardCat          1 2009-05-07 17:11:00 2009-05-07 17:11:00</span></span>
-<span><span class="co">## 2 StationA LeopardCat          2 2009-04-21 00:40:00 2009-04-21 00:40:00</span></span>
-<span><span class="co">## 3 StationA LeopardCat          2 2009-04-22 20:19:00 2009-04-22 20:19:00</span></span>
-<span><span class="co">## 4 StationA LeopardCat          2 2009-04-23 00:07:00 2009-04-23 00:07:00</span></span>
-<span><span class="co">## 5 StationB LeopardCat          1 2009-04-07 00:23:00 2009-04-07 00:23:00</span></span>
-<span><span class="co">## 6 StationB LeopardCat          1 2009-04-14 06:13:00 2009-04-14 06:13:00</span></span>
-<span><span class="co">##   delta.time.secs delta.time.mins delta.time.hours delta.time.days</span></span>
-<span><span class="co">## 1               0               0              0.0             0.0</span></span>
-<span><span class="co">## 2               0               0              0.0             0.0</span></span>
-<span><span class="co">## 3          157140            2619             43.6             1.8</span></span>
-<span><span class="co">## 4           13680             228              3.8             0.2</span></span>
-<span><span class="co">## 5               0               0              0.0             0.0</span></span>
-<span><span class="co">## 6          625800           10430            173.8             7.2</span></span>
-<span><span class="co">##                                                                                                          Directory</span></span>
-<span><span class="co">## 1 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_indiv_tag/LeopardCat</span></span>
-<span><span class="co">## 2 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_indiv_tag/LeopardCat</span></span>
-<span><span class="co">## 3 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_indiv_tag/LeopardCat</span></span>
-<span><span class="co">## 4 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_indiv_tag/LeopardCat</span></span>
-<span><span class="co">## 5 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_indiv_tag/LeopardCat</span></span>
-<span><span class="co">## 6 C:/Users/niedballa/AppData/Local/Programs/R/R-4.3.2/library/camtrapR/pictures/sample_images_indiv_tag/LeopardCat</span></span>
-<span><span class="co">##                                FileName metadata_Species metadata_individual</span></span>
-<span><span class="co">## 1 StationA__2009-05-07__17-11-00(1).JPG      Leopard Cat                   1</span></span>
-<span><span class="co">## 2 StationA__2009-04-21__00-40-00(1).JPG      Leopard Cat                   2</span></span>
-<span><span class="co">## 3 StationA__2009-04-22__20-19-00(1).JPG      Leopard Cat                   2</span></span>
-<span><span class="co">## 4 StationA__2009-04-23__00-07-00(1).JPG      Leopard Cat                   2</span></span>
-<span><span class="co">## 5 StationB__2009-04-07__00-23-00(1).JPG      Leopard Cat                   1</span></span>
-<span><span class="co">## 6 StationB__2009-04-14__06-13-00(1).JPG      Leopard Cat                   1</span></span>
-<span><span class="co">##   n_images               HierarchicalSubject</span></span>
-<span><span class="co">## 1        1 Species|Leopard Cat, individual|1</span></span>
-<span><span class="co">## 2        1 Species|Leopard Cat, individual|2</span></span>
-<span><span class="co">## 3        2 Species|Leopard Cat, individual|2</span></span>
-<span><span class="co">## 4        2 Species|Leopard Cat, individual|2</span></span>
-<span><span class="co">## 5        1 Species|Leopard Cat, individual|1</span></span>
-<span><span class="co">## 6        1 Species|Leopard Cat, individual|1</span></span></code></pre>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rec.db.pbe</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Record table</span> based on <span style="color: #0000BB;">3</span> stations and <span style="color: #0000BB;">18</span> records of a total of <span style="color: #0000BB;">1</span> species:</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 18 × 16</span></span></span>
+<span><span class="co">##    Station  Species    Individual DateTimeOriginal    Date       Time    </span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> StationA LeopardCat 1          2009-05-07 <span style="color: #949494;">17:11:00</span> 2009-05-07 17:11:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> StationA LeopardCat 2          2009-04-21 <span style="color: #949494;">00:40:00</span> 2009-04-21 00:40:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> StationA LeopardCat 2          2009-04-22 <span style="color: #949494;">20:19:00</span> 2009-04-22 20:19:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> StationA LeopardCat 2          2009-04-23 <span style="color: #949494;">00:07:00</span> 2009-04-23 00:07:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> StationB LeopardCat 1          2009-04-07 <span style="color: #949494;">00:23:00</span> 2009-04-07 00:23:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> StationB LeopardCat 1          2009-04-14 <span style="color: #949494;">06:13:00</span> 2009-04-14 06:13:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> StationB LeopardCat 1          2009-04-24 <span style="color: #949494;">22:54:00</span> 2009-04-24 22:54:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> StationB LeopardCat 2          2009-04-05 <span style="color: #949494;">00:11:00</span> 2009-04-05 00:11:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> StationB LeopardCat 2          2009-04-05 <span style="color: #949494;">23:13:00</span> 2009-04-05 23:13:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> StationB LeopardCat 2          2009-04-10 <span style="color: #949494;">04:07:00</span> 2009-04-10 04:07:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span> StationB LeopardCat 2          2009-05-14 <span style="color: #949494;">02:11:00</span> 2009-05-14 02:11:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span> StationB LeopardCat 3          2009-04-25 <span style="color: #949494;">04:33:00</span> 2009-04-25 04:33:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">13</span> StationC LeopardCat 1          2009-04-06 <span style="color: #949494;">03:00:00</span> 2009-04-06 03:00:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">14</span> StationC LeopardCat 1          2009-04-14 <span style="color: #949494;">23:30:00</span> 2009-04-14 23:30:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">15</span> StationC LeopardCat 1          2009-04-23 <span style="color: #949494;">03:33:00</span> 2009-04-23 03:33:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">16</span> StationC LeopardCat 1          2009-05-05 <span style="color: #949494;">18:24:00</span> 2009-05-05 18:24:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">17</span> StationC LeopardCat 2          2009-04-18 <span style="color: #949494;">22:57:00</span> 2009-04-18 22:57:00</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">18</span> StationC LeopardCat 3          2009-05-07 <span style="color: #949494;">18:47:00</span> 2009-05-07 18:47:00</span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 10 more variables: delta.time.secs &lt;dbl&gt;, delta.time.mins &lt;dbl&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   delta.time.hours &lt;dbl&gt;, delta.time.days &lt;dbl&gt;, Directory &lt;chr&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   FileName &lt;chr&gt;, metadata_Species &lt;chr&gt;, metadata_individual &lt;chr&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   n_images &lt;int&gt;, HierarchicalSubject &lt;chr&gt;</span></span></span></code></pre>
 </div>
 </div>
 </div>
@@ -659,7 +631,7 @@ retrieval time as well as time of Problem periods).</p>
 <div class="section level3">
 <h3 id="dates-as-input">Dates as input<a class="anchor" aria-label="anchor" href="#dates-as-input"></a>
 </h3>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span> <span class="co"># first load the camera trap station table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">camtraps</span><span class="op">)</span></span>
 <span></span>
@@ -677,28 +649,38 @@ retrieval time as well as time of Problem periods).</p>
 <span></span>
 <span><span class="co"># as a reminder, these are the dates in our station information table</span></span>
 <span><span class="va">camtraps</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">camtraps</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"utm_y"</span>, <span class="st">"utm_x"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##    Station Setup_date Retrieval_date Problem1_from Problem1_to</span></span>
-<span><span class="co">## 1 StationA 02/04/2009     14/05/2009                          </span></span>
-<span><span class="co">## 2 StationB 03/04/2009     16/05/2009                          </span></span>
-<span><span class="co">## 3 StationC 04/04/2009     17/05/2009    12/05/2009  17/05/2009</span></span></code></pre>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
+<span><span class="co">##   Station  Setup_date Retrieval_date Problem1_from Problem1_to </span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> StationA 02/04/2009 14/05/2009     <span style="color: #949494;">""</span>            <span style="color: #949494;">""</span>          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> StationB 03/04/2009 16/05/2009     <span style="color: #949494;">""</span>            <span style="color: #949494;">""</span>          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> StationC 04/04/2009 17/05/2009     <span style="color: #949494;">"</span>12/05/2009<span style="color: #949494;">"</span>  <span style="color: #949494;">"</span>17/05/2009<span style="color: #949494;">"</span></span></span></code></pre>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># now let's have a look at the first few columns of the camera operation matrix</span></span>
 <span><span class="va">camop_problem</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Camera trap station operation matrix</span> based on</span></span>
+<span><span class="co">## <span style="color: #0000BB;">3</span> stations monitored from <span style="color: #0000BB;">2009-04-02</span> till <span style="color: #0000BB;">2009-04-06</span>,</span></span>
+<span><span class="co">## representing <span style="color: #0000BB;">5</span> days (<span style="color: #0000BB;">5</span> active):</span></span></code></pre>
 <pre><code><span><span class="co">##          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06</span></span>
-<span><span class="co">## StationA        0.5        1.0        1.0          1          1</span></span>
-<span><span class="co">## StationB         NA        0.5        1.0          1          1</span></span>
+<span><span class="co">## StationA        0.5          1          1          1          1</span></span>
+<span><span class="co">## StationB         NA        0.5          1          1          1</span></span>
 <span><span class="co">## StationC         NA         NA        0.5          1          1</span></span></code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># and the last few</span></span>
 <span><span class="va">camop_problem</span><span class="op">[</span>, <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">camop_problem</span><span class="op">)</span><span class="op">-</span><span class="fl">6</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">camop_problem</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##          2009-05-11 2009-05-12 2009-05-13 2009-05-14 2009-05-15 2009-05-16</span></span>
-<span><span class="co">## StationA          1          1          1        0.5         NA         NA</span></span>
-<span><span class="co">## StationB          1          1          1        1.0          1        0.5</span></span>
-<span><span class="co">## StationC          1          0          0        0.0          0        0.0</span></span>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Camera trap station operation matrix</span> based on</span></span>
+<span><span class="co">## <span style="color: #0000BB;">3</span> stations monitored from <span style="color: #0000BB;">2009-05-11</span> till <span style="color: #0000BB;">2009-05-17</span>,</span></span>
+<span><span class="co">## representing <span style="color: #0000BB;">7</span> days (<span style="color: #0000BB;">6</span> active):</span></span></code></pre>
+<pre><code><span><span class="co">##          2009-05-11 2009-05-12 2009-05-13 ...(1 more) 2009-05-15 2009-05-16</span></span>
+<span><span class="co">## StationA          1          1          1         ...         NA         NA</span></span>
+<span><span class="co">## StationB          1          1          1         ...          1        0.5</span></span>
+<span><span class="co">## StationC          1          0          0         ...          0          0</span></span>
 <span><span class="co">##          2009-05-17</span></span>
 <span><span class="co">## StationA         NA</span></span>
 <span><span class="co">## StationB         NA</span></span>
-<span><span class="co">## StationC          0</span></span></code></pre>
+<span><span class="co">## StationC          0</span></span>
+<span><span class="co">## <span style="color: #555555;"># Use `print(nCols = ...)` to see more columns</span></span></span>
+<span><span class="co"><span style="color: #555555;">## </span></span></span></code></pre>
 <p>If stations were not set up, values are NA. Operational stations get
 value 1. If cameras were set up but malfunctioning, it is 0 (if
 hasProblems = TRUE).</p>
@@ -706,7 +688,7 @@ hasProblems = TRUE).</p>
 <div class="section level3">
 <h3 id="date-times-as-input">Date-times as input<a class="anchor" aria-label="anchor" href="#date-times-as-input"></a>
 </h3>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">camtraps_hrs</span> <span class="op">&lt;-</span> <span class="va">camtraps</span></span>
 <span></span>
 <span><span class="co"># assign hours for setup and retrieval</span></span>
@@ -732,32 +714,39 @@ hasProblems = TRUE).</p>
 <span></span>
 <span><span class="co"># as a reminder, these are the date-times in our station information table</span></span>
 <span><span class="va">camtraps_hrs</span></span></code></pre></div>
-<pre><code><span><span class="co">##    Station  utm_y  utm_x    Setup_date Retrieval_date Problem1_from</span></span>
-<span><span class="co">## 1 StationA 604000 526000 02/04/2009 12  14/05/2009 18              </span></span>
-<span><span class="co">## 2 StationB 606000 523000 03/04/2009 15  16/05/2009 15              </span></span>
-<span><span class="co">## 3 StationC 607050 525000 04/04/2009 18  17/05/2009 12 12/05/2009 20</span></span>
-<span><span class="co">##     Problem1_to</span></span>
-<span><span class="co">## 1              </span></span>
-<span><span class="co">## 2              </span></span>
-<span><span class="co">## 3 17/05/2009 12</span></span></code></pre>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Camera table</span> with <span style="color: #0000BB;">3</span> stations in <span style="color: #0000BB;">3</span> rows:</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 3 × 7</span></span></span>
+<span><span class="co">##   Station   utm_y  utm_x Setup_date    Retrieval_date Problem1_from  Problem1_to</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> StationA <span style="text-decoration: underline;">604</span>000 <span style="text-decoration: underline;">526</span>000 02/04/2009 12 14/05/2009 18  <span style="color: #949494;">""</span>             <span style="color: #949494;">""</span>         </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> StationB <span style="text-decoration: underline;">606</span>000 <span style="text-decoration: underline;">523</span>000 03/04/2009 15 16/05/2009 15  <span style="color: #949494;">""</span>             <span style="color: #949494;">""</span>         </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> StationC <span style="text-decoration: underline;">607</span>050 <span style="text-decoration: underline;">525</span>000 04/04/2009 18 17/05/2009 12  <span style="color: #949494;">"</span>12/05/2009 2… <span style="color: #949494;">"</span>17/05/200…</span></span></code></pre>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># now let's have a look at the first few columns of the camera operation matrix</span></span>
 <span><span class="va">camop_hours</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Camera trap station operation matrix</span> based on</span></span>
+<span><span class="co">## <span style="color: #0000BB;">3</span> stations monitored from <span style="color: #0000BB;">2009-04-02</span> till <span style="color: #0000BB;">2009-04-06</span>,</span></span>
+<span><span class="co">## representing <span style="color: #0000BB;">5</span> days (<span style="color: #0000BB;">5</span> active):</span></span></code></pre>
 <pre><code><span><span class="co">##          2009-04-02 2009-04-03 2009-04-04 2009-04-05 2009-04-06</span></span>
-<span><span class="co">## StationA        0.5      1.000       1.00          1          1</span></span>
-<span><span class="co">## StationB         NA      0.375       1.00          1          1</span></span>
+<span><span class="co">## StationA        0.5          1          1          1          1</span></span>
+<span><span class="co">## StationB         NA      0.375          1          1          1</span></span>
 <span><span class="co">## StationC         NA         NA       0.25          1          1</span></span></code></pre>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># and the last few</span></span>
 <span><span class="va">camop_hours</span><span class="op">[</span>, <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">camop_hours</span><span class="op">)</span><span class="op">-</span><span class="fl">6</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">camop_hours</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##          2009-05-11 2009-05-12 2009-05-13 2009-05-14 2009-05-15 2009-05-16</span></span>
-<span><span class="co">## StationA          1     1.0000          1       0.75         NA         NA</span></span>
-<span><span class="co">## StationB          1     1.0000          1       1.00          1      0.625</span></span>
-<span><span class="co">## StationC          1     0.8333          0       0.00          0      0.000</span></span>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Camera trap station operation matrix</span> based on</span></span>
+<span><span class="co">## <span style="color: #0000BB;">3</span> stations monitored from <span style="color: #0000BB;">2009-05-11</span> till <span style="color: #0000BB;">2009-05-17</span>,</span></span>
+<span><span class="co">## representing <span style="color: #0000BB;">7</span> days (<span style="color: #0000BB;">6</span> active):</span></span></code></pre>
+<pre><code><span><span class="co">##          2009-05-11 2009-05-12 2009-05-13 ...(1 more) 2009-05-15 2009-05-16</span></span>
+<span><span class="co">## StationA          1          1          1         ...         NA         NA</span></span>
+<span><span class="co">## StationB          1          1          1         ...          1      0.625</span></span>
+<span><span class="co">## StationC          1      0.833          0         ...          0          0</span></span>
 <span><span class="co">##          2009-05-17</span></span>
 <span><span class="co">## StationA         NA</span></span>
 <span><span class="co">## StationB         NA</span></span>
-<span><span class="co">## StationC          0</span></span></code></pre>
+<span><span class="co">## StationC          0</span></span>
+<span><span class="co">## <span style="color: #555555;"># Use `print(nCols = ...)` to see more columns</span></span></span>
+<span><span class="co"><span style="color: #555555;">## </span></span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="differences-between-version-2-1-and-previous-versions">Differences between version 2.1 and previous versions<a class="anchor" aria-label="anchor" href="#differences-between-version-2-1-and-previous-versions"></a>
@@ -826,7 +815,7 @@ version 2.1.0, it was an argument of detectionHistory and
 spatialDetectionHistory, but was moved to cameraOperation in v2.1.0. It
 can be set to an hour between 0 and 23, describing the hour the
 occasions begin.</p>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create camera operation matrix with occasions / trap days starting on noon (until noon the next day)</span></span>
 <span><span class="va">camop_hours_12</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cameraOperation.html">cameraOperation</a></span><span class="op">(</span>CTtable <span class="op">=</span> <span class="va">camtraps_hrs</span>,</span>
 <span>                                  stationCol   <span class="op">=</span> <span class="st">"Station"</span>,</span>
@@ -839,25 +828,33 @@ occasions begin.</p>
 <span></span>
 <span><span class="co"># now let's have a look at the first few columns of the camera operation matrix</span></span>
 <span><span class="va">camop_hours_12</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Camera trap station operation matrix</span> based on</span></span>
+<span><span class="co">## <span style="color: #0000BB;">3</span> stations monitored from <span style="color: #0000BB;">2009-04-02</span> till <span style="color: #0000BB;">2009-04-06</span>,</span></span>
+<span><span class="co">## representing <span style="color: #0000BB;">5</span> days (<span style="color: #0000BB;">5</span> active):</span></span></code></pre>
 <pre><code><span><span class="co">##          2009-04-02+12h 2009-04-03+12h 2009-04-04+12h 2009-04-05+12h</span></span>
-<span><span class="co">## StationA              1          1.000           1.00              1</span></span>
-<span><span class="co">## StationB             NA          0.875           1.00              1</span></span>
+<span><span class="co">## StationA              1              1              1              1</span></span>
+<span><span class="co">## StationB             NA          0.875              1              1</span></span>
 <span><span class="co">## StationC             NA             NA           0.75              1</span></span>
 <span><span class="co">##          2009-04-06+12h</span></span>
 <span><span class="co">## StationA              1</span></span>
 <span><span class="co">## StationB              1</span></span>
 <span><span class="co">## StationC              1</span></span></code></pre>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># and the last few</span></span>
 <span><span class="va">camop_hours_12</span><span class="op">[</span>, <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">camop_hours_12</span><span class="op">)</span><span class="op">-</span><span class="fl">6</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">camop_hours_12</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##          2009-05-11+12h 2009-05-12+12h 2009-05-13+12h 2009-05-14+12h</span></span>
-<span><span class="co">## StationA              1         1.0000              1           0.25</span></span>
-<span><span class="co">## StationB              1         1.0000              1           1.00</span></span>
-<span><span class="co">## StationC              1         0.3333              0           0.00</span></span>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Camera trap station operation matrix</span> based on</span></span>
+<span><span class="co">## <span style="color: #0000BB;">3</span> stations monitored from <span style="color: #0000BB;">2009-05-11</span> till <span style="color: #0000BB;">2009-05-17</span>,</span></span>
+<span><span class="co">## representing <span style="color: #0000BB;">7</span> days (<span style="color: #0000BB;">6</span> active):</span></span></code></pre>
+<pre><code><span><span class="co">##          2009-05-11+12h 2009-05-12+12h 2009-05-13+12h ...(1 more)</span></span>
+<span><span class="co">## StationA              1              1              1         ...</span></span>
+<span><span class="co">## StationB              1              1              1         ...</span></span>
+<span><span class="co">## StationC              1          0.333              0         ...</span></span>
 <span><span class="co">##          2009-05-15+12h 2009-05-16+12h 2009-05-17+12h</span></span>
 <span><span class="co">## StationA             NA             NA             NA</span></span>
 <span><span class="co">## StationB              1          0.125             NA</span></span>
-<span><span class="co">## StationC              0          0.000             NA</span></span></code></pre>
+<span><span class="co">## StationC              0              0             NA</span></span>
+<span><span class="co">## <span style="color: #555555;"># Use `print(nCols = ...)` to see more columns</span></span></span>
+<span><span class="co"><span style="color: #555555;">## </span></span></span></code></pre>
 <p>The column names now indicate the shift, “+12h” in the example above.
 That means that the first column shows the effort from 12 noon on
 2009-04-02 until 12 noon 2009-04-03.</p>
@@ -878,7 +875,7 @@ to how they were set up.</p>
 contain an hour (e.g. 12 noon in this case: “2020-01-01 12”). Other
 formats for date-time are possible and can be specified with argument
 dateFormat in cameraOperation.</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">camtraps_by_camera</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Station <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"A"</span><span class="op">)</span>,</span>
 <span>                        camera <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cam1"</span>, <span class="st">"cam2"</span><span class="op">)</span>,</span>
 <span>                        setup <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-01-01 12"</span><span class="op">)</span>,</span>
@@ -906,7 +903,7 @@ details.</p>
 <p>Below we’ll run cameraOperation of the little sample table
 camtraps_by_camera, for all possible combinations of allCamsOn,
 cameraOperation and hasProblems.</p>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># list of common arguments for the different function runs</span></span>
 <span> <span class="va">args.common</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>CTtable <span class="op">=</span> <span class="va">camtraps_by_camera</span>,</span>
 <span>  stationCol <span class="op">=</span> <span class="st">"Station"</span>,</span>
@@ -929,10 +926,14 @@ cameraOperation and hasProblems.</p>
 <span>   <span class="co"># run cameraOperation on each combination of arguments, and combine into an output table with the function arguments</span></span>
 <span>   <span class="va">camOp_station_aggregation</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">fun.args0</span>, <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">fun.args1</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span>     <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">cameraOperation</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## CTtable contains Problem columns, but `hasProblem` is FALSE. Ensure this is intended.</span></span>
+<span><span class="co">## CTtable contains Problem columns, but `hasProblem` is FALSE. Ensure this is intended.</span></span>
+<span><span class="co">## CTtable contains Problem columns, but `hasProblem` is FALSE. Ensure this is intended.</span></span>
+<span><span class="co">## CTtable contains Problem columns, but `hasProblem` is FALSE. Ensure this is intended.</span></span></code></pre>
 <p>Now let’s see how the daily effort was combined for the different
 combinations of allCamsOn and camerasIndependent when hasProblems is
 FALSE.</p>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>   <span class="va">camOp_station_aggregation</span> <span class="op">[</span><span class="va">camOp_station_aggregation</span><span class="op">$</span><span class="va">hasProblems</span> <span class="op">==</span> <span class="cn">FALSE</span>, <span class="op">-</span><span class="fl">3</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##   allCamsOn camerasIndependent 2020-01-01 2020-01-02 2020-01-03 2020-01-04</span></span>
 <span><span class="co">## 5      TRUE               TRUE        1.0          2          2          2</span></span>
@@ -944,11 +945,11 @@ FALSE.</p>
 <span><span class="co">## 6          2          2      1.750       0.75</span></span>
 <span><span class="co">## 7          1          1      0.750         NA</span></span>
 <span><span class="co">## 8          1          1      0.875       0.75</span></span></code></pre>
-<p>sS you can see, allCamsOn has no effect if all cameras were active
+<p>As you can see, allCamsOn has no effect if all cameras were active
 (due to hasProblems = FALSE). The differences on the setup/retrieval day
 are due to camerasIndependent.</p>
 <p>Now with hasProblems = TRUE:</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>   <span class="va">camOp_station_aggregation</span> <span class="op">[</span><span class="va">camOp_station_aggregation</span><span class="op">$</span><span class="va">hasProblems</span> <span class="op">==</span> <span class="cn">TRUE</span>, <span class="op">-</span><span class="fl">3</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##   allCamsOn camerasIndependent 2020-01-01 2020-01-02 2020-01-03 2020-01-04</span></span>
 <span><span class="co">## 1      TRUE               TRUE        1.0          2       1.00        0.0</span></span>
@@ -1055,32 +1056,31 @@ cameras half a day).</p>
 <h3 id="plotting-camera-operation-matrices">Plotting camera operation matrices<a class="anchor" aria-label="anchor" href="#plotting-camera-operation-matrices"></a>
 </h3>
 <p>There is a little function for plotting the camera operation matrix
-included in the package, but not exported in the Namespace. It is
-accessible with camtrapR:::camopPlot(). Imagine there is a typo in one
-of your date fields and the setup or retrieval year is wrong. You will
-easily be able to spot it this way.</p>
+included in the package, accessible directly via plot(). Imagine there
+is a typo in one of your date fields and the setup or retrieval year is
+wrong. You will easily be able to spot it this way.</p>
 <p>Here is the camera operation matrix calculated above (in two
 different color palettes, the default being the viridis palette -
 requires R 3.6.0 or higher).</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">camtrapR</span><span class="fu">:::</span><span class="fu">camopPlot</span><span class="op">(</span>camOp <span class="op">=</span> <span class="va">camop_problem</span><span class="op">)</span></span>
-<span><span class="fu">camtrapR</span><span class="fu">:::</span><span class="fu">camopPlot</span><span class="op">(</span>camOp <span class="op">=</span> <span class="va">camop_problem</span>, palette <span class="op">=</span> <span class="st">"Heat"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">camop_problem</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">camop_problem</span>, palette <span class="op">=</span> <span class="st">"Heat"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="700"></p>
 <!--  ```{r include = FALSE} -->
 <!--   par(mfrow = c(1,2)) -->
 <!--  ``` -->
 <p>One can also plot with the levelplot function from the lattice
 package:</p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">camtrapR</span><span class="fu">:::</span><span class="fu">camopPlot</span><span class="op">(</span>camOp <span class="op">=</span> <span class="va">camop_problem</span>, lattice <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-21-1.png" width="700"></p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">camtrapR</span><span class="fu">:::</span><span class="fu">camopPlot</span><span class="op">(</span>camOp <span class="op">=</span> <span class="va">camop_problem</span>, palette <span class="op">=</span> <span class="st">"Heat"</span>, lattice <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-21-2.png" width="700"></p>
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">camop_problem</span>, lattice <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-21-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">camop_problem</span>, palette <span class="op">=</span> <span class="st">"Heat"</span>, lattice <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-21-2.png" class="r-plt" alt="" width="700"></p>
 <p>Here is what it would look like if the year is wrong for one
 station.</p>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">camtraps_typo</span> <span class="op">&lt;-</span> <span class="va">camtraps</span></span>
 <span><span class="co"># replace 2009 with 2008 in setup date of station A</span></span>
 <span><span class="va">camtraps_typo</span><span class="op">$</span><span class="va">Setup_date</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"2009"</span>, <span class="st">"2008"</span>, <span class="va">camtraps_typo</span><span class="op">$</span><span class="va">Setup_date</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
@@ -1093,8 +1093,8 @@ station.</p>
 <span>                                 hasProblems  <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                                 dateFormat   <span class="op">=</span> <span class="va">dateFormat</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu">camtrapR</span><span class="fu">:::</span><span class="fu">camopPlot</span><span class="op">(</span><span class="va">camop_typo</span><span class="op">)</span></span></code></pre></div>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">camop_typo</span><span class="op">)</span></span></code></pre></div>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="700"></p>
 <p>Note that the colors are stretched between the lowest and highest
 value. There is no dedicated color for 0, designating non-operational
 cameras.</p>
@@ -1108,7 +1108,7 @@ setting argument <code>writecsv = TRUE</code>,
 <code>check.names = FALSE</code> and defining <code>outdir</code>). In
 order to load the csv into R again, it is necessary to tell R to use the
 station IDs (the first column) as row names:</p>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">camOp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">...</span>, row.names <span class="op">=</span> <span class="fl">1</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><code>check.names = FALSE</code> ensures that column names (the
 dates) are read back into R as they are (e.g. “2015-12-01”). Otherwise
@@ -1133,7 +1133,7 @@ species, “0”” signifies non-detecion, and NA missing data.</p>
 <code>detectionHistory</code>. Because the function builds on prior
 functions (<code>recordTable</code> and <code>cameraOperation</code>) we
 also show these function here to provide the context.</p>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create camera operation matrix</span></span>
 <span><span class="va">camop_no_problem</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cameraOperation.html">cameraOperation</a></span><span class="op">(</span>CTtable      <span class="op">=</span> <span class="va">camtraps</span>,</span>
 <span>                                    stationCol   <span class="op">=</span> <span class="st">"Station"</span>,</span>
@@ -1141,9 +1141,10 @@ also show these function here to provide the context.</p>
 <span>                                    retrievalCol <span class="op">=</span> <span class="st">"Retrieval_date"</span>,</span>
 <span>                                    hasProblems  <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                                    dateFormat   <span class="op">=</span> <span class="va">dateFormat</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># define image directory</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## CTtable contains Problem columns, but `hasProblem` is FALSE. Ensure this is intended.</span></span></code></pre>
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># define image directory</span></span>
 <span><span class="va">wd_images_ID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pictures/sample_images_species_dir"</span>, package <span class="op">=</span> <span class="st">"camtrapR"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># make record table</span></span>
@@ -1156,7 +1157,7 @@ also show these function here to provide the context.</p>
 <pre><code><span><span class="co">## StationA:      8 images    0 duplicates removed      |=======             |   33%</span></span></code></pre>
 <pre><code><span><span class="co">## StationB:     23 images    6 duplicates removed      |=============       |   67%</span></span></code></pre>
 <pre><code><span><span class="co">## StationC:     37 images    6 duplicates removed      |====================|  100%</span></span></code></pre>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># make detection history (without trapping effort)</span></span>
 <span><span class="va">DetHist1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/detectionHistory.html">detectionHistory</a></span><span class="op">(</span>recordTable         <span class="op">=</span> <span class="va">recordTableSample</span>,</span>
 <span>                            camOp                <span class="op">=</span> <span class="va">camop_no_problem</span>,</span>
@@ -1169,13 +1170,14 @@ also show these function here to provide the context.</p>
 <span>                            includeEffort        <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: timeZone is not specified. Assuming UTC</span></span></code></pre>
-<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DetHist1</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Detection history list</span></span></span></code></pre>
 <pre><code><span><span class="co">## $detection_history</span></span>
-<span><span class="co">##          o1 o2 o3 o4 o5 o6 o7</span></span>
-<span><span class="co">## StationA  0  1  0  0  1  0 NA</span></span>
-<span><span class="co">## StationB  0  1  0  1  0  0 NA</span></span>
-<span><span class="co">## StationC  0  0  1  0  0  0 NA</span></span></code></pre>
+<span><span class="co">##               o1      o2      o3 ...(1 more)      o5      o6      o7</span></span>
+<span><span class="co">## StationA       0       1       0         ...       1       0      NA</span></span>
+<span><span class="co">## StationB       0       1       0         ...       0       0      NA</span></span>
+<span><span class="co">## StationC       0       0       1         ...       0       0      NA</span></span></code></pre>
 <p>Note the warning about the missing time zone (as in the functions
 <code>recordTable</code> and <code>recordTable</code>). Normally, it
 should be fine, but to be on the safe side, better set it to your study
@@ -1184,7 +1186,7 @@ area’s time zone.</p>
 can be returned by setting <code>includeEffort = TRUE</code>. This way
 the number of active trapping days per occasion and station is
 returned.</p>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># make detection history (with trapping effort)</span></span>
 <span><span class="va">DetHist2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/detectionHistory.html">detectionHistory</a></span><span class="op">(</span>recordTable          <span class="op">=</span> <span class="va">recordTableSample</span>,</span>
 <span>                             camOp                <span class="op">=</span> <span class="va">camop_no_problem</span>,</span>
@@ -1204,7 +1206,7 @@ returned.</p>
 <span><span class="co">## StationA  0  1  0  0  1  0  0</span></span>
 <span><span class="co">## StationB  0  1  0  1  0  0  0</span></span>
 <span><span class="co">## StationC  0  0  1  0  0  0  0</span></span></code></pre>
-<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DetHist2</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>  <span class="co"># effort (in days per occasion)</span></span></code></pre></div>
 <pre><code><span><span class="co">##           o1 o2 o3 o4 o5 o6  o7</span></span>
 <span><span class="co">## StationA 6.5  7  7  7  7  7 0.5</span></span>
@@ -1214,7 +1216,7 @@ returned.</p>
 to mean = 0 and sd = 1 by setting <code>scaleEffort = TRUE</code>. If
 <code>writecsv = TRUE</code>, the scaling parameters will also be saved
 in a separate csv file.</p>
-<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DetHist3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/detectionHistory.html">detectionHistory</a></span><span class="op">(</span>recordTable          <span class="op">=</span> <span class="va">recordTableSample</span>,</span>
 <span>                             camOp                <span class="op">=</span> <span class="va">camop_no_problem</span>,</span>
 <span>                             stationCol           <span class="op">=</span> <span class="st">"Station"</span>,</span>
@@ -1233,17 +1235,17 @@ in a separate csv file.</p>
 <span><span class="co">## StationA  0  1  0  0  1  0  0</span></span>
 <span><span class="co">## StationB  0  1  0  1  0  0  0</span></span>
 <span><span class="co">## StationC  0  0  1  0  0  0  0</span></span></code></pre>
-<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DetHist3</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>  <span class="co"># effort (scaled)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                 o1        o2        o3        o4        o5        o6        o7</span></span>
 <span><span class="co">## StationA 0.1948432 0.4355319 0.4355319 0.4355319 0.4355319 0.4355319 -2.693421</span></span>
 <span><span class="co">## StationB 0.1948432 0.4355319 0.4355319 0.4355319 0.4355319 0.4355319 -2.212043</span></span>
 <span><span class="co">## StationC 0.1948432 0.4355319 0.4355319 0.4355319 0.4355319 0.4355319 -2.212043</span></span></code></pre>
-<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb99"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DetHist3</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span>  <span class="co"># scaling parameters for back-transformation</span></span></code></pre></div>
 <pre><code><span><span class="co">##   effort.scaled.center effort.scaled.scale</span></span>
 <span><span class="co">## 1             6.095238            2.077372</span></span></code></pre>
-<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># backtransform scaled effort like this if needed</span></span>
 <span><span class="op">(</span><span class="va">DetHist3</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op">*</span> <span class="va">DetHist3</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">effort.scaled.scale</span><span class="op">)</span> <span class="op">+</span> <span class="va">DetHist3</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">effort.scaled.center</span></span></code></pre></div>
 <pre><code><span><span class="co">##           o1 o2 o3 o4 o5 o6  o7</span></span>
@@ -1338,7 +1340,7 @@ below.</p>
 files (by setting argument <code>writecsv = TRUE</code> and defining
 <code>outdir</code>). In order to load the csv into R again, it is
 necessary to tell R to use the station IDs as row names:</p>
-<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">detHist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">...</span>, row.names <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">effort</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">...</span>, row.names <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -1356,7 +1358,7 @@ during an occasion, argument <code>output = "binary"</code>). note that
 the detector type will change accordingly: “proximity” if
 <code>output = "binary"</code> and “count” if
 <code>output = "count"</code>.</p>
-<div class="sourceCode" id="cb90"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">recordTableIndividualSample</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># create camera operation matrix (with problems/malfunction)</span></span>
@@ -1399,7 +1401,7 @@ the detector type will change accordingly: “proximity” if
 <span><span class="co">## x-range            523000 526000 m </span></span>
 <span><span class="co">## y-range            604000 607050 m </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">##  Usage range by occasion</span></span>
+<span><span class="co">## Usage range by occasion</span></span>
 <span><span class="co">##       1  2  3  4   5</span></span>
 <span><span class="co">## min 7.5 10 10 10 0.0</span></span>
 <span><span class="co">## max 9.5 10 10 10 4.5</span></span>
@@ -1414,11 +1416,11 @@ the detector type will change accordingly: “proximity” if
 <span><span class="co">## detections        3 4 4 3 1    15</span></span>
 <span><span class="co">## detectors visited 2 3 3 2 1    11</span></span>
 <span><span class="co">## detectors used    3 3 3 3 2    14</span></span></code></pre>
-<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sdh</span>, tracks <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in plot.capthist(sdh, tracks = TRUE): track for repeat detections on</span></span>
-<span><span class="co">## same occasion joins points in arbitrary sequence</span></span></code></pre>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-28-1.png" width="700"></p>
+<pre><code><span><span class="co">## Warning: track for repeat detections on same occasion joins points in arbitrary</span></span>
+<span><span class="co">## sequence</span></span></code></pre>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-28-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
 <div class="section level2">
@@ -1439,7 +1441,7 @@ trap table. Records will be assigned to session automatically based on
 their dates.</p>
 <p>First we simulate data for 2 seasons by duplicating the existing
 sample data and adjusting the dates (add 1 year)</p>
-<div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load multi-season data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">camtrapsMultiSeason</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">recordTableSampleMultiSeason</span><span class="op">)</span></span>
@@ -1459,9 +1461,9 @@ sample data and adjusting the dates (add 1 year)</p>
 <span></span>
 <span><span class="co"># plot camera operation matrix</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">7</span>,<span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">camtrapR</span><span class="fu">:::</span><span class="fu">camopPlot</span><span class="op">(</span><span class="va">camop_season</span><span class="op">)</span></span></code></pre></div>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-29-1.png" width="700"></p>
-<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">camop_season</span><span class="op">)</span></span></code></pre></div>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-29-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># make multi-season detection history</span></span>
 <span><span class="va">DetHist_multi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/detectionHistory.html">detectionHistory</a></span><span class="op">(</span>recordTable   <span class="op">=</span> <span class="va">recordTableSampleMultiSeason</span>,</span>
 <span>                            camOp                <span class="op">=</span> <span class="va">camop_season</span>,</span>
@@ -1478,24 +1480,25 @@ sample data and adjusting the dates (add 1 year)</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">DetHist_multi</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #00BBBB;">Detection history list</span></span></span></code></pre>
 <pre><code><span><span class="co">## $detection_history</span></span>
-<span><span class="co">##          o1 o2 o3 o4 o5 o6 o7 o8 o1 o2 o3 o4 o5 o6 o7 o8</span></span>
-<span><span class="co">## StationA  1  0  0  1  0 NA NA NA  1  0  0  1  0 NA NA NA</span></span>
-<span><span class="co">## StationB  0  1  1  0  0 NA NA NA  0  1  1  0  0 NA NA NA</span></span>
-<span><span class="co">## StationC  0  0  1  0 NA NA NA NA  0  0  1  0 NA NA NA NA</span></span>
-<span><span class="co">## StationD NA NA NA NA NA NA NA NA  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">##               o1      o2      o3 ...(10 more)      o6      o7      o8</span></span>
+<span><span class="co">## StationA       1       0       0          ...      NA      NA      NA</span></span>
+<span><span class="co">## StationB       0       1       1          ...      NA      NA      NA</span></span>
+<span><span class="co">## StationC       0       0       1          ...      NA      NA      NA</span></span>
+<span><span class="co">## StationD      NA      NA      NA          ...       0       0       0</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $effort</span></span>
-<span><span class="co">##           o1 o2 o3 o4  o5 o6 o7 o8  o1 o2 o3 o4  o5 o6 o7  o8</span></span>
-<span><span class="co">## StationA 9.5 10 10 10 2.5 NA NA NA 9.5 10 10 10 2.5 NA NA  NA</span></span>
-<span><span class="co">## StationB 9.5 10 10 10 3.5 NA NA NA 9.5 10 10 10 3.5 NA NA  NA</span></span>
-<span><span class="co">## StationC 9.5 10 10  8  NA NA NA NA 9.5 10 10  8  NA NA NA  NA</span></span>
-<span><span class="co">## StationD  NA NA NA NA  NA NA NA NA 9.5 10 10 10 6.0  3 10 4.5</span></span></code></pre>
+<span><span class="co">##               o1      o2      o3 ...(10 more)      o6      o7      o8</span></span>
+<span><span class="co">## StationA     9.5      10      10          ...      NA      NA      NA</span></span>
+<span><span class="co">## StationB     9.5      10      10          ...      NA      NA      NA</span></span>
+<span><span class="co">## StationC     9.5      10      10          ...      NA      NA      NA</span></span>
+<span><span class="co">## StationD      NA      NA      NA          ...       3      10     4.5</span></span></code></pre>
 <p>Note that the function makes sure that all seasons have identical
 number of occasions, and that all stations are represented, even if they
 were not sampled in all seasons.</p>
 <p>From here, the resulting object can be used in unmarked.</p>
-<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">year_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">camtrapsMultiSeason</span><span class="op">$</span><span class="va">session</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>               ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">camtrapsMultiSeason</span><span class="op">$</span><span class="va">session</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>               nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">camtrapsMultiSeason</span><span class="op">$</span><span class="va">Station</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -1506,15 +1509,15 @@ were not sampled in all seasons.</p>
 <span>                              elevation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span>, <span class="fl">500</span>, <span class="fl">300</span><span class="op">)</span>,</span>
 <span>                              treecover <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">100</span>, <span class="fl">50</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">umf</span> <span class="op">&lt;-</span> <span class="fu">unmarked</span><span class="fu">::</span><span class="fu"><a href="https://rbchan.github.io/unmarked/reference/unmarkedMultFrame.html" class="external-link">unmarkedMultFrame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">DetHist_multi</span><span class="op">$</span><span class="va">detection_history</span>,</span>
+<span><span class="va">umf</span> <span class="op">&lt;-</span> <span class="fu">unmarked</span><span class="fu">::</span><span class="fu"><a href="https://ecoverseR.github.io/unmarked/reference/unmarkedMultFrame.html" class="external-link">unmarkedMultFrame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">DetHist_multi</span><span class="op">$</span><span class="va">detection_history</span>,</span>
 <span>                                   siteCovs <span class="op">=</span> <span class="va">site_covariates</span>,</span>
 <span>                                   yearlySiteCovs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>year <span class="op">=</span> <span class="va">year_matrix</span><span class="op">)</span>,</span>
 <span>                                   obsCovs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>effort <span class="op">=</span> <span class="va">DetHist_multi</span><span class="op">$</span><span class="va">effort</span><span class="op">)</span>,</span>
 <span>                                   numPrimary <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: siteCovs contains characters. Converting them to factors.</span></span></code></pre>
 <pre><code><span><span class="co">## Warning: yearlySiteCovs contains characters. Converting them to factors.</span></span></code></pre>
-<div class="sourceCode" id="cb100"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">colext_example</span> <span class="op">&lt;-</span> <span class="fu">unmarked</span><span class="fu">::</span><span class="fu"><a href="https://rbchan.github.io/unmarked/reference/colext.html" class="external-link">colext</a></span><span class="op">(</span>psiformula <span class="op">=</span> <span class="op">~</span> <span class="va">treecover</span>,    <span class="co"># First-year occupancy</span></span>
+<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">colext_example</span> <span class="op">&lt;-</span> <span class="fu">unmarked</span><span class="fu">::</span><span class="fu"><a href="https://ecoverseR.github.io/unmarked/reference/colext.html" class="external-link">colext</a></span><span class="op">(</span>psiformula <span class="op">=</span> <span class="op">~</span> <span class="va">treecover</span>,    <span class="co"># First-year occupancy</span></span>
 <span>                                   gammaformula <span class="op">=</span> <span class="op">~</span> <span class="fl">1</span>,          <span class="co"># Colonization</span></span>
 <span>                                   epsilonformula <span class="op">=</span> <span class="op">~</span> <span class="fl">1</span>,        <span class="co"># Extinction</span></span>
 <span>                                   pformula <span class="op">=</span> <span class="op">~</span> <span class="va">effort</span>,         <span class="co"># Detection</span></span>
@@ -1528,37 +1531,35 @@ were not sampled in all seasons.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Initial (logit-scale):</span></span>
 <span><span class="co">##             Estimate    SE      z P(&gt;|z|)</span></span>
-<span><span class="co">## (Intercept)   -9.504 28.60 -0.332    0.74</span></span>
-<span><span class="co">## treecover      0.342  1.23  0.279    0.78</span></span>
+<span><span class="co">## (Intercept)   -11.48 55.96 -0.205   0.837</span></span>
+<span><span class="co">## treecover       0.41  2.48  0.165   0.869</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Colonization (logit-scale):</span></span>
 <span><span class="co">##  Estimate   SE      z P(&gt;|z|)</span></span>
-<span><span class="co">##      -6.6 27.3 -0.242   0.809</span></span>
+<span><span class="co">##        -8 55.7 -0.144   0.886</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Extinction (logit-scale):</span></span>
 <span><span class="co">##  Estimate   SE      z P(&gt;|z|)</span></span>
-<span><span class="co">##     -7.89 29.4 -0.269   0.788</span></span>
+<span><span class="co">##     -9.15 56.2 -0.163   0.871</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Detection (logit-scale):</span></span>
 <span><span class="co">##             Estimate    SE     z P(&gt;|z|)</span></span>
-<span><span class="co">## (Intercept)   -17.46 14.73 -1.19   0.236</span></span>
-<span><span class="co">## effort          1.75  1.49  1.17   0.241</span></span>
+<span><span class="co">## (Intercept)   -17.90 15.05 -1.19   0.234</span></span>
+<span><span class="co">## effort          1.79  1.53  1.18   0.239</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## AIC: 42.03042 </span></span>
-<span><span class="co">## Number of sites: 4</span></span>
-<span><span class="co">## optim convergence code: 0</span></span>
-<span><span class="co">## optim iterations: 45 </span></span>
-<span><span class="co">## Bootstrap iterations: 0</span></span></code></pre>
+<span><span class="co">## AIC: 41.97665 </span></span>
+<span><span class="co">## Number of sites: 4</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Large or missing SE values. Be very cautious using these results.</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="multi-season-spatial-capture-recapture">Multi-season spatial capture-recapture<a class="anchor" aria-label="anchor" href="#multi-season-spatial-capture-recapture"></a>
 </h3>
 <p>For secr, session IDs must be a gapless sequence of numbers beginning
 with 1. So 2009 becomes season 1 and 2010 season 2</p>
-<div class="sourceCode" id="cb102"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">camtrapsMultiSeason</span><span class="op">$</span><span class="va">session</span><span class="op">[</span><span class="va">camtrapsMultiSeason</span><span class="op">$</span><span class="va">session</span> <span class="op">==</span> <span class="fl">2009</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="va">camtrapsMultiSeason</span><span class="op">$</span><span class="va">session</span><span class="op">[</span><span class="va">camtrapsMultiSeason</span><span class="op">$</span><span class="va">session</span> <span class="op">==</span> <span class="fl">2010</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></code></pre></div>
-<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># we also want a few records in season 2</span></span>
 <span><span class="va">recordTableIndividualSample_season2</span> <span class="op">&lt;-</span> <span class="va">recordTableIndividualSample</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,<span class="op">]</span></span>
 <span><span class="va">recordTableIndividualSample_season2</span><span class="op">$</span><span class="va">DateTimeOriginal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"2009"</span>, <span class="st">"2010"</span>, <span class="va">recordTableIndividualSample_season2</span><span class="op">$</span><span class="va">DateTimeOriginal</span><span class="op">)</span></span>
@@ -1568,7 +1569,7 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span></span>
 <span><span class="co"># for clarity, lets remove all unnecessary columns</span></span>
 <span><span class="va">recordTableIndividualSample_season</span> <span class="op">&lt;-</span> <span class="va">recordTableIndividualSample_season</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Station"</span>, <span class="st">"Species"</span>, <span class="st">"Individual"</span>, <span class="st">"DateTimeOriginal"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create camera operation matrix (with problems/malfunction), same as above for multi-season occupancy</span></span>
 <span><span class="va">camop_season</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cameraOperation.html">cameraOperation</a></span><span class="op">(</span>CTtable         <span class="op">=</span> <span class="va">camtrapsMultiSeason</span>,</span>
 <span>                                    stationCol   <span class="op">=</span> <span class="st">"Station"</span>,</span>
@@ -1612,7 +1613,7 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span><span class="co">## x-range            523000 526000 m </span></span>
 <span><span class="co">## y-range            604000 607050 m </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">##  Usage range by occasion</span></span>
+<span><span class="co">## Usage range by occasion</span></span>
 <span><span class="co">##       1  2  3  4   5</span></span>
 <span><span class="co">## min 7.5 10 10 10 0.0</span></span>
 <span><span class="co">## max 9.5 10 10 10 4.5</span></span>
@@ -1643,7 +1644,7 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span><span class="co">## x-range            523000 526000 m </span></span>
 <span><span class="co">## y-range            604000 607050 m </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">##  Usage range by occasion</span></span>
+<span><span class="co">## Usage range by occasion</span></span>
 <span><span class="co">##       1  2  3  4  5 6 7  8   9</span></span>
 <span><span class="co">## min 2.5 10 10 10  5 0 0  0 0.0</span></span>
 <span><span class="co">## max 4.5 10 10 10 10 3 6 10 1.5</span></span>
@@ -1663,20 +1664,19 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span><span class="co">##  Individual</span></span>
 <span><span class="co">##  1:1       </span></span>
 <span><span class="co">##  2:1</span></span></code></pre>
-<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sdh_multi</span><span class="op">)</span></span></code></pre></div>
-<p><img src="camtrapr3_files/figure-html/unnamed-chunk-33-1.png" width="700"></p>
+<p><img src="camtrapr3_files/figure-html/unnamed-chunk-33-1.png" class="r-plt" alt="" width="700"></p>
 <pre><code><span><span class="co">##  1  2 </span></span>
 <span><span class="co">## 15  6</span></span></code></pre>
-<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="va">secr.fit.example</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/secr/man/secr.fit.html" class="external-link">secr.fit</a></span><span class="op">(</span>capthist <span class="op">=</span> <span class="va">sdh_multi</span>,</span>
 <span>                               start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span>   <span class="co"># with starting values, since its only very little data</span></span></code></pre></div>
 <pre><code><span><span class="co">## Checking data</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in verify.capthist(capthist, report = 1): Levels of factor covariate(s)</span></span>
-<span><span class="co">## differ between sessions - use shareFactorLevels()</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in secr.fit(capthist = sdh_multi, start = c(-1, -2, 10)): using default</span></span>
-<span><span class="co">## buffer width 100 m</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Levels of factor covariate(s) differ between sessions - ",</span></span>
+<span><span class="co">##                  "use shareFactorLevels()</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: using default buffer width 100 m</span></span></code></pre>
 <pre><code><span><span class="co">## Preparing detection design matrices </span></span>
 <span><span class="co">## Preparing density design matrix </span></span>
 <span><span class="co">## Maximizing likelihood... </span></span>
@@ -1772,7 +1772,7 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span><span class="co">##   89    -26.522  -1.2572  -3.5445  10.5337 </span></span>
 <span><span class="co">##   90    -26.522  -1.2572  -3.5445  10.5337 </span></span>
 <span><span class="co">##   91    -26.522  -1.2572  -3.5445  10.5337 </span></span>
-<span><span class="co">##   92    -26.522  -1.2572  -3.5445  10.5337 </span></span>
+<span><span class="co">##   92    -26.522  -1.2572  -3.5445  10.5338 </span></span>
 <span><span class="co">##   93    -26.522  -1.2602  -3.5446  10.8393 </span></span>
 <span><span class="co">##   94    -26.522  -1.2602  -3.5446  10.8393 </span></span>
 <span><span class="co">##   95    -26.522  -1.2602  -3.5446  10.8393 </span></span>
@@ -1804,61 +1804,61 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span><span class="co">##  121    -26.522  -1.2625  -3.5445  12.9888 </span></span>
 <span><span class="co">##  122    -26.522  -1.2625  -3.5445  12.9888 </span></span>
 <span><span class="co">##  123    -26.522  -1.2625  -3.5445  12.9888 </span></span>
-<span><span class="co">##  124    -26.522  -1.2625  -3.5445  12.9889 </span></span>
-<span><span class="co">##  125    -26.522  -1.2626  -3.5445  13.3421 </span></span>
-<span><span class="co">##  126    -26.522  -1.2626  -3.5445  13.3421 </span></span>
-<span><span class="co">##  127    -26.522  -1.2626  -3.5445  13.3421 </span></span>
-<span><span class="co">##  128    -26.522  -1.2626  -3.5445  13.3421 </span></span>
-<span><span class="co">##  129    -26.522  -1.2627  -3.5445  13.6813 </span></span>
-<span><span class="co">##  130    -26.522  -1.2627  -3.5445  13.6813 </span></span>
-<span><span class="co">##  131    -26.522  -1.2627  -3.5445  13.6813 </span></span>
-<span><span class="co">##  132    -26.522  -1.2627  -3.5445  13.6813 </span></span>
-<span><span class="co">##  133    -26.522  -1.2627  -3.5445  14.0030 </span></span>
-<span><span class="co">##  134    -26.522  -1.2627  -3.5445  14.0030 </span></span>
-<span><span class="co">##  135    -26.522  -1.2627  -3.5445  14.0030 </span></span>
-<span><span class="co">##  136    -26.522  -1.2627  -3.5445  14.0030 </span></span>
-<span><span class="co">##  137    -26.522  -1.2627  -3.5445  14.3403 </span></span>
-<span><span class="co">##  138    -26.522  -1.2627  -3.5445  14.3403 </span></span>
-<span><span class="co">##  139    -26.522  -1.2627  -3.5445  14.3403 </span></span>
-<span><span class="co">##  140    -26.522  -1.2627  -3.5445  14.3403 </span></span>
-<span><span class="co">##  141    -26.522  -1.2627  -3.5445  14.6932 </span></span>
-<span><span class="co">##  142    -26.522  -1.2627  -3.5445  14.6932 </span></span>
-<span><span class="co">##  143    -26.522  -1.2627  -3.5445  14.6932 </span></span>
-<span><span class="co">##  144    -26.522  -1.2627  -3.5445  14.6932 </span></span>
-<span><span class="co">##  145    -26.522  -1.2627  -3.5445  15.0328 </span></span>
-<span><span class="co">##  146    -26.522  -1.2627  -3.5445  15.0328 </span></span>
-<span><span class="co">##  147    -26.522  -1.2627  -3.5445  15.0328 </span></span>
-<span><span class="co">##  148    -26.522  -1.2627  -3.5445  15.0328 </span></span>
-<span><span class="co">##  149    -26.522  -1.2627  -3.5445  15.3652 </span></span>
-<span><span class="co">##  150    -26.522  -1.2627  -3.5445  15.3652 </span></span>
-<span><span class="co">##  151    -26.522  -1.2627  -3.5445  15.3652 </span></span>
-<span><span class="co">##  152    -26.522  -1.2627  -3.5445  15.3652 </span></span>
-<span><span class="co">##  153    -26.522  -1.2627  -3.5445  15.7107 </span></span>
-<span><span class="co">##  154    -26.522  -1.2627  -3.5445  15.7107 </span></span>
-<span><span class="co">##  155    -26.522  -1.2627  -3.5445  15.7107 </span></span>
-<span><span class="co">##  156    -26.522  -1.2627  -3.5445  15.7108 </span></span>
-<span><span class="co">##  157    -26.522  -1.2627  -3.5445  16.0514 </span></span>
-<span><span class="co">##  158    -26.522  -1.2627  -3.5445  16.0514 </span></span>
-<span><span class="co">##  159    -26.522  -1.2627  -3.5445  16.0514 </span></span>
-<span><span class="co">##  160    -26.522  -1.2627  -3.5445  16.0515 </span></span>
-<span><span class="co">##  161    -26.522  -1.2627  -3.5445  16.4049 </span></span>
-<span><span class="co">##  162    -26.522  -1.2627  -3.5445  16.4049 </span></span>
-<span><span class="co">##  163    -26.522  -1.2627  -3.5445  16.4049 </span></span>
-<span><span class="co">##  164    -26.522  -1.2627  -3.5445  16.4049 </span></span>
-<span><span class="co">##  165    -26.522  -1.2626  -3.5445  16.4049 </span></span>
-<span><span class="co">##  166    -26.522  -1.2627  -3.5444  16.4049 </span></span>
-<span><span class="co">##  167    -26.522  -1.2627  -3.5445  16.4065 </span></span>
-<span><span class="co">##  168    -26.522  -1.2625  -3.5445  16.4049 </span></span>
-<span><span class="co">##  169    -26.522  -1.2626  -3.5444  16.4049 </span></span>
-<span><span class="co">##  170    -26.522  -1.2626  -3.5445  16.4065 </span></span>
-<span><span class="co">##  171    -26.522  -1.2627  -3.5443  16.4049 </span></span>
-<span><span class="co">##  172    -26.522  -1.2627  -3.5444  16.4065 </span></span>
-<span><span class="co">##  173    -26.522  -1.2627  -3.5445  16.4082 </span></span>
-<span><span class="co">## Completed in 48.02 seconds at 12:22:14 01 Feb 2024</span></span></code></pre>
-<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
+<span><span class="co">##  124    -26.522  -1.2625  -3.5445  12.9888 </span></span>
+<span><span class="co">##  125    -26.522  -1.2626  -3.5445  13.3422 </span></span>
+<span><span class="co">##  126    -26.522  -1.2626  -3.5445  13.3422 </span></span>
+<span><span class="co">##  127    -26.522  -1.2626  -3.5445  13.3422 </span></span>
+<span><span class="co">##  128    -26.522  -1.2626  -3.5445  13.3422 </span></span>
+<span><span class="co">##  129    -26.522  -1.2627  -3.5445  13.6814 </span></span>
+<span><span class="co">##  130    -26.522  -1.2627  -3.5445  13.6814 </span></span>
+<span><span class="co">##  131    -26.522  -1.2627  -3.5445  13.6814 </span></span>
+<span><span class="co">##  132    -26.522  -1.2627  -3.5445  13.6814 </span></span>
+<span><span class="co">##  133    -26.522  -1.2627  -3.5445  14.0034 </span></span>
+<span><span class="co">##  134    -26.522  -1.2627  -3.5445  14.0034 </span></span>
+<span><span class="co">##  135    -26.522  -1.2627  -3.5445  14.0034 </span></span>
+<span><span class="co">##  136    -26.522  -1.2627  -3.5445  14.0034 </span></span>
+<span><span class="co">##  137    -26.522  -1.2627  -3.5445  14.3407 </span></span>
+<span><span class="co">##  138    -26.522  -1.2627  -3.5445  14.3407 </span></span>
+<span><span class="co">##  139    -26.522  -1.2627  -3.5445  14.3407 </span></span>
+<span><span class="co">##  140    -26.522  -1.2627  -3.5445  14.3407 </span></span>
+<span><span class="co">##  141    -26.522  -1.2627  -3.5445  14.6935 </span></span>
+<span><span class="co">##  142    -26.522  -1.2627  -3.5445  14.6935 </span></span>
+<span><span class="co">##  143    -26.522  -1.2627  -3.5445  14.6935 </span></span>
+<span><span class="co">##  144    -26.522  -1.2627  -3.5445  14.6936 </span></span>
+<span><span class="co">##  145    -26.522  -1.2627  -3.5445  15.0331 </span></span>
+<span><span class="co">##  146    -26.522  -1.2627  -3.5445  15.0331 </span></span>
+<span><span class="co">##  147    -26.522  -1.2627  -3.5445  15.0331 </span></span>
+<span><span class="co">##  148    -26.522  -1.2627  -3.5445  15.0331 </span></span>
+<span><span class="co">##  149    -26.522  -1.2627  -3.5445  15.3634 </span></span>
+<span><span class="co">##  150    -26.522  -1.2627  -3.5445  15.3634 </span></span>
+<span><span class="co">##  151    -26.522  -1.2627  -3.5445  15.3634 </span></span>
+<span><span class="co">##  152    -26.522  -1.2627  -3.5445  15.3634 </span></span>
+<span><span class="co">##  153    -26.522  -1.2627  -3.5445  15.7092 </span></span>
+<span><span class="co">##  154    -26.522  -1.2627  -3.5445  15.7092 </span></span>
+<span><span class="co">##  155    -26.522  -1.2627  -3.5445  15.7092 </span></span>
+<span><span class="co">##  156    -26.522  -1.2627  -3.5445  15.7092 </span></span>
+<span><span class="co">##  157    -26.522  -1.2627  -3.5445  16.0582 </span></span>
+<span><span class="co">##  158    -26.522  -1.2627  -3.5445  16.0582 </span></span>
+<span><span class="co">##  159    -26.522  -1.2627  -3.5445  16.0582 </span></span>
+<span><span class="co">##  160    -26.522  -1.2627  -3.5445  16.0582 </span></span>
+<span><span class="co">##  161    -26.522  -1.2627  -3.5445  16.4115 </span></span>
+<span><span class="co">##  162    -26.522  -1.2627  -3.5445  16.4115 </span></span>
+<span><span class="co">##  163    -26.522  -1.2627  -3.5445  16.4115 </span></span>
+<span><span class="co">##  164    -26.522  -1.2627  -3.5445  16.4115 </span></span>
+<span><span class="co">##  165    -26.522  -1.2626  -3.5445  16.4115 </span></span>
+<span><span class="co">##  166    -26.522  -1.2627  -3.5444  16.4115 </span></span>
+<span><span class="co">##  167    -26.522  -1.2627  -3.5445  16.4131 </span></span>
+<span><span class="co">##  168    -26.522  -1.2625  -3.5445  16.4115 </span></span>
+<span><span class="co">##  169    -26.522  -1.2626  -3.5444  16.4115 </span></span>
+<span><span class="co">##  170    -26.522  -1.2626  -3.5445  16.4131 </span></span>
+<span><span class="co">##  171    -26.522  -1.2627  -3.5443  16.4115 </span></span>
+<span><span class="co">##  172    -26.522  -1.2627  -3.5444  16.4131 </span></span>
+<span><span class="co">##  173    -26.522  -1.2627  -3.5445  16.4148 </span></span>
+<span><span class="co">## Completed in 70.29 seconds at 08:16:06 28 Jul 2026</span></span></code></pre>
+<div class="sourceCode" id="cb129"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">secr.fit.example</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $versiontime</span></span>
-<span><span class="co">## [1] "4.6.4, run 12:21:26 01 Feb 2024, elapsed 48.02 s"</span></span>
+<span><span class="co">## [1] "5.4.3, run 08:14:56 28 Jul 2026, elapsed 70.29 s"</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $capthist</span></span>
 <span><span class="co">##             1 2</span></span>
@@ -1878,7 +1878,7 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span><span class="co">## x-range            523000 526000 m </span></span>
 <span><span class="co">## y-range            604000 607050 m </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">##  Usage range by occasion</span></span>
+<span><span class="co">## Usage range by occasion</span></span>
 <span><span class="co">##        1</span></span>
 <span><span class="co">## min 37.5</span></span>
 <span><span class="co">## max 43.0</span></span>
@@ -1891,7 +1891,7 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span><span class="co">## x-range            523000 526000 m </span></span>
 <span><span class="co">## y-range            604000 607050 m </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">##  Usage range by occasion</span></span>
+<span><span class="co">## Usage range by occasion</span></span>
 <span><span class="co">##        1</span></span>
 <span><span class="co">## min 37.5</span></span>
 <span><span class="co">## max 63.0</span></span>
@@ -1910,8 +1910,8 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span><span class="co">## 2    36      50    9</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $modeldetails</span></span>
-<span><span class="co">##     CL fixed distribution hcov</span></span>
-<span><span class="co">##  FALSE  none      poisson     </span></span>
+<span><span class="co">##     CL fixed distribution hcov relativeD</span></span>
+<span><span class="co">##  FALSE  none      poisson          FALSE</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $AICtable</span></span>
 <span><span class="co">##             model   detectfn npar    logLik    AIC   AICc</span></span>
@@ -1921,29 +1921,27 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 <span><span class="co">##            beta      SE.beta       lcl        ucl</span></span>
 <span><span class="co">## D     -1.262694 4.474596e-01 -2.139699 -0.3856896</span></span>
 <span><span class="co">## g0    -3.544483 2.287552e-01 -3.992835 -3.0961309</span></span>
-<span><span class="co">## sigma 16.404893 9.060396e-09 16.404893 16.4048927</span></span>
+<span><span class="co">## sigma 16.411498 8.177831e-09 16.411498 16.4114978</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $predicted</span></span>
 <span><span class="co">## $predicted$`session = 1`</span></span>
 <span><span class="co">##        link     estimate SE.estimate          lcl          ucl</span></span>
-<span><span class="co">## D       log 2.828908e-01 0.133190691 1.176903e-01 6.799816e-01</span></span>
+<span><span class="co">## D       log 2.828908e-01 0.133190698 1.176903e-01 6.799816e-01</span></span>
 <span><span class="co">## g0    logit 2.807271e-02 0.006241503 1.811320e-02 4.326713e-02</span></span>
-<span><span class="co">## sigma   log 1.332154e+07 0.000000000 1.332154e+07 1.332154e+07</span></span>
+<span><span class="co">## sigma   log 1.340982e+07 0.000000000 1.340982e+07 1.340982e+07</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $predicted$`session = 2`</span></span>
 <span><span class="co">##        link     estimate SE.estimate          lcl          ucl</span></span>
-<span><span class="co">## D       log 2.828908e-01 0.133190691 1.176903e-01 6.799816e-01</span></span>
+<span><span class="co">## D       log 2.828908e-01 0.133190698 1.176903e-01 6.799816e-01</span></span>
 <span><span class="co">## g0    logit 2.807271e-02 0.006241503 1.811320e-02 4.326713e-02</span></span>
-<span><span class="co">## sigma   log 1.332154e+07 0.000000000 1.332154e+07 1.332154e+07</span></span></code></pre>
+<span><span class="co">## sigma   log 1.340982e+07 0.000000000 1.340982e+07 1.340982e+07</span></span></code></pre>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -1956,16 +1954,16 @@ with 1. So 2009 becomes season 1 and 2010 season 2</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>

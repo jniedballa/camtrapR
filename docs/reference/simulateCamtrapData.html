@@ -20,7 +20,7 @@ package functionality."><!-- mathjax --><script src="https://cdnjs.cloudflare.co
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
@@ -208,16 +208,13 @@ of an AI language model and subsequently modified.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">camera_data_simple</span><span class="op">$</span><span class="va">camtraps</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Camera table</span> with <span style="color: #0000BB;">6</span> stations in <span style="color: #0000BB;">6</span> rows:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Station    longitude latitude Setup_date Retrieval_date  elev habitat  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Station001      117.     5.47 2022-12-30 2023-02-06     <span style="text-decoration: underline;">1</span>187. habitat_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Station002      117.     5.33 2023-01-02 2023-02-09     <span style="text-decoration: underline;">1</span>035. habitat_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Station003      117.     5.31 2023-01-02 2023-02-10     <span style="text-decoration: underline;">1</span>049. habitat_1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Station004      117.     5.36 2022-12-30 2023-02-08     <span style="text-decoration: underline;">1</span>325. habitat_3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Station005      117.     5.38 2023-01-03 2023-02-12     <span style="text-decoration: underline;">1</span>022. habitat_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Station006      117.     5.34 2023-01-02 2023-02-11      973. habitat_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Station longitude latitude Setup_date Retrieval_date   elev   habitat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Station001  117.2702  5.47492 2022-12-30     2023-02-06 1187.1 habitat_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Station002  117.4586  5.33499 2023-01-02     2023-02-09 1035.3 habitat_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Station003  117.4002  5.30685 2023-01-02     2023-02-10 1048.7 habitat_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Station004  117.2893  5.36408 2022-12-30     2023-02-08 1324.7 habitat_3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 Station005  117.2519  5.38047 2023-01-03     2023-02-12 1022.4 habitat_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Station006  117.3666  5.33913 2023-01-02     2023-02-11  973.2 habitat_2</span>
 <span class="r-in"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">camera_data_simple</span><span class="op">$</span><span class="va">recordTable</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">Record table</span> based on <span style="color: #0000BB;">1</span> station and <span style="color: #0000BB;">6</span> records of a total of <span style="color: #0000BB;">2</span> species:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 5</span></span>

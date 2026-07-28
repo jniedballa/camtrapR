@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">camtrapR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
@@ -44,7 +44,10 @@
       <a href="../articles/camtrapr4.html">4. Data exploration and visualisation</a>
     </li>
     <li>
-      <a href="../articles/camtrapr5.html">5. Multi-species occupancy models</a>
+      <a href="../articles/camtrapr5.html">5. Community occupancy models</a>
+    </li>
+    <li>
+      <a href="../articles/camtrapr6.html">6. Sample camera trap datasets and the `surveyDashboard`</a>
     </li>
   </ul></li>
 <li>
@@ -69,6 +72,104 @@
       <small>Source: <a href="https://github.com/jniedballa/camtrapR/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="3.1.0" id="camtrapr-310">camtrapR 3.1.0<a class="anchor" aria-label="anchor" href="#camtrapr-310"></a></h2>
+<div class="section level3">
+<h3 id="new-function-3-1-0">New function<a class="anchor" aria-label="anchor" href="#new-function-3-1-0"></a></h3>
+<ul><li>simulateCamtrapData(): simulate camera trap data with custom properties (e.g. for testing, examples and teaching)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-3-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-1-0"></a></h3>
+<div class="section level4">
+<h4 id="surveydashboard-3-1-0">surveyDashboard<a class="anchor" aria-label="anchor" href="#surveydashboard-3-1-0"></a></h4>
+<ul><li>new welcome screen (modal dialog) on startup</li>
+<li>new data-quality and convergence warning system, flagging potential problems with input data and model fit (modal dialog and sidebar)</li>
+<li>new date range filter for records</li>
+<li>new instructions for CSV uploads, with links to relevant functions</li>
+<li>stricter validation of CSV uploads: a CRS must now be provided (numeric EPSG codes accepted); uploads abort with an informative modal dialog if the loaded table has only one column (wrong delimiter) or if the camera trap table contains duplicate station/camera combinations</li>
+<li>maximum csv file upload size increased to 500 MB (was 10Mb)</li>
+<li>single-species occupancy: new warning UI, improved printing of model summaries and species names, fitted models can now be exported, unmarkedFrame summary shown in a separate tab</li>
+<li>community occupancy: model file name is now printed in the UI</li>
+<li>added GitHub and Google Group links to the header;</li>
+<li>record preview in the filter section is collapsed by default; various label, tooltip and progress-indicator improvements</li>
+</ul></div>
+<div class="section level4">
+<h4 id="occupancy-models-3-1-0">Occupancy models<a class="anchor" aria-label="anchor" href="#occupancy-models-3-1-0"></a></h4>
+<ul><li>community occupancy models (commOccu) can now be fitted from JAGS model code stored in the new modelText slot, without an external model file</li>
+<li>createCovariates() now accept plain data frames with coordinates (new arguments xcol, ycol, crs; converted to sf internally)</li>
+<li>consistent terminology: “community models” instead of “multi-species models”</li>
+</ul></div>
+<div class="section level4">
+<h4 id="data-import-3-1-0">Data import<a class="anchor" aria-label="anchor" href="#data-import-3-1-0"></a></h4>
+<ul><li>the Camtrap DP interface was rewritten throughout and now uses the camtrapdp package for reading data packages</li>
+<li>readcamtrapDP renamed to readCamtrapDP (capitalisation in line with official name)</li>
+<li>more tolerant Camtrap DP import: missing vernacularNames are generated from scientific names and observation type; missing placename falls back to the deployment ID (with a warning); informative error if all timestamps fail to parse</li>
+<li>activity estimation with Camtrap DP data now uses only observations of type “event”</li>
+</ul></div>
+<div class="section level4">
+<h4 id="improved-displays-and-summary-functions-3-1-0">Improved displays and summary functions<a class="anchor" aria-label="anchor" href="#improved-displays-and-summary-functions-3-1-0"></a></h4>
+<ul><li>recordTable, recordTableIndividual &amp; filterRecordTable now return an object of class “records” with dedicated print, [, summary, and dplyr_reconstruct methods</li>
+<li>cameraOperation now returns an object of class “camOp” with dedicated print, [, summary, and plot methods</li>
+<li>detectionHistory now returns an object of class “detHist” with dedicated print and [ methods</li>
+<li>readCamtrapDP now returns an object of class “cams_dp” with a dedicated print method</li>
+<li>camera tables contained in readCamtrapDP and simulateCamtrapData outputs are now of class “cams” with a dedicated print method</li>
+<li>internal function stripClass to remove added (S3) class and attributes</li>
+</ul></div>
+</div>
+<div class="section level3">
+<h3 id="other-changes-3-1-0">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-3-1-0"></a></h3>
+<ul><li>new vignette 6 introducing the surveyDashboard (with sample data)</li>
+<li>surveyDashboard: documentation expanded (new section on Bayesian priors, more details on model fitting challenges)</li>
+<li>new package dependencies: camtrapdp, checkmate, crayon, tibble (the latter two now direct rather than indirect dependencies)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bugfixes-3-1-0">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-3-1-0"></a></h3>
+<ul><li>surveyDashboard:
+<ul><li>fixed several reactivity issues (records not resetting when loading new Camtrap DP data with active filters; number of removed images not updating; broken model selection table)</li>
+<li>fixed error in export of covariate rasters</li>
+<li>assert validity of parameter inputs (prevents opening app when e.g. column names specified wrongly)</li>
+<li>fixed model selection table for ubms 1.2.9</li>
+<li>ubms models now uses 1 core by default (faster than 3 cores for short runs)</li>
+</ul></li>
+<li>plot_coef(): fixed colors of plot lines by significance level in community model plots</li>
+<li>fixed wrong color ramp being applied to the original rasters in spatial prediction plots</li>
+<li>more robust aggregation of the camera trap table (all columns checked first, clearer error messages)</li>
+<li>fixed ggplot2 warning by replacing ylab() with labs()</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="3.0.4" id="camtrapr-304">camtrapR 3.0.4<small>2026-04-30</small><a class="anchor" aria-label="anchor" href="#camtrapr-304"></a></h2>
+<p>maintenance release to avoid potential problems in CRAN checks (unit tests)</p>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="3.0.3" id="camtrapr-303">camtrapR 3.0.3<small>2026-02-08</small><a class="anchor" aria-label="anchor" href="#camtrapr-303"></a></h2>
+<div class="section level3">
+<h3 id="bugfixes-3-0-3">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-3-0-3"></a></h3>
+<ul><li>surveyDashboard: in covariate extraction, fix “Error in date$retrievalCol: object of type ‘closure’ is not subsettable”</li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-changes-3-0-3">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-3-0-3"></a></h3>
+<ul><li>predict method (commOccu): improved system memory checks</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="3.0.2" id="camtrapr-302">camtrapR 3.0.2<small>2026-01-25</small><a class="anchor" aria-label="anchor" href="#camtrapr-302"></a></h2>
+<div class="section level3">
+<h3 id="bugfixes-3-0-2">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-3-0-2"></a></h3>
+<ul><li>fixed plot_effects with continuous covariates</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="3.0.1" id="camtrapr-301">camtrapR 3.0.1<a class="anchor" aria-label="anchor" href="#camtrapr-301"></a></h2>
+<div class="section level3">
+<h3 id="bugfixes-3-0-1">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-3-0-1"></a></h3>
+<ul><li>fixed plot_effects with categorical covariates</li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-changes-3-0-1">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-3-0-1"></a></h3>
+<ul><li>removed legacy surveyReport (surveyReport now always requires camera operation matrix)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="3.0.0" id="camtrapr-300">camtrapR 3.0.0<small>2025-09-28</small><a class="anchor" aria-label="anchor" href="#camtrapr-300"></a></h2>
 <div class="section level3">
@@ -594,7 +695,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>
