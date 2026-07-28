@@ -58,7 +58,15 @@ recordTableSample <- recordTable(inDir               = wd_images_ID,
                                  deltaTimeComparedTo = "lastRecord",
                                  exclude             = "UNID",
                                  timeZone            = "Asia/Kuala_Lumpur")
+
+recordTableSample$Directory <- sapply(recordTableSample$Directory, 
+       FUN = \(x) {
+         x2 <- strsplit(x, "/", fixed = T)[[1]]
+         x2 <- x2 [which(x2 == "camtrapR") : length(x2)]
+         paste(x2, collapse = "/")
+         })
 recordTableSample
+
 save(recordTableSample, file = "./data/recordTableSample.rda")
 rm(list = ls())
 
@@ -71,6 +79,7 @@ recordTableSample_season2$DateTimeOriginal <- gsub("2009", "2010",
                                                    recordTableSample_season2$DateTimeOriginal) 
 # combine with season 2009
 recordTableSampleMultiSeason <- rbind(recordTableSample, recordTableSample_season2)  
+# save
 recordTableSampleMultiSeason
 save(recordTableSampleMultiSeason, file = "./data/recordTableSampleMultiSeason.rda")
 rm(list = ls())
@@ -79,9 +88,18 @@ rm(list = ls())
 ## recordTableIndividualSample.rda ----
 load("./data/recordTableIndividualSample.rda")
 recordTableIndividualSample
-class(recordTableIndividualSample) <- unique(c("records", class(recordTableIndividualSample)))
-attr(recordTableIndividualSample, "stationCol") <- "Station"
-attr(recordTableIndividualSample, "speciesCol") <- "Species"
+# class(recordTableIndividualSample) <- unique(c("records", class(recordTableIndividualSample)))
+# attr(recordTableIndividualSample, "stationCol") <- "Station"
+# attr(recordTableIndividualSample, "speciesCol") <- "Species"
+# TODO: records class for individuals, or update as_records constructor to support individuals
+
+
+recordTableIndividualSample$Directory <- sapply(recordTableIndividualSample$Directory, 
+                                      FUN = \(x) {
+                                        x2 <- strsplit(x, "/", fixed = T)[[1]]
+                                        x2 <- x2 [which(x2 == "camtrapR") : length(x2)]
+                                        paste(x2, collapse = "/")
+                                      })
 recordTableIndividualSample
 save(recordTableIndividualSample, file = "./data/recordTableIndividualSample.rda")
 rm(list = ls())
