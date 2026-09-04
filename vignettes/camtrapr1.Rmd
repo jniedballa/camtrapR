@@ -31,7 +31,7 @@ print("WARNING: THIS VIGNETTE WAS CREATED WITHOUT EXIFTOOL. OUTPUT IS INCOMPLETE
 
 **camtrapR** provides functions for organising and managing camera trap images and for the preparation of occupancy and (spatial) capture-recapture analyses. The package handles JPG images and supports video files.
 
-The five vignettes demonstrate the camtrapR workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
+The six vignettes demonstrate the camtrapR workflow using the sample data set that is included in the package. Sample data were generated in a camera trapping survey in Sabah, Malaysian Borneo (A. Mohamed *et al. J. Mammal.*, 94, 82-89; 2013).
 
 camtrapR is compatible with other software for camera trap data management. If you prefer to manage images and identify species using other software, you can usually do so. For example, Camelot and TRAPPER can export csv files that can be used as input for camtrapR. To maximize compatibility, camtrapR uses a simple data structure and standard data types (data frames and matrices) to store information about the camera trap survey and the detected species and individuals in separate data frames.
 
@@ -145,7 +145,7 @@ To facilitate understanding here is a glossary on how we use specific terms. It 
 
 ## ExifTool
 
-camtrapR relies on the free and open-source software **ExifTool** written by Phil Harvey to extract metadata from images. ExifTool is freely available [here](https://exiftool.sourceforge.net/) and runs on Windows, Linux and MacOS. In order to use it, your system must be able to find the software. On MacOS, Linux and Unix it needs installation and should afterwards be found by the system without problems. How to set up Exiftool for Windows is detailed below. General installation instruction can be found [here](https://exiftool.sourceforge.net/install.html).
+camtrapR relies on the free and open-source software **ExifTool** written by Phil Harvey to extract metadata from images. ExifTool is freely available [here](https://exiftool.org/) and runs on Windows, Linux and MacOS. In order to use it, your system must be able to find the software. On MacOS, Linux and Unix it needs installation and should afterwards be found by the system without problems. How to set up Exiftool for Windows is detailed below. General installation instruction can be found [here](https://exiftool.sourceforge.net/install.html).
 
 ### ExifTool for Windows
 

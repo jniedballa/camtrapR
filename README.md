@@ -69,14 +69,14 @@ remotes::install_version(package = "camtrapR", version = "3.0.1")
 ## Exiftool
 
 Many camtrapR functions read EXIF metadata from JPG images and videos
-via [**Exiftool**](https://exiftool.sourceforge.net/), a free and
+via [**Exiftool**](https://exiftool.org/), a free and
 open-source tool by Phil Harvey (available for Windows, macOS, and
 Linux).
 
 To make full use of camtrapR, you will need Exiftool on your system. See
 the installation instructions in [vignette
 1](https://CRAN.R-project.org/package=camtrapR/vignettes/camtrapr1.pdf)
-and the [Exiftool website](https://exiftool.sourceforge.net/).
+and the [Exiftool website](https://exiftool.org/).
 
 > If you only use camtrapR to create model input from existing record
 > tables (without working with raw image files), Exiftool is not
