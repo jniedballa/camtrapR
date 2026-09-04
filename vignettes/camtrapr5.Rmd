@@ -332,7 +332,7 @@ Using nimble only makes sense if one can compile the models (which runs them as 
 You can obtain Rtools from: https://cran.r-project.org/bin/windows/Rtools/. 
 
 It then needs to be put in PATH, see here for how to do it: 
-https://cran.r-project.org/bin/windows/Rtools/#putting-rtools-on-the-path.
+https://cran.r-project.org/bin/windows/Rtools/rtools40.html#putting-rtools-on-the-path.
 
 Depending on the version and where you installed Rtools, you should see something like "C:/rtools40/usr/bin" or "C:/RBuildTools/4.2" somewhere in the output of the following line (for me it's usually the first or second entry).
 
