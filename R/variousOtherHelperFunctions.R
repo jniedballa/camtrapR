@@ -1898,141 +1898,189 @@ accessDigiKamDatabase <- function(db_directory,   # database directory
 
 # extract species tags of videos from digiKam database tables
 
+# extract species tags of videos from digiKam database tables
+
 digiKamVideoHierarchicalSubject <- function(stationDir,
-                                    digiKamTablesList,    # output of accessDigiKamDatabase
-                                    videoFormat           # character vector of desired video formats
+                                            digiKamTablesList,    # output of accessDigiKamDatabase
+                                            videoFormat           # character vector of desired video formats
 )
 {
+  Albums     <- digiKamTablesList$Albums
+  AlbumRoots <- digiKamTablesList$AlbumRoots
+  Images     <- digiKamTablesList$Images
+  Tags       <- digiKamTablesList$Tags
+  ImageTags  <- digiKamTablesList$ImageTags
   
-  Albums           <- digiKamTablesList$Albums
-  AlbumRoots       <- digiKamTablesList$AlbumRoots
-  Images           <- digiKamTablesList$Images
-  Tags             <- digiKamTablesList$Tags
-  ImageTags        <- digiKamTablesList$ImageTags
-
-  
-  # add platform file separator to stationDir
+  # stationDir with exactly one trailing file separator
+  # (stationDir0 is returned in the stationDir column, as before)
   stationDir0 <- stationDir
-  stationDir <- paste0(stationDir, .Platform$file.sep)
+  stationDir  <- paste0(sub(paste0("[", .Platform$file.sep, "]+$"), "", stationDir),
+                        .Platform$file.sep)
+  sd0         <- substr(stationDir, 1, nchar(stationDir) - 1L)   # without trailing separator
+  sd0 <- normalizePath(sd0)
   
-  # combine album root and album path (match by albumRoot id, not index position)
-  Albums <- merge(Albums, AlbumRoots, by.x = "albumRoot", by.y = "id", sort = FALSE)
+  ## ================================================================================
+  ## album root and path resolution
+  ## ================================================================================
+  
+  # combine album root and album path (match by albumRoot id, not index position).
+  # Skip the merge if the root columns are already present (e.g. the tables list
+  # was processed before): a second merge would create specificPath.x/.y
+  # and break the column names.
+  if (!"specificPath" %in% names(Albums)) {
+    Albums <- merge(Albums, AlbumRoots, by.x = "albumRoot", by.y = "id", sort = FALSE)
+  }
   Albums$albumPath_full <- paste0(Albums$specificPath, Albums$relativePath)
   
-  # add drive letter (only relevant on Windows, and can potentially be wrong if there's Album roots on different drives)
-  # also not sure if this works on Mac / Linux due to missing drive letters
-  if(.Platform$OS.type == "windows"){
-    Albums$albumPath_full2 <- paste(substr(stationDir, 1,2),   # the Drive letter, digiKam doesn't return it
+  if (.Platform$OS.type == "windows") {
+    # add drive letter (digiKam doesn't store it; can potentially be wrong if
+    # there are album roots on different drives) - unchanged from original
+    Albums$albumPath_full2 <- paste(substr(stationDir, 1, 2),
                                     Albums$albumPath_full,
                                     sep = "")
   }
   
-  # Linux/Mac solution?
-  if(.Platform$OS.type == "unix"){
-    Albums$albumPath_full2 <- Albums$albumPath_full#paste(substr(stationDir, 1,2),
-                                    #Albums$albumPath_full,
-                                    #sep = "")
+  if (.Platform$OS.type == "unix") {
+    ci_match <- FALSE
+    
+    # default (as before): album roots on hard-wired volumes (type 1, internal
+    # disks) store an ABSOLUTE specificPath, so albumPath_full is already valid
+    Albums$albumPath_full2 <- Albums$albumPath_full
+    
+    # Album roots on removable volumes (type 2, identifier "volumeid:?uuid=...")
+    # store the path RELATIVE to the volume's mount point. The mount point is
+    # not stored in the database and changes between sessions
+    # (/run/media/USER/<label>, /Volumes/<name>, ...), so it is reconstructed
+    # from stationDir: the album's stored path must be the tail of stationDir,
+    # whatever precedes it is the mount point. Pure base-R string operations,
+    # therefore identical on Linux and macOS (no UUID resolution, no system calls).
+    
+    suffix <- sub("^/+", "", Albums$albumPath_full)   # stored path relative to mount point
+    
+    hit <- !is.na(suffix) & nzchar(suffix) &
+      (sd0 == suffix | endsWith(sd0, paste0("/", suffix)))
+    
+    # retry case-insensitively, but only for roots on case-insensitive file
+    # systems (FAT/exFAT and default macOS file systems: caseSensitivity == 1;
+    # your ext4 internal root is 2). A case typo on a case-sensitive volume
+    # therefore still ends in the usual "not found" warning, as before.
+    if (!any(hit)) {
+      hit <- !is.na(suffix) & nzchar(suffix) &
+        !is.na(Albums$caseSensitivity) & Albums$caseSensitivity == 1 &
+        (tolower(sd0) == tolower(suffix) |
+           endsWith(tolower(sd0), paste0("/", tolower(suffix))))
+      ci_match <- any(hit)
+    }
+    
+    if (any(hit)) {
+      # the album whose stored path is the tail of stationDir
+      # (longest match wins if several roots share the same folder structure)
+      w    <- which(hit)
+      best <- w[which.max(nchar(suffix[w]))]
+      
+      # mount point = stationDir minus the album's stored path ("" if none)
+      mount <- substr(sd0, 1, nchar(sd0) - nchar(suffix[best]) - 1L)
+      
+      # rewrite all albums of that album root (subalbums included)
+      same_root <- which(Albums$albumRoot == Albums$albumRoot[best])
+      Albums$albumPath_full2[same_root] <- paste0(mount, Albums$albumPath_full[same_root])
+      
+      # the station album itself is stationDir by definition (also keeps the
+      # user's spelling if the match above was case-insensitive)
+      Albums$albumPath_full2[best] <- sd0
+    }
   }
   
-  
-  
-  # add "/" to ensure Station1 doesn't include Station10 also. Also ensure all folders end with one / only
+  # add "/" to ensure Station1 doesn't include Station10. Also ensure all folders end with one / only
   Albums$albumPath_full2 <- ifelse(endsWith(Albums$albumPath_full2, .Platform$file.sep),
                                    Albums$albumPath_full2,
-                                   paste0(Albums$albumPath_full2, .Platform$file.sep)) 
+                                   paste0(Albums$albumPath_full2, .Platform$file.sep))
   
   pathColumn <- "albumPath_full2"
   
+  ## ================================================================================
+  ## station lookup
+  ## ================================================================================
+  
   # see if stationDir exists in database
-  if(!stationDir %in% Albums[, pathColumn]){
-    # stop(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE)
-    # try to handle with a warning instead
-    warning(paste("station directory", stationDir,  "was not found in digiKam albums. Skipping"), call. = FALSE, immediate. = T)
-    # next
+  if (!stationDir %in% Albums[, pathColumn]) {
+    warning(paste("station directory", stationDir, "was not found in digiKam albums. Skipping"),
+            call. = FALSE, immediate. = TRUE)
     return(NULL)
   }
   
-  # find current station in albums
-  #album_of_interest <-Albums [which(Albums[, pathColumn] == stationDir),]   # only return the station directory, not camera subdirectories
-  album_of_interest <- Albums [grep(pattern = stationDir, Albums[, pathColumn]),]   # This one returns Station directory and camera subdirectories
-  if(nrow(album_of_interest) == 0) {
+  # find current station in albums: returns the station directory AND camera
+  # subdirectories. fixed = TRUE so regex metacharacters in paths (".", "(", "+" ...)
+  # can neither error nor match unintended albums.
+  album_of_interest <- Albums[grep(stationDir, Albums[, pathColumn],
+                                   fixed = TRUE, ignore.case = ci_match), ]
+  if (nrow(album_of_interest) == 0) {
     warning("Could not locate album for ", stationDir, ". Skipping", call. = FALSE)   # NOTE TO SELF: DOESN'T SKIP OR BREAK. CHANGE?
   }
   
-  # keep only images in the current album
-  image_subset <- Images[Images$album %in% album_of_interest$id,]  # returns matches for all directories. Also, no NAs apparently
+  # keep only images in the current album (and camera subdirectories)
+  image_subset <- Images[Images$album %in% album_of_interest$id, ]
   
-  # add stationDirectory 
+  # add stationDirectory
   image_subset$stationDir <- stationDir0
   
-  # to do: handle situation where there's no images in image_subset
-  
   # NAs are possible, so remove them
-  if(any(is.na(image_subset$id))) {
-    image_subset <- image_subset[!is.na(image_subset$id),]
+  if (any(is.na(image_subset$id))) {
+    image_subset <- image_subset[!is.na(image_subset$id), ]
   }
   
-  # keep only desired video files
-  image_subset2 <- image_subset[tolower(substr(image_subset$name, 
-                                               nchar(image_subset$name) - 3, 
-                                               nchar(image_subset$name))) %in% 
-                                  paste(".", videoFormat, sep = ""),]
+  # keep only desired video files (extensions must be 3 characters, e.g. "mp4",
+  # and lowercase, as in the original)
+  is_video <- tolower(substr(image_subset$name,
+                             nchar(image_subset$name) - 3,
+                             nchar(image_subset$name))) %in% paste0(".", videoFormat)
+  image_subset2 <- image_subset[is_video, ]
   
-  image_subset_others <- image_subset[!tolower(substr(image_subset$name, 
-                                               nchar(image_subset$name) - 3, 
-                                               nchar(image_subset$name))) %in% 
-                                  paste(".", videoFormat, sep = ""),]
-  
-  #warning if no videos found
-  if(nrow(image_subset2) == 0) {
-    warning("Could not find any ", paste(videoFormat, collapse = "/"), " files in ", stationDir, call. = FALSE)
+  # warning if no videos found
+  if (nrow(image_subset2) == 0) {
+    warning("Could not find any ", paste(videoFormat, collapse = "/"), " files in ",
+            stationDir, call. = FALSE)
   }
   
-  # find "Species" tag group and its children
-   
-   # subset image tags
-   ImageTags <- ImageTags[ImageTags$tagid %in% Tags$id,]
-   
-   # get proper labels for image tags (and their parent labels = tag group names)
-   ImageTags$cleartext_child  <- Tags$name [match(ImageTags$tagid, Tags$id)]
-   
-   Tags$parent_name <- Tags$name[match(Tags$pid, Tags$id)]
-   ImageTags$cleartext_parent <- Tags$parent_name[match(ImageTags$tagid, Tags$id)]    #alternative to above, seems to work (and above seems wrong suddenly)
-   
-   
-   # # # solution by Joel Ruprecht (Google group 2020-07-21) - if a station has no tags with parent ID, doesn't seem to work yet, but should be identical to above solution
-   # parentNA <- which(is.na(Tags$name.parent))
-   # Tags$name.parent[parentNA] <- Tags$name[parentNA]
-   # ImageTags$cleartext_parent_Joel <- Tags$name.parent[match(ImageTags$tagid, Tags$id)]
-   
-   
-   
-   # combine parent and child to create HierarchicalTags
-   ImageTags$cleartext_full <- paste(ImageTags$cleartext_parent, ImageTags$cleartext_child, sep = "|")
-   
-   
-   # remove unnecessary (internal) tags (not essential)
-    remove1 <- grep(Tags$name, pattern = "_Digikam_Internal_Tags_")
-    remove2 <- grep(Tags$name, pattern = "Color Label ")
-    remove3 <- grep(Tags$name, pattern = "Pick Label ")
-
-    Tags <- Tags[!Tags$id  %in% c(remove1, remove2, remove3),]
-    Tags <- Tags[!Tags$pid %in% c(remove1, remove2, remove3),]
-   
-   ImageTags <- ImageTags[!ImageTags$tagid %in% c(remove1, remove2, remove3),]
-
-   # combine multiple tags for images into single field "HierarchicalSubject"
-   ImageTags_aggregate <- aggregate(ImageTags$cleartext_full,
-                                    by = list(ImageTags$imageid),
-                                    FUN = paste, sep  = "", collapse = ", ")
-
-   # assign column names to output
-   colnames(ImageTags_aggregate) <- c("imageid", "HierarchicalSubject")
-   
-   # assign HierarchicalSubject to matching images
-   image_subset2$HierarchicalSubject <- ImageTags_aggregate$HierarchicalSubject[match(image_subset2$id, ImageTags_aggregate$imageid)]
+  ## ================================================================================
+  ## tags
+  ## ================================================================================
   
-   return(image_subset2) 
+  # remove internal tags (digiKam internals, color and pick labels).
+  # NOTE: tag IDs are used, not row numbers (the original compared Tags$id
+  # against grep() row indices, which only works when tag ids coincide with
+  # row positions - usually true, but not guaranteed)
+  remove_these <- Tags$id[grepl("_Digikam_Internal_Tags_|Color Label |Pick Label ",
+                                Tags$name)]
+  Tags         <- Tags[!Tags$id  %in% remove_these &
+                         !Tags$pid %in% remove_these, ]
+  ImageTags    <- ImageTags[ImageTags$tagid %in% Tags$id, ]
+  
+  # get proper labels for image tags (and their parent labels = tag group names).
+  # Tags directly below the tag root have no parent and yield "NA|<tag>", as before.
+  parent_names               <- Tags$name[match(Tags$pid, Tags$id)]
+  ImageTags$cleartext_child  <- Tags$name[match(ImageTags$tagid, Tags$id)]
+  ImageTags$cleartext_parent <- parent_names[match(ImageTags$tagid, Tags$id)]
+  
+  # combine parent and child to create HierarchicalTags
+  ImageTags$cleartext_full <- paste(ImageTags$cleartext_parent,
+                                    ImageTags$cleartext_child,
+                                    sep = "|")
+  
+  # combine multiple tags for images into single field "HierarchicalSubject"
+  ImageTags_aggregate <- aggregate(ImageTags$cleartext_full,
+                                   by = list(ImageTags$imageid),
+                                   FUN = paste, sep = "", collapse = ", ")
+  
+  # assign column names to output
+  colnames(ImageTags_aggregate) <- c("imageid", "HierarchicalSubject")
+  
+  # assign HierarchicalSubject to matching videos
+  image_subset2$HierarchicalSubject <-
+    ImageTags_aggregate$HierarchicalSubject[match(image_subset2$id,
+                                                  ImageTags_aggregate$imageid)]
+  
+  return(image_subset2)
 }
 
 # process the "video" argument of recordTable
@@ -2096,6 +2144,7 @@ addVideoHierarchicalSubject <- function(metadata.tmp,
                                         digiKamTablesList,
                                         videoFormat){
   
+  if(is.null(digiKamVideoMetadata))   return(metadata.tmp)
   if(nrow(digiKamVideoMetadata) == 0) return(metadata.tmp)
   if(is.null(digiKamVideoMetadata))   return(metadata.tmp)
   # add HierarchialSubject for video files (match by filename, must be unique)
