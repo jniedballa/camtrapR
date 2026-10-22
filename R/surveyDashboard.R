@@ -9832,7 +9832,7 @@ surveyDashboard <- function(CTtable = NULL,
           
           showNotification("Model run completed", type = "message")
         }, error = function(e) {
-          showNotification(paste("Error fitting model:", e$message), type = "error")
+          showNotification(paste("Error fitting model:", e$message), type = "error", duration = 10)
           print(paste("Detailed error:", e))
         })
       })
