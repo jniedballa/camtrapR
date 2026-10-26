@@ -95,15 +95,17 @@ Browse them online at <https://cran.r-project.org/package=camtrapR> or locally a
 
 ## Further reading
 
+Niedballa, J., Sollmann, R., Courtiol, A., Deere, N. J., Struebig, M. J., & Wilting, A. (2026). The camtrapR R package: From data management to interactive ecological analysis of camera trap data. *Methods in Ecology and Evolution*, 00, 1–8. [https://doi.org/10.1111/2041-210x.70409](https://doi.org/10.1111/2041-210x.70409) 
+
+
 Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016). camtrapR: an R package for efficient camera trap data management. *Methods in Ecology and Evolution*, 7(12), 1457–1462. [https://doi.org/10.1111/2041-210X.12600](https://doi.org/10.1111/2041-210X.12600)
 
-Niedballa, J., Sollmann, R., Wilting, A. (2025) The camtrapR R package: From data management to interactive ecological analysis of camera trap data. *bioRxiv* 2025.09.26.678697; doi: [https://doi.org/10.1101/2025.09.26.678697](https://doi.org/10.1101/2025.09.26.678697)
 
 ## Citation
 
 To cite camtrapR in publications, please use:
 
-> Niedballa, J., Sollmann, R., Courtiol, A., Wilting, A. (2016). camtrapR: an R package for efficient camera trap data management. *Methods in Ecology and Evolution* 7(12), 1457–1462. https://doi.org/10.1111/2041-210X.12600
+Niedballa, J., Sollmann, R., Courtiol, A., Deere, N. J., Struebig, M. J., & Wilting, A. (2026). The camtrapR R package: From data management to interactive ecological analysis of camera trap data. Methods in Ecology and Evolution, 00, 1–8. https://doi.org/10.1111/2041-210x.70409
 
 or run `citation("camtrapR")` in R.
 

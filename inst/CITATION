@@ -1,20 +1,22 @@
 citHeader("To cite camtrapR in publications use:")
 
 bibentry(bibtype = "Article",
-  title = "camtrapR: an R package for efficient camera trap data management",
+  title = "The camtrapR R package: From data management to interactive ecological analysis of camera trap data",
   author = c(as.person("Jürgen Niedballa"),
              as.person("Rahel Sollmann"),
              as.person("Alexandre Courtiol"),
+             as.person("Nicolas J. Deere"),
+             as.person("Matthew J. Struebig"),
              as.person("Andreas Wilting")),
   journal = "Methods in Ecology and Evolution",
-  year = "2016",
-  volume = "7",
-  number = "12",
-  pages="1457--1462",
-  doi = "10.1111/2041-210X.12600",
-  url = "https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12600",
+  year = "2026",
+  volume = "0",
+  number = "0",
+  pages= "1-8",
+  doi = "10.1111/2041-210x.70409",
+  url = "https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210x.70409",
   textVersion  =
-  paste("Jürgen Niedballa, Rahel Sollmann, Alexandre Courtiol, Andreas Wilting (2016).",
-        "camtrapR: an R package for efficient camera trap data management.",
-        "Methods in Ecology and Evolution 7(12), 1457-1462.")
+  paste("Jürgen Niedballa, Rahel Sollmann, Alexandre Courtiol, Nicolas J. Deere, Matthew J. Struebig, Andreas Wilting (2016).",
+        "The camtrapR R package: From data management to interactive ecological analysis of camera trap data.",
+        "Methods in Ecology and Evolution 0(0), 1-8.")
 )
