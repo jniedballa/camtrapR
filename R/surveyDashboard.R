@@ -6759,7 +6759,7 @@ surveyDashboard <- function(CTtable = NULL,
           # --- Process the results ---
           
           # Get prediction extent if clipping is requested (this seems redundant if createCovariates handles it internally based on buffer_aoi?)
-          # Keep it for now in case createCovariates doesn't clip internally
+          # createCovariates Creates rectangular clip. This is buffered. Map gives wrong impression to user.
           prediction_extent <- if (input$predictionExtent != "none") {
             get_prediction_extent( # Ensure this helper function still works or adapt it
               points_sf = data$CTtable_sf,
@@ -6833,6 +6833,18 @@ surveyDashboard <- function(CTtable = NULL,
             # }
             # --- Potential Redundant Clipping End ---
             
+            
+            # Mask prediction rasters if requested
+            if(!is.null(prediction_extent)) {
+              mask_tmp <- vect(prediction_extent)
+              
+              pred_rasts <- mask(x = pred_rasts,
+                                 mask = mask_tmp)
+              # original covariate rasters are not masked at the moment
+              
+            }
+            
+            
             if (!is.null(data$prediction_raster)) {
               existing_pred_names <- names(data$prediction_raster)
               new_pred_names <- names(pred_rasts)
@@ -6883,6 +6895,8 @@ surveyDashboard <- function(CTtable = NULL,
     
     
     # Helper function to get prediction extent
+    # TODO: shows buffered prediction area in preview (CT grid convex hull + buffer), but actual prediction area is rectangular (from createCovariates)
+    # NOTE: function buffers prediction extent, thus shows camera trap grid convex polygon with buffer.
     get_prediction_extent <- function(points_sf, study_area, extent_type, buffer) {
       
       if (extent_type == "none") {
