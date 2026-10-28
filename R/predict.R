@@ -118,6 +118,7 @@ rast(YourRaster)")
     values_to_predict_all <- as.data.frame(terra::values(x))
   } else {
     if(is.data.frame(x)) {
+      if("tbl_df" %in% class(x)) x <- as.data.frame(x)
       values_to_predict_all <- x
     } else {
       stop("x must be a SpatRaster, data.frame, or NULL")
