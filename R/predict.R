@@ -29,6 +29,9 @@ predictionMapsCommunity <- function(object,
                                       "p_array"))
   interval <- match.arg(interval, choices = c("none", "confidence"))
 
+  if (!requireNamespace("coda", quietly = TRUE)) {
+    stop("Package 'coda' is required to predict from this model. Please install it.")
+  }
   
   if(.hasSlot(object, "model")) {
     if(object@model != "RN"){
@@ -80,7 +83,10 @@ predictionMapsCommunity <- function(object,
   
   
   # subset posterior matrix to number of draws
-  posterior_matrix <- as.matrix(mcmc.list)
+  
+  posterior_matrix <- as.matrix(mcmc.list)   # can fail in new session when coda not loaded yet
+  # posterior_matrix <- do.call("rbind", mcmc.list)  # this is safer but likely not needed with requireNamespace above
+  
   if(hasArg(draws)) {
     if(nrow(posterior_matrix) > draws){
       selected_rows <- sort(sample(1:nrow(posterior_matrix), draws))
