@@ -1861,9 +1861,40 @@ communityModel <- function(data_list,
   }
   
   
-  # for nimble, convert site covariate factors to numeric
-  # the values will then be used for indexing the factor levels, and will not be interpreted as continuous values
+  # adjustments to final objects for nimble
   if(nimble){
+    
+    # NA -> 0 in detection matrices
+    # won't affect parameter estimates because p is fixed at 0 when effort_binary = 0
+    
+    stopifnot(identical(dim(data.list$y)[2:3], dim(effort_binary)))
+    n_comb_na <- sum(effort_binary == 0)          # station-occasion combinations without effort
+    
+    
+    no_eff <- which(effort_binary == 0, arr.ind = TRUE)   # col 1 = station, col 2 = occasion
+    
+    # indices of NA cells in 3D array
+    idx    <- cbind(rep(seq_len(speciesMax_value),  # species
+                        times = nrow(no_eff)),           
+                    no_eff[rep(seq_len(nrow(no_eff)), # station
+                               each = speciesMax_value), 1], 
+                    no_eff[rep(seq_len(nrow(no_eff)),  # occasion
+                               each = speciesMax_value), 2]) 
+    
+    # replace NA -> 0 in those cells
+    data.list$y[idx] <- 0
+    
+    if (n_comb_na > 0)
+      message(sprintf(
+        paste0("%d NA value(s) in each species' detection history were set to 0 ",
+               "(NIMBLE model implementation does not accept NAs).\n", 
+               "Inference is unaffected because detection probability is fixed to 0 when effort_binary == 0, ",
+               "so these occasions contribute no likelihood information. ",
+               "The raw histories in @input remain unchanged."),
+        n_comb_na))
+
+    # convert site covariate factors to numeric
+    # the values will then be used for indexing the factor levels, and will not be interpreted as continuous values
     data.list <- lapply(data.list, FUN = function(x) {
       if(is.factor(x)) {
         as.numeric(x)
@@ -1981,7 +2012,7 @@ fit.commOccu <- function(object,
   
   
   
-  
+  ### JAGS model ----
   if(isFALSE(object@nimble)){
     
     
@@ -2034,7 +2065,7 @@ fit.commOccu <- function(object,
     
   }
   
-  
+  ### NIMBLE model ----
   if(isTRUE(object@nimble)) {
     
     if(!file.exists(object@modelFile)) stop(paste("modelFile not found under", object@modelFile))
