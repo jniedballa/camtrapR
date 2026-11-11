@@ -15,7 +15,9 @@ readCamtrapDP(
   removeEmpty = FALSE,
   remove_bbox = TRUE,
   add_file_path = FALSE,
-  filter_observations = NULL
+  filter_observations = NULL,
+  observation_level = c("event", "media", "all"),
+  include_original_tables = FALSE
 )
 }
 \arguments{
@@ -37,9 +39,25 @@ readCamtrapDP(
 
 \item{remove_bbox}{logical. Whether to remove bounding box columns in the observation table}
 
-\item{add_file_path}{logical. Whether to add file path from media table to the observation table}
+\item{add_file_path}{logical. Whether to add file path from media table to the observation table.
+File paths attach via \code{mediaID}, which event-based observations typically lack - combine
+with \code{observation_level = "media"} or \code{"all"} if you need them.}
 
 \item{filter_observations}{Controls which observation types to include. \code{NULL} or \code{FALSE} keeps all (default), \code{TRUE} keeps only animal, or provide a character vector of types.}
+
+\item{observation_level}{character. Which observation level(s) to keep in the record table:
+\code{"event"} (default) keeps event-based observations, \code{"media"} keeps media-based
+observations, \code{"all"} keeps both. Camtrap DP datasets routinely contain the same animal
+event both as one event-based row and as one row per media file, so keeping both silently
+inflates record counts in e.g. \code{\link{surveyReport}} or
+\code{\link{detectionHistory}} with \code{output = "count"}. If a dataset contains no
+observations of the requested level, all observations are kept with a warning.}
+
+\item{include_original_tables}{logical. If \code{TRUE}, the returned list contains an
+additional element \code{originalTables}: the deployments, observations and media tables
+exactly as read by \code{\link[camtrapdp]{read_camtrapdp}}, before any camtrapR-specific
+processing (tag parsing, station aggregation, gap analysis). Useful for checking how the
+heavily processed \code{CTtable} was derived. Default \code{FALSE}.}
 }
 \value{
 List (of class `cams_dp`) containing three elements:
@@ -48,6 +66,9 @@ List (of class `cams_dp`) containing three elements:
   \item \strong{recordTable}: Data frame with species records in camtrapR format
   \item \strong{metadata}: List containing project metadata extracted from datapackage.json
 }
+If \code{include_original_tables = TRUE}, a fourth element \strong{originalTables} is added:
+a list of the unprocessed deployments, observations and media tables as read by
+\code{\link[camtrapdp]{read_camtrapdp}}.
 }
 \description{
 This function converts camera trap data from the Camtrap DP standard format to the format
@@ -69,8 +90,16 @@ The function provides a fallback mechanism for location names and species names.
 \note{
 The Camtrap DP standard structures data in a way that supports both media-based observations
 (using a single media file as source) and event-based observations (considering an event with
-a specified duration as source). For the purpose of this function, both are treated to be equivalent. 
+a specified duration as source). Datasets routinely contain the same event at both levels;
+by default only event-based observations are kept (see \code{observation_level}).
 Event-based observations are converted to a single timestamp in the recordTable (using the event start time).
+
+Timestamps in Camtrap DP data carry UTC offsets (e.g. \code{2020-05-30T04:57:37+02:00}).
+These are re-expressed as UTC \emph{clock time} in the output (here \code{2020-05-30 02:57:37}).
+The instants are correct and internally consistent, but functions operating on clock time
+(e.g. the activity analyses \code{\link{activityDensity}}, \code{\link{activityOverlap}})
+will be shifted by the dataset's UTC offset relative to true local time. For datasets whose
+offsets are not +00:00, shift the times to local time before diel activity analyses.
 }
 \section{Handling Optional Data and Fallbacks}{
 

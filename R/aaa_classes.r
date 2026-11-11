@@ -120,6 +120,11 @@ print.cams_dp <- function(x, ...) {
     message(crayon::cyan("Metadata"), " available:")
     print(names(x$metadata))
   }
+  if ("originalTables" %in% names(x)) {
+    cat("\n$originalTables\n")
+    message(crayon::cyan("Original tables"), " available (as read by camtrapdp, before processing):")
+    print(names(x$originalTables))
+  }
   invisible(x)
 }
 
