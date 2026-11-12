@@ -5,6 +5,7 @@
 # - nested  / other random effects
 # - allow for alpha if it only has site covariates?
 
+# TODO: replace rownames(object@data$y) / dimnames(object@data$y)[1] / dimnames(object@data$y)[[1]] with single new object throughout
 
 setGeneric("predict", function(object, ...) {})
 
