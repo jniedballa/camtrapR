@@ -1,3 +1,20 @@
+# camtrapR 3.1.1
+
+
+## New features
+
+* communityModel: NAs in detection histories of NIMBLE models are replaced with 0s automatically (does not affect estimation of detection probabilities)
+* surveyDashboard: prediction rasters are masked with (buffered) AOI instead of rectangular clip
+
+## Bugfixes
+
+* minor bugfixes in surveyDashboard
+
+## Other changes
+
+* updated citation
+
+
 # camtrapR 3.1.0
 
 ## New function
