@@ -1,3 +1,13 @@
+# camtrapR (development version)
+
+## readCamtrapDP
+
+* new argument `observation_level`: keep event-based observations (default), media-based, or all. Previously both levels were kept, silently inflating record counts when datasets contain the same event both as an event-based row and as one row per media file (#52)
+* the deployment gap analysis now measures gaps against the running coverage frontier (latest end of all previous deployments at a station), so nested or overlapping deployments no longer create false Problem periods (#52)
+* when deployments of one station differ in latitude/longitude, the per-station mean is used (with a warning) instead of concatenating the values into an unusable character string (#52)
+* new argument `include_original_tables`: optionally return the unprocessed deployments, observations and media tables as read by camtrapdp in an additional `originalTables` element (#52)
+* documentation: timestamps with UTC offsets are re-expressed as UTC clock time; added a note that diel activity analyses need a shift to local time first (#52)
+
 # camtrapR 3.1.0
 
 ## New function
