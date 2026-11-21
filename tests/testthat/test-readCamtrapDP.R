@@ -165,6 +165,8 @@ testthat::describe("Gap Analysis and Data Processing", {
       
       # Force a gap of 5 days (> 24 hours) for the same station
       deps$locationID[1:2] <- "GapStation"
+      deps$latitude[1:2] <- deps$latitude[1]
+      deps$longitude[1:2] <- deps$longitude[1]
       deps$deploymentStart[1] <- "2020-01-01T12:00:00Z"
       deps$deploymentEnd[1]   <- "2020-01-10T12:00:00Z"
       
@@ -238,4 +240,154 @@ testthat::describe("Argument Flags Handling", {
     }
   })
   
+})
+
+# ---------------------------------------------------------
+# Test Suite 5: Observation Level Filtering (issue #52, finding 1)
+# ---------------------------------------------------------
+
+testthat::describe("Observation level filtering", {
+  
+  skip_if_not_installed("camtrapdp")
+  skip_if_not(dir.exists(fixture_path), "Sample fixture data not found.")
+  
+  raw_obs <- read.csv(file.path(fixture_path, "observations.csv"), stringsAsFactors = FALSE)
+  n_event <- sum(raw_obs$observationLevel == "event", na.rm = TRUE)
+  n_media <- sum(raw_obs$observationLevel == "media", na.rm = TRUE)
+  
+  test_that("default keeps only event-level observations", {
+    res <- readCamtrapDP(file = dp_file)
+    expect_true(all(res$recordTable$observationLevel == "event", na.rm = TRUE))
+    expect_equal(nrow(res$recordTable), n_event)
+  })
+  
+  test_that("observation_level = 'media' keeps only media-level observations", {
+    res <- readCamtrapDP(file = dp_file, observation_level = "media")
+    expect_true(all(res$recordTable$observationLevel == "media", na.rm = TRUE))
+    expect_equal(nrow(res$recordTable), n_media)
+  })
+  
+  test_that("observation_level = 'all' keeps both levels", {
+    res <- readCamtrapDP(file = dp_file, observation_level = "all")
+    expect_equal(nrow(res$recordTable), n_event + n_media)
+    expect_setequal(unique(res$recordTable$observationLevel), c("event", "media"))
+  })
+  
+  test_that("an event is no longer duplicated per media file under the default", {
+    res <- readCamtrapDP(file = dp_file)
+    # eventID 4bb69c45 is 1 event-based + 10 media-based rows in the raw data
+    expect_equal(sum(res$recordTable$eventID == "4bb69c45", na.rm = TRUE), 1)
+  })
+  
+  test_that("it warns and keeps all observations when the requested level is absent", {
+    with_tempdir({
+      file.copy(list.files(fixture_path, full.names = TRUE), ".", recursive = TRUE)
+      
+      obs <- read.csv("observations.csv", stringsAsFactors = FALSE)
+      obs <- obs[obs$observationLevel == "media", ]
+      write.csv(obs, "observations.csv", row.names = FALSE, na = "")
+      
+      expect_warning(
+        res <- readCamtrapDP("datapackage.json"),
+        "No observations with observationLevel"
+      )
+      expect_equal(nrow(res$recordTable), nrow(obs))
+    })
+  })
+})
+
+# ---------------------------------------------------------
+# Test Suite 6: Overlapping Deployments & Coordinates (issue #52, findings 2 + 3)
+# ---------------------------------------------------------
+
+testthat::describe("Overlapping deployments and station coordinates", {
+  
+  skip_if_not_installed("camtrapdp")
+  skip_if_not(dir.exists(fixture_path), "Sample fixture data not found.")
+  
+  test_that("nested deployments do not create false Problem periods", {
+    with_tempdir({
+      file.copy(list.files(fixture_path, full.names = TRUE), ".", recursive = TRUE)
+      
+      deps <- read.csv("deployments.csv", stringsAsFactors = FALSE)
+      
+      # One long deployment, a second nested inside it, and a third after a real gap.
+      # The nested deployment ends 2020-01-15, but the station was covered until
+      # 2020-03-01 - comparing against deployment i-1 alone would declare a false
+      # Problem period 2020-01-15 -> 2020-04-01.
+      deps$locationID[1:3] <- "OverlapStation"
+      deps$latitude[1:3] <- deps$latitude[1]
+      deps$longitude[1:3] <- deps$longitude[1]
+      deps$deploymentStart[1] <- "2020-01-01T12:00:00Z"
+      deps$deploymentEnd[1]   <- "2020-03-01T12:00:00Z"
+      deps$deploymentStart[2] <- "2020-01-10T12:00:00Z"
+      deps$deploymentEnd[2]   <- "2020-01-15T12:00:00Z"
+      deps$deploymentStart[3] <- "2020-04-01T12:00:00Z"
+      deps$deploymentEnd[3]   <- "2020-04-05T12:00:00Z"
+      write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
+      
+      res <- readCamtrapDP("datapackage.json", min_gap_hours = 24)
+      st <- as.data.frame(res$CTtable)
+      st <- st[st$Station == "OverlapStation", ]
+      
+      # Exactly one Problem: the real gap, measured from the coverage frontier
+      expect_equal(st$Problem1_from, "2020-03-01 12:00:00")
+      expect_equal(st$Problem1_to, "2020-04-01 12:00:00")
+      expect_false("Problem2_from" %in% colnames(res$CTtable))
+    })
+  })
+  
+  test_that("differing station coordinates are averaged and stay numeric", {
+    with_tempdir({
+      file.copy(list.files(fixture_path, full.names = TRUE), ".", recursive = TRUE)
+      
+      deps <- read.csv("deployments.csv", stringsAsFactors = FALSE)
+      
+      # Same station re-deployed with a small GPS re-measurement difference
+      deps$locationID[1:2] <- "MovedStation"
+      deps$latitude[1] <- 51.496; deps$latitude[2] <- 51.498
+      deps$longitude[1] <- 4.774; deps$longitude[2] <- 4.776
+      deps$deploymentStart[1] <- "2020-01-01T12:00:00Z"
+      deps$deploymentEnd[1]   <- "2020-01-10T12:00:00Z"
+      deps$deploymentStart[2] <- "2020-01-10T13:00:00Z"
+      deps$deploymentEnd[2]   <- "2020-01-20T12:00:00Z"
+      write.csv(deps, "deployments.csv", row.names = FALSE, na = "")
+      
+      expect_warning(
+        res <- readCamtrapDP("datapackage.json"),
+        "mean coordinates"
+      )
+      st <- as.data.frame(res$CTtable)
+      
+      expect_type(st$latitude, "double")
+      expect_type(st$longitude, "double")
+      expect_equal(st$latitude[st$Station == "MovedStation"], 51.497)
+      expect_equal(st$longitude[st$Station == "MovedStation"], 4.775)
+    })
+  })
+})
+
+# ---------------------------------------------------------
+# Test Suite 7: Original Tables (issue #52)
+# ---------------------------------------------------------
+
+testthat::describe("Original tables passthrough", {
+  
+  skip_if_not_installed("camtrapdp")
+  skip_if_not(dir.exists(fixture_path), "Sample fixture data not found.")
+  
+  test_that("include_original_tables returns the unprocessed tables on request only", {
+    res_default <- readCamtrapDP(file = dp_file)
+    expect_false("originalTables" %in% names(res_default))
+    
+    res <- readCamtrapDP(file = dp_file, include_original_tables = TRUE)
+    expect_true("originalTables" %in% names(res))
+    expect_named(res$originalTables, c("deployments", "observations", "media"))
+    
+    raw_deps <- read.csv(file.path(fixture_path, "deployments.csv"), stringsAsFactors = FALSE)
+    expect_equal(nrow(res$originalTables$deployments), nrow(raw_deps))
+    
+    # original observations are unfiltered even though recordTable defaults to event level
+    expect_gt(nrow(res$originalTables$observations), nrow(res$recordTable))
+  })
 })

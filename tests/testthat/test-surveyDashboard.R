@@ -110,14 +110,17 @@ test_that("surveyDashboard server logic initializes correctly with camtrap DP da
       expect_equal(num_stations(), 4)
       expect_equal(date_range_min(), as.Date("2020-05-30"))
       expect_equal(date_range_max(), as.Date("2021-04-18"))
-      expect_equal(num_species(), 14)
-      expect_equal(num_images(), 549)
-      expect_equal(round(avg_records_per_station()), 137)
+      # Values below reflect readCamtrapDP()'s event-level default:
+      # 36 event observations (previously 549 incl. media-level duplicates);
+      # "human" occurs only in media-level observations, so 13 species, not 14.
+      expect_equal(num_species(), 13)
+      expect_equal(num_images(), 36)
+      expect_equal(round(avg_records_per_station()), 9)
       expect_equal(dim(data$CTtable), c(4,26))
-      expect_equal(dim(data$recordTable), c(549,34))
-      expect_equal(dim(df_n_records()), c(14, 2))
-      
-      expect_equal(dim(detmaps_sf()), c(4,19))
+      expect_equal(dim(data$recordTable), c(36,34))
+      expect_equal(dim(df_n_records()), c(13, 2))
+
+      expect_equal(dim(detmaps_sf()), c(4,18))
     }
   )
 })
